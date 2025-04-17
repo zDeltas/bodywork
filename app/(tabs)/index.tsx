@@ -5,13 +5,12 @@ import { Plus } from 'lucide-react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-SplashScreen.preventAutoHideAsync();
+import { Calendar } from 'react-native-calendars';
 
 interface Workout {
   id: string;
-  muscleGroup: string;
   exercise: string;
+  muscleGroup: string;
   weight: number;
   reps: number;
   sets: number;
@@ -20,6 +19,7 @@ interface Workout {
 
 export default function WorkoutScreen() {
   const [workouts, setWorkouts] = useState<Workout[]>([]);
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const params = useLocalSearchParams();
   const [fontsLoaded] = useFonts({
     'Inter-Regular': Inter_400Regular,
@@ -33,29 +33,49 @@ export default function WorkoutScreen() {
     }
   }, [fontsLoaded]);
 
-  const loadWorkouts = async () => {
-    try {
-      const savedWorkouts = await AsyncStorage.getItem('workouts');
-      if (savedWorkouts) {
-        setWorkouts(JSON.parse(savedWorkouts));
+  useEffect(() => {
+    const loadWorkouts = async () => {
+      try {
+        const storedWorkouts = await AsyncStorage.getItem('workouts');
+        if (storedWorkouts) {
+          setWorkouts(JSON.parse(storedWorkouts));
+        }
+      } catch (error) {
+        console.error('Erreur lors du chargement des séances:', error);
       }
-    } catch (error) {
-      console.error('Erreur lors du chargement des workouts:', error);
-    }
-  };
+    };
+
+    loadWorkouts();
+  }, []);
 
   useEffect(() => {
-    loadWorkouts();
-  }, [params.refresh]);
+    const saveWorkouts = async () => {
+      try {
+        await AsyncStorage.setItem('workouts', JSON.stringify(workouts));
+      } catch (error) {
+        console.error('Erreur lors de la sauvegarde des séances:', error);
+      }
+    };
+
+    saveWorkouts();
+  }, [workouts]);
+
+  const markedDates = workouts.reduce((acc, workout) => {
+    const date = new Date(workout.date).toISOString().split('T')[0];
+    acc[date] = { marked: true, dotColor: '#6366f1' };
+    if (date === selectedDate) {
+      acc[date].selected = true;
+    }
+    return acc;
+  }, {} as { [key: string]: { marked: boolean; dotColor: string; selected?: boolean } });
+
+  const selectedDateWorkouts = workouts.filter(workout =>
+    new Date(workout.date).toISOString().split('T')[0] === selectedDate
+  );
 
   if (!fontsLoaded) {
     return null;
   }
-
-  const today = new Date().toLocaleDateString();
-  const todayWorkouts = workouts.filter(workout =>
-    new Date(workout.date).toLocaleDateString() === today
-  );
 
   return (
     <View style={styles.container} onLayout={onLayoutRootView}>
@@ -63,26 +83,49 @@ export default function WorkoutScreen() {
         <Text style={styles.title}>Workouts</Text>
         <TouchableOpacity
           style={styles.addButton}
-          onPress={() => router.push('/workout/new')}
+          onPress={() => router.push({
+            pathname: '/workout/new',
+            params: { selectedDate }
+          })}
         >
           <Plus color="#fff" size={24} />
         </TouchableOpacity>
       </View>
 
       <ScrollView style={styles.content}>
-        <Text style={styles.sectionTitle}>Today's Workout</Text>
-        {todayWorkouts.length === 0 ? (
+        <Calendar
+          theme={{
+            backgroundColor: '#1a1a1a',
+            calendarBackground: '#1a1a1a',
+            textSectionTitleColor: '#fff',
+            selectedDayBackgroundColor: '#6366f1',
+            selectedDayTextColor: '#fff',
+            todayTextColor: '#6366f1',
+            dayTextColor: '#fff',
+            textDisabledColor: '#444',
+            monthTextColor: '#fff',
+            arrowColor: '#6366f1',
+          }}
+          markedDates={markedDates}
+          onDayPress={(day: { dateString: string }) => setSelectedDate(day.dateString)}
+        />
+
+        <Text style={styles.sectionTitle}>Séances du {selectedDate}</Text>
+        {selectedDateWorkouts.length === 0 ? (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyStateText}>No workouts recorded today</Text>
+            <Text style={styles.emptyStateText}>Aucune séance enregistrée ce jour</Text>
             <TouchableOpacity
               style={styles.startButton}
-              onPress={() => router.push('/workout/new')}
+              onPress={() => router.push({
+                pathname: '/workout/new',
+                params: { selectedDate }
+              })}
             >
-              <Text style={styles.startButtonText}>Start Workout</Text>
+              <Text style={styles.startButtonText}>Commencer une séance</Text>
             </TouchableOpacity>
           </View>
         ) : (
-          todayWorkouts.map((workout) => (
+          selectedDateWorkouts.map((workout) => (
             <View key={workout.id} style={styles.workoutCard}>
               <View style={styles.workoutHeader}>
                 <Text style={styles.workoutTitle}>{workout.exercise}</Text>
@@ -92,34 +135,12 @@ export default function WorkoutScreen() {
               </View>
               <Text style={styles.workoutMuscle}>{workout.muscleGroup}</Text>
               <View style={styles.workoutDetails}>
-                <Text style={styles.workoutDetail}>Weight: {workout.weight}kg</Text>
-                <Text style={styles.workoutDetail}>Reps: {workout.reps}</Text>
-                <Text style={styles.workoutDetail}>Sets: {workout.sets}</Text>
+                <Text style={styles.workoutDetail}>Poids: {workout.weight}kg</Text>
+                <Text style={styles.workoutDetail}>Répétitions: {workout.reps}</Text>
+                <Text style={styles.workoutDetail}>Séries: {workout.sets}</Text>
               </View>
             </View>
           ))
-        )}
-
-        {workouts.length > 0 && (
-          <>
-            <Text style={styles.sectionTitle}>All Workouts</Text>
-            {workouts.map((workout) => (
-              <View key={workout.id} style={styles.workoutCard}>
-                <View style={styles.workoutHeader}>
-                  <Text style={styles.workoutTitle}>{workout.exercise}</Text>
-                  <Text style={styles.workoutDate}>
-                    {new Date(workout.date).toLocaleDateString()}
-                  </Text>
-                </View>
-                <Text style={styles.workoutMuscle}>{workout.muscleGroup}</Text>
-                <View style={styles.workoutDetails}>
-                  <Text style={styles.workoutDetail}>Weight: {workout.weight}kg</Text>
-                  <Text style={styles.workoutDetail}>Reps: {workout.reps}</Text>
-                  <Text style={styles.workoutDetail}>Sets: {workout.sets}</Text>
-                </View>
-              </View>
-            ))}
-          </>
         )}
       </ScrollView>
     </View>

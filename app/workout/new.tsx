@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 
 import { useFonts, Inter_400Regular, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 import { useCallback, useState } from 'react';
 import * as SplashScreen from 'expo-splash-screen';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { X } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -24,6 +24,8 @@ export default function NewWorkoutScreen() {
   const [weight, setWeight] = useState('');
   const [reps, setReps] = useState('');
   const [sets, setSets] = useState('');
+  const params = useLocalSearchParams();
+  const selectedDate = params.selectedDate as string;
 
   const [fontsLoaded] = useFonts({
     'Inter-Regular': Inter_400Regular,
@@ -46,7 +48,7 @@ export default function NewWorkoutScreen() {
         weight: parseFloat(weight) || 0,
         reps: parseInt(reps) || 0,
         sets: parseInt(sets) || 0,
-        date: new Date().toISOString(),
+        date: selectedDate ? `${selectedDate}T${new Date().toTimeString().split(' ')[0]}` : new Date().toISOString(),
       };
 
       // Récupérer les workouts existants

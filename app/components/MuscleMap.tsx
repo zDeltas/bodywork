@@ -11,6 +11,20 @@ import Body, { ExtendedBodyPart, Slug } from 'react-native-body-highlighter';
 
 const AnimatedText = Animated.createAnimatedComponent(Text);
 
+interface Workout {
+  id: string;
+  exercise: string;
+  muscleGroup: string;
+  weight: number;
+  reps: number;
+  sets: number;
+  date: string;
+}
+
+interface MuscleMapProps {
+  workouts: Workout[];
+}
+
 const muscleSlugs: Record<string, Slug> = {
   CHEST: "chest" as Slug,
   ABS: "abs" as Slug,
@@ -37,24 +51,17 @@ const muscleSlugs: Record<string, Slug> = {
   KNEES: "knees" as Slug,
 };
 
-const initialMuscleData: ExtendedBodyPart[] = Object.entries({
-  [muscleSlugs.CHEST]: 2,
-  [muscleSlugs.ABS]: 0.6,
-  [muscleSlugs.BICEPS]: 0.4,
-  [muscleSlugs.UPPER_BACK]: 0.7,
-  [muscleSlugs.TRICEPS]: 0.5,
-  [muscleSlugs.DELTOIDS]: 0.3,
-  [muscleSlugs.TRAPEZIUS]: 0.4,
-  [muscleSlugs.QUADRICEPS]: 0.9,
-  [muscleSlugs.CALVES]: 0.6,
-  [muscleSlugs.HAMSTRING]: 0.7,
-  [muscleSlugs.GLUTEAL]: 0.5,
-}).map(([slug, value]) => ({
-  slug: slug as Slug,
-  intensity: value > 0.5 ? 2 : 1,
-}));
+const muscleGroupToSlug: Record<string, Slug> = {
+  'Chest': muscleSlugs.CHEST,
+  'Back': muscleSlugs.UPPER_BACK,
+  'Legs': muscleSlugs.QUADRICEPS,
+  'Shoulders': muscleSlugs.DELTOIDS,
+  'Biceps': muscleSlugs.BICEPS,
+  'Triceps': muscleSlugs.TRICEPS,
+  'Core': muscleSlugs.ABS,
+};
 
-export default function MuscleMap() {
+export default function MuscleMap({ workouts }: MuscleMapProps) {
   const [selectedView, setSelectedView] = useState<'front' | 'back'>('front');
   const [selectedMuscle, setSelectedMuscle] = useState<string | null>(null);
 
@@ -82,6 +89,21 @@ export default function MuscleMap() {
     transform: [{ rotateY: `${rotationValue.value}deg` }],
   }));
 
+  // Calculer l'intensité des muscles travaillés
+  const muscleData = workouts.reduce((acc, workout) => {
+    const slug = muscleGroupToSlug[workout.muscleGroup];
+    if (slug) {
+      acc[slug] = (acc[slug] || 0) + (workout.sets * workout.reps * workout.weight);
+    }
+    return acc;
+  }, {} as Record<Slug, number>);
+
+  // Convertir en format ExtendedBodyPart
+  const bodyData: ExtendedBodyPart[] = Object.entries(muscleData).map(([slug, value]) => ({
+    slug: slug as Slug,
+    intensity: value > 1000 ? 2 : value > 500 ? 1 : 0.5,
+  }));
+
   return (
     <View style={styles.container}>
       <View style={styles.viewToggle}>
@@ -102,7 +124,7 @@ export default function MuscleMap() {
       </View>
       <Animated.View style={[styles.bodyContainer, containerStyle]}>
         <Body
-          data={initialMuscleData}
+          data={bodyData}
           onBodyPartPress={handleMusclePress}
           side={selectedView}
           gender="male"

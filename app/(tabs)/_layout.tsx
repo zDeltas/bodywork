@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Dumbbell, ChartLine as LineChart, User, Clock } from 'lucide-react-native';
+import { Dumbbell, ChartLine as LineChart, User, Clock, Ruler } from 'lucide-react-native';
 
 export default function TabLayout() {
   return (
@@ -47,6 +47,15 @@ export default function TabLayout() {
           title: 'Statistics',
           tabBarIcon: ({ color, size }) => (
             <LineChart size={size} color={color} />
+          ),
+        }}
+      />
+            <Tabs.Screen
+        name="measurements"
+        options={{
+          title: 'Measurements',
+          tabBarIcon: ({ color, size }) => (
+            <Ruler  size={size} color={color} />
           ),
         }}
       />

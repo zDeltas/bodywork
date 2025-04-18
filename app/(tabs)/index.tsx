@@ -6,6 +6,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Calendar } from 'react-native-calendars';
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 
 interface Workout {
   id: string;
@@ -15,6 +16,7 @@ interface Workout {
   reps: number;
   sets: number;
   date: string;
+  rpe?: number; // Rate of Perceived Exertion (optional for backward compatibility)
 }
 
 export default function WorkoutScreen() {
@@ -67,7 +69,23 @@ export default function WorkoutScreen() {
       acc[date].selected = true;
     }
     return acc;
-  }, {} as { [key: string]: { marked: boolean; dotColor: string; selected?: boolean } });
+  }, {} as { [key: string]: { marked?: boolean; dotColor?: string; selected?: boolean } });
+
+  // Ajouter la date d'aujourd'hui si elle n'est pas déjà marquée
+  const today = new Date().toISOString().split('T')[0];
+  if (!markedDates[today]) {
+    markedDates[today] = { dotColor: '#6366f1' };
+  }
+  if (today === selectedDate) {
+    markedDates[today].selected = true;
+  } else {
+    markedDates[today].marked = true;
+  }
+
+  // Assurez-vous que la date sélectionnée est toujours marquée comme selected
+  if (!markedDates[selectedDate]) {
+    markedDates[selectedDate] = { selected: true };
+  }
 
   const selectedDateWorkouts = workouts.filter(workout =>
     new Date(workout.date).toISOString().split('T')[0] === selectedDate
@@ -76,6 +94,15 @@ export default function WorkoutScreen() {
   if (!fontsLoaded) {
     return null;
   }
+
+  // Formater la date pour affichage
+  const formattedDate = new Date(selectedDate).toLocaleDateString('fr-FR', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
+  const capitalizedDate = formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
 
   return (
     <View style={styles.container} onLayout={onLayoutRootView}>
@@ -93,26 +120,52 @@ export default function WorkoutScreen() {
       </View>
 
       <ScrollView style={styles.content}>
-        <Calendar
-          theme={{
-            backgroundColor: '#1a1a1a',
-            calendarBackground: '#1a1a1a',
-            textSectionTitleColor: '#fff',
-            selectedDayBackgroundColor: '#6366f1',
-            selectedDayTextColor: '#fff',
-            todayTextColor: '#6366f1',
-            dayTextColor: '#fff',
-            textDisabledColor: '#444',
-            monthTextColor: '#fff',
-            arrowColor: '#6366f1',
-          }}
-          markedDates={markedDates}
-          onDayPress={(day: { dateString: string }) => setSelectedDate(day.dateString)}
-        />
+        <View style={styles.calendarSection}>
+          <View style={styles.calendarContainer}>
+            <Calendar
+              theme={{
+                backgroundColor: '#1a1a1a',
+                calendarBackground: '#1a1a1a',
+                textSectionTitleColor: '#9ca3af',
+                textSectionTitleDisabledColor: '#4b5563',
+                selectedDayBackgroundColor: '#6366f1',
+                selectedDayTextColor: '#fff',
+                todayTextColor: '#6366f1',
+                dayTextColor: '#fff',
+                textDisabledColor: '#444',
+                dotColor: '#6366f1',
+                selectedDotColor: '#fff',
+                arrowColor: '#6366f1',
+                monthTextColor: '#fff',
+                indicatorColor: '#6366f1',
+                textDayFontFamily: 'Inter-Regular',
+                textMonthFontFamily: 'Inter-SemiBold',
+                textDayHeaderFontFamily: 'Inter-Regular',
+                textDayFontSize: 16,
+                textMonthFontSize: 18,
+                textDayHeaderFontSize: 14,
+              }}
+              markedDates={markedDates}
+              onDayPress={(day: { dateString: string }) => setSelectedDate(day.dateString)}
+              enableSwipeMonths={true}
+              hideExtraDays={false}
+              showWeekNumbers={false}
+              disableArrowLeft={false}
+              disableArrowRight={false}
+            />
+          </View>
+        </View>
 
-        <Text style={styles.sectionTitle}>Séances du {selectedDate}</Text>
+        <View style={styles.dateHeader}>
+          <Text style={styles.dateHeaderText}>{capitalizedDate}</Text>
+        </View>
+
         {selectedDateWorkouts.length === 0 ? (
-          <View style={styles.emptyState}>
+          <Animated.View
+            entering={FadeIn.duration(300)}
+            exiting={FadeOut.duration(300)}
+            style={styles.emptyState}
+          >
             <Text style={styles.emptyStateText}>Aucune séance enregistrée ce jour</Text>
             <TouchableOpacity
               style={styles.startButton}
@@ -123,24 +176,34 @@ export default function WorkoutScreen() {
             >
               <Text style={styles.startButtonText}>Commencer une séance</Text>
             </TouchableOpacity>
-          </View>
+          </Animated.View>
         ) : (
-          selectedDateWorkouts.map((workout) => (
-            <View key={workout.id} style={styles.workoutCard}>
-              <View style={styles.workoutHeader}>
-                <Text style={styles.workoutTitle}>{workout.exercise}</Text>
-                <Text style={styles.workoutDate}>
-                  {new Date(workout.date).toLocaleTimeString()}
-                </Text>
-              </View>
-              <Text style={styles.workoutMuscle}>{workout.muscleGroup}</Text>
-              <View style={styles.workoutDetails}>
-                <Text style={styles.workoutDetail}>Poids: {workout.weight}kg</Text>
-                <Text style={styles.workoutDetail}>Répétitions: {workout.reps}</Text>
-                <Text style={styles.workoutDetail}>Séries: {workout.sets}</Text>
-              </View>
-            </View>
-          ))
+          <View style={styles.workoutsContainer}>
+            {selectedDateWorkouts.map((workout) => (
+              <Animated.View
+                key={workout.id}
+                style={styles.workoutCard}
+                entering={FadeIn.duration(300)}
+                exiting={FadeOut.duration(300)}
+              >
+                <View style={styles.workoutHeader}>
+                  <Text style={styles.workoutTitle}>{workout.exercise}</Text>
+                  <Text style={styles.workoutDate}>
+                    {new Date(workout.date).toLocaleTimeString()}
+                  </Text>
+                </View>
+                <Text style={styles.workoutMuscle}>{workout.muscleGroup}</Text>
+                <View style={styles.workoutDetails}>
+                  <Text style={styles.workoutDetail}>Poids: {workout.weight}kg</Text>
+                  <Text style={styles.workoutDetail}>Répétitions: {workout.reps}</Text>
+                  <Text style={styles.workoutDetail}>Séries: {workout.sets}</Text>
+                  {workout.rpe > 0 && (
+                    <Text style={styles.workoutDetail}>RPE: {workout.rpe}</Text>
+                  )}
+                </View>
+              </Animated.View>
+            ))}
+          </View>
         )}
       </ScrollView>
     </View>
@@ -172,24 +235,56 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     backgroundColor: '#6366f1',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    shadowColor: '#6366f1',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
   },
   content: {
     flex: 1,
     padding: 20
   },
-  sectionTitle: {
+  calendarSection: {
+    marginBottom: 16,
+  },
+  calendarContainer: {
+    borderRadius: 12,
+    overflow: 'hidden',
+    backgroundColor: '#1a1a1a',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  dateHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 4,
+    marginBottom: 16,
+    marginTop: 8,
+  },
+  dateHeaderText: {
     fontSize: 20,
     fontFamily: 'Inter-SemiBold',
     color: '#fff',
-    marginBottom: 16,
-    marginTop: 24
+  },
+  workoutsContainer: {
+    marginTop: 8,
   },
   emptyState: {
     backgroundColor: '#1a1a1a',
     borderRadius: 12,
     padding: 24,
-    alignItems: 'center'
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 3,
   },
   emptyStateText: {
     fontFamily: 'Inter-Regular',
@@ -200,7 +295,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#6366f1',
     paddingHorizontal: 24,
     paddingVertical: 12,
-    borderRadius: 8
+    borderRadius: 8,
+    shadowColor: '#6366f1',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+    elevation: 3,
   },
   startButtonText: {
     color: '#fff',
@@ -211,7 +311,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#1a1a1a',
     borderRadius: 12,
     padding: 16,
-    marginBottom: 16
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 3,
+    borderLeftWidth: 4,
+    borderLeftColor: '#6366f1',
   },
   workoutHeader: {
     flexDirection: 'row',

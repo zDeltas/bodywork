@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, Pressable, Text } from 'react-native';
-import Animated, { 
-  useAnimatedStyle, 
+import Animated, {
+  useAnimatedStyle,
   withSpring,
   useSharedValue,
   withTiming
 } from 'react-native-reanimated';
 import { router } from 'expo-router';
 import Body, { ExtendedBodyPart, Slug } from 'react-native-body-highlighter';
+import { differenceInHours } from 'date-fns';
+import { useSettings } from '@/hooks/useSettings';
 
 const AnimatedText = Animated.createAnimatedComponent(Text);
 
@@ -63,7 +65,7 @@ const muscleGroupToSlug: Record<string, Slug> = {
 
 export default function MuscleMap({ workouts }: MuscleMapProps) {
   const [selectedView, setSelectedView] = useState<'front' | 'back'>('front');
-  const [selectedMuscle, setSelectedMuscle] = useState<string | null>(null);
+  const { settings } = useSettings();
 
   const frontTextOpacity = useSharedValue(1);
   const backTextOpacity = useSharedValue(0);
@@ -76,32 +78,34 @@ export default function MuscleMap({ workouts }: MuscleMapProps) {
     rotationValue.value = withSpring(view === 'front' ? 0 : 180);
   };
 
-  const handleMusclePress = (bodyPart: ExtendedBodyPart) => {
-    const muscleSlug = bodyPart.slug;
-    setSelectedMuscle(muscleSlug as string);
-    router.push({
-      pathname: '/workout/new',
-      params: { muscle: muscleSlug as string }
-    });
-  };
-
   const containerStyle = useAnimatedStyle(() => ({
     transform: [{ rotateY: `${rotationValue.value}deg` }],
   }));
 
-  // Calculer l'intensité des muscles travaillés
-  const muscleData = workouts.reduce((acc, workout) => {
-    const slug = muscleGroupToSlug[workout.muscleGroup];
-    if (slug) {
-      acc[slug] = (acc[slug] || 0) + (workout.sets * workout.reps * workout.weight);
-    }
-    return acc;
-  }, {} as Record<Slug, number>);
+  // Calculer l'état de repos des muscles
+  const calculateMuscleRestState = (muscleGroup: string): number => {
+    const now = new Date();
+    const muscleWorkouts = workouts.filter(w => w.muscleGroup === muscleGroup);
+    
+    if (muscleWorkouts.length === 0) return 3; // Plus de 72h (gris)
+    
+    const lastWorkout = muscleWorkouts.reduce((latest, current) => {
+      const currentDate = new Date(current.date);
+      const latestDate = new Date(latest.date);
+      return currentDate > latestDate ? current : latest;
+    });
+    
+    const hoursSinceLastWorkout = differenceInHours(now, new Date(lastWorkout.date));
+    
+    if (hoursSinceLastWorkout < 24) return 1; // 0-24h (rouge)
+    if (hoursSinceLastWorkout < 72) return 2; // 24-72h (bordeaux)
+    return 3; // Plus de 72h (gris)
+  };
 
-  // Convertir en format ExtendedBodyPart
-  const bodyData: ExtendedBodyPart[] = Object.entries(muscleData).map(([slug, value]) => ({
+  // Convertir en format ExtendedBodyPart avec les états de repos
+  const bodyData: ExtendedBodyPart[] = Object.entries(muscleGroupToSlug).map(([group, slug]) => ({
     slug: slug as Slug,
-    intensity: value > 1000 ? 2 : value > 500 ? 1 : 0.5,
+    intensity: calculateMuscleRestState(group)
   }));
 
   return (
@@ -111,25 +115,41 @@ export default function MuscleMap({ workouts }: MuscleMapProps) {
           style={[styles.toggleButton, selectedView === 'front' && styles.toggleButtonActive]}
           onPress={() => handleViewChange('front')}>
           <AnimatedText style={[styles.toggleText]}>
-            Front View
+            Vue de face
           </AnimatedText>
         </Pressable>
         <Pressable
           style={[styles.toggleButton, selectedView === 'back' && styles.toggleButtonActive]}
           onPress={() => handleViewChange('back')}>
           <AnimatedText style={[styles.toggleText]}>
-            Back View
+            Vue de dos
           </AnimatedText>
         </Pressable>
       </View>
       <Animated.View style={[styles.bodyContainer, containerStyle]}>
         <Body
           data={bodyData}
-          onBodyPartPress={handleMusclePress}
           side={selectedView}
-          gender="male"
+          gender={settings.gender}
         />
       </Animated.View>
+      <View style={styles.legend}>
+        <Text style={styles.legendTitle}>État de repos des muscles</Text>
+        <View style={styles.legendItems}>
+          <View style={styles.legendItem}>
+            <View style={[styles.legendColor, { backgroundColor: '#ef4444' }]} />
+            <Text style={styles.legendText}>0-24h</Text>
+          </View>
+          <View style={styles.legendItem}>
+            <View style={[styles.legendColor, { backgroundColor: '#7f1d1d' }]} />
+            <Text style={styles.legendText}>24-72h</Text>
+          </View>
+          <View style={styles.legendItem}>
+            <View style={[styles.legendColor, { backgroundColor: '#4b5563' }]} />
+            <Text style={styles.legendText}>72h+</Text>
+          </View>
+        </View>
+      </View>
     </View>
   );
 }
@@ -154,7 +174,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   toggleButtonActive: {
-    backgroundColor: '#6366f1',
+    backgroundColor: '#fd8f09',
   },
   toggleText: {
     color: '#fff',
@@ -162,13 +182,43 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   bodyContainer: {
-    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  body: {
+  legend: {
+    backgroundColor: '#2a2a2a',
+    borderRadius: 12,
+    padding: 16,
+    marginTop: 20,
     width: '100%',
-    height: '100%',
-  }
+  },
+  legendTitle: {
+    fontSize: 16,
+    fontFamily: 'Inter-SemiBold',
+    color: '#fff',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  legendItems: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  legendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  legendColor: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    marginRight: 8,
+  },
+  legendText: {
+    color: '#fff',
+    fontFamily: 'Inter-Regular',
+    fontSize: 14,
+  },
 });

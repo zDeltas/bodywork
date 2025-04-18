@@ -30,7 +30,7 @@ export default function Timer({
                                 exerciseName = 'Exercise',
                                 onSettingsPress
                               }: TimerProps) {
-  const [workTime, setWorkTime] = useState(initialTime);
+  const [workTime, setWorkTime] = useState(mode === 'timer' ? initialTime : 0);
   const [restTimeState, setRestTime] = useState(restTime);
   const [isRunning, setIsRunning] = useState(false);
   const [currentSet, setCurrentSet] = useState(1);
@@ -40,13 +40,12 @@ export default function Timer({
     'Inter-SemiBold': Inter_600SemiBold
   });
 
-  // Mise à jour des temps lorsque les props changent
   useEffect(() => {
     if (!isRunning) {
-      setWorkTime(initialTime);
+      setWorkTime(mode === 'timer' ? initialTime : 0);
       setRestTime(restTime);
     }
-  }, [initialTime, restTime, isRunning]);
+  }, [initialTime, restTime, isRunning, mode]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -64,27 +63,33 @@ export default function Timer({
             return prev - 1;
           });
         } else {
-          setWorkTime(prev => {
-            if (prev <= 1) {
-              setIsRunning(false);
-              setIsResting(true);
-              handleWorkComplete();
-              return initialTime;
-            }
-            return prev - 1;
-          });
+          if (mode === 'timer') {
+            setWorkTime(prev => {
+              if (prev <= 1) {
+                setIsRunning(false);
+                setIsResting(true);
+                handleWorkComplete();
+                return initialTime;
+              }
+              return prev - 1;
+            });
+          } else { // mode stopwatch
+            setWorkTime(prev => prev + 1);
+          }
         }
       }, 1000);
     }
 
     return () => clearInterval(interval);
-  }, [isRunning, isResting, initialTime, restTime]);
+  }, [isRunning, isResting, initialTime, restTime, mode]);
 
   const handleWorkComplete = useCallback(() => {
-    Vibration.vibrate([0, 500, 200, 500]);
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    setIsRunning(true);
-  }, []);
+    if (mode === 'timer') {
+      Vibration.vibrate([0, 500, 200, 500]);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      setIsRunning(true);
+    }
+  }, [mode]);
 
   const handleRestComplete = useCallback(() => {
     Vibration.vibrate([0, 500, 200, 500]);
@@ -113,10 +118,10 @@ export default function Timer({
     setIsRunning(false);
     setIsResting(false);
     setCurrentSet(1);
-    setWorkTime(initialTime);
+    setWorkTime(mode === 'timer' ? initialTime : 0);
     setRestTime(restTime);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-  }, [initialTime, restTime]);
+  }, [initialTime, restTime, mode]);
 
   const updateSets = useCallback((increment: boolean) => {
     if (!isRunning) {
@@ -133,7 +138,7 @@ export default function Timer({
       <View style={styles.header}>
         <Text style={styles.exerciseName}>{exerciseName}</Text>
         <TouchableOpacity onPress={onSettingsPress} style={styles.settingsButton}>
-          <Settings color="#6366f1" size={24} />
+          <Settings color="#fd8f09" size={24} />
         </TouchableOpacity>
       </View>
 
@@ -163,7 +168,7 @@ export default function Timer({
         isResting ? styles.restTimer : styles.workTimer
       ]}>
         <Text style={styles.timerLabel}>
-          {isResting ? 'Rest Time' : 'Work Time'}
+          {isResting ? 'Rest Time' : (mode === 'timer' ? 'Work Time' : 'Stopwatch')}
         </Text>
         <Text style={styles.time}>
           {formatTime(isResting ? restTimeState : workTime)}
@@ -283,7 +288,7 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   startButton: {
-    backgroundColor: '#6366f1'
+    backgroundColor: '#fd8f09'
   },
   stopButton: {
     backgroundColor: '#ef4444'

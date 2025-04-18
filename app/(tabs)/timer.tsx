@@ -432,7 +432,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modeButtonActive: {
-    backgroundColor: '#6366f1',
+    backgroundColor: '#fd8f09',
   },
   modeText: {
     fontFamily: 'Inter-SemiBold',
@@ -476,7 +476,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   timeButtonActive: {
-    backgroundColor: '#6366f1',
+    backgroundColor: '#fd8f09',
   },
   timeText: {
     color: '#fff',
@@ -593,7 +593,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   saveButton: {
-    backgroundColor: '#6366f1',
+    backgroundColor: '#fd8f09',
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',

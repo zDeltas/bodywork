@@ -10,24 +10,25 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 SplashScreen.preventAutoHideAsync();
 
 export const muscleGroups = [
-  'Chest',
-  'Back',
-  'Legs',
-  'Shoulders',
+  'Poitrine',
+  'Dos',
+  'Jambes',
+  'Epaules',
   'Biceps',
   'Triceps',
-  'Core',
+  'Ceinture abdominale',
 ];
 
 export const predefinedExercises = {
-  'Chest': ['Bench Press', 'Incline Press', 'Decline Press', 'Dumbbell Fly', 'Cable Crossover'],
-  'Back': ['Pull-ups', 'Lat Pulldown', 'Barbell Row', 'Dumbbell Row', 'T-Bar Row'],
-  'Legs': ['Squat', 'Deadlift', 'Leg Press', 'Lunges', 'Leg Extension'],
-  'Shoulders': ['Overhead Press', 'Lateral Raise', 'Front Raise', 'Rear Delt Fly', 'Shrugs'],
-  'Biceps': ['Barbell Curl', 'Dumbbell Curl', 'Hammer Curl', 'Preacher Curl', 'Concentration Curl'],
-  'Triceps': ['Tricep Pushdown', 'Skull Crushers', 'Overhead Extension', 'Dips', 'Close Grip Bench'],
-  'Core': ['Plank', 'Russian Twists', 'Leg Raises', 'Crunches', 'Hanging Knee Raises'],
+  'Poitrine': ['Développé couché', 'Développé incliné', 'Développé décliné', 'Écarté avec haltères', 'Crossover à la poulie'],
+  'Dos': ['Tractions', 'Tirage vertical', 'Rowing barre', 'Rowing haltère', 'Rowing T-Bar'],
+  'Jambes': ['Squat', 'Soulevé de terre', 'Presse à jambes', 'Fentes', 'Extension des jambes'],
+  'Epaules': ['Développé militaire', 'Élévations latérales', 'Élévations frontales', 'Oiseau pour deltoïdes postérieurs', 'Haussements d’épaules'],
+  'Biceps': ['Curl barre', 'Curl haltères', 'Curl marteau', 'Curl au pupitre', 'Curl concentration'],
+  'Triceps': ['Extension à la poulie', 'Barre au front', 'Extension au-dessus de la tête', 'Dips', 'Développé couché prise serrée'],
+  'Ceinture abdominale': ['Planche', 'Twists russes', 'Relevés de jambes', 'Crunchs', 'Relevés de genoux suspendu'],
 };
+
 
 export default function NewWorkoutScreen() {
   const [selectedMuscle, setSelectedMuscle] = useState('');
@@ -35,6 +36,8 @@ export default function NewWorkoutScreen() {
   const [weight, setWeight] = useState('');
   const [reps, setReps] = useState('');
   const [sets, setSets] = useState('');
+  const [rpe, setRpe] = useState('');
+  const [suggestedWeight, setSuggestedWeight] = useState<number | null>(null);
   const [isCustomExercise, setIsCustomExercise] = useState(false);
   const params = useLocalSearchParams();
   const selectedDate = params.selectedDate as string;
@@ -51,6 +54,70 @@ export default function NewWorkoutScreen() {
     }
   }, [fontsLoaded]);
 
+  // Function to calculate suggested weight based on previous workouts
+  const calculateSuggestedWeight = useCallback(async (selectedExercise: string, inputReps: string, inputRpe: string) => {
+    if (!selectedExercise || !inputReps || !inputRpe) {
+      setSuggestedWeight(null);
+      return;
+    }
+
+    try {
+      const existingWorkouts = await AsyncStorage.getItem('workouts');
+      if (!existingWorkouts) {
+        setSuggestedWeight(null);
+        return;
+      }
+
+      const workouts = JSON.parse(existingWorkouts);
+
+      // Filter workouts for the same exercise
+      const sameExerciseWorkouts = workouts.filter(
+        (w: any) => w.exercise === selectedExercise
+      ).sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+      // If no previous workouts for this exercise, return null
+      if (sameExerciseWorkouts.length === 0) {
+        setSuggestedWeight(null);
+        return;
+      }
+
+      // Get the most recent workout for this exercise
+      const lastWorkout = sameExerciseWorkouts[0];
+
+      // If the last workout doesn't have RPE, we can't calculate
+      if (!lastWorkout.rpe) {
+        setSuggestedWeight(lastWorkout.weight);
+        return;
+      }
+
+      const lastWeight = lastWorkout.weight;
+      const lastReps = lastWorkout.reps;
+      const lastRpe = lastWorkout.rpe;
+      const currentReps = parseInt(inputReps);
+      const currentRpe = parseInt(inputRpe);
+
+      // Calculate one-rep max (Epley formula)
+      const lastOneRepMax = lastWeight * (1 + lastReps / 30);
+
+      // Adjust based on RPE difference
+      // RPE 10 is maximum effort, so we adjust based on how far from max
+      const rpeAdjustment = (currentRpe - lastRpe) * 0.03;
+
+      // Calculate suggested weight based on one-rep max, desired reps, and RPE
+      let calculatedWeight = lastOneRepMax * (1 - currentReps / 30) * (1 + rpeAdjustment);
+
+      // Round to nearest 2.5kg for barbells or 1kg for dumbbells
+      // This is a simplification - in reality, you'd want to adjust based on the equipment type
+      const roundingFactor = selectedExercise.toLowerCase().includes('haltères') ? 1 : 2.5;
+      calculatedWeight = Math.round(calculatedWeight / roundingFactor) * roundingFactor;
+
+      setSuggestedWeight(calculatedWeight > 0 ? calculatedWeight : lastWeight);
+    } catch (error) {
+      console.error('Error calculating suggested weight:', error);
+      setSuggestedWeight(null);
+    }
+  }, []);
+
   const saveWorkout = async () => {
     try {
       const workout = {
@@ -60,6 +127,7 @@ export default function NewWorkoutScreen() {
         weight: parseFloat(weight) || 0,
         reps: parseInt(reps) || 0,
         sets: parseInt(sets) || 0,
+        rpe: parseInt(rpe) || 0,
         date: selectedDate ? `${selectedDate}T${new Date().toTimeString().split(' ')[0]}` : new Date().toISOString(),
       };
 
@@ -84,7 +152,7 @@ export default function NewWorkoutScreen() {
   return (
     <View style={styles.container} onLayout={onLayoutRootView}>
       <View style={styles.header}>
-        <Text style={styles.title}>New Workout</Text>
+        <Text style={styles.title}>Nouvel entraînement</Text>
         <TouchableOpacity 
           style={styles.closeButton}
           onPress={() => router.back()}
@@ -94,7 +162,7 @@ export default function NewWorkoutScreen() {
       </View>
 
       <ScrollView style={styles.content}>
-        <Text style={styles.sectionTitle}>Muscle Group</Text>
+        <Text style={styles.sectionTitle}>Groupe musculaire</Text>
         <View style={styles.muscleGrid}>
           {muscleGroups.map((muscle) => (
             <TouchableOpacity
@@ -107,6 +175,7 @@ export default function NewWorkoutScreen() {
                 setSelectedMuscle(muscle);
                 setExercise('');
                 setIsCustomExercise(false);
+                setSuggestedWeight(null);
               }}
             >
               <Text style={[
@@ -131,7 +200,47 @@ export default function NewWorkoutScreen() {
                       styles.exerciseButton,
                       exercise === ex && styles.exerciseButtonSelected,
                     ]}
-                    onPress={() => setExercise(ex)}
+                    onPress={() => {
+                      setExercise(ex);
+                      // Try to calculate suggested weight if reps and RPE are already set
+                      if (reps && rpe) {
+                        calculateSuggestedWeight(ex, reps, rpe);
+                      } else {
+                        // Otherwise, try to find previous workouts for this exercise
+                        // and use default values to show a suggestion
+                        (async () => {
+                          try {
+                            const existingWorkouts = await AsyncStorage.getItem('workouts');
+                            if (existingWorkouts) {
+                              const workouts = JSON.parse(existingWorkouts);
+                              const sameExerciseWorkouts = workouts
+                                .filter((w: any) => w.exercise === ex)
+                                .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+                              if (sameExerciseWorkouts.length > 0) {
+                                const lastWorkout = sameExerciseWorkouts[0];
+                                // If we have reps but no RPE, use the last workout's RPE
+                                if (reps && !rpe && lastWorkout.rpe) {
+                                  calculateSuggestedWeight(ex, reps, lastWorkout.rpe.toString());
+                                }
+                                // If we have RPE but no reps, use the last workout's reps
+                                else if (!reps && rpe && lastWorkout.reps) {
+                                  calculateSuggestedWeight(ex, lastWorkout.reps.toString(), rpe);
+                                }
+                                // If we have neither, use both from the last workout
+                                else if (!reps && !rpe && lastWorkout.reps && lastWorkout.rpe) {
+                                  setReps(lastWorkout.reps.toString());
+                                  setRpe(lastWorkout.rpe.toString());
+                                  calculateSuggestedWeight(ex, lastWorkout.reps.toString(), lastWorkout.rpe.toString());
+                                }
+                              }
+                            }
+                          } catch (error) {
+                            console.error('Error loading previous workouts:', error);
+                          }
+                        })();
+                      }
+                    }}
                   >
                     <Text style={[
                       styles.exerciseButtonText,
@@ -145,7 +254,7 @@ export default function NewWorkoutScreen() {
                   style={styles.customExerciseButton}
                   onPress={() => setIsCustomExercise(true)}
                 >
-                  <Plus color="#6366f1" size={20} />
+                  <Plus color="#fd8f09" size={20} />
                   <Text style={styles.customExerciseButtonText}>Custom Exercise</Text>
                 </TouchableOpacity>
               </View>
@@ -154,7 +263,47 @@ export default function NewWorkoutScreen() {
                 <TextInput
                   style={styles.input}
                   value={exercise}
-                  onChangeText={setExercise}
+                  onChangeText={(value) => {
+                    setExercise(value);
+                    // Try to calculate suggested weight if reps and RPE are already set
+                    if (value && reps && rpe) {
+                      calculateSuggestedWeight(value, reps, rpe);
+                    } else if (value) {
+                      // Otherwise, try to find previous workouts for this exercise
+                      // and use default values to show a suggestion
+                      (async () => {
+                        try {
+                          const existingWorkouts = await AsyncStorage.getItem('workouts');
+                          if (existingWorkouts) {
+                            const workouts = JSON.parse(existingWorkouts);
+                            const sameExerciseWorkouts = workouts
+                              .filter((w: any) => w.exercise === value)
+                              .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+                            if (sameExerciseWorkouts.length > 0) {
+                              const lastWorkout = sameExerciseWorkouts[0];
+                              // If we have reps but no RPE, use the last workout's RPE
+                              if (reps && !rpe && lastWorkout.rpe) {
+                                calculateSuggestedWeight(value, reps, lastWorkout.rpe.toString());
+                              }
+                              // If we have RPE but no reps, use the last workout's reps
+                              else if (!reps && rpe && lastWorkout.reps) {
+                                calculateSuggestedWeight(value, lastWorkout.reps.toString(), rpe);
+                              }
+                              // If we have neither, use both from the last workout
+                              else if (!reps && !rpe && lastWorkout.reps && lastWorkout.rpe) {
+                                setReps(lastWorkout.reps.toString());
+                                setRpe(lastWorkout.rpe.toString());
+                                calculateSuggestedWeight(value, lastWorkout.reps.toString(), lastWorkout.rpe.toString());
+                              }
+                            }
+                          }
+                        } catch (error) {
+                          console.error('Error loading previous workouts:', error);
+                        }
+                      })();
+                    }
+                  }}
                   placeholder="Enter exercise name"
                   placeholderTextColor="#666"
                 />
@@ -171,7 +320,20 @@ export default function NewWorkoutScreen() {
 
         <View style={styles.row}>
           <View style={styles.column}>
-            <Text style={styles.sectionTitle}>Weight (kg)</Text>
+            <Text style={styles.sectionTitle}>Poids (kg)</Text>
+            {suggestedWeight !== null && (
+              <View style={styles.suggestedWeightContainer}>
+                <Text style={styles.suggestedWeightText}>
+                  Suggested: {suggestedWeight} kg
+                </Text>
+                <TouchableOpacity
+                  onPress={() => setWeight(suggestedWeight.toString())}
+                  style={styles.useSuggestedButton}
+                >
+                  <Text style={styles.useSuggestedButtonText}>Use</Text>
+                </TouchableOpacity>
+              </View>
+            )}
             <TextInput
               style={styles.input}
               value={weight}
@@ -186,7 +348,12 @@ export default function NewWorkoutScreen() {
             <TextInput
               style={styles.input}
               value={reps}
-              onChangeText={setReps}
+              onChangeText={(value) => {
+                setReps(value);
+                if (exercise && value && rpe) {
+                  calculateSuggestedWeight(exercise, value, rpe);
+                }
+              }}
               placeholder="0"
               placeholderTextColor="#666"
               keyboardType="numeric"
@@ -202,6 +369,40 @@ export default function NewWorkoutScreen() {
               placeholderTextColor="#666"
               keyboardType="numeric"
             />
+          </View>
+        </View>
+
+        <View style={styles.rpeContainer}>
+          <Text style={styles.sectionTitle}>RPE (Rate of Perceived Exertion)</Text>
+          <Text style={styles.rpeDescription}>
+            1 = Très facile, 10 = Effort maximal,
+          </Text>
+          <View style={styles.rpeButtonsContainer}>
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((value) => (
+              <TouchableOpacity
+                key={value}
+                style={[
+                  styles.rpeButton,
+                  parseInt(rpe) === value && styles.rpeButtonSelected,
+                ]}
+                onPress={() => {
+                  const rpeValue = value.toString();
+                  setRpe(rpeValue);
+                  if (exercise && reps && rpeValue) {
+                    calculateSuggestedWeight(exercise, reps, rpeValue);
+                  }
+                }}
+              >
+                <Text
+                  style={[
+                    styles.rpeButtonText,
+                    parseInt(rpe) === value && styles.rpeButtonTextSelected,
+                  ]}
+                >
+                  {value}
+                </Text>
+              </TouchableOpacity>
+            ))}
           </View>
         </View>
 
@@ -269,7 +470,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   muscleButtonSelected: {
-    backgroundColor: '#6366f1',
+    backgroundColor: '#fd8f09',
   },
   muscleButtonText: {
     color: '#fff',
@@ -293,7 +494,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   exerciseButtonSelected: {
-    backgroundColor: '#6366f1',
+    backgroundColor: '#fd8f09',
   },
   exerciseButtonText: {
     color: '#fff',
@@ -314,7 +515,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   customExerciseButtonText: {
-    color: '#6366f1',
+    color: '#fd8f09',
     fontFamily: 'Inter-Regular',
   },
   customExerciseContainer: {
@@ -325,7 +526,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   backButtonText: {
-    color: '#6366f1',
+    color: '#fd8f09',
     fontFamily: 'Inter-Regular',
     textAlign: 'center',
   },
@@ -345,8 +546,68 @@ const styles = StyleSheet.create({
   column: {
     flex: 1,
   },
+  suggestedWeightContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#2a2a2a',
+    borderRadius: 8,
+    padding: 8,
+    marginBottom: 8,
+  },
+  suggestedWeightText: {
+    color: '#fd8f09',
+    fontFamily: 'Inter-Regular',
+    fontSize: 14,
+  },
+  useSuggestedButton: {
+    backgroundColor: '#fd8f09',
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 4,
+  },
+  useSuggestedButtonText: {
+    color: '#fff',
+    fontFamily: 'Inter-SemiBold',
+    fontSize: 12,
+  },
+  rpeContainer: {
+    marginBottom: 24,
+  },
+  rpeDescription: {
+    color: '#999',
+    fontFamily: 'Inter-Regular',
+    fontSize: 14,
+    marginBottom: 12,
+  },
+  rpeButtonsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  rpeButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#1a1a1a',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 8,
+    marginBottom: 8,
+  },
+  rpeButtonSelected: {
+    backgroundColor: '#fd8f09',
+  },
+  rpeButtonText: {
+    color: '#fff',
+    fontFamily: 'Inter-Regular',
+    fontSize: 16,
+  },
+  rpeButtonTextSelected: {
+    fontFamily: 'Inter-SemiBold',
+  },
   addButton: {
-    backgroundColor: '#6366f1',
+    backgroundColor: '#fd8f09',
     paddingVertical: 16,
     borderRadius: 8,
     alignItems: 'center',

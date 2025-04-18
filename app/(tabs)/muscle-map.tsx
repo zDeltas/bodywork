@@ -68,7 +68,7 @@ export default function MuscleMapScreen() {
         <MuscleMap workouts={workouts} />
 
         <View style={styles.legend}>
-          <Text style={styles.legendTitle}>Intensité des muscles travaillés</Text>
+          <Text style={styles.legendTitle}>Intensité des muscles travaillés sur la semaine en cours</Text>
           <View style={styles.legendItems}>
             <View style={styles.legendItem}>
               <View style={[styles.legendColor, { backgroundColor: '#6366f1' }]} />

@@ -197,7 +197,7 @@ export default function WorkoutScreen() {
                   <Text style={styles.workoutDetail}>Poids: {workout.weight}kg</Text>
                   <Text style={styles.workoutDetail}>Répétitions: {workout.reps}</Text>
                   <Text style={styles.workoutDetail}>Séries: {workout.sets}</Text>
-                  {workout.rpe > 0 && (
+                  {workout.rpe && workout.rpe > 0 && (
                     <Text style={styles.workoutDetail}>RPE: {workout.rpe}</Text>
                   )}
                 </View>

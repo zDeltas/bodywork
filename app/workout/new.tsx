@@ -20,14 +20,15 @@ export const muscleGroups = [
 ];
 
 export const predefinedExercises = {
-  'Chest': ['Bench Press', 'Incline Press', 'Decline Press', 'Dumbbell Fly', 'Cable Crossover'],
-  'Back': ['Pull-ups', 'Lat Pulldown', 'Barbell Row', 'Dumbbell Row', 'T-Bar Row'],
-  'Legs': ['Squat', 'Deadlift', 'Leg Press', 'Lunges', 'Leg Extension'],
-  'Shoulders': ['Overhead Press', 'Lateral Raise', 'Front Raise', 'Rear Delt Fly', 'Shrugs'],
-  'Biceps': ['Barbell Curl', 'Dumbbell Curl', 'Hammer Curl', 'Preacher Curl', 'Concentration Curl'],
-  'Triceps': ['Tricep Pushdown', 'Skull Crushers', 'Overhead Extension', 'Dips', 'Close Grip Bench'],
-  'Core': ['Plank', 'Russian Twists', 'Leg Raises', 'Crunches', 'Hanging Knee Raises'],
+  'Poitrine': ['Développé couché', 'Développé incliné', 'Développé décliné', 'Écarté avec haltères', 'Crossover à la poulie'],
+  'Dos': ['Tractions', 'Tirage vertical', 'Rowing barre', 'Rowing haltère', 'Rowing T-Bar'],
+  'Jambes': ['Squat', 'Soulevé de terre', 'Presse à jambes', 'Fentes', 'Extension des jambes'],
+  'Epaules': ['Développé militaire', 'Élévations latérales', 'Élévations frontales', 'Oiseau pour deltoïdes postérieurs', 'Haussements d’épaules'],
+  'Biceps': ['Curl barre', 'Curl haltères', 'Curl marteau', 'Curl au pupitre', 'Curl concentration'],
+  'Triceps': ['Extension à la poulie', 'Barre au front', 'Extension au-dessus de la tête', 'Dips', 'Développé couché prise serrée'],
+  'Ceinture abdominale': ['Planche', 'Twists russes', 'Relevés de jambes', 'Crunchs', 'Relevés de genoux suspendu'],
 };
+
 
 export default function NewWorkoutScreen() {
   const [selectedMuscle, setSelectedMuscle] = useState('');
@@ -107,7 +108,7 @@ export default function NewWorkoutScreen() {
 
       // Round to nearest 2.5kg for barbells or 1kg for dumbbells
       // This is a simplification - in reality, you'd want to adjust based on the equipment type
-      const roundingFactor = selectedExercise.toLowerCase().includes('dumbbell') ? 1 : 2.5;
+      const roundingFactor = selectedExercise.toLowerCase().includes('haltères') ? 1 : 2.5;
       calculatedWeight = Math.round(calculatedWeight / roundingFactor) * roundingFactor;
 
       setSuggestedWeight(calculatedWeight > 0 ? calculatedWeight : lastWeight);
@@ -151,7 +152,7 @@ export default function NewWorkoutScreen() {
   return (
     <View style={styles.container} onLayout={onLayoutRootView}>
       <View style={styles.header}>
-        <Text style={styles.title}>New Workout</Text>
+        <Text style={styles.title}>Nouvel entraînement</Text>
         <TouchableOpacity 
           style={styles.closeButton}
           onPress={() => router.back()}
@@ -319,7 +320,7 @@ export default function NewWorkoutScreen() {
 
         <View style={styles.row}>
           <View style={styles.column}>
-            <Text style={styles.sectionTitle}>Weight (kg)</Text>
+            <Text style={styles.sectionTitle}>Poids (kg)</Text>
             {suggestedWeight !== null && (
               <View style={styles.suggestedWeightContainer}>
                 <Text style={styles.suggestedWeightText}>

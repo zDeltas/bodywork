@@ -10,6 +10,7 @@ import { router } from 'expo-router';
 import Body, { ExtendedBodyPart, Slug } from 'react-native-body-highlighter';
 import { differenceInHours } from 'date-fns';
 import { useSettings } from '@/hooks/useSettings';
+import { useTranslation } from '@/hooks/useTranslation';
 
 const AnimatedText = Animated.createAnimatedComponent(Text);
 
@@ -66,6 +67,7 @@ const muscleGroupToSlug: Record<string, Slug> = {
 export default function MuscleMap({ workouts }: MuscleMapProps) {
   const [selectedView, setSelectedView] = useState<'front' | 'back'>('front');
   const { settings } = useSettings();
+  const { t } = useTranslation();
 
   const frontTextOpacity = useSharedValue(1);
   const backTextOpacity = useSharedValue(0);
@@ -86,17 +88,17 @@ export default function MuscleMap({ workouts }: MuscleMapProps) {
   const calculateMuscleRestState = (muscleGroup: string): number => {
     const now = new Date();
     const muscleWorkouts = workouts.filter(w => w.muscleGroup === muscleGroup);
-    
+
     if (muscleWorkouts.length === 0) return 3; // Plus de 72h (gris)
-    
+
     const lastWorkout = muscleWorkouts.reduce((latest, current) => {
       const currentDate = new Date(current.date);
       const latestDate = new Date(latest.date);
       return currentDate > latestDate ? current : latest;
     });
-    
+
     const hoursSinceLastWorkout = differenceInHours(now, new Date(lastWorkout.date));
-    
+
     if (hoursSinceLastWorkout < 24) return 1; // 0-24h (rouge)
     if (hoursSinceLastWorkout < 72) return 2; // 24-72h (bordeaux)
     return 3; // Plus de 72h (gris)
@@ -115,14 +117,14 @@ export default function MuscleMap({ workouts }: MuscleMapProps) {
           style={[styles.toggleButton, selectedView === 'front' && styles.toggleButtonActive]}
           onPress={() => handleViewChange('front')}>
           <AnimatedText style={[styles.toggleText]}>
-            Vue de face
+            {t('frontView')}
           </AnimatedText>
         </Pressable>
         <Pressable
           style={[styles.toggleButton, selectedView === 'back' && styles.toggleButtonActive]}
           onPress={() => handleViewChange('back')}>
           <AnimatedText style={[styles.toggleText]}>
-            Vue de dos
+            {t('backView')}
           </AnimatedText>
         </Pressable>
       </View>
@@ -134,19 +136,19 @@ export default function MuscleMap({ workouts }: MuscleMapProps) {
         />
       </Animated.View>
       <View style={styles.legend}>
-        <Text style={styles.legendTitle}>État de repos des muscles</Text>
+        <Text style={styles.legendTitle}>{t('muscleRestState')}</Text>
         <View style={styles.legendItems}>
           <View style={styles.legendItem}>
             <View style={[styles.legendColor, { backgroundColor: '#ef4444' }]} />
-            <Text style={styles.legendText}>0-24h</Text>
+            <Text style={styles.legendText}>{t('restPeriod0to24')}</Text>
           </View>
           <View style={styles.legendItem}>
             <View style={[styles.legendColor, { backgroundColor: '#7f1d1d' }]} />
-            <Text style={styles.legendText}>24-72h</Text>
+            <Text style={styles.legendText}>{t('restPeriod24to72')}</Text>
           </View>
           <View style={styles.legendItem}>
             <View style={[styles.legendColor, { backgroundColor: '#4b5563' }]} />
-            <Text style={styles.legendText}>72h+</Text>
+            <Text style={styles.legendText}>{t('restPeriod72plus')}</Text>
           </View>
         </View>
       </View>

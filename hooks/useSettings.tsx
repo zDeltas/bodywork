@@ -5,12 +5,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 interface Settings {
   weightUnit: 'kg' | 'lb';
   gender: 'male' | 'female';
+  language: 'en' | 'fr';
 }
 
 // Default settings
 const defaultSettings: Settings = {
   weightUnit: 'kg',
   gender: 'male',
+  language: 'fr',
 };
 
 // Create context with default values

@@ -6,9 +6,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
 import { useSettings } from '@/hooks/useSettings';
+import { useTranslation } from '@/hooks/useTranslation';
+import { Language, languages, getLanguageName } from '@/translations';
 
 export default function SettingsScreen() {
   const { settings, updateSettings, isLoading } = useSettings();
+  const { t, language } = useTranslation();
   const [showAbout, setShowAbout] = useState(false);
 
   const toggleWeightUnit = () => {
@@ -23,6 +26,12 @@ export default function SettingsScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
 
+  const toggleLanguage = () => {
+    const newLanguage = settings.language === 'en' ? 'fr' : 'en';
+    updateSettings({ language: newLanguage as 'en' | 'fr' });
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  };
+
   const toggleAbout = () => {
     setShowAbout(!showAbout);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -31,32 +40,32 @@ export default function SettingsScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="light" />
-      
+
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Réglages</Text>
+        <Text style={styles.headerTitle}>{t('settings')}</Text>
       </View>
 
       {isLoading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#fd8f09" />
-          <Text style={styles.loadingText}>Chargement des réglages...</Text>
+          <Text style={styles.loadingText}>{t('loadingSettings')}</Text>
         </View>
       ) : (
         <ScrollView style={styles.content}>
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Préférences</Text>
-            
+            <Text style={styles.sectionTitle}>{t('preferences')}</Text>
+
             <View style={styles.settingItem}>
               <View style={styles.settingInfo}>
                 <Ionicons name="body-outline" size={24} color="#fd8f09" />
-                <Text style={styles.settingLabel}>Genre</Text>
+                <Text style={styles.settingLabel}>{t('gender')}</Text>
               </View>
               <TouchableOpacity 
                 style={styles.settingControl} 
                 onPress={toggleGender}
               >
                 <Text style={styles.settingValue}>
-                  {settings.gender === 'male' ? 'Homme' : 'Femme'}
+                  {settings.gender === 'male' ? t('male') : t('female')}
                 </Text>
                 <Ionicons name="chevron-forward" size={20} color="#999" />
               </TouchableOpacity>
@@ -65,7 +74,7 @@ export default function SettingsScreen() {
             <View style={styles.settingItem}>
               <View style={styles.settingInfo}>
                 <Ionicons name="scale-outline" size={24} color="#fd8f09" />
-                <Text style={styles.settingLabel}>Unité de poids</Text>
+                <Text style={styles.settingLabel}>{t('weightUnit')}</Text>
               </View>
               <TouchableOpacity 
                 style={styles.settingControl} 
@@ -75,18 +84,34 @@ export default function SettingsScreen() {
                 <Ionicons name="chevron-forward" size={20} color="#999" />
               </TouchableOpacity>
             </View>
+
+            <View style={styles.settingItem}>
+              <View style={styles.settingInfo}>
+                <Ionicons name="language-outline" size={24} color="#fd8f09" />
+                <Text style={styles.settingLabel}>{t('language')}</Text>
+              </View>
+              <TouchableOpacity 
+                style={styles.settingControl} 
+                onPress={toggleLanguage}
+              >
+                <Text style={styles.settingValue}>
+                  {settings.language === 'en' ? t('english') : t('french')}
+                </Text>
+                <Ionicons name="chevron-forward" size={20} color="#999" />
+              </TouchableOpacity>
+            </View>
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Application</Text>
-            
+            <Text style={styles.sectionTitle}>{t('application')}</Text>
+
             <TouchableOpacity 
               style={styles.settingItem} 
               onPress={toggleAbout}
             >
               <View style={styles.settingInfo}>
                 <Ionicons name="information-circle-outline" size={24} color="#fd8f09" />
-                <Text style={styles.settingLabel}>À propos</Text>
+                <Text style={styles.settingLabel}>{t('about')}</Text>
               </View>
               <Ionicons name="chevron-forward" size={20} color="#999" />
             </TouchableOpacity>
@@ -95,16 +120,16 @@ export default function SettingsScreen() {
           {showAbout && (
             <BlurView intensity={20} style={styles.aboutContainer}>
               <View style={styles.aboutContent}>
-                <Text style={styles.aboutTitle}>BodyWork</Text>
-                <Text style={styles.aboutVersion}>Version 1.0.0</Text>
+                <Text style={styles.aboutTitle}>{t('aboutTitle')}</Text>
+                <Text style={styles.aboutVersion}>{t('aboutVersion')}</Text>
                 <Text style={styles.aboutDescription}>
-                  Une application pour suivre vos entraînements, mesurer votre progression et atteindre vos objectifs de fitness.
+                  {t('aboutDescription')}
                 </Text>
-                
+
                 <View style={styles.aboutDivider} />
-                
-                <Text style={styles.aboutDeveloper}>Développé avec ❤️</Text>
-                
+
+                <Text style={styles.aboutDeveloper}>{t('aboutDeveloper')}</Text>
+
                 <TouchableOpacity 
                   style={styles.aboutLink}
                   onPress={() => Linking.openURL('https://github.com')}
@@ -112,12 +137,12 @@ export default function SettingsScreen() {
                   <Ionicons name="logo-github" size={20} color="#fd8f09" />
                   <Text style={styles.aboutLinkText}>GitHub</Text>
                 </TouchableOpacity>
-                
+
                 <TouchableOpacity 
                   style={styles.closeButton}
                   onPress={toggleAbout}
                 >
-                  <Text style={styles.closeButtonText}>Fermer</Text>
+                  <Text style={styles.closeButtonText}>{t('close')}</Text>
                 </TouchableOpacity>
               </View>
             </BlurView>

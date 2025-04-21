@@ -7,6 +7,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Calendar } from 'react-native-calendars';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface Workout {
   id: string;
@@ -23,6 +24,7 @@ export default function WorkoutScreen() {
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const params = useLocalSearchParams();
+  const { t, language } = useTranslation();
   const [fontsLoaded] = useFonts({
     'Inter-Regular': Inter_400Regular,
     'Inter-SemiBold': Inter_600SemiBold,
@@ -43,7 +45,7 @@ export default function WorkoutScreen() {
           setWorkouts(JSON.parse(storedWorkouts));
         }
       } catch (error) {
-        console.error('Erreur lors du chargement des séances:', error);
+        console.error(`${t('errorLoadingWorkouts')}`, error);
       }
     };
 
@@ -55,7 +57,7 @@ export default function WorkoutScreen() {
       try {
         await AsyncStorage.setItem('workouts', JSON.stringify(workouts));
       } catch (error) {
-        console.error('Erreur lors de la sauvegarde des séances:', error);
+        console.error(`${t('errorSavingWorkouts')}`, error);
       }
     };
 
@@ -96,7 +98,8 @@ export default function WorkoutScreen() {
   }
 
   // Formater la date pour affichage
-  const formattedDate = new Date(selectedDate).toLocaleDateString('fr-FR', {
+  const locale = language === 'fr' ? 'fr-FR' : 'en-US';
+  const formattedDate = new Date(selectedDate).toLocaleDateString(locale, {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
@@ -107,7 +110,7 @@ export default function WorkoutScreen() {
   return (
     <View style={styles.container} onLayout={onLayoutRootView}>
       <View style={styles.header}>
-        <Text style={styles.title}>Body Work</Text>
+        <Text style={styles.title}>{t('appTitle')}</Text>
       </View>
 
       <ScrollView style={styles.content}>
@@ -153,7 +156,7 @@ export default function WorkoutScreen() {
             exiting={FadeOut.duration(300)}
             style={styles.emptyState}
           >
-            <Text style={styles.emptyStateText}>Aucune séance enregistrée ce jour</Text>
+            <Text style={styles.emptyStateText}>{t('noWorkoutsToday')}</Text>
             <TouchableOpacity
               style={styles.startButton}
               onPress={() => router.push({
@@ -161,7 +164,7 @@ export default function WorkoutScreen() {
                 params: { selectedDate }
               })}
             >
-              <Text style={styles.startButtonText}>Commencer une séance</Text>
+              <Text style={styles.startButtonText}>{t('startWorkout')}</Text>
             </TouchableOpacity>
           </Animated.View>
         ) : (
@@ -181,9 +184,9 @@ export default function WorkoutScreen() {
                 </View>
                 <Text style={styles.workoutMuscle}>{workout.muscleGroup}</Text>
                 <View style={styles.workoutDetails}>
-                  <Text style={styles.workoutDetail}>Poids: {workout.weight}kg</Text>
-                  <Text style={styles.workoutDetail}>Répétitions: {workout.reps}</Text>
-                  <Text style={styles.workoutDetail}>Séries: {workout.sets}</Text>
+                  <Text style={styles.workoutDetail}>{t('weight')}: {workout.weight}kg</Text>
+                  <Text style={styles.workoutDetail}>{t('reps')}: {workout.reps}</Text>
+                  <Text style={styles.workoutDetail}>{t('sets')}: {workout.sets}</Text>
                   {workout.rpe && workout.rpe > 0 && (
                     <Text style={styles.workoutDetail}>RPE: {workout.rpe}</Text>
                   )}

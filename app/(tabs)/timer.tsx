@@ -5,6 +5,7 @@ import { useCallback } from 'react';
 import * as SplashScreen from 'expo-splash-screen';
 import Timer, { REST_TIMES } from '../components/Timer';
 import { Plus, Minus, X } from 'lucide-react-native';
+import { useTranslation } from '@/hooks/useTranslation';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -24,6 +25,7 @@ interface CustomTimeModalProps {
 }
 
 function CustomTimeModal({ visible, onClose, onSave, initialMinutes = 0, initialSeconds = 0 }: CustomTimeModalProps) {
+  const { t } = useTranslation();
   const [minutes, setMinutes] = useState(initialMinutes.toString());
   const [seconds, setSeconds] = useState(initialSeconds.toString());
 
@@ -53,7 +55,7 @@ function CustomTimeModal({ visible, onClose, onSave, initialMinutes = 0, initial
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
           <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Custom Time</Text>
+            <Text style={styles.modalTitle}>{t('customTime')}</Text>
             <TouchableOpacity onPress={onClose}>
               <X color="#fff" size={24} />
             </TouchableOpacity>
@@ -61,7 +63,7 @@ function CustomTimeModal({ visible, onClose, onSave, initialMinutes = 0, initial
 
           <View style={styles.timeInputs}>
             <View style={styles.timeInputContainer}>
-              <Text style={styles.timeLabel}>Minutes</Text>
+              <Text style={styles.timeLabel}>{t('minutes')}</Text>
               <View style={styles.timeInputControls}>
                 <TouchableOpacity
                   style={styles.timeControlButton}
@@ -87,7 +89,7 @@ function CustomTimeModal({ visible, onClose, onSave, initialMinutes = 0, initial
             </View>
 
             <View style={styles.timeInputContainer}>
-              <Text style={styles.timeLabel}>Seconds</Text>
+              <Text style={styles.timeLabel}>{t('seconds')}</Text>
               <View style={styles.timeInputControls}>
                 <TouchableOpacity
                   style={styles.timeControlButton}
@@ -144,7 +146,7 @@ function CustomTimeModal({ visible, onClose, onSave, initialMinutes = 0, initial
           </View>
 
           <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-            <Text style={styles.saveButtonText}>Save</Text>
+            <Text style={styles.saveButtonText}>{t('save')}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -153,6 +155,7 @@ function CustomTimeModal({ visible, onClose, onSave, initialMinutes = 0, initial
 }
 
 export default function TimerScreen() {
+  const { t } = useTranslation();
   const [mode, setMode] = useState<'timer' | 'stopwatch'>('timer');
   const [selectedTime, setSelectedTime] = useState(60);
   const [selectedRestTime, setSelectedRestTime] = useState(60);
@@ -195,14 +198,14 @@ export default function TimerScreen() {
   return (
     <View style={styles.container} onLayout={onLayoutRootView}>
       <View style={styles.header}>
-        <Text style={styles.title}>Timer</Text>
+        <Text style={styles.title}>{t('timer')}</Text>
         <View style={styles.modeSelector}>
           <TouchableOpacity
             style={[styles.modeButton, mode === 'timer' && styles.modeButtonActive]}
             onPress={() => setMode('timer')}
           >
             <Text style={[styles.modeText, mode === 'timer' && styles.modeTextActive]}>
-              Timer
+              {t('timer')}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -210,7 +213,7 @@ export default function TimerScreen() {
             onPress={() => setMode('stopwatch')}
           >
             <Text style={[styles.modeText, mode === 'stopwatch' && styles.modeTextActive]}>
-              Stopwatch
+              {t('stopwatch')}
             </Text>
           </TouchableOpacity>
         </View>
@@ -219,16 +222,16 @@ export default function TimerScreen() {
       <ScrollView style={styles.content}>
         {mode === 'timer' && (
           <>
-            <Text style={styles.sectionTitle}>Exercise Name</Text>
+            <Text style={styles.sectionTitle}>{t('exerciseName')}</Text>
             <TextInput
               style={styles.input}
               value={exerciseName}
               onChangeText={setExerciseName}
-              placeholder="Enter exercise name"
+              placeholder={t('enterExerciseName')}
               placeholderTextColor="#666"
             />
 
-            <Text style={styles.sectionTitle}>Work Time</Text>
+            <Text style={styles.sectionTitle}>{t('workTime')}</Text>
             <View style={styles.timeGrid}>
               {Object.entries(WORKOUT_TIMES).map(([label, time]) => (
                 <TouchableOpacity
@@ -275,7 +278,7 @@ export default function TimerScreen() {
                     isCustomTime && styles.timeTextActive,
                   ]}
                 >
-                  Custom
+                  {t('custom')}
                 </Text>
                 <Text
                   style={[
@@ -290,7 +293,7 @@ export default function TimerScreen() {
               </TouchableOpacity>
             </View>
 
-            <Text style={styles.sectionTitle}>Rest Time</Text>
+            <Text style={styles.sectionTitle}>{t('restTime')}</Text>
             <View style={styles.timeGrid}>
               {Object.entries(REST_TIMES).map(([label, time]) => (
                 <TouchableOpacity
@@ -337,7 +340,7 @@ export default function TimerScreen() {
                     isCustomRestTime && styles.timeTextActive,
                   ]}
                 >
-                  Custom
+                  {t('custom')}
                 </Text>
                 <Text
                   style={[
@@ -352,7 +355,7 @@ export default function TimerScreen() {
               </TouchableOpacity>
             </View>
 
-            <Text style={styles.sectionTitle}>Sets</Text>
+            <Text style={styles.sectionTitle}>{t('sets')}</Text>
             <View style={styles.setsContainer}>
               <TouchableOpacity
                 style={styles.setsButton}
@@ -378,7 +381,7 @@ export default function TimerScreen() {
             onComplete={handleTimerComplete}
             sets={sets}
             restTime={selectedRestTime}
-            exerciseName={exerciseName || 'Exercise'}
+            exerciseName={exerciseName || t('exercise')}
           />
         </View>
       </ScrollView>

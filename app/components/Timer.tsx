@@ -3,6 +3,7 @@ import { StyleSheet, Text, TouchableOpacity, Vibration, View } from 'react-nativ
 import { Inter_400Regular, Inter_600SemiBold, useFonts } from '@expo-google-fonts/inter';
 import { Minus, Pause, Play, Plus, RotateCcw, Settings } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface TimerProps {
   initialTime?: number;
@@ -30,6 +31,7 @@ export default function Timer({
                                 exerciseName = 'Exercise',
                                 onSettingsPress
                               }: TimerProps) {
+  const { t } = useTranslation();
   const [workTime, setWorkTime] = useState(mode === 'timer' ? initialTime : 0);
   const [restTimeState, setRestTime] = useState(restTime);
   const [isRunning, setIsRunning] = useState(false);
@@ -143,7 +145,7 @@ export default function Timer({
       </View>
 
       <View style={styles.setsContainer}>
-        <Text style={styles.setsLabel}>Sets</Text>
+        <Text style={styles.setsLabel}>{t('sets')}</Text>
         <View style={styles.setsControls}>
           <TouchableOpacity
             style={styles.setsButton}
@@ -168,7 +170,7 @@ export default function Timer({
         isResting ? styles.restTimer : styles.workTimer
       ]}>
         <Text style={styles.timerLabel}>
-          {isResting ? 'Rest Time' : (mode === 'timer' ? 'Work Time' : 'Stopwatch')}
+          {isResting ? t('restTime') : (mode === 'timer' ? t('workTime') : t('stopwatch'))}
         </Text>
         <Text style={styles.time}>
           {formatTime(isResting ? restTimeState : workTime)}

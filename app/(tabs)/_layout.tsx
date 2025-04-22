@@ -1,8 +1,7 @@
-import { useRef } from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
 import { router } from 'expo-router';
 import { CurvedBottomBar } from 'react-native-curved-bottom-bar';
-import { Dumbbell, ChartLine as LineChart, Settings, Clock, Ruler, Plus,Calendar } from 'lucide-react-native';
+import { Calendar, ChartLine as LineChart, Clock, Plus, Ruler, Settings } from 'lucide-react-native';
 import Animated from 'react-native-reanimated';
 import WorkoutScreen from '@/app/(tabs)/index';
 import TimerScreen from '@/app/(tabs)/timer';
@@ -108,7 +107,7 @@ export default function TabLayout() {
 
 const styles = StyleSheet.create({
   bottomBar: {
-    backgroundColor: '#0a0a0a',
+    backgroundColor: '#0a0a0a'
   },
   btnCircleUp: {
     width: 60,
@@ -120,12 +119,12 @@ const styles = StyleSheet.create({
     shadowColor: '#fd8f09',
     shadowOffset: {
       width: 0,
-      height: 2,
-    },
+      height: 2
+    }
   },
   tabbarItem: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
-  },
+    justifyContent: 'center'
+  }
 });

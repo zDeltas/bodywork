@@ -1,11 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold, useFonts } from '@expo-google-fonts/inter';
-import { Plus } from 'lucide-react-native';
-import { router, useLocalSearchParams } from 'expo-router';
+import { router } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Calendar } from 'react-native-calendars';
+import { Calendar, LocaleConfig } from 'react-native-calendars';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { useTranslation } from '@/hooks/useTranslation';
 
@@ -17,13 +16,55 @@ interface Workout {
   reps: number;
   sets: number;
   date: string;
-  rpe?: number; // Rate of Perceived Exertion (optional for backward compatibility)
+  rpe?: number;
 }
+
+LocaleConfig.locales['fr'] = {
+  monthNames: [
+    'Janvier',
+    'Février',
+    'Mars',
+    'Avril',
+    'Mai',
+    'Juin',
+    'Juillet',
+    'Août',
+    'Septembre',
+    'Octobre',
+    'Novembre',
+    'Décembre'
+  ],
+  monthNamesShort: ['Janv.', 'Févr.', 'Mars', 'Avril', 'Mai', 'Juin', 'Juil.', 'Août', 'Sept.', 'Oct.', 'Nov.', 'Déc.'],
+  dayNames: ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'],
+  dayNamesShort: ['Dim.', 'Lun.', 'Mar.', 'Mer.', 'Jeu.', 'Ven.', 'Sam.'],
+  today: 'Aujourd\'hui'
+};
+
+LocaleConfig.locales['en'] = {
+  monthNames: [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December'
+  ],
+  monthNamesShort: ['Jan.', 'Feb.', 'Mar.', 'Apr.', 'May', 'Jun.', 'Jul.', 'Aug.', 'Sep.', 'Oct.', 'Nov.', 'Dec.'],
+  dayNames: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+  dayNamesShort: ['Sun.', 'Mon.', 'Tue.', 'Wed.', 'Thu.', 'Fri.', 'Sat.'],
+  today: 'Today'
+};
+
 
 export default function WorkoutScreen() {
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
-  const params = useLocalSearchParams();
   const { t, language } = useTranslation();
   const [fontsLoaded] = useFonts({
     'Inter-Regular': Inter_400Regular,
@@ -99,6 +140,8 @@ export default function WorkoutScreen() {
 
   // Formater la date pour affichage
   const locale = language === 'fr' ? 'fr-FR' : 'en-US';
+  LocaleConfig.defaultLocale = language;
+
   const formattedDate = new Date(selectedDate).toLocaleDateString(locale, {
     weekday: 'long',
     day: 'numeric',
@@ -113,7 +156,7 @@ export default function WorkoutScreen() {
         <Text style={styles.title}>{t('appTitle')}</Text>
       </View>
 
-      <ScrollView style={styles.content}>
+      <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: 100 }}>
         <View style={styles.calendarSection}>
           <View style={styles.calendarContainer}>
             <Calendar
@@ -137,7 +180,7 @@ export default function WorkoutScreen() {
                 textDayHeaderFontFamily: 'Inter-Regular',
                 textDayFontSize: 16,
                 textMonthFontSize: 18,
-                textDayHeaderFontSize: 14,
+                textDayHeaderFontSize: 14
               }}
               markedDates={markedDates}
               onDayPress={(day: { dateString: string }) => setSelectedDate(day.dateString)}
@@ -179,7 +222,7 @@ export default function WorkoutScreen() {
                 <View style={styles.workoutHeader}>
                   <Text style={styles.workoutTitle}>{workout.exercise}</Text>
                   <Text style={styles.workoutDate}>
-                    {new Date(workout.date).toLocaleTimeString()}
+                    {new Date(workout.date).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })}
                   </Text>
                 </View>
                 <Text style={styles.workoutMuscle}>{workout.muscleGroup}</Text>
@@ -224,7 +267,7 @@ const styles = StyleSheet.create({
     padding: 20
   },
   calendarSection: {
-    marginBottom: 16,
+    marginBottom: 16
   },
   calendarContainer: {
     borderRadius: 12,
@@ -234,7 +277,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
-    elevation: 5,
+    elevation: 5
   },
   dateHeader: {
     flexDirection: 'row',
@@ -242,15 +285,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 4,
     marginBottom: 16,
-    marginTop: 8,
+    marginTop: 8
   },
   dateHeaderText: {
     fontSize: 20,
     fontFamily: 'Inter-SemiBold',
-    color: '#fff',
+    color: '#fff'
   },
   workoutsContainer: {
-    marginTop: 8,
+    marginTop: 8
   },
   emptyState: {
     backgroundColor: '#1a1a1a',
@@ -261,7 +304,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 2,
-    elevation: 3,
+    elevation: 3
   },
   emptyStateText: {
     fontFamily: 'Inter-Regular',
@@ -277,7 +320,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 2,
-    elevation: 3,
+    elevation: 3
   },
   startButtonText: {
     color: '#fff',
@@ -295,7 +338,7 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 3,
     borderLeftWidth: 4,
-    borderLeftColor: '#fd8f09',
+    borderLeftColor: '#fd8f09'
   },
   workoutHeader: {
     flexDirection: 'row',

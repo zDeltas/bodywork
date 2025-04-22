@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, Vibration, View } from 'react-native';
 import { Inter_400Regular, Inter_600SemiBold, useFonts } from '@expo-google-fonts/inter';
-import { Minus, Pause, Play, Plus, RotateCcw, Settings } from 'lucide-react-native';
+import { Minus, Pause, Play, Plus, RotateCcw } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { useTranslation } from '@/hooks/useTranslation';
 
@@ -12,15 +12,7 @@ interface TimerProps {
   sets?: number;
   restTime?: number;
   exerciseName?: string;
-  onSettingsPress?: () => void;
 }
-
-export const REST_TIMES = {
-  'Short': 30,
-  'Medium': 60,
-  'Long': 90,
-  'Very Long': 120
-};
 
 export default function Timer({
                                 initialTime = 60,
@@ -28,8 +20,7 @@ export default function Timer({
                                 onComplete,
                                 sets = 1,
                                 restTime = 60,
-                                exerciseName = 'Exercise',
-                                onSettingsPress
+                                exerciseName = 'Exercise'
                               }: TimerProps) {
   const { t } = useTranslation();
   const [workTime, setWorkTime] = useState(mode === 'timer' ? initialTime : 0);
@@ -139,9 +130,6 @@ export default function Timer({
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.exerciseName}>{exerciseName}</Text>
-        <TouchableOpacity onPress={onSettingsPress} style={styles.settingsButton}>
-          <Settings color="#fd8f09" size={24} />
-        </TouchableOpacity>
       </View>
 
       <View style={styles.setsContainer}>
@@ -218,9 +206,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontFamily: 'Inter-SemiBold',
     color: '#fff'
-  },
-  settingsButton: {
-    padding: 8
   },
   setsContainer: {
     flexDirection: 'row',

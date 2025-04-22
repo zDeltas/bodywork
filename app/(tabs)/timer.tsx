@@ -1,158 +1,24 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Modal } from 'react-native';
-import { useFonts, Inter_400Regular, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
-import { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold, useFonts } from '@expo-google-fonts/inter';
 import * as SplashScreen from 'expo-splash-screen';
 import Timer, { REST_TIMES } from '../components/Timer';
-import { Plus, Minus, X } from 'lucide-react-native';
+import { Minus, Plus } from 'lucide-react-native';
 import { useTranslation } from '@/hooks/useTranslation';
+import { TimerPickerModal } from 'react-native-timer-picker';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Audio } from 'expo-av';
+import * as Haptics from 'expo-haptics';
+import { TranslationKey } from '@/translations';
 
 SplashScreen.preventAutoHideAsync();
 
 const WORKOUT_TIMES = {
-  'Quick': 30,
-  'Standard': 60,
-  'Long': 90,
-  'Very Long': 120,
+  'quick': 30,
+  'standard': 60,
+  'long': 90,
+  'veryLong': 120
 };
-
-interface CustomTimeModalProps {
-  visible: boolean;
-  onClose: () => void;
-  onSave: (minutes: number, seconds: number) => void;
-  initialMinutes?: number;
-  initialSeconds?: number;
-}
-
-function CustomTimeModal({ visible, onClose, onSave, initialMinutes = 0, initialSeconds = 0 }: CustomTimeModalProps) {
-  const { t } = useTranslation();
-  const [minutes, setMinutes] = useState(initialMinutes.toString());
-  const [seconds, setSeconds] = useState(initialSeconds.toString());
-
-  const handleSave = () => {
-    const mins = parseInt(minutes) || 0;
-    const secs = parseInt(seconds) || 0;
-    onSave(mins, secs);
-    onClose();
-  };
-
-  const updateTime = (type: 'minutes' | 'seconds', increment: boolean) => {
-    const currentValue = type === 'minutes' ? minutes : seconds;
-    const newValue = Math.max(0, (parseInt(currentValue) || 0) + (increment ? 1 : -1));
-    if (type === 'minutes') {
-      setMinutes(newValue.toString());
-    } else {
-      setSeconds(newValue.toString());
-    }
-  };
-
-  return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="fade"
-    >
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>{t('customTime')}</Text>
-            <TouchableOpacity onPress={onClose}>
-              <X color="#fff" size={24} />
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.timeInputs}>
-            <View style={styles.timeInputContainer}>
-              <Text style={styles.timeLabel}>{t('minutes')}</Text>
-              <View style={styles.timeInputControls}>
-                <TouchableOpacity
-                  style={styles.timeControlButton}
-                  onPress={() => updateTime('minutes', false)}
-                >
-                  <Minus color="#fff" size={24} />
-                </TouchableOpacity>
-                <TextInput
-                  style={styles.timeInput}
-                  value={minutes}
-                  onChangeText={setMinutes}
-                  keyboardType="numeric"
-                  placeholder="0"
-                  placeholderTextColor="#666"
-                />
-                <TouchableOpacity
-                  style={styles.timeControlButton}
-                  onPress={() => updateTime('minutes', true)}
-                >
-                  <Plus color="#fff" size={24} />
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            <View style={styles.timeInputContainer}>
-              <Text style={styles.timeLabel}>{t('seconds')}</Text>
-              <View style={styles.timeInputControls}>
-                <TouchableOpacity
-                  style={styles.timeControlButton}
-                  onPress={() => updateTime('seconds', false)}
-                >
-                  <Minus color="#fff" size={24} />
-                </TouchableOpacity>
-                <TextInput
-                  style={styles.timeInput}
-                  value={seconds}
-                  onChangeText={setSeconds}
-                  keyboardType="numeric"
-                  placeholder="0"
-                  placeholderTextColor="#666"
-                />
-                <TouchableOpacity
-                  style={styles.timeControlButton}
-                  onPress={() => updateTime('seconds', true)}
-                >
-                  <Plus color="#fff" size={24} />
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-
-          <View style={styles.presetButtons}>
-            <TouchableOpacity
-              style={styles.presetButton}
-              onPress={() => {
-                setMinutes('1');
-                setSeconds('0');
-              }}
-            >
-              <Text style={styles.presetButtonText}>1:00</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.presetButton}
-              onPress={() => {
-                setMinutes('2');
-                setSeconds('0');
-              }}
-            >
-              <Text style={styles.presetButtonText}>2:00</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.presetButton}
-              onPress={() => {
-                setMinutes('3');
-                setSeconds('0');
-              }}
-            >
-              <Text style={styles.presetButtonText}>3:00</Text>
-            </TouchableOpacity>
-          </View>
-
-          <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-            <Text style={styles.saveButtonText}>{t('save')}</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </Modal>
-  );
-}
 
 export default function TimerScreen() {
   const { t } = useTranslation();
@@ -168,7 +34,7 @@ export default function TimerScreen() {
   const [fontsLoaded] = useFonts({
     'Inter-Regular': Inter_400Regular,
     'Inter-SemiBold': Inter_600SemiBold,
-    'Inter-Bold': Inter_700Bold,
+    'Inter-Bold': Inter_700Bold
   });
 
   const onLayoutRootView = useCallback(async () => {
@@ -181,14 +47,18 @@ export default function TimerScreen() {
     // Vous pouvez ajouter une notification ou un son ici
   };
 
-  const handleCustomTimeSave = (minutes: number, seconds: number) => {
-    setSelectedTime(minutes * 60 + seconds);
+  const handleCustomTimeSave = (pickedDuration: { hours: number, minutes: number, seconds: number }) => {
+    const totalSeconds = (pickedDuration.hours * 3600) + (pickedDuration.minutes * 60) + pickedDuration.seconds;
+    setSelectedTime(totalSeconds);
     setIsCustomTime(true);
+    setShowCustomTimeModal(false);
   };
 
-  const handleCustomRestTimeSave = (minutes: number, seconds: number) => {
-    setSelectedRestTime(minutes * 60 + seconds);
+  const handleCustomRestTimeSave = (pickedDuration: { hours: number, minutes: number, seconds: number }) => {
+    const totalSeconds = (pickedDuration.hours * 3600) + (pickedDuration.minutes * 60) + pickedDuration.seconds;
+    setSelectedRestTime(totalSeconds);
     setIsCustomRestTime(true);
+    setShowCustomRestTimeModal(false);
   };
 
   if (!fontsLoaded) {
@@ -219,26 +89,26 @@ export default function TimerScreen() {
         </View>
       </View>
 
-      <ScrollView style={styles.content}>
+      <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: 100 }}>
         {mode === 'timer' && (
           <>
-            <Text style={styles.sectionTitle}>{t('exerciseName')}</Text>
-            <TextInput
-              style={styles.input}
-              value={exerciseName}
-              onChangeText={setExerciseName}
-              placeholder={t('enterExerciseName')}
-              placeholderTextColor="#666"
-            />
+            {/*<Text style={styles.sectionTitle}>{t('exerciseName')}</Text>*/}
+            {/*<TextInput*/}
+            {/*  style={styles.input}*/}
+            {/*  value={exerciseName}*/}
+            {/*  onChangeText={setExerciseName}*/}
+            {/*  placeholder={t('enterExerciseName')}*/}
+            {/*  placeholderTextColor="#666"*/}
+            {/*/>*/}
 
             <Text style={styles.sectionTitle}>{t('workTime')}</Text>
             <View style={styles.timeGrid}>
-              {Object.entries(WORKOUT_TIMES).map(([label, time]) => (
+              {Object.entries(WORKOUT_TIMES).map(([key, time]) => (
                 <TouchableOpacity
-                  key={label}
+                  key={key}
                   style={[
                     styles.timeButton,
-                    selectedTime === time && !isCustomTime && styles.timeButtonActive,
+                    selectedTime === time && !isCustomTime && styles.timeButtonActive
                   ]}
                   onPress={() => {
                     setSelectedTime(time);
@@ -248,15 +118,15 @@ export default function TimerScreen() {
                   <Text
                     style={[
                       styles.timeText,
-                      selectedTime === time && !isCustomTime && styles.timeTextActive,
+                      selectedTime === time && !isCustomTime && styles.timeTextActive
                     ]}
                   >
-                    {label}
+                    {t(key as TranslationKey)}
                   </Text>
                   <Text
                     style={[
                       styles.timeValue,
-                      selectedTime === time && !isCustomTime && styles.timeValueActive,
+                      selectedTime === time && !isCustomTime && styles.timeValueActive
                     ]}
                   >
                     {time < 60
@@ -268,14 +138,14 @@ export default function TimerScreen() {
               <TouchableOpacity
                 style={[
                   styles.timeButton,
-                  isCustomTime && styles.timeButtonActive,
+                  isCustomTime && styles.timeButtonActive
                 ]}
                 onPress={() => setShowCustomTimeModal(true)}
               >
                 <Text
                   style={[
                     styles.timeText,
-                    isCustomTime && styles.timeTextActive,
+                    isCustomTime && styles.timeTextActive
                   ]}
                 >
                   {t('custom')}
@@ -283,7 +153,7 @@ export default function TimerScreen() {
                 <Text
                   style={[
                     styles.timeValue,
-                    isCustomTime && styles.timeValueActive,
+                    isCustomTime && styles.timeValueActive
                   ]}
                 >
                   {selectedTime < 60
@@ -295,12 +165,12 @@ export default function TimerScreen() {
 
             <Text style={styles.sectionTitle}>{t('restTime')}</Text>
             <View style={styles.timeGrid}>
-              {Object.entries(REST_TIMES).map(([label, time]) => (
+              {Object.entries(WORKOUT_TIMES).map(([key, time]) => (
                 <TouchableOpacity
-                  key={label}
+                  key={key}
                   style={[
                     styles.timeButton,
-                    selectedRestTime === time && !isCustomRestTime && styles.timeButtonActive,
+                    selectedRestTime === time && !isCustomRestTime && styles.timeButtonActive
                   ]}
                   onPress={() => {
                     setSelectedRestTime(time);
@@ -310,15 +180,15 @@ export default function TimerScreen() {
                   <Text
                     style={[
                       styles.timeText,
-                      selectedRestTime === time && !isCustomRestTime && styles.timeTextActive,
+                      selectedRestTime === time && !isCustomRestTime && styles.timeTextActive
                     ]}
                   >
-                    {label}
+                    {t(key as TranslationKey)}
                   </Text>
                   <Text
                     style={[
                       styles.timeValue,
-                      selectedRestTime === time && !isCustomRestTime && styles.timeValueActive,
+                      selectedRestTime === time && !isCustomRestTime && styles.timeValueActive
                     ]}
                   >
                     {time < 60
@@ -330,14 +200,14 @@ export default function TimerScreen() {
               <TouchableOpacity
                 style={[
                   styles.timeButton,
-                  isCustomRestTime && styles.timeButtonActive,
+                  isCustomRestTime && styles.timeButtonActive
                 ]}
                 onPress={() => setShowCustomRestTimeModal(true)}
               >
                 <Text
                   style={[
                     styles.timeText,
-                    isCustomRestTime && styles.timeTextActive,
+                    isCustomRestTime && styles.timeTextActive
                   ]}
                 >
                   {t('custom')}
@@ -345,7 +215,7 @@ export default function TimerScreen() {
                 <Text
                   style={[
                     styles.timeValue,
-                    isCustomRestTime && styles.timeValueActive,
+                    isCustomRestTime && styles.timeValueActive
                   ]}
                 >
                   {selectedRestTime < 60
@@ -386,20 +256,93 @@ export default function TimerScreen() {
         </View>
       </ScrollView>
 
-      <CustomTimeModal
+      <TimerPickerModal
         visible={showCustomTimeModal}
-        onClose={() => setShowCustomTimeModal(false)}
-        onSave={handleCustomTimeSave}
-        initialMinutes={Math.floor(selectedTime / 60)}
-        initialSeconds={selectedTime % 60}
+        setIsVisible={setShowCustomTimeModal}
+        onCancel={() => setShowCustomTimeModal(false)}
+        onConfirm={handleCustomTimeSave}
+        cancelButtonText={t('cancel')}
+        confirmButtonText={t('save')}
+        closeOnOverlayPress={true}
+        modalTitle={t('workTime')}
+        styles={{
+          backgroundColor: '#1a1a1a',
+          pickerContainer: {
+            backgroundColor: '#1a1a1a'
+          },
+          pickerItem: {
+            color: '#fff',
+            fontSize: 34
+          },
+          pickerLabel: {
+            color: '#fff',
+            fontSize: 26,
+            right: -20
+          },
+          theme: 'dark',
+          pickerLabelContainer: {
+            width: 60
+          },
+          pickerItemContainer: {
+            width: 150
+          },
+          confirmButton: {
+            backgroundColor: '#fd8f09',
+            borderColor: '#fd8f09'
+          }
+        }}
+        hideHours={true}
+        padWithNItems={1}
+        minuteLabel="min"
+        secondLabel="sec"
+        LinearGradient={LinearGradient}
+        Haptics={Haptics}
+        Audio={Audio}
       />
 
-      <CustomTimeModal
+
+      <TimerPickerModal
         visible={showCustomRestTimeModal}
-        onClose={() => setShowCustomRestTimeModal(false)}
-        onSave={handleCustomRestTimeSave}
-        initialMinutes={Math.floor(selectedRestTime / 60)}
-        initialSeconds={selectedRestTime % 60}
+        setIsVisible={setShowCustomRestTimeModal}
+        onCancel={() => setShowCustomRestTimeModal(false)}
+        onConfirm={handleCustomRestTimeSave}
+        cancelButtonText={t('cancel')}
+        confirmButtonText={t('save')}
+        closeOnOverlayPress={true}
+        modalTitle={t('restTime')}
+        styles={{
+          backgroundColor: '#1a1a1a',
+          pickerContainer: {
+            backgroundColor: '#1a1a1a'
+          },
+          pickerItem: {
+            color: '#fff',
+            fontSize: 34
+          },
+          pickerLabel: {
+            color: '#fff',
+            fontSize: 26,
+            right: -20
+          },
+          theme: 'dark',
+          pickerLabelContainer: {
+            width: 60
+          },
+          pickerItemContainer: {
+            width: 150
+          },
+          confirmButton: {
+            backgroundColor: '#fd8f09',
+            borderColor: '#fd8f09'
+          }
+        }}
+        hideHours={true}
+        padWithNItems={1}
+        minuteLabel="min"
+        secondLabel="sec"
+        LinearGradient={LinearGradient}
+        Haptics={Haptics}
+        Audio={Audio}
       />
     </View>
   );
@@ -408,53 +351,53 @@ export default function TimerScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0a0a0a',
+    backgroundColor: '#0a0a0a'
   },
   header: {
     paddingTop: 60,
     paddingHorizontal: 20,
     paddingBottom: 20,
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#1a1a1a'
   },
   title: {
     fontSize: 32,
     fontFamily: 'Inter-Bold',
     color: '#fff',
-    marginBottom: 20,
+    marginBottom: 20
   },
   modeSelector: {
     flexDirection: 'row',
     backgroundColor: '#333',
     borderRadius: 8,
-    padding: 4,
+    padding: 4
   },
   modeButton: {
     flex: 1,
     paddingVertical: 8,
     borderRadius: 6,
-    alignItems: 'center',
+    alignItems: 'center'
   },
   modeButtonActive: {
-    backgroundColor: '#fd8f09',
+    backgroundColor: '#fd8f09'
   },
   modeText: {
     fontFamily: 'Inter-SemiBold',
     color: '#666',
-    fontSize: 16,
+    fontSize: 16
   },
   modeTextActive: {
-    color: '#fff',
+    color: '#fff'
   },
   content: {
     flex: 1,
-    padding: 20,
+    padding: 20
   },
   sectionTitle: {
     fontSize: 20,
     fontFamily: 'Inter-SemiBold',
     color: '#fff',
     marginBottom: 16,
-    marginTop: 24,
+    marginTop: 24
   },
   input: {
     backgroundColor: '#1a1a1a',
@@ -462,13 +405,13 @@ const styles = StyleSheet.create({
     padding: 12,
     color: '#fff',
     fontFamily: 'Inter-Regular',
-    marginBottom: 24,
+    marginBottom: 24
   },
   timeGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 12,
-    marginBottom: 24,
+    marginBottom: 24
   },
   timeButton: {
     backgroundColor: '#1a1a1a',
@@ -476,34 +419,34 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     flex: 1,
     minWidth: '45%',
-    alignItems: 'center',
+    alignItems: 'center'
   },
   timeButtonActive: {
-    backgroundColor: '#fd8f09',
+    backgroundColor: '#fd8f09'
   },
   timeText: {
     color: '#fff',
     fontFamily: 'Inter-SemiBold',
     fontSize: 16,
-    marginBottom: 4,
+    marginBottom: 4
   },
   timeTextActive: {
-    color: '#fff',
+    color: '#fff'
   },
   timeValue: {
     color: '#666',
     fontFamily: 'Inter-Regular',
-    fontSize: 14,
+    fontSize: 14
   },
   timeValueActive: {
-    color: '#fff',
+    color: '#fff'
   },
   setsContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 24,
-    marginBottom: 24,
+    marginBottom: 24
   },
   setsButton: {
     width: 48,
@@ -511,104 +454,16 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     backgroundColor: '#1a1a1a',
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'center'
   },
   setsValue: {
     fontSize: 24,
     fontFamily: 'Inter-SemiBold',
     color: '#fff',
     minWidth: 40,
-    textAlign: 'center',
+    textAlign: 'center'
   },
   timerContainer: {
-    marginTop: 20,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContent: {
-    backgroundColor: '#1a1a1a',
-    borderRadius: 12,
-    padding: 20,
-    width: '80%',
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontFamily: 'Inter-SemiBold',
-    color: '#fff',
-  },
-  timeInputs: {
-    flexDirection: 'row',
-    gap: 16,
-    marginBottom: 24,
-  },
-  timeInputContainer: {
-    flex: 1,
-  },
-  timeInputControls: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  timeControlButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#333',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  timeInput: {
-    flex: 1,
-    backgroundColor: '#1a1a1a',
-    borderRadius: 8,
-    padding: 12,
-    color: '#fff',
-    fontFamily: 'Inter-Regular',
-    textAlign: 'center',
-    fontSize: 18,
-  },
-  presetButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 24,
-  },
-  presetButton: {
-    flex: 1,
-    marginHorizontal: 4,
-    paddingVertical: 8,
-    backgroundColor: '#333',
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  presetButtonText: {
-    color: '#fff',
-    fontFamily: 'Inter-SemiBold',
-    fontSize: 16,
-  },
-  saveButton: {
-    backgroundColor: '#fd8f09',
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  saveButtonText: {
-    color: '#fff',
-    fontFamily: 'Inter-SemiBold',
-    fontSize: 16,
-  },
-  timeLabel: {
-    color: '#666',
-    fontFamily: 'Inter-Regular',
-    marginBottom: 8,
-  },
+    marginTop: 20
+  }
 });

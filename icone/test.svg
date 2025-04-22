@@ -1,0 +1,14 @@
+<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fond carré noir -->
+  <rect width="400" height="400" rx="60" fill="#181818"/>
+  <!-- Silhouette musculaire stylisée -->
+  <path d="M90 320 Q130 180 200 130 Q270 180 310 320" stroke="#FF8C32" stroke-width="18" fill="none"/>
+  <ellipse cx="200" cy="160" rx="68" ry="50" fill="#2C2C2C"/>
+  <!-- Lettre B à gauche, intégrée -->
+  <path d="M135 210 Q135 185 160 185 Q185 185 185 210 Q185 235 160 235 Q135 235 135 210" stroke="#FF8C32" stroke-width="10" fill="none"/>
+  <path d="M135 185 L135 235" stroke="#FF8C32" stroke-width="10"/>
+  <!-- Lettre W à droite, intégrée -->
+  <path d="M215 185 L225 235 L235 185 L245 235 L255 185" stroke="#FF8C32" stroke-width="10" fill="none"/>
+  <!-- Lignes tech grises -->
+  <rect x="65" y="65" width="270" height="270" rx="50" stroke="#444" stroke-width="6"/>
+</svg>

@@ -51,7 +51,7 @@ export default function SettingsScreen() {
           <Text style={styles.loadingText}>{t('loadingSettings')}</Text>
         </View>
       ) : (
-        <ScrollView style={styles.content}>
+        <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: 100 }}>
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>{t('preferences')}</Text>
 
@@ -130,12 +130,12 @@ export default function SettingsScreen() {
 
                 <Text style={styles.aboutDeveloper}>{t('aboutDeveloper')}</Text>
 
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={styles.aboutLink}
-                  onPress={() => Linking.openURL('https://github.com')}
+                  onPress={() => Linking.openURL('https://www.linkedin.com/in/damien-le-borgne-997b991a1/')}
                 >
-                  <Ionicons name="logo-github" size={20} color="#fd8f09" />
-                  <Text style={styles.aboutLinkText}>GitHub</Text>
+                  <Ionicons name="logo-linkedin" size={20} color="#fd8f09" />
+                  <Text style={styles.aboutLinkText}>Linkedin</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity 

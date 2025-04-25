@@ -10,7 +10,6 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import { Inter_400Regular, Inter_600SemiBold, useFonts } from '@expo-google-fonts/inter';
 import Svg, { Line } from 'react-native-svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Body from 'react-native-body-highlighter';
@@ -18,6 +17,7 @@ import { VictoryAxis, VictoryChart, VictoryLine, VictoryTheme } from 'victory-na
 import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 import { Calendar } from 'react-native-calendars';
 import { useTranslation } from '@/hooks/useTranslation';
+import theme, { colors, typography, spacing, borderRadius } from '@/app/theme/theme';
 
 interface Measurement {
   date: string;
@@ -121,7 +121,6 @@ export default function BodyMeasurements() {
 
   const rotationValue = useSharedValue(0);
 
-
   useEffect(() => {
     const loadMeasurements = async () => {
       try {
@@ -155,7 +154,7 @@ export default function BodyMeasurements() {
     {
       label: 'Cou',
       key: 'neck',
-      color: '#4ade80',
+      color: colors.measurement.neck,
       position: {
         x: bodyWidth * 0.20,
         y: bodyHeight * 0.15,
@@ -171,7 +170,7 @@ export default function BodyMeasurements() {
     {
       label: 'Épaules',
       key: 'shoulders',
-      color: '#4ade80',
+      color: colors.measurement.shoulders,
       position: {
         x: bodyWidth * 0.20,
         y: bodyHeight * 0.23,
@@ -187,7 +186,7 @@ export default function BodyMeasurements() {
     {
       label: 'Poitrine',
       key: 'chest',
-      color: '#4ade80',
+      color: colors.measurement.chest,
       position: {
         x: bodyWidth * 0.28,
         y: bodyHeight * 0.3,
@@ -203,7 +202,7 @@ export default function BodyMeasurements() {
     {
       label: 'Bras',
       key: 'arms',
-      color: '#818cf8',
+      color: colors.measurement.arms,
       position: {
         x: bodyWidth * 0.22,
         y: bodyHeight * 0.3,
@@ -219,7 +218,7 @@ export default function BodyMeasurements() {
     {
       label: 'Avant-bras',
       key: 'forearms',
-      color: '#818cf8',
+      color: colors.measurement.forearms,
       position: {
         x: bodyWidth * 0.19,
         y: bodyHeight * 0.42,
@@ -235,7 +234,7 @@ export default function BodyMeasurements() {
     {
       label: 'Taille',
       key: 'waist',
-      color: '#4ade80',
+      color: colors.measurement.waist,
       position: {
         x: bodyWidth * 0.28,
         y: bodyHeight * 0.38,
@@ -251,7 +250,7 @@ export default function BodyMeasurements() {
     {
       label: 'Hanches',
       key: 'hips',
-      color: '#4ade80',
+      color: colors.measurement.hips,
       position: {
         x: bodyWidth * 0.28,
         y: bodyHeight * 0.45,
@@ -267,7 +266,7 @@ export default function BodyMeasurements() {
     {
       label: 'Cuisses',
       key: 'thighs',
-      color: '#fbbf24',
+      color: colors.measurement.thighs,
       position: {
         x: bodyWidth * 0.26,
         y: bodyHeight * 0.55,
@@ -283,7 +282,7 @@ export default function BodyMeasurements() {
     {
       label: 'Mollets',
       key: 'calves',
-      color: '#fbbf24',
+      color: colors.measurement.calves,
       position: {
         x: bodyWidth * 0.26,
         y: bodyHeight * 0.75,
@@ -346,11 +345,6 @@ export default function BodyMeasurements() {
 
     return [...sortedLeftPoints, ...sortedRightPoints];
   }, [bodyWidth, bodyHeight, windowWidth]);
-
-  const [fontsLoaded] = useFonts({
-    'Inter-Regular': Inter_400Regular,
-    'Inter-SemiBold': Inter_600SemiBold
-  });
 
   const containerStyle = useAnimatedStyle(() => ({
     transform: [{ rotateY: `${rotationValue.value}deg` }]
@@ -528,9 +522,46 @@ export default function BodyMeasurements() {
     setShowHistory(true);
   };
 
-  if (!fontsLoaded) {
-    return null;
-  }
+  // Theme pour VictoryChart
+  const chartTheme = {
+    axis: {
+      style: {
+        axis: { stroke: colors.border.default },
+        tickLabels: { fill: colors.text.secondary, fontSize: typography.fontSize.xs, fontFamily: typography.fontFamily.regular },
+        grid: { stroke: colors.border.default, strokeDasharray: '3,3' },
+      },
+    },
+    line: {
+      style: {
+        data: {
+          strokeWidth: 2,
+        },
+      },
+    },
+  };
+
+  // Theme pour Calendar
+  const calendarTheme = {
+    backgroundColor: colors.background.card, // theme
+    calendarBackground: colors.background.card, // theme
+    textSectionTitleColor: colors.text.primary, // theme
+    selectedDayBackgroundColor: colors.primary, // theme
+    selectedDayTextColor: colors.text.primary, // theme
+    todayTextColor: colors.primary, // theme
+    dayTextColor: colors.text.primary, // theme
+    textDisabledColor: colors.text.disabled, // theme
+    dotColor: colors.primary, // theme
+    selectedDotColor: colors.text.primary, // theme
+    arrowColor: colors.primary, // theme
+    monthTextColor: colors.text.primary, // theme
+    indicatorColor: colors.primary, // theme
+    textDayFontFamily: typography.fontFamily.regular, // theme
+    textMonthFontFamily: typography.fontFamily.semiBold, // theme
+    textDayHeaderFontFamily: typography.fontFamily.regular, // theme
+    textDayFontSize: typography.fontSize.sm, // theme
+    textMonthFontSize: typography.fontSize.lg, // theme
+    textDayHeaderFontSize: typography.fontSize.xs, // theme
+  };
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 100 }}>
@@ -544,12 +575,12 @@ export default function BodyMeasurements() {
 
         <View style={styles.weightContainer}>
           <TextInput
-            style={[styles.weightValue, { minWidth: 80 }]}
+            style={styles.weightValue}
             value={measurements.weight > 0 ? measurements.weight.toString() : ''}
             onChangeText={handleWeightChange}
             keyboardType="numeric"
             placeholder="0"
-            placeholderTextColor="#666"
+            placeholderTextColor={colors.text.disabled}
             onBlur={() => saveMeasurements(measurements)}
           />
           <Text style={styles.weightLabel}>kg</Text>
@@ -567,7 +598,7 @@ export default function BodyMeasurements() {
           />
         </Animated.View>
 
-        {/* Measurement points */}
+        {/* Measurement points SVG */}
         <Svg width={windowWidth} height={bodyHeight} style={StyleSheet.absoluteFill}>
           {adjustPointPositions(visiblePoints).map((point, index) => {
             const position = point.position;
@@ -577,6 +608,7 @@ export default function BodyMeasurements() {
               <React.Fragment key={index}>
                 {position.measurementLine && position.labelX && position.labelY && (
                   <>
+                    {/* Ligne mesure corps */}
                     <Line
                       x1={position.measurementLine.x1}
                       y1={position.measurementLine.y1}
@@ -586,14 +618,14 @@ export default function BodyMeasurements() {
                       strokeWidth="2"
                       strokeDasharray="3,3"
                     />
-
+                    {/* Ligne connecteur */}
                     <Line
                       x1={(position.measurementLine.x1 + position.measurementLine.x2) / 2}
                       y1={position.measurementLine.y1}
                       x2={position.labelX + (position.side === 'left' ? 40 : 0)}
                       y2={position.labelY}
                       stroke={point.color}
-                      strokeWidth="2"
+                      strokeWidth="1"
                       strokeDasharray="3,3"
                     />
                   </>
@@ -603,23 +635,14 @@ export default function BodyMeasurements() {
           })}
         </Svg>
 
-        {/* Interactive touch areas for the body points */}
+        {/* Interactive touch areas (garder invisibles) */}
         {adjustPointPositions(visiblePoints).map((point, index) => {
           const position = point.position;
           if (!position) return null;
-
           return (
             <TouchableOpacity
               key={`touch-${index}`}
-              style={{
-                position: 'absolute',
-                left: position.x - 15,
-                top: position.y - 15,
-                width: 30,
-                height: 30,
-                borderRadius: 15,
-                zIndex: 2
-              }}
+              style={[styles.touchArea, { left: position.x - 15, top: position.y - 15 }]}
               onPress={() => handleMeasurementPointPress(point)}
             />
           );
@@ -629,25 +652,16 @@ export default function BodyMeasurements() {
         {adjustPointPositions(visiblePoints).map((point, index) => {
           const position = point.position;
           if (!position || position.labelX === undefined || position.labelY === undefined) return null;
-
           const value = measurements.measurements[point.key];
-
           return (
             <TouchableOpacity
               key={`label-${index}`}
-              style={[
-                styles.measurementLabel,
-                {
-                  left: position.labelX,
-                  top: position.labelY - 15,
-                  marginBottom: 10
-                }
-              ]}
+              style={[styles.measurementLabel, { left: position.labelX, top: position.labelY - 15 }]}
               onPress={() => handleMeasurementPointPress(point)}
             >
               <View style={[styles.measurementValue, { borderColor: point.color }]}>
                 <Text style={[styles.measurementText, { color: point.color }]}>
-                  {value > 0 ? (value <= 999 ? value : `${value} cm`) : '•'}
+                  {value > 0 ? (value <= 999 ? value.toFixed(1) : `${value} cm`) : '-'}
                 </Text>
               </View>
             </TouchableOpacity>
@@ -663,59 +677,34 @@ export default function BodyMeasurements() {
         onRequestClose={() => setShowModal(false)}
         statusBarTranslucent
       >
-        <Pressable
-          style={styles.modalOverlay}
-          onPress={() => setShowModal(false)}
-        >
-          <Pressable
-            style={styles.modalContent}
-            onPress={(e) => e.stopPropagation()}
-          >
+        <Pressable style={styles.modalOverlay} onPress={() => setShowModal(false)}>
+          <Pressable style={styles.modalContent} onPress={(e) => e.stopPropagation()}>
             <View style={styles.modalHeader}>
-              <Text style={[
-                styles.modalTitle,
-                selectedPoint ? { color: selectedPoint.color } : {}
-              ]}>
+              <Text style={[styles.modalTitle, selectedPoint ? { color: selectedPoint.color } : {}]}>
                 {selectedPoint ? selectedPoint.label : ''}
               </Text>
             </View>
-
             <TextInput
-              style={[
-                styles.modalInput,
-                selectedPoint ? { borderColor: selectedPoint.color, borderWidth: 2 } : {}
-              ]}
+              style={[styles.modalInput, selectedPoint ? { borderColor: selectedPoint.color } : {}]}
               value={inputValue}
               onChangeText={setInputValue}
               keyboardType="numeric"
               placeholder="0"
-              placeholderTextColor="#666"
+              placeholderTextColor={colors.text.disabled}
               autoFocus
               selectTextOnFocus
             />
-
             <View style={styles.modalButtons}>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.modalCancelButton]}
-                onPress={() => setShowModal(false)}
-              >
+              <TouchableOpacity style={[styles.modalButton, styles.modalCancelButton]} onPress={() => setShowModal(false)}>
                 <Text style={styles.modalButtonText}>Annuler</Text>
               </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[styles.modalButton, styles.modalSaveButton]}
-                onPress={handleModalSave}
-              >
+              <TouchableOpacity style={[styles.modalButton, styles.modalSaveButton]} onPress={handleModalSave}>
                 <Text style={styles.modalButtonText}>Enregistrer</Text>
               </TouchableOpacity>
-
               {selectedPoint && allMeasurements.length > 1 && (
                 <TouchableOpacity
                   style={[styles.modalButton, styles.modalHistoryButton]}
-                  onPress={() => {
-                    setShowModal(false);
-                    loadHistoryData(selectedPoint.key);
-                  }}
+                  onPress={() => { setShowModal(false); loadHistoryData(selectedPoint.key); }}
                 >
                   <Text style={styles.modalButtonText}>Historique</Text>
                 </TouchableOpacity>
@@ -725,24 +714,24 @@ export default function BodyMeasurements() {
         </Pressable>
       </Modal>
 
+      {/* History modal */}
       <Modal
         visible={showHistory}
         transparent={true}
         animationType="fade"
         onRequestClose={() => setShowHistory(false)}
       >
-        <View style={styles.modalOverlay}>
-          <View style={[styles.modalContent, styles.historyModalContent]}>
+        <Pressable style={styles.modalOverlay} onPress={() => setShowHistory(false)}>
+          <Pressable style={[styles.modalContent, styles.historyModalContent]} onPress={(e) => e.stopPropagation()}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>
                 Historique {selectedPoint ? selectedPoint.label : ''}
               </Text>
             </View>
-
             {historyData.length > 1 ? (
               <View style={styles.chartContainer}>
                 <VictoryChart
-                  theme={VictoryTheme.material}
+                  theme={chartTheme}
                   height={300}
                   width={windowWidth * 0.8}
                   padding={{ top: 50, bottom: 50, left: 50, right: 50 }}
@@ -753,29 +742,16 @@ export default function BodyMeasurements() {
                       const d = new Date(date);
                       return `${d.getDate()}/${d.getMonth() + 1}`;
                     }}
-                    style={{
-                      axis: { stroke: '#ccc' },
-                      tickLabels: { fill: '#ccc', fontSize: 10 }
-                    }}
                   />
                   <VictoryAxis
                     dependentAxis
                     tickFormat={(value) => `${value}cm`}
-                    style={{
-                      axis: { stroke: '#ccc' },
-                      tickLabels: { fill: '#ccc', fontSize: 10 }
-                    }}
                   />
                   <VictoryLine
                     data={historyData}
                     x="date"
                     y="value"
-                    style={{
-                      data: {
-                        stroke: selectedPoint ? selectedPoint.color : '#fd8f09',
-                        strokeWidth: 2
-                      }
-                    }}
+                    style={{ data: { stroke: selectedPoint ? selectedPoint.color : colors.primary } }}
                     interpolation="natural"
                   />
                 </VictoryChart>
@@ -785,15 +761,11 @@ export default function BodyMeasurements() {
                 {historyData.length === 0 ? 'Aucune donnée disponible' : 'Pas assez de données pour afficher un graphique'}
               </Text>
             )}
-
-            <TouchableOpacity
-              style={[styles.modalButton, styles.modalCloseButton]}
-              onPress={() => setShowHistory(false)}
-            >
+            <TouchableOpacity style={[styles.modalButton, styles.modalCloseButton]} onPress={() => setShowHistory(false)}>
               <Text style={styles.modalButtonText}>{t('close')}</Text>
             </TouchableOpacity>
-          </View>
-        </View>
+          </Pressable>
+        </Pressable>
       </Modal>
 
       {/* Date picker modal */}
@@ -803,12 +775,11 @@ export default function BodyMeasurements() {
         animationType="fade"
         onRequestClose={() => setShowDatePicker(false)}
       >
-        <View style={styles.modalOverlay}>
-          <View style={[styles.modalContent, styles.datePickerContent]}>
+        <Pressable style={styles.modalOverlay} onPress={() => setShowDatePicker(false)}>
+          <Pressable style={[styles.modalContent, styles.datePickerContent]} onPress={(e) => e.stopPropagation()}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Sélectionner une date</Text>
             </View>
-
             <Calendar
               current={selectedDate}
               onDayPress={(day: { dateString: string; }) => handleDateChange(day.dateString)}
@@ -816,39 +787,25 @@ export default function BodyMeasurements() {
                 allMeasurements.reduce((acc, measurement) => {
                   acc[measurement.date] = {
                     marked: true,
-                    dotColor: '#fd8f09'
+                    dotColor: colors.primary,
                   };
                   if (measurement.date === selectedDate) {
                     acc[measurement.date] = {
                       ...acc[measurement.date],
                       selected: true,
-                      selectedColor: '#fd8f09'
+                      selectedColor: colors.primary,
                     };
                   }
                   return acc;
-                }, { [selectedDate]: { selected: true, selectedColor: '#fd8f09' } } as Record<string, any>)
+                }, { [selectedDate]: { selected: true, selectedColor: colors.primary } } as Record<string, any>)
               }
-              theme={{
-                backgroundColor: '#1a1a1a',
-                calendarBackground: '#1a1a1a',
-                textSectionTitleColor: '#fff',
-                selectedDayBackgroundColor: '#fd8f09',
-                selectedDayTextColor: '#fff',
-                todayTextColor: '#fd8f09',
-                dayTextColor: '#fff',
-                textDisabledColor: '#444',
-                monthTextColor: '#fff'
-              }}
+              theme={calendarTheme}
             />
-
-            <TouchableOpacity
-              style={[styles.modalButton, styles.modalCloseButton]}
-              onPress={() => setShowDatePicker(false)}
-            >
+            <TouchableOpacity style={[styles.modalButton, styles.modalCloseButton]} onPress={() => setShowDatePicker(false)}>
               <Text style={styles.modalButtonText}>Fermer</Text>
             </TouchableOpacity>
-          </View>
-        </View>
+          </Pressable>
+        </Pressable>
       </Modal>
     </ScrollView>
   );
@@ -857,34 +814,35 @@ export default function BodyMeasurements() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0a0a0a'
+    backgroundColor: colors.background.main,
   },
   header: {
-    padding: 20,
+    padding: spacing.lg,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#1a1a1a',
-    marginBottom: 10
+    backgroundColor: colors.background.card,
+    marginBottom: spacing.sm,
   },
   dateSelector: {
-    backgroundColor: '#2a2a2a',
-    padding: 14,
-    borderRadius: 12,
+    backgroundColor: colors.background.button,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    borderRadius: borderRadius.md,
     minWidth: 180,
     height: 50,
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   dateText: {
-    color: '#fff',
-    fontFamily: 'Inter-Regular',
-    fontSize: 16,
-    textAlign: 'center'
+    color: colors.text.primary,
+    fontFamily: typography.fontFamily.regular,
+    fontSize: typography.fontSize.base,
+    textAlign: 'center',
   },
   weightContainer: {
-    backgroundColor: '#2a2a2a',
-    padding: 14,
-    borderRadius: 12,
+    backgroundColor: colors.background.button,
+    paddingHorizontal: spacing.md,
+    borderRadius: borderRadius.md,
     flexDirection: 'row',
     alignItems: 'baseline',
     height: 50,
@@ -893,16 +851,16 @@ const styles = StyleSheet.create({
   },
   weightValue: {
     fontSize: 32,
-    color: '#ef4444',
-    fontFamily: 'Inter-SemiBold',
+    color: colors.text.warning,
+    fontFamily: typography.fontFamily.semiBold,
     backgroundColor: 'transparent',
     textAlign: 'center'
   },
   weightLabel: {
     fontSize: 16,
-    color: '#ef4444',
+    color: colors.text.warning,
     marginLeft: 6,
-    fontFamily: 'Inter-Regular'
+    fontFamily: typography.fontFamily.regular
   },
   controls: {
     flexDirection: 'row',
@@ -939,33 +897,23 @@ const styles = StyleSheet.create({
   },
   measurementLabel: {
     position: 'absolute',
-    minWidth: 60,
-    maxWidth: 80,
-    zIndex: 3
+    zIndex: 3,
   },
   measurementValue: {
-    backgroundColor: '#2a2a2a',
-    borderRadius: 12,
-    padding: 10,
-    minWidth: 60,
-    maxWidth: 80,
+    backgroundColor: colors.background.button,
+    borderRadius: borderRadius.md,
+    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.sm,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.4,
-    shadowRadius: 4,
-    elevation: 5,
-    height: 40,
-    margin: 2
+    borderWidth: 1,
+    ...theme.shadows.sm,
+    minHeight: 36,
   },
   measurementText: {
-    fontFamily: 'Inter-SemiBold',
-    fontSize: 14,
+    fontFamily: typography.fontFamily.semiBold,
+    fontSize: typography.fontSize.sm,
     textAlign: 'center',
-    color: '#fff',
-    flexShrink: 1,
-    flexWrap: 'nowrap'
   },
   input: {
     backgroundColor: '#1a1a1a',
@@ -985,13 +933,13 @@ const styles = StyleSheet.create({
     padding: 20
   },
   modalContent: {
-    backgroundColor: '#1a1a1a',
-    borderRadius: 20,
-    padding: 24,
+    backgroundColor: colors.background.card,
+    borderRadius: borderRadius.lg,
+    padding: spacing.lg,
     width: '100%',
     maxWidth: 400,
     elevation: 5,
-    shadowColor: '#000',
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84
@@ -1008,27 +956,27 @@ const styles = StyleSheet.create({
   },
   modalHeader: {
     borderBottomWidth: 1,
-    borderBottomColor: '#333',
-    paddingBottom: 18,
-    marginBottom: 18
+    borderBottomColor: colors.border.default,
+    paddingBottom: spacing.md,
+    marginBottom: spacing.md
   },
   modalTitle: {
-    color: '#fff',
-    fontSize: 20,
-    fontFamily: 'Inter-SemiBold',
+    color: colors.text.primary,
+    fontSize: typography.fontSize.xl,
+    fontFamily: typography.fontFamily.semiBold,
     textAlign: 'center'
   },
   modalInput: {
-    backgroundColor: '#2a2a2a',
-    borderRadius: 12,
-    padding: 16,
-    color: '#fff',
-    fontFamily: 'Inter-Regular',
-    fontSize: 24,
+    backgroundColor: colors.background.input,
+    borderRadius: borderRadius.md,
+    padding: spacing.md,
+    color: colors.text.primary,
+    fontFamily: typography.fontFamily.regular,
+    fontSize: typography.fontSize['2xl'],
     textAlign: 'center',
-    marginVertical: 20,
+    marginVertical: spacing.lg,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: colors.border.default,
     height: 60
   },
   modalButtons: {
@@ -1049,39 +997,37 @@ const styles = StyleSheet.create({
     height: 50
   },
   modalSaveButton: {
-    backgroundColor: '#fd8f09'
+    backgroundColor: colors.primary
   },
   modalCancelButton: {
-    backgroundColor: '#333'
+    backgroundColor: colors.background.button
   },
   modalHistoryButton: {
-    backgroundColor: '#0891b2'
+    backgroundColor: colors.info
   },
   modalCloseButton: {
-    backgroundColor: '#333',
-    marginTop: 15,
-    color: '#fff',
+    backgroundColor: colors.background.button,
+    marginTop: spacing.md,
+    color: colors.text.primary,
     alignSelf: 'center'
   },
   modalButtonText: {
-    color: '#ccc',
-    fontFamily: 'Inter-Regular',
-    fontSize: 16,
-    textAlign: 'center',
-    marginVertical: 20
+    color: colors.text.primary,
+    fontFamily: typography.fontFamily.semiBold,
+    fontSize: typography.fontSize.base
   },
   chartContainer: {
-    backgroundColor: '#2a2a2a',
-    borderRadius: 12,
-    padding: 16,
-    marginVertical: 16
+    backgroundColor: colors.background.input,
+    borderRadius: borderRadius.md,
+    padding: spacing.md,
+    marginVertical: spacing.md
   },
   noDataText: {
-    color: '#ccc',
-    fontFamily: 'Inter-Regular',
-    fontSize: 16,
+    color: colors.text.secondary,
+    fontFamily: typography.fontFamily.regular,
+    fontSize: typography.fontSize.base,
     textAlign: 'center',
-    marginVertical: 20
+    marginVertical: spacing.lg
   },
   measurementPoint: {
     position: 'absolute',
@@ -1096,5 +1042,12 @@ const styles = StyleSheet.create({
     width: 12,
     height: 12,
     borderRadius: 6
-  }
+  },
+  touchArea: {
+    position: 'absolute',
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    zIndex: 2,
+  },
 });

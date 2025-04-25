@@ -13,6 +13,7 @@ import MuscleMap from '@/app/components/MuscleMap';
 import { useTranslation } from '@/hooks/useTranslation';
 import { router } from 'expo-router';
 import { predefinedExercises } from '@/app/workout/new';
+import theme, { colors, typography, spacing, borderRadius } from '@/app/theme/theme';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -59,9 +60,9 @@ const formatDate = (date: string): string => {
 
 // Fonction pour obtenir une couleur en fonction de la progression
 const getProgressColor = (progress: number): string => {
-  if (progress > 0) return '#4ade80'; // Vert pour progression positive
-  if (progress < 0) return '#f87171'; // Rouge pour régression
-  return '#94a3b8'; // Gris pour stagnation
+  if (progress > 0) return colors.success;
+  if (progress < 0) return colors.error;
+  return colors.text.secondary;
 };
 
 // Fonction pour calculer la progression mensuelle
@@ -110,10 +111,10 @@ const sampleData: ExerciseDataSet = {
 };
 
 const muscleGroups = [
-  { name: 'Pectoraux', value: 30, color: '#FF6B6B' },
-  { name: 'Dos', value: 25, color: '#4ECDC4' },
-  { name: 'Jambes', value: 35, color: '#45B7D1' },
-  { name: 'Épaules', value: 10, color: '#96CEB4' }
+  { name: 'Pectoraux', value: 30, color: colors.error },
+  { name: 'Dos', value: 25, color: colors.primary },
+  { name: 'Jambes', value: 35, color: colors.success },
+  { name: 'Épaules', value: 10, color: colors.text.accent }
 ];
 
 // Initial goals data
@@ -125,14 +126,14 @@ const initialGoals = [
 
 // Define muscle group categories with their icons
 const muscleGroupCategories = [
-  { id: 'chest', icon: 'pectorals', color: '#FF6B6B' },
-  { id: 'back', icon: 'human-handsdown', color: '#4ECDC4' },
-  { id: 'legs', icon: 'human-male', color: '#45B7D1' },
-  { id: 'arms', icon: 'arm-flex', color: '#96CEB4' },
-  { id: 'shoulders', icon: 'human-male', color: '#FFAD69' },
-  { id: 'core', icon: 'ab-testing', color: '#6C63FF' },
-  { id: 'cardio', icon: 'heart-pulse', color: '#FF7285' },
-  { id: 'other', icon: 'dumbbell', color: '#9D8DF1' }
+  { id: 'chest', icon: 'pectorals', color: colors.error },
+  { id: 'back', icon: 'human-handsdown', color: colors.primary },
+  { id: 'legs', icon: 'human-male', color: colors.success },
+  { id: 'arms', icon: 'arm-flex', color: colors.text.accent },
+  { id: 'shoulders', icon: 'human-male', color: colors.primaryLight },
+  { id: 'core', icon: 'ab-testing', color: colors.primaryBorder },
+  { id: 'cardio', icon: 'heart-pulse', color: colors.error },
+  { id: 'other', icon: 'dumbbell', color: colors.text.secondary }
 ];
 
 export default function StatsScreen() {
@@ -179,7 +180,19 @@ export default function StatsScreen() {
         // Load recent exercises
         const storedRecent = await AsyncStorage.getItem('recentExercises');
         if (storedRecent) {
-          setRecentExercises(JSON.parse(storedRecent));
+          try {
+            const parsed = JSON.parse(storedRecent);
+            if (Array.isArray(parsed)) {
+              // Assume elements are strings, consider adding validation if needed
+              setRecentExercises(parsed as string[]);
+            } else {
+              console.warn('Stored recent exercises were not an array:', parsed);
+              setRecentExercises([]);
+            }
+          } catch (parseError) {
+            console.error('Error parsing recent exercises:', parseError);
+            setRecentExercises([]);
+          }
         }
 
         // Load goals
@@ -525,405 +538,410 @@ export default function StatsScreen() {
   }
 
   return (
-    <ScrollView style={styles.container} onLayout={onLayoutRootView}>
+    <ScrollView 
+      style={styles.container} 
+      contentContainerStyle={styles.scrollViewContent}
+      onLayout={onLayoutRootView}
+    >
       <View style={styles.header}>
         <Text style={styles.title}>{t('stats')}</Text>
       </View>
 
-      <View style={styles.content}>
-        {/* Section Motivation avec animation */}
-        <Animated.View
-          style={[
-            styles.motivationCard,
-            { opacity: fadeAnim, transform: [{ scale: fadeAnim }] }
-          ]}
+      {/* Section Motivation/KPI avec animation */}
+      <Animated.View
+        style={[
+          styles.card,
+          { marginHorizontal: spacing.lg },
+          { opacity: fadeAnim, transform: [{ scale: fadeAnim }] }
+        ]}
+      >
+        <LinearGradient
+          colors={[colors.primary, colors.primaryLight]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.statGradient}
         >
-          <LinearGradient
-            colors={['#fd8f09', '#8b5cf6']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.motivationGradient}
+          <Text 
+            style={[styles.kpiLabel, { marginBottom: spacing.base, color: colors.text.primary, textAlign: 'left' }]}
           >
-            <Text style={styles.motivationText}>
-              {bestProgressExercise
-                ? t('progressionText').replace('{progress}', bestProgressExercise.progress.toString()).replace('{exercise}', bestProgressExercise.exercise)
-                : monthlyProgress > 0
-                  ? t('progressionTextMonth').replace('{progress}', monthlyProgress.toString())
-                  : t('progressionTextNone')}
-            </Text>
-            <View style={styles.motivationStats}>
-              <View style={styles.motivationStat}>
-                <Text style={styles.motivationStatValue}>{trainingFrequency}%</Text>
-                <Text style={styles.motivationStatLabel}>{t('attendance')}</Text>
-              </View>
-              <View style={styles.motivationStat}>
-                <Text style={styles.motivationStatValue}>{totalSets}</Text>
-                <Text style={styles.motivationStatLabel}>{t('series')}</Text>
-              </View>
-              <View style={styles.motivationStat}>
-                <Text style={styles.motivationStatValue}>{totalWorkouts}</Text>
-                <Text style={styles.motivationStatLabel}>{t('sessions')}</Text>
-              </View>
+            {bestProgressExercise
+              ? t('progressionText').replace('{progress}', bestProgressExercise.progress.toString()).replace('{exercise}', bestProgressExercise.exercise)
+              : monthlyProgress > 0
+                ? t('progressionTextMonth').replace('{progress}', monthlyProgress.toString())
+                : t('progressionTextNone')}
+          </Text>
+          <View style={styles.kpiContainer}>
+            <View style={styles.kpiItem}>
+              <Text style={styles.kpiValue}>{trainingFrequency}%</Text>
+              <Text style={styles.kpiLabel}>{t('attendance')}</Text>
             </View>
-          </LinearGradient>
-        </Animated.View>
-
-        {/* Liste des exercices par groupe musculaire */}
-        <View style={styles.chartContainer}>
-          <View style={styles.chartHeader}>
-            <Text style={styles.chartTitle}>{t('allExercises')}</Text>
-            <View style={styles.searchContainer}>
-              <Ionicons name="search" size={20} color="#999" style={styles.searchIcon} />
-              <TextInput
-                style={styles.searchInput}
-                placeholder={t('searchExercise')}
-                placeholderTextColor="#999"
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
-              {searchQuery.length > 0 && (
-                <TouchableOpacity onPress={() => setSearchQuery('')}>
-                  <Ionicons name="close-circle" size={20} color="#999" />
-                </TouchableOpacity>
-              )}
+            <View style={styles.kpiItem}>
+              <Text style={styles.kpiValue}>{totalSets}</Text>
+              <Text style={styles.kpiLabel}>{t('series')}</Text>
+            </View>
+            <View style={styles.kpiItem}>
+              <Text style={styles.kpiValue}>{totalWorkouts}</Text>
+              <Text style={styles.kpiLabel}>{t('sessions')}</Text>
             </View>
           </View>
+        </LinearGradient>
+      </Animated.View>
 
-          {/* Favorites section */}
-          {favoriteExercises.length > 0 && (
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>{t('favorites')}</Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipsContainer}>
-                {favoriteExercises.map((exercise) => (
-                  <TouchableOpacity
-                    key={`fav-${exercise}`}
-                    style={styles.chip}
-                    onPress={() => handleSelectExercise(exercise)}
-                  >
-                    <Ionicons name="star" size={16} color="#fd8f09" style={styles.chipIcon} />
-                    <Text style={styles.chipText}>{exercise}</Text>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
-            </View>
-          )}
-
-          {/* Recent exercises section */}
-          {recentExercises.length > 0 && (
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>{t('recentExercises')}</Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipsContainer}>
-                {recentExercises.map((exercise) => (
-                  <TouchableOpacity
-                    key={`recent-${exercise}`}
-                    style={styles.chip}
-                    onPress={() => handleSelectExercise(exercise)}
-                  >
-                    <Ionicons name="time" size={16} color="#999" style={styles.chipIcon} />
-                    <Text style={styles.chipText}>{exercise}</Text>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
-            </View>
-          )}
-
-          {/* Muscle group categories */}
-          <View style={styles.sectionContainer}>
-            {muscleGroupCategories.map((category) => (
-              <View key={category.id} style={styles.accordionContainer}>
-                <TouchableOpacity
-                  style={styles.accordionHeader}
-                  onPress={() => {
-                    setExpandedMuscleGroup(expandedMuscleGroup === category.id ? null : category.id);
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  }}
-                >
-                  <View style={styles.accordionHeaderContent}>
-                    <View style={[styles.muscleGroupIcon, { backgroundColor: category.color }]}>
-                      <MaterialCommunityIcons name={category.icon} size={20} color="#fff" />
-                    </View>
-                    <Text style={styles.accordionTitle}>{t(category.id)}</Text>
-                  </View>
-                  <Ionicons
-                    name={expandedMuscleGroup === category.id ? 'chevron-up' : 'chevron-down'}
-                    size={20}
-                    color="#fff"
-                  />
-                </TouchableOpacity>
-
-                {expandedMuscleGroup === category.id && (
-                  <View style={styles.accordionContent}>
-                    {(() => {
-                      // Map muscle group categories to the corresponding keys in predefinedExercises
-                      const muscleGroupMapping: { [key: string]: string } = {
-                        'chest': 'Poitrine',
-                        'back': 'Dos',
-                        'legs': 'Jambes',
-                        'shoulders': 'Epaules',
-                        'arms': 'Biceps', // Note: This will only show biceps exercises, might need to combine with triceps
-                        'core': 'Ceinture abdominale',
-                        'cardio': '', // No direct mapping in predefinedExercises
-                        'other': '' // No direct mapping in predefinedExercises
-                      };
-
-                      // Get predefined exercises for this muscle group
-                      const muscleGroupKey = muscleGroupMapping[category.id];
-                      let predefinedExercisesForGroup: string[] = [];
-
-                      if (muscleGroupKey) {
-                        if (category.id === 'arms') {
-                          // Special case for arms - combine biceps and triceps
-                          predefinedExercisesForGroup = [
-                            ...(predefinedExercises['Biceps'] || []),
-                            ...(predefinedExercises['Triceps'] || [])
-                          ];
-                        } else {
-                          predefinedExercisesForGroup = predefinedExercises[muscleGroupKey as keyof typeof predefinedExercises] || [];
-                        }
-                      }
-
-                      // Filter exercises based on search query
-                      if (searchQuery) {
-                        predefinedExercisesForGroup = predefinedExercisesForGroup.filter(exercise =>
-                          exercise.toLowerCase().includes(searchQuery.toLowerCase())
-                        );
-                      }
-
-                      if (predefinedExercisesForGroup.length === 0) {
-                        return (
-                          <View style={styles.noExercisesContainer}>
-                            <Text style={styles.noExercisesText}>{t('noExercisesInGroup')}</Text>
-                          </View>
-                        );
-                      }
-
-                      return predefinedExercisesForGroup.map((exercise) => (
-                        <TouchableOpacity
-                          key={exercise}
-                          style={styles.exerciseItem}
-                          onPress={() => handleSelectExercise(exercise)}
-                        >
-                          <Text style={styles.exerciseItemText}>{exercise}</Text>
-                          <TouchableOpacity
-                            style={styles.favoriteButton}
-                            onPress={(e) => {
-                              e.stopPropagation();
-                              toggleFavorite(exercise);
-                            }}
-                          >
-                            <Ionicons
-                              name={favoriteExercises.includes(exercise) ? 'star' : 'star-outline'}
-                              size={20}
-                              color={favoriteExercises.includes(exercise) ? '#fd8f09' : '#999'}
-                            />
-                          </TouchableOpacity>
-                        </TouchableOpacity>
-                      ));
-                    })()}
-                  </View>
-                )}
-              </View>
-            ))}
+      {/* Liste des exercices par groupe musculaire */}
+      <View style={styles.chartContainer}>
+        <View style={styles.chartHeader}>
+          <Text style={styles.chartTitle}>{t('allExercises')}</Text>
+          <View style={styles.searchContainer}>
+            <Ionicons name="search" size={20} color="#999" style={styles.searchIcon} />
+            <TextInput
+              style={styles.searchInput}
+              placeholder={t('searchExercise')}
+              placeholderTextColor="#999"
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
+            {searchQuery.length > 0 && (
+              <TouchableOpacity onPress={() => setSearchQuery('')}>
+                <Ionicons name="close-circle" size={20} color="#999" />
+              </TouchableOpacity>
+            )}
           </View>
-
-          {/* All exercises (if search is active) */}
-          {searchQuery.length > 0 && (
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>{t('searchResults')}</Text>
-              {getFilteredExercises().map((exercise) => (
-                <TouchableOpacity
-                  key={exercise}
-                  style={styles.exerciseItem}
-                  onPress={() => handleSelectExercise(exercise)}
-                >
-                  <Text style={styles.exerciseItemText}>{exercise}</Text>
-                  <TouchableOpacity
-                    style={styles.favoriteButton}
-                    onPress={(e) => {
-                      e.stopPropagation();
-                      toggleFavorite(exercise);
-                    }}
-                  >
-                    <Ionicons
-                      name={favoriteExercises.includes(exercise) ? 'star' : 'star-outline'}
-                      size={20}
-                      color={favoriteExercises.includes(exercise) ? '#fd8f09' : '#999'}
-                    />
-                  </TouchableOpacity>
-                </TouchableOpacity>
-              ))}
-            </View>
-          )}
         </View>
 
-        {/* Objectifs et progression */}
-        <Animated.View
-          style={[
-            styles.chartContainer,
-            { opacity: fadeAnim, transform: [{ scale: fadeAnim }] }
-          ]}
-        >
-          <Text style={styles.chartTitle}>{t('goals')}</Text>
-
-          {goals.length === 0 ? (
-            <View style={styles.noGoalsContainer}>
-              <Text style={styles.noGoalsText}>{t('noGoalsYet')}</Text>
-            </View>
-          ) : (
-            goals.map((goal, index) => (
-              <View key={index} style={styles.goalItem}>
-                <View style={styles.goalHeader}>
-                  <Text style={styles.goalTitle}>{goal.exercise}</Text>
-                  <View style={styles.goalHeaderRight}>
-                    <Text style={styles.goalValues}>
-                      <Text style={styles.goalCurrent}>{goal.current}kg</Text>
-                      <Text style={styles.goalSeparator}> / </Text>
-                      <Text style={styles.goalTarget}>{goal.target}kg</Text>
-                    </Text>
-                    <TouchableOpacity
-                      style={styles.deleteGoalButton}
-                      onPress={() => {
-                        // Show confirmation dialog
-                        Alert.alert(
-                          t('deleteGoal'),
-                          t('deleteGoalConfirmation').replace('{exercise}', goal.exercise),
-                          [
-                            {
-                              text: t('cancel'),
-                              style: 'cancel'
-                            },
-                            {
-                              text: t('delete'),
-                              style: 'destructive',
-                              onPress: () => {
-                                // Remove goal
-                                const updatedGoals = goals.filter((_, i) => i !== index);
-                                setGoals(updatedGoals);
-
-                                // Save updated goals to AsyncStorage
-                                try {
-                                  AsyncStorage.setItem('goals', JSON.stringify(updatedGoals));
-                                } catch (error) {
-                                  console.error(t('errorSavingWorkouts'), error);
-                                }
-
-                                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                              }
-                            }
-                          ]
-                        );
-                      }}
-                    >
-                      <Ionicons name="trash-outline" size={18} color="#ff4d4d" />
-                    </TouchableOpacity>
-                  </View>
-                </View>
-
-                <View style={styles.goalProgressContainer}>
-                  <View
-                    style={[
-                      styles.goalProgressBar,
-                      { width: `${goal.progress}%` },
-                      goal.progress > 80 ? styles.goalProgressHigh :
-                        goal.progress > 50 ? styles.goalProgressMedium :
-                          styles.goalProgressLow
-                    ]}
-                  />
-                </View>
-
-                <Text style={styles.goalProgressText}>
-                  {goal.progress < 100
-                    ? t('goalRemaining').replace('{remaining}', (goal.target - goal.current).toString())
-                    : t('goalAchieved')}
-                </Text>
-              </View>
-            ))
-          )}
-
-          <TouchableOpacity
-            style={styles.addGoalButton}
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-              router.push('/goal/new');
-            }}
-          >
-            <Ionicons name="add-circle" size={20} color="#fd8f09" />
-            <Text style={styles.addGoalText}>{t('addGoal')}</Text>
-          </TouchableOpacity>
-        </Animated.View>
-
-        {/* Répartition des groupes musculaires avec animation */}
-        <Animated.View
-          style={[
-            styles.chartContainer,
-            { opacity: fadeAnim, transform: [{ scale: fadeAnim }] }
-          ]}
-        >
-          <View style={styles.chartTitleContainer}>
-            <Text style={styles.chartTitle}>{t('muscleDistribution')}</Text>
-            <View style={styles.filterContainer}>
-              <TouchableOpacity
-                style={[styles.filterButton, selectedPeriod === '1m' && styles.filterButtonActive]}
-                onPress={() => {
-                  setSelectedPeriod('1m');
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                }}
-              >
-                <Text style={[styles.filterText, selectedPeriod === '1m' && styles.filterTextActive]}>{t('oneMonth')}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.filterButton, selectedPeriod === '3m' && styles.filterButtonActive]}
-                onPress={() => {
-                  setSelectedPeriod('3m');
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                }}
-              >
-                <Text style={[styles.filterText, selectedPeriod === '3m' && styles.filterTextActive]}>{t('threeMonths')}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.filterButton, selectedPeriod === '6m' && styles.filterButtonActive]}
-                onPress={() => {
-                  setSelectedPeriod('6m');
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                }}
-              >
-                <Text style={[styles.filterText, selectedPeriod === '6m' && styles.filterTextActive]}>{t('sixMonths')}</Text>
-              </TouchableOpacity>
-            </View>
+        {/* Favorites section */}
+        {favoriteExercises.length > 0 && (
+          <View style={styles.sectionContainer}>
+            <Text style={styles.sectionTitle}>{t('favorites')}</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipsContainer}>
+              {favoriteExercises.map((exercise) => (
+                <TouchableOpacity
+                  key={`fav-${exercise}`}
+                  style={styles.chip}
+                  onPress={() => handleSelectExercise(exercise)}
+                >
+                  <Ionicons name="star" size={16} color={colors.primary} style={styles.chipIcon} />
+                  <Text style={styles.chipText}>{exercise}</Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
           </View>
-          <VictoryPie
-            data={muscleGroups}
-            x="name"
-            y="value"
-            colorScale={muscleGroups.map(g => g.color)}
-            width={Dimensions.get('window').width - 40}
-            height={300}
-            innerRadius={70}
-            labelRadius={100}
-            style={{
-              labels: { fill: '#fff', fontSize: 12 }
-            }}
-            labelComponent={
-              <VictoryLabel
-                style={{ fill: '#fff', fontSize: 12 }}
-                text={({ datum }) => `${datum.name}\n${datum.value}kg`}
-              />
-            }
-          />
-        </Animated.View>
+        )}
 
-        <Animated.View
-          style={[
-            styles.chartContainer,
-            { opacity: fadeAnim, transform: [{ scale: fadeAnim }] }
-          ]}
-        >
-          <Text style={styles.chartTitle}>{t('muscleRestState')}</Text>
-          <MuscleMap workouts={workouts} />
-        </Animated.View>
+        {/* Recent exercises section */}
+        {recentExercises.length > 0 && (
+          <View style={styles.sectionContainer}>
+            <Text style={styles.sectionTitle}>{t('recentExercises')}</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipsContainer}>
+              {recentExercises.map((exercise) => (
+                <TouchableOpacity
+                  key={`recent-${exercise}`}
+                  style={styles.chip}
+                  onPress={() => handleSelectExercise(exercise)}
+                >
+                  <Ionicons name="time" size={16} color={colors.text.secondary} style={styles.chipIcon} />
+                  <Text style={styles.chipText}>{exercise}</Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        )}
+
+        {/* Muscle group categories */}
+        <View style={styles.sectionContainer}>
+          {muscleGroupCategories.map((category) => (
+            <View key={category.id} style={styles.accordionContainer}>
+              <TouchableOpacity
+                style={styles.accordionHeader}
+                onPress={() => {
+                  setExpandedMuscleGroup(expandedMuscleGroup === category.id ? null : category.id);
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                }}
+              >
+                <View style={styles.accordionHeaderContent}>
+                  <View style={[styles.muscleGroupIcon, { backgroundColor: category.color }]}>
+                    <MaterialCommunityIcons name={category.icon as any} size={20} color="#fff" />
+                  </View>
+                  <Text style={styles.accordionTitle}>{t(category.id)}</Text>
+                </View>
+                <Ionicons
+                  name={expandedMuscleGroup === category.id ? 'chevron-up' : 'chevron-down'}
+                  size={20}
+                  color="#fff"
+                />
+              </TouchableOpacity>
+
+              {expandedMuscleGroup === category.id && (
+                <View style={styles.accordionContent}>
+                  {(() => {
+                    // Map muscle group categories to the corresponding keys in predefinedExercises
+                    const muscleGroupMapping: { [key: string]: string } = {
+                      'chest': 'Poitrine',
+                      'back': 'Dos',
+                      'legs': 'Jambes',
+                      'shoulders': 'Epaules',
+                      'arms': 'Biceps', // Note: This will only show biceps exercises, might need to combine with triceps
+                      'core': 'Ceinture abdominale',
+                      'cardio': '', // No direct mapping in predefinedExercises
+                      'other': '' // No direct mapping in predefinedExercises
+                    };
+
+                    // Get predefined exercises for this muscle group
+                    const muscleGroupKey = muscleGroupMapping[category.id];
+                    let predefinedExercisesForGroup: string[] = [];
+
+                    if (muscleGroupKey) {
+                      if (category.id === 'arms') {
+                        // Special case for arms - combine biceps and triceps
+                        predefinedExercisesForGroup = [
+                          ...(predefinedExercises['Biceps'] || []),
+                          ...(predefinedExercises['Triceps'] || [])
+                        ];
+                      } else {
+                        predefinedExercisesForGroup = predefinedExercises[muscleGroupKey as keyof typeof predefinedExercises] || [];
+                      }
+                    }
+
+                    // Filter exercises based on search query
+                    if (searchQuery) {
+                      predefinedExercisesForGroup = predefinedExercisesForGroup.filter(exercise =>
+                        exercise.toLowerCase().includes(searchQuery.toLowerCase())
+                      );
+                    }
+
+                    if (predefinedExercisesForGroup.length === 0) {
+                      return (
+                        <View style={styles.noExercisesContainer}>
+                          <Text style={styles.noExercisesText}>{t('noExercisesInGroup')}</Text>
+                        </View>
+                      );
+                    }
+
+                    return predefinedExercisesForGroup.map((exercise) => (
+                      <TouchableOpacity
+                        key={exercise}
+                        style={styles.exerciseItem}
+                        onPress={() => handleSelectExercise(exercise)}
+                      >
+                        <Text style={styles.exerciseItemText}>{exercise}</Text>
+                        <TouchableOpacity
+                          style={styles.favoriteButton}
+                          onPress={(e) => {
+                            e.stopPropagation();
+                            toggleFavorite(exercise);
+                          }}
+                        >
+                          <Ionicons
+                            name={favoriteExercises.includes(exercise) ? 'star' : 'star-outline'}
+                            size={20}
+                            color={favoriteExercises.includes(exercise) ? '#fd8f09' : '#999'}
+                          />
+                        </TouchableOpacity>
+                      </TouchableOpacity>
+                    ));
+                  })()}
+                </View>
+              )}
+            </View>
+          ))}
+        </View>
+
+        {/* All exercises (if search is active) */}
+        {searchQuery.length > 0 && (
+          <View style={styles.sectionContainer}>
+            <Text style={styles.sectionTitle}>{t('searchResults')}</Text>
+            {getFilteredExercises().map((exercise) => (
+              <TouchableOpacity
+                key={exercise}
+                style={styles.exerciseItem}
+                onPress={() => handleSelectExercise(exercise)}
+              >
+                <Text style={styles.exerciseItemText}>{exercise}</Text>
+                <TouchableOpacity
+                  style={styles.favoriteButton}
+                  onPress={(e) => {
+                    e.stopPropagation();
+                    toggleFavorite(exercise);
+                  }}
+                >
+                  <Ionicons
+                    name={favoriteExercises.includes(exercise) ? 'star' : 'star-outline'}
+                    size={20}
+                    color={favoriteExercises.includes(exercise) ? '#fd8f09' : '#999'}
+                  />
+                </TouchableOpacity>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
       </View>
+
+      {/* Objectifs et progression */}
+      <Animated.View
+        style={[
+          styles.chartContainer,
+          { opacity: fadeAnim, transform: [{ scale: fadeAnim }] }
+        ]}
+      >
+        <Text style={styles.chartTitle}>{t('goals')}</Text>
+
+        {goals.length === 0 ? (
+          <View style={styles.noGoalsContainer}>
+            <Text style={styles.noGoalsText}>{t('noGoalsYet')}</Text>
+          </View>
+        ) : (
+          goals.map((goal, index) => (
+            <View key={index} style={styles.goalItem}>
+              <View style={styles.goalHeader}>
+                <Text style={styles.goalTitle}>{goal.exercise}</Text>
+                <View style={styles.goalHeaderRight}>
+                  <Text style={styles.goalValues}>
+                    <Text style={styles.goalCurrent}>{goal.current}kg</Text>
+                    <Text style={styles.goalSeparator}> / </Text>
+                    <Text style={styles.goalTarget}>{goal.target}kg</Text>
+                  </Text>
+                  <TouchableOpacity
+                    style={styles.deleteGoalButton}
+                    onPress={() => {
+                      // Show confirmation dialog
+                      Alert.alert(
+                        t('deleteGoal'),
+                        t('deleteGoalConfirmation').replace('{exercise}', goal.exercise),
+                        [
+                          {
+                            text: t('cancel'),
+                            style: 'cancel'
+                          },
+                          {
+                            text: t('delete'),
+                            style: 'destructive',
+                            onPress: () => {
+                              // Remove goal
+                              const updatedGoals = goals.filter((_, i) => i !== index);
+                              setGoals(updatedGoals);
+
+                              // Save updated goals to AsyncStorage
+                              try {
+                                AsyncStorage.setItem('goals', JSON.stringify(updatedGoals));
+                              } catch (error) {
+                                console.error(t('errorSavingWorkouts'), error);
+                              }
+
+                              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                            }
+                          }
+                        ]
+                      );
+                    }}
+                  >
+                    <Ionicons name="trash-outline" size={18} color="#ff4d4d" />
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              <View style={styles.goalProgressContainer}>
+                <View
+                  style={[
+                    styles.goalProgressBar,
+                    { width: `${goal.progress}%` },
+                    goal.progress > 80 ? styles.goalProgressHigh :
+                      goal.progress > 50 ? styles.goalProgressMedium :
+                        styles.goalProgressLow
+                  ]}
+                />
+              </View>
+
+              <Text style={styles.goalProgressText}>
+                {goal.progress < 100
+                  ? t('goalRemaining').replace('{remaining}', (goal.target - goal.current).toString())
+                  : t('goalAchieved')}
+              </Text>
+            </View>
+          ))
+        )}
+
+        <TouchableOpacity
+          style={styles.addGoalButton}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            router.push('/goal/new');
+          }}
+        >
+          <Ionicons name="add-circle" size={20} color="#fd8f09" />
+          <Text style={styles.addGoalText}>{t('addGoal')}</Text>
+        </TouchableOpacity>
+      </Animated.View>
+
+      {/* Répartition des groupes musculaires avec animation */}
+      <Animated.View
+        style={[
+          styles.chartContainer,
+          { opacity: fadeAnim, transform: [{ scale: fadeAnim }] }
+        ]}
+      >
+        <View style={styles.chartTitleContainer}>
+          <Text style={styles.chartTitle}>{t('muscleDistribution')}</Text>
+          <View style={styles.filterContainer}>
+            <TouchableOpacity
+              style={[styles.filterButton, selectedPeriod === '1m' && styles.filterButtonActive]}
+              onPress={() => {
+                setSelectedPeriod('1m');
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              }}
+            >
+              <Text style={[styles.filterText, selectedPeriod === '1m' && styles.filterTextActive]}>{t('oneMonth')}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.filterButton, selectedPeriod === '3m' && styles.filterButtonActive]}
+              onPress={() => {
+                setSelectedPeriod('3m');
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              }}
+            >
+              <Text style={[styles.filterText, selectedPeriod === '3m' && styles.filterTextActive]}>{t('threeMonths')}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.filterButton, selectedPeriod === '6m' && styles.filterButtonActive]}
+              onPress={() => {
+                setSelectedPeriod('6m');
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              }}
+            >
+              <Text style={[styles.filterText, selectedPeriod === '6m' && styles.filterTextActive]}>{t('sixMonths')}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+        <VictoryPie
+          data={muscleGroups}
+          x="name"
+          y="value"
+          colorScale={muscleGroups.map(g => g.color)}
+          width={Dimensions.get('window').width - 40}
+          height={300}
+          innerRadius={70}
+          labelRadius={100}
+          style={{
+            labels: { fill: '#fff', fontSize: 12 }
+          }}
+          labelComponent={
+            <VictoryLabel
+              style={{ fill: '#fff', fontSize: 12 }}
+              text={({ datum }) => `${datum.name}\n${datum.value}kg`}
+            />
+          }
+        />
+      </Animated.View>
+
+      <Animated.View
+        style={[
+          styles.chartContainer,
+          { opacity: fadeAnim, transform: [{ scale: fadeAnim }] }
+        ]}
+      >
+        <Text style={styles.chartTitle}>{t('muscleRestState')}</Text>
+        <MuscleMap workouts={workouts} />
+      </Animated.View>
 
       {/* Exercise Selector Modal */}
       {showExerciseSelector && (
@@ -995,570 +1013,531 @@ export default function StatsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0a0a0a'
+    backgroundColor: colors.background.main,
+    paddingTop: spacing.lg,
   },
-  scrollContainer: {
-    flex: 1,
-    backgroundColor: '#0a0a0a'
+  scrollViewContent: {
+    paddingBottom: spacing.xl * 2,
   },
   header: {
-    paddingTop: 60,
-    paddingHorizontal: 20,
-    paddingBottom: 20,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#1a1a1a'
+    paddingHorizontal: spacing.lg,
+    marginBottom: spacing.lg,
   },
   title: {
-    fontSize: 32,
-    fontFamily: 'Inter-Bold',
-    color: '#fff',
-    marginBottom: 20
+    fontSize: typography.fontSize['3xl'],
+    fontFamily: typography.fontFamily.bold,
+    color: colors.text.primary,
   },
-  filterSection: {
-    marginBottom: 15
-  },
-  filterLabel: {
-    fontSize: 14,
-    fontFamily: 'Inter-Regular',
-    color: '#fff',
-    marginBottom: 8
-  },
-  filterContainer: {
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    marginTop: 5
-  },
-  filterButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 20,
-    backgroundColor: '#2a2a2a',
-    marginRight: 10
-  },
-  filterButtonActive: {
-    backgroundColor: '#fd8f09'
-  },
-  filterText: {
-    color: '#666',
-    fontFamily: 'Inter-SemiBold'
-  },
-  filterTextActive: {
-    color: '#fff'
-  },
-  muscleGroupSelector: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#2a2a2a',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 8,
-    alignSelf: 'flex-start'
-  },
-  selectorText: {
-    color: '#fff',
-    fontFamily: 'Inter-Regular',
-    marginRight: 8
-  },
-  selectorList: {
-    position: 'absolute',
-    top: 80,
-    left: 20,
-    backgroundColor: 'rgba(26, 26, 26, 0.9)',
-    borderRadius: 8,
-    padding: 8,
-    zIndex: 1000,
-    maxHeight: 200
-  },
-  selectorItem: {
-    paddingVertical: 8,
-    paddingHorizontal: 12
-  },
-  selectorItemText: {
-    color: '#fff',
-    fontFamily: 'Inter-Regular'
-  },
-  content: {
-    flex: 1,
-    padding: 20
-  },
-  motivationCard: {
-    borderRadius: 12,
-    overflow: 'hidden',
-    marginBottom: 20
-  },
-  motivationGradient: {
-    padding: 20,
-    borderRadius: 12
-  },
-  motivationText: {
-    color: '#fff',
-    fontSize: 18,
-    fontFamily: 'Inter-SemiBold',
-    marginBottom: 16
-  },
-  motivationStats: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 10
-  },
-  motivationStat: {
-    alignItems: 'center'
-  },
-  motivationStatValue: {
-    color: '#fff',
-    fontSize: 20,
-    fontFamily: 'Inter-Bold'
-  },
-  motivationStatLabel: {
-    color: '#fff',
-    fontSize: 12,
-    fontFamily: 'Inter-Regular',
-    opacity: 0.8,
-    marginTop: 4
-  },
-  chartContainer: {
-    backgroundColor: '#1a1a1a',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 20
-  },
-  chartHeader: {
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 16
-  },
-  chartTitleContainer: {
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 10
-  },
-  chartTitle: {
-    fontSize: 18,
-    fontFamily: 'Inter-SemiBold',
-    color: '#fff'
-  },
-  chartTypeSelector: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginBottom: 16,
-    backgroundColor: '#2a2a2a',
-    borderRadius: 20,
-    padding: 4
-  },
-  chartTypeButton: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 16
-  },
-  chartTypeButtonActive: {
-    backgroundColor: '#fd8f09'
-  },
-  chartTypeText: {
-    color: '#666',
-    fontFamily: 'Inter-SemiBold',
-    fontSize: 13
-  },
-  chartTypeTextActive: {
-    color: '#fff'
-  },
-  exerciseSelector: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#2a2a2a',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8
-  },
-  exerciseSelectorText: {
-    color: '#fff',
-    fontFamily: 'Inter-Regular',
-    marginRight: 4
-  },
-  // New styles for the exercise selector modal
-  exerciseSelectorModal: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: '#0a0a0a',
-    zIndex: 1000,
-    paddingTop: 60,
-    paddingBottom: 20
+  iconButton: {
+    padding: spacing.sm,
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1a1a1a',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    marginHorizontal: 20,
-    marginBottom: 16
+    backgroundColor: colors.background.card,
+    borderRadius: borderRadius.md,
+    paddingHorizontal: spacing.md,
+    marginHorizontal: spacing.lg,
+    marginBottom: spacing.lg,
   },
   searchIcon: {
-    marginRight: 8
+    marginRight: spacing.sm,
   },
   searchInput: {
     flex: 1,
-    color: '#fff',
-    fontFamily: 'Inter-Regular',
-    fontSize: 16,
-    padding: 0
+    height: 44,
+    color: colors.text.primary,
+    fontSize: typography.fontSize.base,
+    fontFamily: typography.fontFamily.regular,
   },
-  exerciseSelectorContent: {
-    flex: 1,
-    paddingHorizontal: 20
+  periodSelector: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginHorizontal: spacing.lg,
+    marginBottom: spacing.xl,
+    backgroundColor: colors.background.card,
+    borderRadius: borderRadius.md,
+    paddingVertical: spacing.xs,
+  },
+  periodButton: {
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.lg,
+    borderRadius: borderRadius.sm,
+  },
+  periodButtonActive: {
+    backgroundColor: colors.primary,
+  },
+  periodText: {
+    fontFamily: typography.fontFamily.semiBold,
+    fontSize: typography.fontSize.sm,
+    color: colors.text.secondary,
+  },
+  periodTextActive: {
+    color: colors.text.primary,
   },
   sectionContainer: {
-    marginBottom: 24
+    marginBottom: spacing.xl,
+    paddingHorizontal: spacing.lg,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontFamily: 'Inter-SemiBold',
-    color: '#fff',
-    marginBottom: 12
+    fontSize: typography.fontSize.xl,
+    fontFamily: typography.fontFamily.bold,
+    color: colors.text.primary,
+    marginBottom: spacing.md,
   },
-  chipsContainer: {
-    flexDirection: 'row',
-    marginBottom: 8
+  card: {
+    backgroundColor: colors.background.card,
+    borderRadius: borderRadius.lg,
+    padding: spacing.lg,
+    marginBottom: spacing.lg,
+    ...theme.shadows.md,
   },
-  chip: {
+  kpiContainer: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: spacing.lg,
+  },
+  kpiItem: {
     alignItems: 'center',
-    backgroundColor: '#2a2a2a',
-    borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    marginRight: 8
   },
-  chipIcon: {
-    marginRight: 6
+  kpiValue: {
+    fontSize: typography.fontSize['2xl'],
+    fontFamily: typography.fontFamily.bold,
+    color: colors.primary,
   },
-  chipText: {
-    color: '#fff',
-    fontFamily: 'Inter-Regular',
-    fontSize: 14
+  kpiLabel: {
+    fontSize: typography.fontSize.sm,
+    fontFamily: typography.fontFamily.regular,
+    color: colors.text.secondary,
+    marginTop: spacing.xs,
+  },
+  chartContainer: {
+    marginBottom: spacing.xl,
+    paddingHorizontal: spacing.lg,
+  },
+  chartHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: spacing.md,
+  },
+  chartTitle: {
+    fontSize: typography.fontSize.lg,
+    fontFamily: typography.fontFamily.semiBold,
+    color: colors.text.primary,
+  },
+  chart: {
+    height: 250,
+    alignItems: 'center',
+  },
+  centeredLabel: {
+    position: 'absolute',
+    top: '45%',
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+  },
+  centeredLabelTextValue: {
+    fontSize: typography.fontSize['3xl'],
+    fontFamily: typography.fontFamily.bold,
+    color: colors.text.primary,
+  },
+  centeredLabelTextLabel: {
+    fontSize: typography.fontSize.sm,
+    fontFamily: typography.fontFamily.regular,
+    color: colors.text.secondary,
+    marginTop: -spacing.xs,
+  },
+  muscleMapContainer: {
+    height: 350,
+    marginBottom: spacing.lg,
+  },
+  exerciseListContainer: {
+    marginBottom: spacing.xl,
+    paddingHorizontal: spacing.lg,
+  },
+  listSectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: spacing.md,
+  },
+  viewAllButton: {
+    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.sm,
+  },
+  viewAllText: {
+    color: colors.primary,
+    fontFamily: typography.fontFamily.semiBold,
+    fontSize: typography.fontSize.sm,
   },
   accordionContainer: {
-    marginBottom: 12,
-    backgroundColor: '#1a1a1a',
-    borderRadius: 8,
-    overflow: 'hidden'
+    backgroundColor: colors.background.card,
+    borderRadius: borderRadius.lg,
+    marginBottom: spacing.sm,
+    overflow: 'hidden',
   },
   accordionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16
+    padding: spacing.base,
   },
   accordionHeaderContent: {
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   muscleGroupIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 32,
+    height: 32,
+    borderRadius: borderRadius.full,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12
+    marginRight: spacing.md,
   },
   accordionTitle: {
-    fontSize: 16,
-    fontFamily: 'Inter-SemiBold',
-    color: '#fff'
+    fontSize: typography.fontSize.base,
+    fontFamily: typography.fontFamily.semiBold,
+    color: colors.text.primary,
   },
   accordionContent: {
-    backgroundColor: '#2a2a2a',
-    paddingVertical: 8
+    paddingHorizontal: spacing.base,
+    paddingBottom: spacing.sm,
   },
   exerciseItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
+    paddingVertical: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#333'
+    borderBottomColor: colors.border.default,
   },
   exerciseItemText: {
-    color: '#fff',
-    fontFamily: 'Inter-Regular',
-    fontSize: 15
+    color: colors.text.primary,
+    fontFamily: typography.fontFamily.regular,
+    fontSize: typography.fontSize.base,
   },
   favoriteButton: {
-    padding: 8
+    padding: spacing.sm,
   },
   noExercisesContainer: {
-    padding: 16,
+    padding: spacing.base,
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   noExercisesText: {
-    color: '#999',
-    fontFamily: 'Inter-Regular',
-    fontSize: 14,
-    textAlign: 'center'
+    color: colors.text.secondary,
+    fontFamily: typography.fontFamily.regular,
+    fontSize: typography.fontSize.sm,
+    textAlign: 'center',
   },
   closeButton: {
-    backgroundColor: '#2a2a2a',
-    borderRadius: 8,
-    paddingVertical: 14,
-    marginHorizontal: 20,
-    marginTop: 16,
-    alignItems: 'center'
+    backgroundColor: colors.background.button,
+    borderRadius: borderRadius.md,
+    paddingVertical: spacing.md,
+    marginHorizontal: spacing.lg,
+    marginTop: spacing.base,
+    alignItems: 'center',
   },
   closeButtonText: {
-    color: '#fff',
-    fontFamily: 'Inter-SemiBold',
-    fontSize: 16
+    color: colors.text.primary,
+    fontFamily: typography.fontFamily.semiBold,
+    fontSize: typography.fontSize.base,
   },
   goalItem: {
-    marginBottom: 20
+    marginBottom: spacing.lg,
   },
   goalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8
+    marginBottom: spacing.sm,
   },
   goalHeaderRight: {
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   goalTitle: {
-    fontSize: 16,
-    fontFamily: 'Inter-SemiBold',
-    color: '#fff'
+    fontSize: typography.fontSize.base,
+    fontFamily: typography.fontFamily.semiBold,
+    color: colors.text.primary,
   },
   goalValues: {
-    fontSize: 14,
-    marginRight: 10
+    fontSize: typography.fontSize.sm,
+    marginRight: spacing.sm,
   },
   deleteGoalButton: {
-    padding: 5
+    padding: spacing.xs,
   },
   goalCurrent: {
-    color: '#fff',
-    fontFamily: 'Inter-Bold'
+    color: colors.text.primary,
+    fontFamily: typography.fontFamily.bold,
   },
   goalSeparator: {
-    color: '#666',
-    fontFamily: 'Inter-Regular'
+    color: colors.text.secondary,
+    fontFamily: typography.fontFamily.regular,
   },
   goalTarget: {
-    color: '#fd8f09',
-    fontFamily: 'Inter-Bold'
+    color: colors.primary,
+    fontFamily: typography.fontFamily.bold,
   },
   goalProgressContainer: {
     height: 8,
-    backgroundColor: '#2a2a2a',
-    borderRadius: 4,
+    backgroundColor: colors.background.button,
+    borderRadius: borderRadius.xs,
     overflow: 'hidden',
-    marginBottom: 8
+    marginBottom: spacing.sm,
   },
   goalProgressBar: {
     height: '100%',
-    borderRadius: 4
+    borderRadius: borderRadius.xs,
   },
   goalProgressLow: {
-    backgroundColor: '#f87171'
+    backgroundColor: colors.error,
   },
   goalProgressMedium: {
-    backgroundColor: '#fbbf24'
+    backgroundColor: colors.primary,
   },
   goalProgressHigh: {
-    backgroundColor: '#4ade80'
+    backgroundColor: colors.success,
   },
   goalProgressText: {
-    fontSize: 12,
-    fontFamily: 'Inter-Regular',
-    color: '#666'
+    fontSize: typography.fontSize.sm,
+    fontFamily: typography.fontFamily.regular,
+    color: colors.text.secondary,
   },
   addGoalButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 12,
-    marginTop: 10
+    paddingVertical: spacing.md,
+    marginTop: spacing.sm,
   },
   addGoalText: {
-    color: '#fd8f09',
-    fontFamily: 'Inter-SemiBold',
-    marginLeft: 8
+    color: colors.primary,
+    fontFamily: typography.fontFamily.semiBold,
+    marginLeft: spacing.sm,
   },
   statsContainer: {
-    backgroundColor: '#1a1a1a',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 20
+    backgroundColor: colors.background.card,
+    borderRadius: borderRadius.lg,
+    padding: spacing.base,
+    marginBottom: spacing.lg,
   },
   statsGrid: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 12
+    marginBottom: spacing.md,
   },
   statCard: {
     flex: 1,
-    borderRadius: 12,
+    borderRadius: borderRadius.lg,
     overflow: 'hidden',
-    marginHorizontal: 4
+    marginHorizontal: spacing.xs,
   },
   statGradient: {
-    padding: 16,
-    borderRadius: 12,
-    alignItems: 'center'
+    padding: spacing.base,
+    borderRadius: borderRadius.lg,
+    alignItems: 'center',
   },
   statIcon: {
-    marginBottom: 8
+    marginBottom: spacing.sm,
   },
   statLabel: {
-    fontSize: 14,
-    fontFamily: 'Inter-Regular',
-    color: '#fff',
-    marginBottom: 4,
-    textAlign: 'center'
+    fontSize: typography.fontSize.sm,
+    fontFamily: typography.fontFamily.regular,
+    color: colors.text.primary,
+    marginBottom: spacing.xs,
+    textAlign: 'center',
   },
   statValue: {
-    fontSize: 20,
-    fontFamily: 'Inter-Bold',
-    color: '#fff',
-    textAlign: 'center'
+    fontSize: typography.fontSize.xl,
+    fontFamily: typography.fontFamily.bold,
+    color: colors.text.primary,
+    textAlign: 'center',
   },
-  // Modal styles
   modalOverlay: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(255, 0, 0, 0.7)', // Changed to red for visibility
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 9999,
-    elevation: 5 // Added elevation for Android
+    zIndex: theme.zIndex.modal,
+    elevation: 5,
   },
   modalContainer: {
-    backgroundColor: '#ffffff', // Changed to white for visibility
-    borderRadius: 12,
-    padding: 20,
+    backgroundColor: colors.background.card,
+    borderRadius: borderRadius.lg,
+    padding: spacing.lg,
+    width: '90%',
     maxWidth: 400,
-    borderWidth: 2, // Added border for visibility
-    borderColor: '#000000' // Added border color for visibility
+    borderWidth: 1,
+    borderColor: colors.border.default,
+    ...theme.shadows.lg,
   },
   modalTitle: {
-    fontSize: 20,
-    fontFamily: 'Inter-Bold',
-    color: '#000000', // Changed to black for visibility against white background
-    marginBottom: 20,
-    textAlign: 'center'
+    fontSize: typography.fontSize.xl,
+    fontFamily: typography.fontFamily.bold,
+    color: colors.text.primary,
+    marginBottom: spacing.lg,
+    textAlign: 'center',
   },
   formGroup: {
-    marginBottom: 16
+    marginBottom: spacing.base,
   },
   formLabel: {
-    fontSize: 16,
-    fontFamily: 'Inter-SemiBold',
-    color: '#000000', // Changed to black for visibility against white background
-    marginBottom: 8
+    fontSize: typography.fontSize.base,
+    fontFamily: typography.fontFamily.semiBold,
+    color: colors.text.secondary,
+    marginBottom: spacing.sm,
   },
   formInput: {
-    backgroundColor: '#cccccc', // Changed to light gray for visibility against white background
-    borderRadius: 8,
-    padding: 12,
-    color: '#000000', // Changed to black for visibility against light gray background
-    fontFamily: 'Inter-Regular',
-    fontSize: 16
+    backgroundColor: colors.background.input,
+    borderRadius: borderRadius.md,
+    padding: spacing.md,
+    color: colors.text.primary,
+    fontFamily: typography.fontFamily.regular,
+    fontSize: typography.fontSize.base,
+    borderWidth: 1,
+    borderColor: colors.border.default,
   },
   modalButtons: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 20
+    marginTop: spacing.lg,
   },
   cancelButton: {
     flex: 1,
-    backgroundColor: '#ff0000', // Changed to red for visibility
-    borderRadius: 8,
-    padding: 12,
-    marginRight: 8,
-    alignItems: 'center'
+    backgroundColor: colors.background.button,
+    borderRadius: borderRadius.md,
+    padding: spacing.md,
+    marginRight: spacing.sm,
+    alignItems: 'center',
   },
   cancelButtonText: {
-    color: '#ffffff', // Changed to white for visibility against red background
-    fontFamily: 'Inter-SemiBold',
-    fontSize: 16
+    color: colors.text.primary,
+    fontFamily: typography.fontFamily.semiBold,
+    fontSize: typography.fontSize.base,
   },
   saveButton: {
     flex: 1,
-    backgroundColor: '#0000ff', // Changed to blue for visibility
-    borderRadius: 8,
-    padding: 12,
-    marginLeft: 8,
-    alignItems: 'center'
+    backgroundColor: colors.primary,
+    borderRadius: borderRadius.md,
+    padding: spacing.md,
+    marginLeft: spacing.sm,
+    alignItems: 'center',
   },
   saveButtonText: {
-    color: '#ffffff', // Changed to white for visibility against blue background
-    fontFamily: 'Inter-SemiBold',
-    fontSize: 16
+    color: colors.text.primary,
+    fontFamily: typography.fontFamily.semiBold,
+    fontSize: typography.fontSize.base,
   },
   noGoalsContainer: {
-    padding: 20,
+    padding: spacing.lg,
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   noGoalsText: {
-    color: '#999',
-    fontFamily: 'Inter-Regular',
-    fontSize: 16,
-    textAlign: 'center'
+    color: colors.text.secondary,
+    fontFamily: typography.fontFamily.regular,
+    fontSize: typography.fontSize.base,
+    textAlign: 'center',
   },
   exerciseSelectorButton: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     width: '100%',
-    height: '100%'
   },
   exerciseSelectorText: {
-    color: '#000000', // Changed to black for visibility against light gray background
-    fontFamily: 'Inter-Regular',
-    fontSize: 16
+    color: colors.text.primary,
+    fontFamily: typography.fontFamily.regular,
+    fontSize: typography.fontSize.base,
   },
   weightInputContainer: {
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   suggestedButton: {
-    backgroundColor: '#00ff00', // Changed to green for visibility
-    borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    marginLeft: 8
+    backgroundColor: colors.primaryLight,
+    borderRadius: borderRadius.md,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    marginLeft: spacing.sm,
   },
   suggestedButtonText: {
-    color: '#000000', // Changed to black for visibility against green background
-    fontFamily: 'Inter-SemiBold',
-    fontSize: 12
+    color: colors.primary,
+    fontFamily: typography.fontFamily.semiBold,
+    fontSize: typography.fontSize.xs,
   },
   exerciseList: {
     maxHeight: 300,
-    marginVertical: 16
+    marginVertical: spacing.base,
+    borderColor: colors.border.default,
+    borderWidth: 1,
+    borderRadius: borderRadius.md,
   },
   exerciseOption: {
-    paddingVertical: 12,
-    paddingHorizontal: 16,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.base,
     borderBottomWidth: 1,
-    borderBottomColor: '#333',
-    backgroundColor: '#ffff00' // Changed to yellow for visibility
+    borderBottomColor: colors.border.default,
   },
   exerciseOptionText: {
-    color: '#000000', // Changed to black for visibility against yellow background
-    fontFamily: 'Inter-Regular',
-    fontSize: 16
-  }
+    color: colors.text.primary,
+    fontFamily: typography.fontFamily.regular,
+    fontSize: typography.fontSize.base,
+  },
+  chartTitleContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: spacing.base,
+  },
+  filterContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    backgroundColor: colors.background.card,
+    borderRadius: borderRadius.md,
+    padding: spacing.xs,
+  },
+  filterButton: {
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.lg,
+    borderRadius: borderRadius.sm,
+  },
+  filterButtonActive: {
+    backgroundColor: colors.primary,
+  },
+  filterText: {
+    fontFamily: typography.fontFamily.semiBold,
+    fontSize: typography.fontSize.sm,
+    color: colors.text.secondary,
+  },
+  filterTextActive: {
+    color: colors.text.primary,
+  },
+  chipsContainer: {
+    padding: spacing.sm,
+  },
+  chip: {
+    padding: spacing.sm,
+    borderRadius: borderRadius.full,
+    backgroundColor: colors.background.card,
+    marginRight: spacing.sm,
+  },
+  chipIcon: {
+    marginRight: spacing.sm,
+  },
+  chipText: {
+    color: colors.text.primary,
+    fontFamily: typography.fontFamily.regular,
+    fontSize: typography.fontSize.base,
+  },
 });

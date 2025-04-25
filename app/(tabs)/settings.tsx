@@ -8,6 +8,7 @@ import * as Haptics from 'expo-haptics';
 import { useSettings } from '@/hooks/useSettings';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Language, languages, getLanguageName } from '@/translations';
+import theme, { colors, typography, spacing, borderRadius } from '@/app/theme/theme';
 
 export default function SettingsScreen() {
   const { settings, updateSettings, isLoading } = useSettings();
@@ -47,7 +48,7 @@ export default function SettingsScreen() {
 
       {isLoading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#fd8f09" />
+          <ActivityIndicator size="large" color={colors.primary} />
           <Text style={styles.loadingText}>{t('loadingSettings')}</Text>
         </View>
       ) : (
@@ -57,7 +58,7 @@ export default function SettingsScreen() {
 
             <View style={styles.settingItem}>
               <View style={styles.settingInfo}>
-                <Ionicons name="body-outline" size={24} color="#fd8f09" />
+                <Ionicons name="body-outline" size={24} color={colors.primary} />
                 <Text style={styles.settingLabel}>{t('gender')}</Text>
               </View>
               <TouchableOpacity 
@@ -67,13 +68,13 @@ export default function SettingsScreen() {
                 <Text style={styles.settingValue}>
                   {settings.gender === 'male' ? t('male') : t('female')}
                 </Text>
-                <Ionicons name="chevron-forward" size={20} color="#999" />
+                <Ionicons name="chevron-forward" size={20} color={colors.text.secondary} />
               </TouchableOpacity>
             </View>
 
             <View style={styles.settingItem}>
               <View style={styles.settingInfo}>
-                <Ionicons name="scale-outline" size={24} color="#fd8f09" />
+                <Ionicons name="scale-outline" size={24} color={colors.primary} />
                 <Text style={styles.settingLabel}>{t('weightUnit')}</Text>
               </View>
               <TouchableOpacity 
@@ -81,13 +82,13 @@ export default function SettingsScreen() {
                 onPress={toggleWeightUnit}
               >
                 <Text style={styles.settingValue}>{settings.weightUnit.toUpperCase()}</Text>
-                <Ionicons name="chevron-forward" size={20} color="#999" />
+                <Ionicons name="chevron-forward" size={20} color={colors.text.secondary} />
               </TouchableOpacity>
             </View>
 
             <View style={styles.settingItem}>
               <View style={styles.settingInfo}>
-                <Ionicons name="language-outline" size={24} color="#fd8f09" />
+                <Ionicons name="language-outline" size={24} color={colors.primary} />
                 <Text style={styles.settingLabel}>{t('language')}</Text>
               </View>
               <TouchableOpacity 
@@ -97,7 +98,7 @@ export default function SettingsScreen() {
                 <Text style={styles.settingValue}>
                   {settings.language === 'en' ? t('english') : t('french')}
                 </Text>
-                <Ionicons name="chevron-forward" size={20} color="#999" />
+                <Ionicons name="chevron-forward" size={20} color={colors.text.secondary} />
               </TouchableOpacity>
             </View>
           </View>
@@ -110,10 +111,10 @@ export default function SettingsScreen() {
               onPress={toggleAbout}
             >
               <View style={styles.settingInfo}>
-                <Ionicons name="information-circle-outline" size={24} color="#fd8f09" />
+                <Ionicons name="information-circle-outline" size={24} color={colors.primary} />
                 <Text style={styles.settingLabel}>{t('about')}</Text>
               </View>
-              <Ionicons name="chevron-forward" size={20} color="#999" />
+              <Ionicons name="chevron-forward" size={20} color={colors.text.secondary} />
             </TouchableOpacity>
           </View>
 
@@ -134,7 +135,7 @@ export default function SettingsScreen() {
                   style={styles.aboutLink}
                   onPress={() => Linking.openURL('https://www.linkedin.com/in/damien-le-borgne-997b991a1/')}
                 >
-                  <Ionicons name="logo-linkedin" size={20} color="#fd8f09" />
+                  <Ionicons name="logo-linkedin" size={20} color={colors.primary} />
                   <Text style={styles.aboutLinkText}>Linkedin</Text>
                 </TouchableOpacity>
 
@@ -156,67 +157,72 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#121212',
+    backgroundColor: colors.background.main,
   },
   header: {
-    padding: 20,
-    paddingBottom: 15,
+    padding: spacing.lg,
+    paddingBottom: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#333',
+    borderBottomColor: colors.border.default,
+    backgroundColor: colors.background.card,
   },
   headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontSize: typography.fontSize['2xl'],
+    fontFamily: typography.fontFamily.bold,
+    color: colors.text.primary,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: colors.background.main,
   },
   loadingText: {
-    marginTop: 10,
-    fontSize: 16,
-    color: '#999',
+    marginTop: spacing.sm,
+    fontSize: typography.fontSize.base,
+    color: colors.text.secondary,
+    fontFamily: typography.fontFamily.regular,
   },
   content: {
     flex: 1,
-    padding: 20,
+    padding: spacing.lg,
   },
   section: {
-    marginBottom: 30,
+    marginBottom: spacing.xl,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#fd8f09',
-    marginBottom: 15,
+    fontSize: typography.fontSize.lg,
+    fontFamily: typography.fontFamily.bold,
+    color: colors.primary,
+    marginBottom: spacing.md,
   },
   settingItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 15,
+    paddingVertical: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#333',
+    borderBottomColor: colors.border.default,
   },
   settingInfo: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   settingLabel: {
-    fontSize: 16,
-    color: '#fff',
-    marginLeft: 10,
+    fontSize: typography.fontSize.base,
+    color: colors.text.primary,
+    marginLeft: spacing.md,
+    fontFamily: typography.fontFamily.regular,
   },
   settingControl: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   settingValue: {
-    fontSize: 16,
-    color: '#999',
-    marginRight: 10,
+    fontSize: typography.fontSize.base,
+    color: colors.text.secondary,
+    marginRight: spacing.sm,
+    fontFamily: typography.fontFamily.regular,
   },
   aboutContainer: {
     position: 'absolute',
@@ -226,65 +232,71 @@ const styles = StyleSheet.create({
     bottom: 0,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: spacing.lg,
   },
   aboutContent: {
-    backgroundColor: '#1a1a1a',
-    borderRadius: 15,
-    padding: 20,
-    width: '100%',
+    backgroundColor: colors.background.card,
+    borderRadius: borderRadius.lg,
+    padding: spacing.lg,
+    width: '90%',
+    maxWidth: 500,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: colors.border.default,
+    ...theme.shadows.lg,
   },
   aboutTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 5,
+    fontSize: typography.fontSize['2xl'],
+    fontFamily: typography.fontFamily.bold,
+    color: colors.text.primary,
+    marginBottom: spacing.xs,
   },
   aboutVersion: {
-    fontSize: 16,
-    color: '#999',
-    marginBottom: 15,
+    fontSize: typography.fontSize.base,
+    color: colors.text.secondary,
+    marginBottom: spacing.md,
+    fontFamily: typography.fontFamily.regular,
   },
   aboutDescription: {
-    fontSize: 16,
-    color: '#ccc',
+    fontSize: typography.fontSize.base,
+    color: colors.text.secondary,
     textAlign: 'center',
-    lineHeight: 24,
+    lineHeight: typography.lineHeight.normal * typography.fontSize.base,
+    fontFamily: typography.fontFamily.regular,
   },
   aboutDivider: {
     height: 1,
-    backgroundColor: '#333',
+    backgroundColor: colors.border.default,
     width: '100%',
-    marginVertical: 20,
+    marginVertical: spacing.lg,
   },
   aboutDeveloper: {
-    fontSize: 16,
-    color: '#ccc',
-    marginBottom: 15,
+    fontSize: typography.fontSize.base,
+    color: colors.text.secondary,
+    marginBottom: spacing.md,
+    fontFamily: typography.fontFamily.regular,
   },
   aboutLink: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 5,
+    marginBottom: spacing.sm,
   },
   aboutLinkText: {
-    fontSize: 16,
-    color: '#fd8f09',
-    marginLeft: 10,
+    fontSize: typography.fontSize.base,
+    color: colors.primary,
+    marginLeft: spacing.sm,
+    fontFamily: typography.fontFamily.semiBold,
   },
   closeButton: {
-    marginTop: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    backgroundColor: '#fd8f09',
-    borderRadius: 10,
+    marginTop: spacing.lg,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.lg,
+    backgroundColor: colors.primary,
+    borderRadius: borderRadius.md,
   },
   closeButtonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontSize: typography.fontSize.base,
+    fontFamily: typography.fontFamily.bold,
+    color: colors.text.primary,
   },
 });

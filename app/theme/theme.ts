@@ -17,6 +17,8 @@ export const colors = {
   // Secondary colors
   success: '#22c55e', // Green - for success states, workout timer
   error: '#ef4444',   // Red - for error states, rest timer
+  warning: '#f59e0b', // Added warning color
+  info: '#0ea5e9',    // Added info color
   
   // Background colors
   background: {
@@ -32,12 +34,26 @@ export const colors = {
     secondary: '#999',  // Secondary text
     disabled: '#666',   // Disabled text
     accent: '#fd8f09',  // Accent text (same as primary color)
+    warning: '#f59e0b', // Added warning text color
   },
   
   // Border colors
   border: {
     default: '#333',    // Default borders
     focus: '#fd8f09',   // Focused borders
+  },
+  
+  // Measurement point colors
+  measurement: {
+    neck: '#0ea5e9',       // Info color
+    shoulders: '#22c55e', // Success color
+    chest: '#22c55e',     // Success color
+    arms: '#a600e7',       // Primary color
+    forearms: '#a600e7',    // Primary color
+    waist: '#f59e0b',     // Warning color
+    hips: '#f59e0b',      // Warning color
+    thighs: '#ef4444',    // Error color
+    calves: '#ef4444',     // Error color
   },
 };
 

@@ -10,6 +10,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { predefinedExercises, muscleGroups } from '@/app/workout/new';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
+import theme, { colors, typography, spacing, borderRadius } from '@/app/theme/theme';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -43,21 +44,32 @@ export default function NewGoalScreen() {
       try {
         // Load workouts
         const storedWorkouts = await AsyncStorage.getItem('workouts');
+        let parsedWorkouts: any[] = []; // Initialiser comme tableau vide
         if (storedWorkouts) {
-          const parsedWorkouts = JSON.parse(storedWorkouts);
-
-          // Extract unique exercise names for the exercise selector
-          const uniqueExercises = Array.from(new Set(parsedWorkouts.map((w: any) => w.exercise)));
-
-          // Combine with predefined exercises
-          const predefinedExercisesList = Object.values(predefinedExercises).flat();
-          const allExercises = Array.from(new Set([
-            ...uniqueExercises,
-            ...predefinedExercisesList
-          ]));
-
-          setExerciseOptions(allExercises);
+          try {
+            const parsed = JSON.parse(storedWorkouts);
+            if (Array.isArray(parsed)) {
+              parsedWorkouts = parsed; // Assigner si c'est un tableau
+            } else {
+              console.warn('Stored workouts were not an array:', parsed);
+            }
+          } catch (parseError) {
+            console.error('Error parsing workouts:', parseError);
+          }
         }
+
+        // Extract unique exercise names for the exercise selector
+        const uniqueExercises = Array.from(new Set(parsedWorkouts.map((w: any) => w.exercise)));
+
+        // Combine with predefined exercises
+        const predefinedExercisesList = Object.values(predefinedExercises).flat();
+        const allExercises = Array.from(new Set([
+          ...uniqueExercises,
+          ...predefinedExercisesList
+        ]));
+
+        setExerciseOptions(allExercises as string[]); // Assurer le type string[]
+
       } catch (error) {
         console.error(t('errorLoadingWorkouts'), error);
       }
@@ -184,7 +196,7 @@ export default function NewGoalScreen() {
             router.back();
           }}
         >
-          <X color="#fff" size={24} />
+          <X color={colors.text.primary} size={24} />
         </TouchableOpacity>
       </View>
 
@@ -205,10 +217,10 @@ export default function NewGoalScreen() {
               }}
             >
               <View style={styles.exerciseSelectorButton}>
-                <Text style={[styles.exerciseSelectorText, !newGoalExercise && { color: '#666' }]}>
+                <Text style={[styles.exerciseSelectorText, !newGoalExercise && { color: colors.text.secondary }]}>
                   {newGoalExercise || t('selectExerciseForGoal')}
                 </Text>
-                <ChevronDown color="#666" size={20} />
+                <ChevronDown color={colors.text.secondary} size={20} />
               </View>
             </TouchableOpacity>
           </View>
@@ -219,7 +231,7 @@ export default function NewGoalScreen() {
               <TextInput
                 style={styles.formInput}
                 placeholder="0"
-                placeholderTextColor="#666"
+                placeholderTextColor={colors.text.secondary}
                 value={newGoalCurrent}
                 onChangeText={setNewGoalCurrent}
                 keyboardType="numeric"
@@ -244,7 +256,7 @@ export default function NewGoalScreen() {
                   }}
                 >
                   {isLoadingLastWorkout ? (
-                    <ActivityIndicator size="small" color="#fff" />
+                    <ActivityIndicator size="small" color={colors.text.primary} />
                   ) : (
                     <Text style={styles.suggestedButtonText}>{t('useLastWorkout')}</Text>
                   )}
@@ -441,79 +453,72 @@ export default function NewGoalScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0a0a0a',
+    backgroundColor: colors.background.main,
   },
   header: {
-    paddingTop: 30,
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-    backgroundColor: '#1a1a1a',
+    paddingTop: spacing.lg,
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.md,
+    backgroundColor: colors.background.card,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border.default,
   },
   title: {
-    fontSize: 32,
-    fontFamily: 'Inter-Bold',
-    color: '#fff',
+    fontSize: typography.fontSize['2xl'],
+    fontFamily: typography.fontFamily.bold,
+    color: colors.text.primary,
   },
   closeButton: {
     width: 44,
     height: 44,
-    borderRadius: 22,
-    backgroundColor: '#333',
+    borderRadius: borderRadius.full,
+    backgroundColor: colors.background.button,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 3,
-    elevation: 5,
+    ...theme.shadows.sm,
   },
   content: {
     flex: 1,
-    padding: 20,
+    padding: spacing.lg,
   },
   formCard: {
-    backgroundColor: '#1a1a1a',
-    borderRadius: 12,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    elevation: 4,
-    marginBottom: 20,
+    backgroundColor: colors.background.card,
+    borderRadius: borderRadius.lg,
+    padding: spacing.lg,
+    ...theme.shadows.md,
+    marginBottom: spacing.lg,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontFamily: 'Inter-SemiBold',
-    color: '#fff',
-    marginBottom: 20,
+    fontSize: typography.fontSize.xl,
+    fontFamily: typography.fontFamily.semiBold,
+    color: colors.text.primary,
+    marginBottom: spacing.lg,
     borderLeftWidth: 3,
-    borderLeftColor: '#fd8f09',
-    paddingLeft: 10,
+    borderLeftColor: colors.primary,
+    paddingLeft: spacing.sm,
   },
   formGroup: {
-    marginBottom: 24,
+    marginBottom: spacing.lg,
   },
   formLabel: {
-    fontSize: 18,
-    fontFamily: 'Inter-SemiBold',
-    color: '#fff',
-    marginBottom: 12,
+    fontSize: typography.fontSize.base,
+    fontFamily: typography.fontFamily.semiBold,
+    color: colors.text.secondary,
+    marginBottom: spacing.sm,
   },
   formInput: {
-    backgroundColor: '#2a2a2a',
-    borderRadius: 8,
-    padding: 12,
-    color: '#fff',
-    fontFamily: 'Inter-Regular',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    backgroundColor: colors.background.input,
+    borderRadius: borderRadius.md,
+    padding: spacing.md,
+    color: colors.text.primary,
+    fontFamily: typography.fontFamily.regular,
+    ...theme.shadows.sm,
+    fontSize: typography.fontSize.base,
+    minHeight: 48,
+    justifyContent: 'center',
   },
   exerciseSelectorButton: {
     flexDirection: 'row',
@@ -522,55 +527,46 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   exerciseSelectorText: {
-    color: '#fff',
-    fontFamily: 'Inter-Regular',
-    fontSize: 16,
+    color: colors.text.primary,
+    fontFamily: typography.fontFamily.regular,
+    fontSize: typography.fontSize.base,
   },
   weightInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   suggestedButton: {
-    backgroundColor: '#fd8f09',
-    borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    marginLeft: 8,
-    shadowColor: '#fd8f09',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 2,
-    elevation: 3,
+    backgroundColor: colors.primaryLight,
+    borderRadius: borderRadius.md,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    marginLeft: spacing.sm,
+    ...theme.shadows.sm,
     minWidth: 100,
     alignItems: 'center',
     justifyContent: 'center',
   },
   suggestedButtonText: {
-    color: '#fff',
-    fontFamily: 'Inter-SemiBold',
-    fontSize: 12,
+    color: colors.primary,
+    fontFamily: typography.fontFamily.semiBold,
+    fontSize: typography.fontSize.xs,
   },
   saveButton: {
-    backgroundColor: '#fd8f09',
-    paddingVertical: 16,
-    borderRadius: 8,
+    backgroundColor: colors.primary,
+    paddingVertical: spacing.md,
+    borderRadius: borderRadius.md,
     alignItems: 'center',
-    marginTop: 24,
-    shadowColor: '#fd8f09',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 3,
-    elevation: 5,
+    marginTop: spacing.xl,
+    ...theme.shadows.primary,
   },
   saveButtonDisabled: {
-    backgroundColor: '#333',
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
+    backgroundColor: colors.background.button,
+    ...theme.shadows.sm,
   },
   saveButtonText: {
-    color: '#fff',
-    fontFamily: 'Inter-SemiBold',
-    fontSize: 16,
+    color: colors.text.primary,
+    fontFamily: typography.fontFamily.semiBold,
+    fontSize: typography.fontSize.base,
   },
   // Exercise Selector Modal
   modalOverlay: {
@@ -582,124 +578,115 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 1000,
+    zIndex: theme.zIndex.modal,
   },
   modalContainer: {
-    backgroundColor: '#1a1a1a',
-    borderRadius: 12,
-    padding: 20,
+    backgroundColor: colors.background.card,
+    borderRadius: borderRadius.lg,
+    padding: spacing.lg,
     width: '90%',
     maxHeight: '80%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
-    elevation: 10,
+    ...theme.shadows.lg,
   },
   modalTitle: {
-    fontSize: 20,
-    fontFamily: 'Inter-Bold',
-    color: '#fff',
-    marginBottom: 20,
+    fontSize: typography.fontSize.xl,
+    fontFamily: typography.fontFamily.bold,
+    color: colors.text.primary,
+    marginBottom: spacing.lg,
     textAlign: 'center',
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#2a2a2a',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 3,
+    backgroundColor: colors.background.input,
+    borderRadius: borderRadius.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    marginBottom: spacing.md,
+    ...theme.shadows.sm,
   },
   searchIcon: {
-    marginRight: 8,
+    marginRight: spacing.sm,
   },
   searchInput: {
     flex: 1,
-    color: '#fff',
-    fontFamily: 'Inter-Regular',
-    fontSize: 16,
+    color: colors.text.primary,
+    fontFamily: typography.fontFamily.regular,
+    fontSize: typography.fontSize.base,
     padding: 0,
+    height: 24,
   },
   exerciseList: {
-    maxHeight: 400,
-    marginVertical: 16,
+    // Pas de styles spécifiques, géré par ScrollView?
   },
   exerciseOption: {
-    paddingVertical: 12,
-    paddingHorizontal: 16,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.base,
     borderBottomWidth: 1,
-    borderBottomColor: '#333',
+    borderBottomColor: colors.border.default,
   },
   exerciseOptionText: {
-    color: '#fff',
-    fontFamily: 'Inter-Regular',
-    fontSize: 16,
+    color: colors.text.primary,
+    fontFamily: typography.fontFamily.regular,
+    fontSize: typography.fontSize.base,
   },
   muscleGroupContainer: {
-    marginBottom: 16,
-    backgroundColor: '#2a2a2a',
-    borderRadius: 8,
+    marginBottom: spacing.base,
+    backgroundColor: colors.background.card,
+    borderRadius: borderRadius.md,
     overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: colors.border.default,
   },
   muscleGroupHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#333',
+    borderBottomColor: colors.border.default,
+    backgroundColor: colors.background.button,
   },
   muscleGroupTitle: {
-    color: '#fd8f09',
-    fontFamily: 'Inter-SemiBold',
-    fontSize: 16,
+    color: colors.primary,
+    fontFamily: typography.fontFamily.semiBold,
+    fontSize: typography.fontSize.base,
   },
   exerciseGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    padding: 12,
-    gap: 8,
+    padding: spacing.sm,
+    gap: spacing.sm,
   },
   exerciseButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: '#1a1a1a',
-    marginRight: 8,
-    marginBottom: 8,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: borderRadius.full,
+    backgroundColor: colors.background.input,
   },
   exerciseButtonSelected: {
-    backgroundColor: '#fd8f09',
+    backgroundColor: colors.primary,
   },
   exerciseButtonText: {
-    color: '#fff',
-    fontFamily: 'Inter-Regular',
+    color: colors.text.secondary,
+    fontFamily: typography.fontFamily.regular,
+    fontSize: typography.fontSize.sm,
   },
   exerciseButtonTextSelected: {
-    fontFamily: 'Inter-SemiBold',
+    color: colors.text.primary,
+    fontFamily: typography.fontFamily.semiBold,
   },
   cancelButton: {
-    backgroundColor: '#333',
-    borderRadius: 8,
-    padding: 12,
+    backgroundColor: colors.background.button,
+    borderRadius: borderRadius.md,
+    padding: spacing.md,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 3,
+    marginTop: spacing.md,
   },
   cancelButtonText: {
-    color: '#fff',
-    fontFamily: 'Inter-SemiBold',
-    fontSize: 16,
-  },
+    color: colors.text.primary,
+    fontFamily: typography.fontFamily.semiBold,
+    fontSize: typography.fontSize.base,
+  }
 });

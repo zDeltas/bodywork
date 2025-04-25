@@ -1,7 +1,5 @@
 import React, { useCallback, useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Dimensions, ScrollView, TouchableOpacity, Animated } from 'react-native';
-import { useFonts, Inter_400Regular, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
-import * as SplashScreen from 'expo-splash-screen';
 import { VictoryChart, VictoryLine, VictoryAxis, VictoryTheme, VictoryScatter, VictoryTooltip } from 'victory-native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -9,8 +7,7 @@ import { format, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useLocalSearchParams, router } from 'expo-router';
 import { useTranslation } from '@/hooks/useTranslation';
-
-SplashScreen.preventAutoHideAsync();
+import theme, { colors, typography, spacing, borderRadius } from '@/app/theme/theme';
 
 interface Workout {
   id: string;
@@ -50,11 +47,6 @@ export default function ExerciseDetailsScreen() {
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [selectedPeriod, setSelectedPeriod] = useState('1m');
   const [selectedChartType, setSelectedChartType] = useState<'1rm' | 'volume' | 'reps'>('1rm');
-  const [fontsLoaded] = useFonts({
-    'Inter-Regular': Inter_400Regular,
-    'Inter-SemiBold': Inter_600SemiBold,
-    'Inter-Bold': Inter_700Bold,
-  });
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(0)).current;
@@ -160,18 +152,8 @@ export default function ExerciseDetailsScreen() {
 
   const { exerciseData, volumeData, repsData } = calculateChartData();
 
-  const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
-      await SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded]);
-
-  if (!fontsLoaded) {
-    return null;
-  }
-
   return (
-    <ScrollView style={styles.container} onLayout={onLayoutRootView}>
+    <ScrollView style={styles.container}>
       <Animated.View style={[styles.header, { opacity: fadeAnim, transform: [{ translateY: slideAnim.interpolate({ inputRange: [0, 1], outputRange: [-50, 0] }) }] }]}>
         <TouchableOpacity 
           style={styles.backButton}
@@ -386,87 +368,87 @@ export default function ExerciseDetailsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0a0a0a',
+    backgroundColor: colors.background.main,
   },
   header: {
-    paddingTop: 60,
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-    backgroundColor: '#1a1a1a',
+    paddingTop: spacing.xl * 2,
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.lg,
+    backgroundColor: colors.background.card,
     flexDirection: 'row',
     alignItems: 'center',
   },
   backButton: {
-    marginRight: 16,
+    marginRight: spacing.base,
   },
   title: {
-    fontSize: 24,
-    fontFamily: 'Inter-Bold',
-    color: '#fff',
+    fontSize: typography.fontSize['2xl'],
+    fontFamily: typography.fontFamily.bold,
+    color: colors.text.primary,
   },
   content: {
     flex: 1,
-    padding: 20,
+    padding: spacing.lg,
   },
   filterSection: {
-    marginBottom: 15,
+    marginBottom: spacing.base,
   },
   filterLabel: {
-    fontSize: 14,
-    fontFamily: 'Inter-Regular',
-    color: '#fff',
-    marginBottom: 8,
+    fontSize: typography.fontSize.md,
+    fontFamily: typography.fontFamily.regular,
+    color: colors.text.primary,
+    marginBottom: spacing.sm,
   },
   filterContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-start',
-    marginTop: 5,
+    marginTop: spacing.xs,
   },
   filterButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 20,
-    backgroundColor: '#2a2a2a',
-    marginRight: 10,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.base,
+    borderRadius: borderRadius.full,
+    backgroundColor: colors.background.button,
+    marginRight: spacing.sm,
   },
   filterButtonActive: {
-    backgroundColor: '#fd8f09',
+    backgroundColor: colors.primary,
   },
   filterText: {
-    color: '#666',
-    fontFamily: 'Inter-SemiBold',
+    color: colors.text.secondary,
+    fontFamily: typography.fontFamily.semiBold,
   },
   filterTextActive: {
-    color: '#fff',
+    color: colors.text.primary,
   },
   chartTypeSelector: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginBottom: 16,
-    backgroundColor: '#2a2a2a',
-    borderRadius: 20,
-    padding: 4,
+    marginBottom: spacing.base,
+    backgroundColor: colors.background.button,
+    borderRadius: borderRadius.full,
+    padding: spacing.xs,
   },
   chartTypeButton: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 16,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    borderRadius: borderRadius.full,
   },
   chartTypeButtonActive: {
-    backgroundColor: '#fd8f09',
+    backgroundColor: colors.primary,
   },
   chartTypeText: {
-    color: '#666',
-    fontFamily: 'Inter-SemiBold',
-    fontSize: 13,
+    color: colors.text.secondary,
+    fontFamily: typography.fontFamily.semiBold,
+    fontSize: typography.fontSize.sm,
   },
   chartTypeTextActive: {
-    color: '#fff',
+    color: colors.text.primary,
   },
   chartContainer: {
-    backgroundColor: '#1a1a1a',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 20,
+    backgroundColor: colors.background.card,
+    borderRadius: borderRadius.lg,
+    padding: spacing.base,
+    marginBottom: spacing.lg,
   },
 });

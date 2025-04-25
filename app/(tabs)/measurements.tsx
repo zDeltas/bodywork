@@ -1,35 +1,19 @@
 import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
-import { useFonts, Inter_400Regular, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 import { useCallback } from 'react';
 import * as SplashScreen from 'expo-splash-screen';
 import BodyMeasurements from '@/app/components/BodyMeasurements';
 import { Check } from 'lucide-react-native';
+import theme, { colors, typography, spacing, borderRadius } from '@/app/theme/theme';
 
 SplashScreen.preventAutoHideAsync();
 
 export default function MeasurementsScreen() {
-  const [fontsLoaded] = useFonts({
-    'Inter-Regular': Inter_400Regular,
-    'Inter-SemiBold': Inter_600SemiBold,
-    'Inter-Bold': Inter_700Bold,
-  });
-
-  const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
-      await SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded]);
-
-  if (!fontsLoaded) {
-    return null;
-  }
-
   return (
-    <View style={styles.container} onLayout={onLayoutRootView}>
+    <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Mesures</Text>
         <TouchableOpacity style={styles.saveButton}>
-          <Check color="#fff" size={24} />
+          <Check color={colors.text.primary} size={24} />
         </TouchableOpacity>
       </View>
 
@@ -41,28 +25,29 @@ export default function MeasurementsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0a0a0a',
+    backgroundColor: colors.background.main,
   },
   header: {
-    paddingTop: 60,
-    paddingHorizontal: 20,
-    paddingBottom: 20,
+    paddingTop: spacing.xl * 2,
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.lg,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#1a1a1a',
+    backgroundColor: colors.background.card,
   },
   title: {
-    fontSize: 32,
-    fontFamily: 'Inter-Bold',
-    color: '#fff',
+    fontSize: typography.fontSize['3xl'],
+    fontFamily: typography.fontFamily.bold,
+    color: colors.text.primary,
   },
   saveButton: {
     width: 44,
     height: 44,
-    borderRadius: 22,
-    backgroundColor: '#fd8f09',
+    borderRadius: borderRadius.full,
+    backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
+    ...theme.shadows.primary,
   },
 }); 

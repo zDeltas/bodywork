@@ -11,6 +11,7 @@ import Body, { ExtendedBodyPart, Slug } from 'react-native-body-highlighter';
 import { differenceInHours } from 'date-fns';
 import { useSettings } from '@/hooks/useSettings';
 import { useTranslation } from '@/hooks/useTranslation';
+import theme, { colors, typography, spacing, borderRadius } from '@/app/theme/theme';
 
 const AnimatedText = Animated.createAnimatedComponent(Text);
 
@@ -110,6 +111,13 @@ export default function MuscleMap({ workouts }: MuscleMapProps) {
     intensity: calculateMuscleRestState(group)
   }));
 
+  // Définir les couleurs pour l'intensité sous forme de tableau
+  const intensityColorsArray: string[] = [
+    colors.error,          // 0-24h (rouge)
+    colors.text.warning,   // 24-72h (remplacé bordeaux par warning)
+    colors.text.disabled   // 72h+ (gris)
+  ];
+
   return (
     <View style={styles.container}>
       <View style={styles.viewToggle}>
@@ -133,21 +141,22 @@ export default function MuscleMap({ workouts }: MuscleMapProps) {
           data={bodyData}
           side={selectedView}
           gender={settings.gender}
+          colors={intensityColorsArray}
         />
       </Animated.View>
       <View style={styles.legend}>
         <Text style={styles.legendTitle}>{t('muscleRestState')}</Text>
         <View style={styles.legendItems}>
           <View style={styles.legendItem}>
-            <View style={[styles.legendColor, { backgroundColor: '#ef4444' }]} />
+            <View style={[styles.legendColor, { backgroundColor: intensityColorsArray[0] }]} />
             <Text style={styles.legendText}>{t('restPeriod0to24')}</Text>
           </View>
           <View style={styles.legendItem}>
-            <View style={[styles.legendColor, { backgroundColor: '#7f1d1d' }]} />
+            <View style={[styles.legendColor, { backgroundColor: intensityColorsArray[1] }]} />
             <Text style={styles.legendText}>{t('restPeriod24to72')}</Text>
           </View>
           <View style={styles.legendItem}>
-            <View style={[styles.legendColor, { backgroundColor: '#4b5563' }]} />
+            <View style={[styles.legendColor, { backgroundColor: intensityColorsArray[2] }]} />
             <Text style={styles.legendText}>{t('restPeriod72plus')}</Text>
           </View>
         </View>
@@ -160,48 +169,50 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    backgroundColor: '#1a1a1a',
-    padding: 20,
+    backgroundColor: colors.background.card,
+    padding: spacing.md,
+    borderRadius: borderRadius.lg,
+    width: '100%',
+    ...theme.shadows.md,
   },
   viewToggle: {
     flexDirection: 'row',
-    marginBottom: 20,
-    backgroundColor: '#333',
-    borderRadius: 20,
-    padding: 4,
+    marginBottom: spacing.md,
+    backgroundColor: colors.background.button,
+    borderRadius: borderRadius.full,
+    padding: spacing.xs,
   },
   toggleButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 16,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    borderRadius: borderRadius.full,
   },
   toggleButtonActive: {
-    backgroundColor: '#fd8f09',
+    backgroundColor: colors.primary,
   },
   toggleText: {
-    color: '#fff',
-    fontFamily: 'Inter-SemiBold',
-    fontSize: 14,
+    color: colors.text.primary,
+    fontFamily: typography.fontFamily.semiBold,
+    fontSize: typography.fontSize.sm,
   },
   bodyContainer: {
-    display: 'flex',
-    flexDirection: 'column',
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
+    marginBottom: spacing.md,
   },
   legend: {
-    backgroundColor: '#2a2a2a',
-    borderRadius: 12,
-    padding: 16,
-    marginTop: 20,
+    backgroundColor: colors.background.main,
+    borderRadius: borderRadius.md,
+    padding: spacing.md,
+    marginTop: spacing.lg,
     width: '100%',
   },
   legendTitle: {
-    fontSize: 16,
-    fontFamily: 'Inter-SemiBold',
-    color: '#fff',
-    marginBottom: 12,
+    fontSize: typography.fontSize.base,
+    fontFamily: typography.fontFamily.semiBold,
+    color: colors.text.primary,
+    marginBottom: spacing.sm,
     textAlign: 'center',
   },
   legendItems: {
@@ -216,11 +227,11 @@ const styles = StyleSheet.create({
     width: 16,
     height: 16,
     borderRadius: 8,
-    marginRight: 8,
+    marginRight: spacing.sm,
   },
   legendText: {
-    color: '#fff',
-    fontFamily: 'Inter-Regular',
-    fontSize: 14,
+    color: colors.text.primary,
+    fontFamily: typography.fontFamily.regular,
+    fontSize: typography.fontSize.sm,
   },
 });

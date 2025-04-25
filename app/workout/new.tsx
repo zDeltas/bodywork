@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Pressable } from 'react-native';
-import { useFonts, Inter_400Regular, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 import { useCallback, useState, useEffect } from 'react';
 import * as SplashScreen from 'expo-splash-screen';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -9,6 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from '@/hooks/useTranslation';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import ExerciseList from '../components/ExerciseList';
+import theme, { colors, typography, spacing, borderRadius } from '@/app/theme/theme';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -37,12 +37,11 @@ export const predefinedExercises = {
   'Poitrine': ['Développé couché', 'Développé incliné', 'Développé décliné', 'Écarté avec haltères', 'Crossover à la poulie'],
   'Dos': ['Tractions', 'Tirage vertical', 'Rowing barre', 'Rowing haltère', 'Rowing T-Bar'],
   'Jambes': ['Squat', 'Soulevé de terre', 'Presse à jambes', 'Fentes', 'Extension des jambes'],
-  'Epaules': ['Développé militaire', 'Élévations latérales', 'Élévations frontales', 'Oiseau pour deltoïdes postérieurs', 'Haussements d’épaules'],
+  'Epaules': ['Développé militaire', 'Élévations latérales', 'Élévations frontales', 'Oiseau pour deltoïdes postérieurs', 'Haussements d\'épaules'],
   'Biceps': ['Curl barre', 'Curl haltères', 'Curl marteau', 'Curl au pupitre', 'Curl concentration'],
   'Triceps': ['Extension à la poulie', 'Barre au front', 'Extension au-dessus de la tête', 'Dips', 'Développé couché prise serrée'],
   'Ceinture abdominale': ['Planche', 'Twists russes', 'Relevés de jambes', 'Crunchs', 'Relevés de genoux suspendu'],
 };
-
 
 export default function NewWorkoutScreen() {
   const { t } = useTranslation();
@@ -61,72 +60,6 @@ export default function NewWorkoutScreen() {
   const [isCustomExercise, setIsCustomExercise] = useState(false);
   const params = useLocalSearchParams();
   const selectedDate = params.selectedDate as string;
-
-  const [fontsLoaded] = useFonts({
-    'Inter-Regular': Inter_400Regular,
-    'Inter-SemiBold': Inter_600SemiBold,
-    'Inter-Bold': Inter_700Bold,
-  });
-
-  const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
-      await SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded]);
-
-  // Function to try to calculate suggested weight based on exercise, reps, and RPE
-  const tryCalculateSuggestedWeight = useCallback(async (selectedExercise: string) => {
-    const currentReps = series[0]?.reps || '';
-    const currentRpe = series[0]?.rpe || rpe;
-
-    // Try to calculate suggested weight if reps and RPE are already set
-    if (selectedExercise && currentReps && currentRpe) {
-      calculateSuggestedWeight(selectedExercise, currentReps, currentRpe);
-      return;
-    }
-
-    // Otherwise, try to find previous workouts for this exercise
-    try {
-      const existingWorkouts = await AsyncStorage.getItem('workouts');
-      if (!existingWorkouts) return;
-
-      const workouts = JSON.parse(existingWorkouts);
-      const sameExerciseWorkouts = workouts
-        .filter((w: any) => w.exercise === selectedExercise)
-        .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
-
-      if (sameExerciseWorkouts.length === 0) return;
-
-      const lastWorkout = sameExerciseWorkouts[0];
-
-      // If we have reps but no RPE, use the last workout's RPE
-      if (currentReps && !currentRpe && lastWorkout.rpe) {
-        calculateSuggestedWeight(selectedExercise, currentReps, lastWorkout.rpe.toString());
-      }
-      // If we have RPE but no reps, use the last workout's reps
-      else if (!currentReps && currentRpe && lastWorkout.reps) {
-        calculateSuggestedWeight(selectedExercise, lastWorkout.reps.toString(), currentRpe);
-      }
-      // If we have neither, use both from the last workout
-      else if (!currentReps && !currentRpe && lastWorkout.reps && lastWorkout.rpe) {
-        // Update the first series with the reps from the last workout
-        const newSeries = [...series];
-        if (newSeries.length > 0) {
-          newSeries[0] = {
-            ...newSeries[0],
-            reps: lastWorkout.reps.toString()
-          };
-          setSeries(newSeries);
-        }
-        setRpe(lastWorkout.rpe.toString());
-        calculateSuggestedWeight(selectedExercise, lastWorkout.reps.toString(), lastWorkout.rpe.toString());
-      }
-    } catch (error) {
-      console.error('Error loading previous workouts:', error);
-    }
-  }, [series, rpe, calculateSuggestedWeight]);
-
-
 
   // Function to calculate suggested weight based on previous workouts
   const calculateSuggestedWeight = useCallback(async (selectedExercise: string, inputReps: string, inputRpe: string) => {
@@ -210,6 +143,58 @@ export default function NewWorkoutScreen() {
     }
   }, []);
 
+  // Function to try to calculate suggested weight based on exercise, reps, and RPE
+  const tryCalculateSuggestedWeight = useCallback(async (selectedExercise: string) => {
+    const currentReps = series[0]?.reps || '';
+    const currentRpe = series[0]?.rpe || rpe;
+
+    // Try to calculate suggested weight if reps and RPE are already set
+    if (selectedExercise && currentReps && currentRpe) {
+      calculateSuggestedWeight(selectedExercise, currentReps, currentRpe);
+      return;
+    }
+
+    // Otherwise, try to find previous workouts for this exercise
+    try {
+      const existingWorkouts = await AsyncStorage.getItem('workouts');
+      if (!existingWorkouts) return;
+
+      const workouts = JSON.parse(existingWorkouts);
+      const sameExerciseWorkouts = workouts
+        .filter((w: any) => w.exercise === selectedExercise)
+        .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+      if (sameExerciseWorkouts.length === 0) return;
+
+      const lastWorkout = sameExerciseWorkouts[0];
+
+      // If we have reps but no RPE, use the last workout's RPE
+      if (currentReps && !currentRpe && lastWorkout.rpe) {
+        calculateSuggestedWeight(selectedExercise, currentReps, lastWorkout.rpe.toString());
+      }
+      // If we have RPE but no reps, use the last workout's reps
+      else if (!currentReps && currentRpe && lastWorkout.reps) {
+        calculateSuggestedWeight(selectedExercise, lastWorkout.reps.toString(), currentRpe);
+      }
+      // If we have neither, use both from the last workout
+      else if (!currentReps && !currentRpe && lastWorkout.reps && lastWorkout.rpe) {
+        // Update the first series with the reps from the last workout
+        const newSeries = [...series];
+        if (newSeries.length > 0) {
+          newSeries[0] = {
+            ...newSeries[0],
+            reps: lastWorkout.reps.toString()
+          };
+          setSeries(newSeries);
+        }
+        setRpe(lastWorkout.rpe.toString());
+        calculateSuggestedWeight(selectedExercise, lastWorkout.reps.toString(), lastWorkout.rpe.toString());
+      }
+    } catch (error) {
+      console.error('Error loading previous workouts:', error);
+    }
+  }, [series, rpe, calculateSuggestedWeight]);
+
   const saveWorkout = async () => {
     try {
       // Filter out empty series
@@ -272,12 +257,8 @@ export default function NewWorkoutScreen() {
     }
   };
 
-  if (!fontsLoaded) {
-    return null;
-  }
-
   return (
-    <View style={styles.container} onLayout={onLayoutRootView}>
+    <View style={styles.container}>
       <Animated.View 
         entering={FadeIn.duration(500)} 
         style={styles.header}
@@ -293,7 +274,7 @@ export default function NewWorkoutScreen() {
             style={styles.closeButton}
             onPress={() => router.back()}
           >
-            <X color="#fff" size={24} />
+            <X color={colors.text.primary} size={24} />
           </TouchableOpacity>
         </Animated.View>
       </Animated.View>
@@ -330,7 +311,7 @@ export default function NewWorkoutScreen() {
                 }
               }}
               placeholder={t('enterExerciseName')}
-              placeholderTextColor="#666"
+              placeholderTextColor={colors.text.secondary}
             />
             <TouchableOpacity
               style={styles.backButton}
@@ -345,7 +326,7 @@ export default function NewWorkoutScreen() {
           entering={FadeIn.duration(500).delay(300)} 
         >
           <View style={styles.sectionTitleContainer}>
-            <Layers color="#fd8f09" size={24} style={styles.sectionTitleIcon} />
+            <Layers color={colors.primary} size={24} style={styles.sectionTitleIcon} />
             <Animated.Text 
               entering={FadeIn.duration(400)} 
               style={styles.sectionTitle}
@@ -372,7 +353,7 @@ export default function NewWorkoutScreen() {
                         setSeries(newSeries);
                       }}
                     >
-                      <X color="#fff" size={18} />
+                      <X color={colors.text.primary} size={18} />
                     </TouchableOpacity>
                   )}
                 </View>
@@ -434,7 +415,7 @@ export default function NewWorkoutScreen() {
               <View style={[styles.row]}>
                 <View style={styles.column}>
                   <View style={styles.sectionTitleContainer}>
-                    <Weight color="#fd8f09" size={20} style={styles.sectionTitleIcon} />
+                    <Weight color={colors.primary} size={20} style={styles.sectionTitleIcon} />
                     <Text style={styles.seriesInputLabel}>{t('weightKg')}</Text>
                   </View>
                   {index === 0 && suggestedWeight !== null && (
@@ -466,13 +447,13 @@ export default function NewWorkoutScreen() {
                       setSeries(newSeries);
                     }}
                     placeholder="0"
-                    placeholderTextColor="#666"
+                    placeholderTextColor={colors.text.secondary}
                     keyboardType="numeric"
                   />
                 </View>
                 <View style={styles.column}>
                   <View style={styles.sectionTitleContainer}>
-                    <BarChart color="#fd8f09" size={20} style={styles.sectionTitleIcon} />
+                    <BarChart color={colors.primary} size={20} style={styles.sectionTitleIcon} />
                     <Text style={styles.seriesInputLabel}>{t('reps')}</Text>
                   </View>
                   <TextInput
@@ -488,13 +469,13 @@ export default function NewWorkoutScreen() {
                       }
                     }}
                     placeholder="0"
-                    placeholderTextColor="#666"
+                    placeholderTextColor={colors.text.secondary}
                     keyboardType="numeric"
                   />
                 </View>
                 <View style={[styles.column]}>
                   <View style={styles.sectionTitleContainer}>
-                    <Gauge color="#fd8f09" size={20} style={styles.sectionTitleIcon} />
+                    <Gauge color={colors.primary} size={20} style={styles.sectionTitleIcon} />
                     <Text 
                       style={[
                         styles.seriesInputLabel,
@@ -593,7 +574,7 @@ export default function NewWorkoutScreen() {
                     setSeries(newSeries);
                   }}
                   placeholder={t('optionalNote')}
-                  placeholderTextColor="#666"
+                  placeholderTextColor={colors.text.secondary}
                   multiline
                 />
               </View>
@@ -637,7 +618,7 @@ export default function NewWorkoutScreen() {
               }]);
             }}
           >
-            <Plus color="#fff" size={20} style={{ marginRight: 8 }} />
+            <Plus color={colors.text.primary} size={20} style={{ marginRight: 8 }} />
             <Text style={styles.addSeriesButtonText}>{t('addSeries')}</Text>
           </TouchableOpacity>
         </Animated.View>
@@ -661,85 +642,81 @@ export default function NewWorkoutScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0a0a0a',
+    backgroundColor: colors.background.main,
   },
   serieTypeContainer: {
-    marginBottom: 16,
+    marginBottom: spacing.base,
   },
   serieTypeButtonsContainer: {
     flexDirection: 'row',
-    gap: 12,
-    marginBottom: 8,
+    gap: spacing.md,
+    marginBottom: spacing.sm,
   },
   serieTypeButton: {
     flex: 1,
-    backgroundColor: '#1a1a1a',
-    borderRadius: 12,
-    padding: 12,
+    backgroundColor: colors.background.card,
+    borderRadius: borderRadius.lg,
+    padding: spacing.md,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: colors.border.default,
   },
   serieTypeButtonSelected: {
-    backgroundColor: 'rgba(253, 143, 9, 0.1)',
-    borderColor: '#fd8f09',
+    backgroundColor: colors.primaryLight,
+    borderColor: colors.primaryBorder,
   },
   serieTypeButtonText: {
-    color: '#fff',
-    fontFamily: 'Inter-SemiBold',
-    fontSize: 16,
-    marginBottom: 4,
+    color: colors.text.primary,
+    fontFamily: typography.fontFamily.semiBold,
+    fontSize: typography.fontSize.base,
+    marginBottom: spacing.xs,
     textAlign: 'center',
   },
   serieTypeButtonTextSelected: {
-    color: '#fd8f09',
+    color: colors.primary,
   },
   serieTypeDescription: {
-    color: '#999',
-    fontFamily: 'Inter-Regular',
-    fontSize: 12,
+    color: colors.text.secondary,
+    fontFamily: typography.fontFamily.regular,
+    fontSize: typography.fontSize.sm,
     textAlign: 'center',
   },
   disabledLabel: {
-    color: '#666',
+    color: colors.text.disabled,
   },
   disabledLabelNote: {
-    color: '#666',
-    fontFamily: 'Inter-Regular',
-    fontSize: 12,
+    color: colors.text.disabled,
+    fontFamily: typography.fontFamily.regular,
+    fontSize: typography.fontSize.sm,
   },
   disabledDropdown: {
     opacity: 0.7,
   },
   disabledDropdownButton: {
-    backgroundColor: '#222',
-    borderColor: '#444',
+    backgroundColor: colors.background.button,
+    borderColor: colors.border.default,
   },
   disabledDropdownButtonText: {
-    color: '#666',
+    color: colors.text.disabled,
   },
   dropdownContainer: {
     position: 'relative',
-    zIndex: 99999,
-    marginBottom: 16,
+    zIndex: theme.zIndex.dropdown,
+    marginBottom: spacing.base,
   },
   dropdownButton: {
-    backgroundColor: '#1a1a1a',
-    borderRadius: 10,
-    padding: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-    elevation: 2,
+    backgroundColor: colors.background.card,
+    borderRadius: borderRadius.md,
+    padding: spacing.sm,
+    ...theme.shadows.sm,
     borderWidth: 1,
-    borderColor: '#333',
-    height: 44, // Match height with compactInput
-    width: 60, // Reduced width for RPE (small numbers only)
+    borderColor: colors.border.default,
+    height: 44,
+    width: 60,
   },
   dropdownButtonText: {
-    color: '#fff',
-    fontFamily: 'Inter-Regular',
-    fontSize: 14,
+    color: colors.text.primary,
+    fontFamily: typography.fontFamily.regular,
+    fontSize: typography.fontSize.md,
     textAlign: 'center',
   },
   dropdownList: {
@@ -747,215 +724,179 @@ const styles = StyleSheet.create({
     top: '100%',
     left: 0,
     right: 0,
-    backgroundColor: '#1a1a1a',
-    borderRadius: 12,
-    marginTop: 4,
-    padding: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    backgroundColor: colors.background.card,
+    borderRadius: borderRadius.lg,
+    marginTop: spacing.xs,
+    padding: spacing.sm,
+    ...theme.shadows.md,
     borderWidth: 1,
-    borderColor: '#333',
-    zIndex: 99999,
-    elevation: 99999, // Higher elevation for Android
-    maxHeight: 200, // Limit height to prevent overflow
+    borderColor: colors.border.default,
+    zIndex: theme.zIndex.dropdown + 1,
+    elevation: theme.zIndex.dropdown + 1,
+    maxHeight: 200,
   },
   dropdownScroll: {
-    maxHeight: 200, // Match maxHeight with dropdownList
+    maxHeight: 200,
   },
   dropdownItem: {
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.base,
+    borderRadius: borderRadius.sm,
   },
   dropdownItemText: {
-    color: '#fff',
-    fontFamily: 'Inter-Regular',
-    fontSize: 16,
+    color: colors.text.primary,
+    fontFamily: typography.fontFamily.regular,
+    fontSize: typography.fontSize.base,
     textAlign: 'center',
   },
   dropdownItemTextSelected: {
-    color: '#fd8f09',
-    fontFamily: 'Inter-SemiBold',
+    color: colors.primary,
+    fontFamily: typography.fontFamily.semiBold,
   },
   header: {
-    paddingTop: 50,
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-    backgroundColor: '#1a1a1a',
+    paddingTop: spacing.xl * 1.5,
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.lg,
+    backgroundColor: colors.background.card,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    ...theme.shadows.md,
   },
   title: {
-    fontSize: 32,
-    fontFamily: 'Inter-Bold',
-    color: '#fff',
+    fontSize: typography.fontSize['3xl'],
+    fontFamily: typography.fontFamily.bold,
+    color: colors.text.primary,
   },
   closeButton: {
     width: 44,
     height: 44,
-    borderRadius: 22,
-    backgroundColor: '#333',
+    borderRadius: borderRadius.full,
+    backgroundColor: colors.background.button,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-    elevation: 2,
+    ...theme.shadows.sm,
   },
   content: {
     flex: 1,
-    padding: 20,
+    padding: spacing.lg,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontFamily: 'Inter-SemiBold',
-    color: '#fff',
-    marginBottom: 16,
-    marginTop: 8,
+    fontSize: typography.fontSize.xl,
+    fontFamily: typography.fontFamily.semiBold,
+    color: colors.text.primary,
+    marginBottom: spacing.base,
+    marginTop: spacing.sm,
   },
   sectionTitleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: spacing.sm,
   },
   sectionTitleIcon: {
-    marginRight: 10,
+    marginRight: spacing.sm,
   },
-  // Keep existing styles
   muscleGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginBottom: 28,
-    gap: 10,
+    marginBottom: spacing.xl,
+    gap: spacing.sm,
   },
   muscleButton: {
-    paddingHorizontal: 18,
-    paddingVertical: 10,
-    borderRadius: 20,
-    backgroundColor: '#1a1a1a',
-    marginRight: 8,
-    marginBottom: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-    elevation: 2,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    borderRadius: borderRadius.full,
+    backgroundColor: colors.background.card,
+    marginRight: spacing.sm,
+    marginBottom: spacing.sm,
+    ...theme.shadows.sm,
   },
   muscleButtonSelected: {
-    backgroundColor: '#fd8f09',
-    shadowColor: '#fd8f09',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 2,
-    elevation: 3,
+    backgroundColor: colors.primary,
+    ...theme.shadows.primary,
   },
   muscleButtonText: {
-    color: '#fff',
-    fontFamily: 'Inter-Regular',
-    fontSize: 15,
+    color: colors.text.primary,
+    fontFamily: typography.fontFamily.regular,
+    fontSize: typography.fontSize.md,
   },
   muscleButtonTextSelected: {
-    fontFamily: 'Inter-SemiBold',
-    color: '#fff',
+    fontFamily: typography.fontFamily.semiBold,
+    color: colors.text.primary,
   },
   exerciseGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginBottom: 28,
-    gap: 10,
+    marginBottom: spacing.xl,
+    gap: spacing.sm,
   },
   exerciseButton: {
-    paddingHorizontal: 18,
-    paddingVertical: 10,
-    borderRadius: 20,
-    backgroundColor: '#1a1a1a',
-    marginRight: 8,
-    marginBottom: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-    elevation: 2,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    borderRadius: borderRadius.full,
+    backgroundColor: colors.background.card,
+    marginRight: spacing.sm,
+    marginBottom: spacing.sm,
+    ...theme.shadows.sm,
   },
   exerciseButtonSelected: {
-    backgroundColor: '#fd8f09',
-    shadowColor: '#fd8f09',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 2,
-    elevation: 3,
+    backgroundColor: colors.primary,
+    ...theme.shadows.primary,
   },
   exerciseButtonText: {
-    color: '#fff',
-    fontFamily: 'Inter-Regular',
-    fontSize: 15,
+    color: colors.text.primary,
+    fontFamily: typography.fontFamily.regular,
+    fontSize: typography.fontSize.md,
   },
   exerciseButtonTextSelected: {
-    fontFamily: 'Inter-SemiBold',
-    color: '#fff',
+    fontFamily: typography.fontFamily.semiBold,
+    color: colors.text.primary,
   },
   customExerciseContainer: {
-    marginBottom: 28,
+    marginBottom: spacing.xl,
   },
   backButton: {
-    marginTop: 12,
-    paddingVertical: 10,
-    backgroundColor: 'rgba(253, 143, 9, 0.1)',
-    borderRadius: 8,
+    marginTop: spacing.md,
+    paddingVertical: spacing.sm,
+    backgroundColor: colors.primaryLight,
+    borderRadius: borderRadius.sm,
     alignItems: 'center',
   },
   backButtonText: {
-    color: '#fd8f09',
-    fontFamily: 'Inter-SemiBold',
+    color: colors.primary,
+    fontFamily: typography.fontFamily.semiBold,
     textAlign: 'center',
   },
   input: {
-    backgroundColor: '#1a1a1a',
-    borderRadius: 12,
-    padding: 16,
-    color: '#fff',
-    fontFamily: 'Inter-Regular',
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-    elevation: 2,
-    fontSize: 16,
+    backgroundColor: colors.background.card,
+    borderRadius: borderRadius.lg,
+    padding: spacing.base,
+    color: colors.text.primary,
+    fontFamily: typography.fontFamily.regular,
+    marginBottom: spacing.base,
+    ...theme.shadows.sm,
+    fontSize: typography.fontSize.base,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: colors.border.default,
   },
   compactInput: {
-    backgroundColor: '#1a1a1a',
-    borderRadius: 10,
-    padding: 10,
-    color: '#fff',
-    fontFamily: 'Inter-Regular',
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-    elevation: 2,
-    fontSize: 14,
+    backgroundColor: colors.background.card,
+    borderRadius: borderRadius.md,
+    padding: spacing.sm,
+    color: colors.text.primary,
+    fontFamily: typography.fontFamily.regular,
+    marginBottom: spacing.base,
+    ...theme.shadows.sm,
+    fontSize: typography.fontSize.md,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: colors.border.default,
     textAlign: 'center',
   },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    gap: 8,
-    marginBottom: 16,
+    gap: spacing.sm,
+    marginBottom: spacing.base,
   },
   column: {
     flex: 1,
@@ -1018,7 +959,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Bold',
     fontSize: 18,
   },
-  // New styles for series
   seriesContainer: {
     backgroundColor: '#1a1a1a',
     borderRadius: 16,

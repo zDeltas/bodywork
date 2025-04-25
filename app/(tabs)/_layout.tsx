@@ -1,4 +1,4 @@
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { router } from 'expo-router';
 import { CurvedBottomBar } from 'react-native-curved-bottom-bar';
 import { Calendar, ChartLine as LineChart, Clock, Plus, Ruler, Settings } from 'lucide-react-native';
@@ -8,6 +8,10 @@ import TimerScreen from '@/app/(tabs)/timer';
 import StatsScreen from '@/app/(tabs)/stats';
 import MeasurementsScreen from '@/app/(tabs)/measurements';
 import SettingsScreen from '@/app/(tabs)/settings';
+import theme, { colors, typography, spacing, borderRadius } from '@/app/theme/theme';
+import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold, useFonts } from '@expo-google-fonts/inter';
+import * as SplashScreen from 'expo-splash-screen';
+import { useCallback } from 'react';
 
 interface RenderTabBarProps {
   routeName: string;
@@ -15,10 +19,24 @@ interface RenderTabBarProps {
   navigate: (routeName: string) => void;
 }
 
+SplashScreen.preventAutoHideAsync();
+
 export default function TabLayout() {
+  const [fontsLoaded, fontError] = useFonts({
+    'Inter-Regular': Inter_400Regular,
+    'Inter-SemiBold': Inter_600SemiBold,
+    'Inter-Bold': Inter_700Bold,
+  });
+
+  const onLayoutRootView = useCallback(async () => {
+    if (fontsLoaded || fontError) {
+      await SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded, fontError]);
+
   const _renderIcon = (routeName: string, selectedTab: string) => {
     const isSelected = routeName === selectedTab;
-    const color = isSelected ? '#fd8f09' : '#666';
+    const color = isSelected ? colors.primary : colors.text.secondary;
     const size = 24;
 
     switch (routeName) {
@@ -53,78 +71,89 @@ export default function TabLayout() {
     );
   };
 
+  if (!fontsLoaded && !fontError) {
+    return null;
+  }
+
   return (
-    <CurvedBottomBar.Navigator
-      type="DOWN"
-      style={styles.bottomBar}
-      height={65}
-      bgColor="#1a1a1a"
-      initialRouteName="index"
-      circlePosition="RIGHT"
-      renderCircle={() => (
-        <Animated.View style={styles.btnCircleUp}>
-          <Plus
-            color="#fff"
-            size={28}
-            onPress={handleAddButtonPress}
-          />
-        </Animated.View>
-      )}
-      tabBar={renderTabBar}>
-      <CurvedBottomBar.Screen
-        name="index"
-        position="LEFT"
-        component={WorkoutScreen}
-        options={{ headerShown: false }}
-      />
-      <CurvedBottomBar.Screen
-        name="timer"
-        position="LEFT"
-        component={TimerScreen}
-        options={{ headerShown: false }}
-      />
-      <CurvedBottomBar.Screen
-        name="stats"
-        position="LEFT"
-        component={StatsScreen}
-        options={{ headerShown: false }}
-      />
-      <CurvedBottomBar.Screen
-        name="measurements"
-        position="LEFT"
-        component={MeasurementsScreen}
-        options={{ headerShown: false }}
-      />
-      <CurvedBottomBar.Screen
-        name="settings"
-        position="LEFT"
-        component={SettingsScreen}
-        options={{ headerShown: false }}
-      />
-    </CurvedBottomBar.Navigator>
+    <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
+      <CurvedBottomBar.Navigator
+        type="DOWN"
+        style={styles.bottomBar}
+        height={65}
+        bgColor={colors.background.card}
+        initialRouteName="index"
+        circlePosition="RIGHT"
+        renderCircle={() => (
+          <Animated.View style={styles.btnCircleUp}>
+            <Plus
+              color={colors.text.primary}
+              size={28}
+              onPress={handleAddButtonPress}
+            />
+          </Animated.View>
+        )}
+        tabBar={renderTabBar}>
+        <CurvedBottomBar.Screen
+          name="index"
+          position="LEFT"
+          component={WorkoutScreen}
+          options={{ headerShown: false }}
+        />
+        <CurvedBottomBar.Screen
+          name="timer"
+          position="LEFT"
+          component={TimerScreen}
+          options={{ headerShown: false }}
+        />
+        <CurvedBottomBar.Screen
+          name="stats"
+          position="LEFT"
+          component={StatsScreen}
+          options={{ headerShown: false }}
+        />
+        <CurvedBottomBar.Screen
+          name="measurements"
+          position="LEFT"
+          component={MeasurementsScreen}
+          options={{ headerShown: false }}
+        />
+        <CurvedBottomBar.Screen
+          name="settings"
+          position="LEFT"
+          component={SettingsScreen}
+          options={{ headerShown: false }}
+        />
+      </CurvedBottomBar.Navigator>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   bottomBar: {
-    backgroundColor: '#0a0a0a'
+    backgroundColor: colors.background.main,
   },
   btnCircleUp: {
     width: 60,
     height: 60,
-    borderRadius: 30,
+    borderRadius: borderRadius.full,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#fd8f09',
-    shadowColor: '#fd8f09',
+    backgroundColor: colors.primary,
+    bottom: spacing.lg,
+    ...theme.shadows.primary,
+    shadowColor: colors.primary,
     shadowOffset: {
       width: 0,
-      height: 2
-    }
+      height: 2,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+    elevation: 5,
   },
   tabbarItem: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center'
-  }
+    justifyContent: 'center',
+  },
 });

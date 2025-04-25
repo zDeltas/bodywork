@@ -4,6 +4,7 @@ import { Inter_400Regular, Inter_600SemiBold, useFonts } from '@expo-google-font
 import { Minus, Pause, Play, Plus, RotateCcw } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { useTranslation } from '@/hooks/useTranslation';
+import theme, { colors, typography, spacing, borderRadius } from '@/app/theme/theme';
 
 interface TimerProps {
   initialTime?: number;
@@ -24,7 +25,7 @@ export default function Timer({
                               }: TimerProps) {
   const { t } = useTranslation();
   const [workTime, setWorkTime] = useState(mode === 'timer' ? initialTime : 0);
-  const [restTimeState, setRestTime] = useState(restTime);
+  const [restTimeState, setRestTimeState] = useState(restTime);
   const [isRunning, setIsRunning] = useState(false);
   const [currentSet, setCurrentSet] = useState(1);
   const [isResting, setIsResting] = useState(false);
@@ -33,10 +34,31 @@ export default function Timer({
     'Inter-SemiBold': Inter_600SemiBold
   });
 
+  const handleWorkComplete = useCallback(() => {
+    if (mode === 'timer') {
+      Vibration.vibrate([0, 500, 200, 500]);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      setIsRunning(true);
+    }
+  }, [mode]);
+
+  const handleRestComplete = useCallback(() => {
+    Vibration.vibrate([0, 500, 200, 500]);
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+
+    if (currentSet < sets) {
+      setCurrentSet(prev => prev + 1);
+      setIsRunning(true);
+    } else {
+      onComplete?.();
+      setIsRunning(false);
+    }
+  }, [currentSet, sets, onComplete]);
+
   useEffect(() => {
     if (!isRunning) {
       setWorkTime(mode === 'timer' ? initialTime : 0);
-      setRestTime(restTime);
+      setRestTimeState(restTime);
     }
   }, [initialTime, restTime, isRunning, mode]);
 
@@ -46,7 +68,7 @@ export default function Timer({
     if (isRunning) {
       interval = setInterval(() => {
         if (isResting) {
-          setRestTime(prev => {
+          setRestTimeState(prev => {
             if (prev <= 1) {
               setIsRunning(false);
               setIsResting(false);
@@ -74,27 +96,7 @@ export default function Timer({
     }
 
     return () => clearInterval(interval);
-  }, [isRunning, isResting, initialTime, restTime, mode]);
-
-  const handleWorkComplete = useCallback(() => {
-    if (mode === 'timer') {
-      Vibration.vibrate([0, 500, 200, 500]);
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      setIsRunning(true);
-    }
-  }, [mode]);
-
-  const handleRestComplete = useCallback(() => {
-    Vibration.vibrate([0, 500, 200, 500]);
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-
-    if (currentSet < sets) {
-      setCurrentSet(prev => prev + 1);
-      setIsRunning(true);
-    } else {
-      onComplete?.();
-    }
-  }, [currentSet, sets, onComplete]);
+  }, [isRunning, isResting, initialTime, restTime, mode, handleWorkComplete, handleRestComplete]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -112,15 +114,9 @@ export default function Timer({
     setIsResting(false);
     setCurrentSet(1);
     setWorkTime(mode === 'timer' ? initialTime : 0);
-    setRestTime(restTime);
+    setRestTimeState(restTime);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
   }, [initialTime, restTime, mode]);
-
-  const updateSets = useCallback((increment: boolean) => {
-    if (!isRunning) {
-      setCurrentSet(prev => Math.max(1, increment ? prev + 1 : prev - 1));
-    }
-  }, [isRunning]);
 
   if (!fontsLoaded) {
     return null;
@@ -135,26 +131,12 @@ export default function Timer({
       <View style={styles.setsContainer}>
         <Text style={styles.setsLabel}>{t('sets')}</Text>
         <View style={styles.setsControls}>
-          <TouchableOpacity
-            style={styles.setsButton}
-            onPress={() => updateSets(false)}
-            disabled={isRunning}
-          >
-            <Minus color="#fff" size={24} />
-          </TouchableOpacity>
           <Text style={styles.setsValue}>{currentSet} / {sets}</Text>
-          <TouchableOpacity
-            style={styles.setsButton}
-            onPress={() => updateSets(true)}
-            disabled={isRunning}
-          >
-            <Plus color="#fff" size={24} />
-          </TouchableOpacity>
         </View>
       </View>
 
       <View style={[
-        styles.timerContainer,
+        styles.timerDisplayContainer,
         isResting ? styles.restTimer : styles.workTimer
       ]}>
         <Text style={styles.timerLabel}>
@@ -167,21 +149,22 @@ export default function Timer({
 
       <View style={styles.controls}>
         <TouchableOpacity
+          style={[styles.button, styles.resetButton]}
+          onPress={resetTimer}
+        >
+          <RotateCcw color={colors.text.primary} size={24} />
+        </TouchableOpacity>
+        <TouchableOpacity
           style={[styles.button, isRunning ? styles.stopButton : styles.startButton]}
           onPress={toggleTimer}
         >
           {isRunning ? (
-            <Pause color="#fff" size={24} />
+            <Pause color={colors.text.primary} size={32} />
           ) : (
-            <Play color="#fff" size={24} />
+            <Play color={colors.text.primary} size={32} />
           )}
         </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.button, styles.resetButton]}
-          onPress={resetTimer}
-        >
-          <RotateCcw color="#fff" size={24} />
-        </TouchableOpacity>
+        <View style={styles.buttonPlaceholder} />
       </View>
     </View>
   );
@@ -189,98 +172,101 @@ export default function Timer({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#1a1a1a',
-    borderRadius: 12,
-    padding: 20,
+    backgroundColor: colors.background.card,
+    borderRadius: borderRadius.lg,
+    padding: spacing.lg,
     alignItems: 'center',
-    width: '100%'
+    width: '100%',
+    ...theme.shadows.md,
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
-    marginBottom: 8
+    marginBottom: spacing.sm,
   },
   exerciseName: {
-    fontSize: 24,
-    fontFamily: 'Inter-SemiBold',
-    color: '#fff'
+    fontSize: typography.fontSize['2xl'],
+    fontFamily: typography.fontFamily.semiBold,
+    color: colors.text.primary,
+    textAlign: 'center',
   },
   setsContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 16,
-    marginBottom: 24
+    gap: spacing.md,
+    marginBottom: spacing.lg,
   },
   setsLabel: {
-    fontSize: 16,
-    fontFamily: 'Inter-Regular',
-    color: '#fff'
+    fontSize: typography.fontSize.base,
+    fontFamily: typography.fontFamily.regular,
+    color: colors.text.secondary,
   },
   setsControls: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 16
-  },
-  setsButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#333',
-    justifyContent: 'center',
-    alignItems: 'center'
+    gap: spacing.md,
   },
   setsValue: {
-    fontSize: 18,
-    fontFamily: 'Inter-SemiBold',
-    color: '#fff',
+    fontSize: typography.fontSize.lg,
+    fontFamily: typography.fontFamily.semiBold,
+    color: colors.text.primary,
     minWidth: 60,
-    textAlign: 'center'
+    textAlign: 'center',
   },
-  timerContainer: {
+  timerDisplayContainer: {
     width: '100%',
-    padding: 20,
-    borderRadius: 12,
+    padding: spacing.xl,
+    borderRadius: borderRadius.lg,
     alignItems: 'center',
-    marginBottom: 24
+    marginBottom: spacing.xl,
   },
   workTimer: {
-    backgroundColor: '#22c55e' // Vert
+    backgroundColor: colors.success,
   },
   restTimer: {
-    backgroundColor: '#ef4444' // Rouge
+    backgroundColor: colors.error,
   },
   timerLabel: {
-    fontSize: 20,
-    fontFamily: 'Inter-SemiBold',
-    color: '#fff',
-    marginBottom: 8
+    fontSize: typography.fontSize.base,
+    fontFamily: typography.fontFamily.regular,
+    color: colors.text.primary,
+    marginBottom: spacing.xs,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
   },
   time: {
-    fontSize: 64,
-    fontFamily: 'Inter-SemiBold',
-    color: '#fff'
+    fontSize: typography.fontSize['4xl'],
+    fontFamily: typography.fontFamily.bold,
+    color: colors.text.primary,
   },
   controls: {
     flexDirection: 'row',
-    gap: 16
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    width: '100%',
+    marginTop: spacing.md,
   },
   button: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 70,
+    height: 70,
+    borderRadius: borderRadius.full,
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    ...theme.shadows.md,
   },
   startButton: {
-    backgroundColor: '#fd8f09'
+    backgroundColor: colors.primary,
   },
   stopButton: {
-    backgroundColor: '#ef4444'
+    backgroundColor: colors.error,
   },
   resetButton: {
-    backgroundColor: '#333'
-  }
+    backgroundColor: colors.background.button,
+  },
+  buttonPlaceholder: {
+    width: 70,
+  },
 });

@@ -1,0 +1,169 @@
+/**
+ * Main theme configuration for the Bodywork application
+ * This file contains all the styling variables used throughout the app
+ */
+
+import { Platform } from 'react-native';
+
+/**
+ * Color palette
+ */
+export const colors = {
+  // Primary colors
+  primary: '#fd8f09', // Orange - main accent color
+  primaryLight: 'rgba(253, 143, 9, 0.1)',
+  primaryBorder: 'rgba(253, 143, 9, 0.3)',
+  
+  // Secondary colors
+  success: '#22c55e', // Green - for success states, workout timer
+  error: '#ef4444',   // Red - for error states, rest timer
+  
+  // Background colors
+  background: {
+    main: '#0a0a0a',  // Main app background
+    card: '#1a1a1a',  // Card backgrounds
+    input: '#1a1a1a', // Input backgrounds
+    button: '#333',   // Button backgrounds
+  },
+  
+  // Text colors
+  text: {
+    primary: '#fff',    // Primary text
+    secondary: '#999',  // Secondary text
+    disabled: '#666',   // Disabled text
+    accent: '#fd8f09',  // Accent text (same as primary color)
+  },
+  
+  // Border colors
+  border: {
+    default: '#333',    // Default borders
+    focus: '#fd8f09',   // Focused borders
+  },
+};
+
+/**
+ * Typography
+ */
+export const typography = {
+  // Font families
+  fontFamily: {
+    regular: 'Inter-Regular',
+    semiBold: 'Inter-SemiBold',
+    bold: 'Inter-Bold',
+  },
+  
+  // Font sizes
+  fontSize: {
+    xs: 11,
+    sm: 12,
+    md: 14,
+    base: 16,
+    lg: 18,
+    xl: 20,
+    '2xl': 24,
+    '3xl': 32,
+    '4xl': 64,
+  },
+  
+  // Line heights
+  lineHeight: {
+    tight: 1.2,
+    normal: 1.5,
+    loose: 1.8,
+  },
+};
+
+/**
+ * Spacing
+ */
+export const spacing = {
+  xs: 4,
+  sm: 8,
+  md: 12,
+  base: 16,
+  lg: 20,
+  xl: 24,
+  '2xl': 32,
+  '3xl': 48,
+};
+
+/**
+ * Border radius
+ */
+export const borderRadius = {
+  xs: 4,
+  sm: 8,
+  md: 10,
+  base: 12,
+  lg: 16,
+  xl: 20,
+  full: 9999,
+};
+
+/**
+ * Shadows
+ */
+export const shadows = {
+  sm: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+    elevation: 2,
+  },
+  md: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  lg: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4.65,
+    elevation: 8,
+  },
+  primary: {
+    shadowColor: '#fd8f09',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+    elevation: 3,
+  },
+};
+
+/**
+ * Z-index values
+ */
+export const zIndex = {
+  base: 1,
+  dropdown: 10,
+  modal: 50,
+  toast: 100,
+};
+
+/**
+ * Layout
+ */
+export const layout = {
+  screenPadding: spacing.lg,
+  contentPadding: spacing.base,
+  headerHeight: Platform.OS === 'ios' ? 90 : 70,
+};
+
+/**
+ * Export the entire theme
+ */
+const theme = {
+  colors,
+  typography,
+  spacing,
+  borderRadius,
+  shadows,
+  zIndex,
+  layout,
+};
+
+export default theme;

@@ -3,7 +3,7 @@
  * This file exports all theme-related files for easy importing
  */
 
-import theme, { 
+import darkTheme, { 
   colors, 
   typography, 
   spacing, 
@@ -13,6 +13,8 @@ import theme, {
   layout as themeLayout 
 } from './theme';
 
+import lightTheme from './lightTheme';
+
 import components, { 
   buttons, 
   cards, 
@@ -20,6 +22,8 @@ import components, {
   text, 
   layout as componentLayout 
 } from './components';
+
+import { useDynamicStyles } from './dynamicComponents';
 
 // Export everything
 export {
@@ -31,21 +35,25 @@ export {
   shadows,
   zIndex,
   themeLayout,
-  
+
   // Component styles
   buttons,
   cards,
   inputs,
   text,
   componentLayout,
-  
+
   // Full objects
-  theme,
-  components
+  darkTheme,
+  lightTheme,
+  components,
+
+  // Theme hooks
+  useDynamicStyles
 };
 
-// Default export for importing everything at once
+// For backward compatibility, export darkTheme as the default theme
 export default {
-  ...theme,
+  ...darkTheme,
   components
 };

@@ -9,7 +9,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Audio } from 'expo-av';
 import * as Haptics from 'expo-haptics';
 import { TranslationKey } from '@/translations';
-import theme, { colors, typography, spacing, borderRadius } from '@/app/theme/theme';
+import { useTheme } from '@/hooks/useTheme';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -20,8 +20,176 @@ const WORKOUT_TIMES = {
   'veryLong': 120
 };
 
+// Define styles using the current theme
+const useStyles = () => {
+  const { theme } = useTheme();
+
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background.main,
+    },
+    header: {
+      paddingTop: theme.spacing.xl * 2,
+      paddingHorizontal: theme.spacing.lg,
+      paddingBottom: theme.spacing.lg,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      backgroundColor: theme.colors.background.card,
+    },
+    title: {
+      fontSize: theme.typography.fontSize['3xl'],
+      fontFamily: theme.typography.fontFamily.bold,
+      color: theme.colors.text.primary,
+    },
+    modeSelector: {
+      flexDirection: 'row',
+      backgroundColor: theme.colors.background.button,
+      borderRadius: theme.borderRadius.full,
+      padding: theme.spacing.xs,
+    },
+    modeButton: {
+      paddingVertical: theme.spacing.sm,
+      paddingHorizontal: theme.spacing.lg,
+      borderRadius: theme.borderRadius.full,
+    },
+    modeButtonActive: {
+      backgroundColor: theme.colors.primary,
+    },
+    modeText: {
+      fontFamily: theme.typography.fontFamily.semiBold,
+      fontSize: theme.typography.fontSize.sm,
+      color: theme.colors.text.secondary,
+    },
+    modeTextActive: {
+      color: theme.colors.text.primary,
+    },
+    content: {
+      flex: 1,
+      padding: theme.spacing.lg,
+    },
+    sectionTitle: {
+      fontSize: theme.typography.fontSize.xl,
+      fontFamily: theme.typography.fontFamily.bold,
+      color: theme.colors.text.primary,
+      marginBottom: theme.spacing.md,
+      marginTop: theme.spacing.lg,
+    },
+    timeGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'space-between',
+      marginBottom: theme.spacing.lg,
+    },
+    timeButton: {
+      width: '48%',
+      backgroundColor: theme.colors.background.card,
+      borderRadius: theme.borderRadius.md,
+      padding: theme.spacing.md,
+      marginBottom: theme.spacing.md,
+      alignItems: 'center',
+      ...theme.shadows.sm,
+    },
+    timeButtonActive: {
+      backgroundColor: theme.colors.primary,
+      borderColor: theme.colors.primary,
+      borderWidth: 2,
+    },
+    timeText: {
+      fontFamily: theme.typography.fontFamily.semiBold,
+      fontSize: theme.typography.fontSize.base,
+      color: theme.colors.text.primary,
+    },
+    timeTextActive: {
+      color: theme.colors.text.primary,
+      fontWeight: 'bold',
+    },
+    customTimeButton: {
+      width: '48%',
+      backgroundColor: theme.colors.background.card,
+      borderRadius: theme.borderRadius.md,
+      padding: theme.spacing.md,
+      marginBottom: theme.spacing.md,
+      alignItems: 'center',
+      ...theme.shadows.sm,
+    },
+    customTimeButtonActive: {
+      backgroundColor: theme.colors.primary,
+      borderColor: theme.colors.primary,
+      borderWidth: 2,
+    },
+    customTimeText: {
+      fontFamily: theme.typography.fontFamily.semiBold,
+      fontSize: theme.typography.fontSize.base,
+      color: theme.colors.text.primary,
+    },
+    customTimeTextActive: {
+      color: theme.colors.text.primary,
+    },
+    input: {
+      backgroundColor: theme.colors.background.input,
+      borderRadius: theme.borderRadius.md,
+      padding: theme.spacing.md,
+      marginBottom: theme.spacing.lg,
+      color: theme.colors.text.primary,
+      fontFamily: theme.typography.fontFamily.regular,
+      fontSize: theme.typography.fontSize.base,
+    },
+    setsContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      backgroundColor: theme.colors.background.card,
+      borderRadius: theme.borderRadius.md,
+      padding: theme.spacing.lg,
+      marginBottom: theme.spacing.lg,
+    },
+    setsLabel: {
+      fontFamily: theme.typography.fontFamily.semiBold,
+      fontSize: theme.typography.fontSize.base,
+      color: theme.colors.text.primary,
+    },
+    setsControls: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    setsButton: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: theme.colors.background.button,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    setsValue: {
+      fontFamily: theme.typography.fontFamily.bold,
+      fontSize: theme.typography.fontSize.lg,
+      color: theme.colors.text.primary,
+      marginHorizontal: theme.spacing.md,
+      minWidth: 30,
+      textAlign: 'center',
+    },
+    startButton: {
+      backgroundColor: theme.colors.primary,
+      borderRadius: theme.borderRadius.md,
+      padding: theme.spacing.md,
+      alignItems: 'center',
+      marginTop: theme.spacing.lg,
+      ...theme.shadows.md,
+    },
+    startButtonText: {
+      color: theme.colors.text.primary,
+      fontFamily: theme.typography.fontFamily.semiBold,
+      fontSize: theme.typography.fontSize.lg,
+    },
+  });
+};
+
 export default function TimerScreen() {
   const { t } = useTranslation();
+  const { theme } = useTheme();
+  const styles = useStyles();
   const [mode, setMode] = useState<'timer' | 'stopwatch'>('timer');
   const [selectedTime, setSelectedTime] = useState(60);
   const [selectedRestTime, setSelectedRestTime] = useState(60);
@@ -217,14 +385,14 @@ export default function TimerScreen() {
                 style={styles.setsButton}
                 onPress={() => setSets(prev => Math.max(1, prev - 1))}
               >
-                <Minus color={colors.text.primary} size={24} />
+                <Minus color={theme.colors.text.primary} size={24} />
               </TouchableOpacity>
               <Text style={styles.setsValue}>{sets}</Text>
               <TouchableOpacity
                 style={styles.setsButton}
                 onPress={() => setSets(prev => prev + 1)}
               >
-                <Plus color={colors.text.primary} size={24} />
+                <Plus color={theme.colors.text.primary} size={24} />
               </TouchableOpacity>
             </View>
           </>
@@ -252,17 +420,17 @@ export default function TimerScreen() {
         closeOnOverlayPress={true}
         modalTitle={t('workTime')}
         styles={{
-          backgroundColor: colors.background.card,
+          backgroundColor: theme.colors.background.card,
           pickerContainer: {
-            backgroundColor: colors.background.card,
+            backgroundColor: theme.colors.background.card,
           },
           pickerItem: {
-            color: colors.text.primary,
-            fontSize: typography.fontSize['3xl'],
+            color: theme.colors.text.primary,
+            fontSize: theme.typography.fontSize['3xl'],
           },
           pickerLabel: {
-            color: colors.text.primary,
-            fontSize: typography.fontSize.xl,
+            color: theme.colors.text.primary,
+            fontSize: theme.typography.fontSize.xl,
             right: -20,
           },
           theme: 'dark',
@@ -273,8 +441,8 @@ export default function TimerScreen() {
             width: 150,
           },
           confirmButton: {
-            backgroundColor: colors.primary,
-            borderColor: colors.primary,
+            backgroundColor: theme.colors.primary,
+            borderColor: theme.colors.primary,
           },
         }}
         hideHours={true}
@@ -297,17 +465,17 @@ export default function TimerScreen() {
         closeOnOverlayPress={true}
         modalTitle={t('restTime')}
         styles={{
-          backgroundColor: colors.background.card,
+          backgroundColor: theme.colors.background.card,
           pickerContainer: {
-            backgroundColor: colors.background.card,
+            backgroundColor: theme.colors.background.card,
           },
           pickerItem: {
-            color: colors.text.primary,
-            fontSize: typography.fontSize['3xl'],
+            color: theme.colors.text.primary,
+            fontSize: theme.typography.fontSize['3xl'],
           },
           pickerLabel: {
-            color: colors.text.primary,
-            fontSize: typography.fontSize.xl,
+            color: theme.colors.text.primary,
+            fontSize: theme.typography.fontSize.xl,
             right: -20,
           },
           theme: 'dark',
@@ -318,8 +486,8 @@ export default function TimerScreen() {
             width: 150,
           },
           confirmButton: {
-            backgroundColor: colors.primary,
-            borderColor: colors.primary,
+            backgroundColor: theme.colors.primary,
+            borderColor: theme.colors.primary,
           },
         }}
         hideHours={true}
@@ -334,123 +502,3 @@ export default function TimerScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.main,
-  },
-  header: {
-    paddingTop: spacing.xl * 2,
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.lg,
-    backgroundColor: colors.background.card,
-  },
-  title: {
-    fontSize: typography.fontSize['3xl'],
-    fontFamily: typography.fontFamily.bold,
-    color: colors.text.primary,
-    marginBottom: spacing.lg,
-  },
-  modeSelector: {
-    flexDirection: 'row',
-    backgroundColor: colors.background.button,
-    borderRadius: borderRadius.md,
-    padding: spacing.xs,
-  },
-  modeButton: {
-    flex: 1,
-    paddingVertical: spacing.sm,
-    borderRadius: borderRadius.sm,
-    alignItems: 'center',
-  },
-  modeButtonActive: {
-    backgroundColor: colors.primary,
-  },
-  modeText: {
-    fontFamily: typography.fontFamily.semiBold,
-    color: colors.text.secondary,
-    fontSize: typography.fontSize.base,
-  },
-  modeTextActive: {
-    color: colors.text.primary,
-  },
-  content: {
-    flex: 1,
-    padding: spacing.lg,
-  },
-  sectionTitle: {
-    fontSize: typography.fontSize.xl,
-    fontFamily: typography.fontFamily.semiBold,
-    color: colors.text.primary,
-    marginBottom: spacing.base,
-    marginTop: spacing.xl,
-  },
-  input: {
-    backgroundColor: colors.background.input,
-    borderRadius: borderRadius.md,
-    padding: spacing.md,
-    color: colors.text.primary,
-    fontFamily: typography.fontFamily.regular,
-    marginBottom: spacing.xl,
-    fontSize: typography.fontSize.base,
-  },
-  timeGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.md,
-    marginBottom: spacing.xl,
-  },
-  timeButton: {
-    backgroundColor: colors.background.card,
-    padding: spacing.md,
-    borderRadius: borderRadius.md,
-    flex: 1,
-    minWidth: '45%',
-    alignItems: 'center',
-  },
-  timeButtonActive: {
-    backgroundColor: colors.primary,
-  },
-  timeText: {
-    color: colors.text.primary,
-    fontFamily: typography.fontFamily.semiBold,
-    fontSize: typography.fontSize.base,
-    marginBottom: spacing.xs,
-  },
-  timeTextActive: {
-    color: colors.text.primary,
-  },
-  timeValue: {
-    color: colors.text.secondary,
-    fontFamily: typography.fontFamily.regular,
-    fontSize: typography.fontSize.sm,
-  },
-  timeValueActive: {
-    color: colors.text.primary,
-  },
-  setsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.xl,
-    marginBottom: spacing.xl,
-  },
-  setsButton: {
-    width: 48,
-    height: 48,
-    borderRadius: borderRadius.full,
-    backgroundColor: colors.background.card,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  setsValue: {
-    fontSize: typography.fontSize['2xl'],
-    fontFamily: typography.fontFamily.semiBold,
-    color: colors.text.primary,
-    minWidth: 40,
-    textAlign: 'center',
-  },
-  timerContainer: {
-    marginTop: spacing.lg,
-  },
-});

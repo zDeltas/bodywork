@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Linking, ActivityIndicator } from 'react-native';
+import { ActivityIndicator, Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
@@ -7,12 +7,13 @@ import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
 import { useSettings } from '@/hooks/useSettings';
 import { useTranslation } from '@/hooks/useTranslation';
-import { Language, languages, getLanguageName } from '@/translations';
-import theme, { colors, typography, spacing, borderRadius } from '@/app/theme/theme';
+import { useTheme } from '@/hooks/useTheme';
 
 export default function SettingsScreen() {
   const { settings, updateSettings, isLoading } = useSettings();
   const { t, language } = useTranslation();
+  const { theme } = useTheme();
+  const styles = useStyles();
   const [showAbout, setShowAbout] = useState(false);
 
   const toggleWeightUnit = () => {
@@ -33,6 +34,12 @@ export default function SettingsScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
 
+  const toggleTheme = () => {
+    const newTheme = settings.theme === 'dark' ? 'light' : 'dark';
+    updateSettings({ theme: newTheme as 'dark' | 'light' });
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  };
+
   const toggleAbout = () => {
     setShowAbout(!showAbout);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -48,7 +55,7 @@ export default function SettingsScreen() {
 
       {isLoading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={colors.primary} />
+          <ActivityIndicator size="large" color={theme.colors.primary} />
           <Text style={styles.loadingText}>{t('loadingSettings')}</Text>
         </View>
       ) : (
@@ -58,47 +65,63 @@ export default function SettingsScreen() {
 
             <View style={styles.settingItem}>
               <View style={styles.settingInfo}>
-                <Ionicons name="body-outline" size={24} color={colors.primary} />
+                <Ionicons name="body-outline" size={24} color={theme.colors.primary} />
                 <Text style={styles.settingLabel}>{t('gender')}</Text>
               </View>
-              <TouchableOpacity 
-                style={styles.settingControl} 
+              <TouchableOpacity
+                style={styles.settingControl}
                 onPress={toggleGender}
               >
                 <Text style={styles.settingValue}>
                   {settings.gender === 'male' ? t('male') : t('female')}
                 </Text>
-                <Ionicons name="chevron-forward" size={20} color={colors.text.secondary} />
+                <Ionicons name="chevron-forward" size={20} color={theme.colors.text.secondary} />
               </TouchableOpacity>
             </View>
 
             <View style={styles.settingItem}>
               <View style={styles.settingInfo}>
-                <Ionicons name="scale-outline" size={24} color={colors.primary} />
+                <Ionicons name="scale-outline" size={24} color={theme.colors.primary} />
                 <Text style={styles.settingLabel}>{t('weightUnit')}</Text>
               </View>
-              <TouchableOpacity 
-                style={styles.settingControl} 
+              <TouchableOpacity
+                style={styles.settingControl}
                 onPress={toggleWeightUnit}
               >
                 <Text style={styles.settingValue}>{settings.weightUnit.toUpperCase()}</Text>
-                <Ionicons name="chevron-forward" size={20} color={colors.text.secondary} />
+                <Ionicons name="chevron-forward" size={20} color={theme.colors.text.secondary} />
               </TouchableOpacity>
             </View>
 
             <View style={styles.settingItem}>
               <View style={styles.settingInfo}>
-                <Ionicons name="language-outline" size={24} color={colors.primary} />
+                <Ionicons name="language-outline" size={24} color={theme.colors.primary} />
                 <Text style={styles.settingLabel}>{t('language')}</Text>
               </View>
-              <TouchableOpacity 
-                style={styles.settingControl} 
+              <TouchableOpacity
+                style={styles.settingControl}
                 onPress={toggleLanguage}
               >
                 <Text style={styles.settingValue}>
                   {settings.language === 'en' ? t('english') : t('french')}
                 </Text>
-                <Ionicons name="chevron-forward" size={20} color={colors.text.secondary} />
+                <Ionicons name="chevron-forward" size={20} color={theme.colors.text.secondary} />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.settingItem}>
+              <View style={styles.settingInfo}>
+                <Ionicons name="contrast-outline" size={24} color={theme.colors.primary} />
+                <Text style={styles.settingLabel}>{t('theme')}</Text>
+              </View>
+              <TouchableOpacity
+                style={styles.settingControl}
+                onPress={toggleTheme}
+              >
+                <Text style={styles.settingValue}>
+                  {settings.theme === 'dark' ? t('dark') : t('light')}
+                </Text>
+                <Ionicons name="chevron-forward" size={20} color={theme.colors.text.secondary} />
               </TouchableOpacity>
             </View>
           </View>
@@ -106,15 +129,15 @@ export default function SettingsScreen() {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>{t('application')}</Text>
 
-            <TouchableOpacity 
-              style={styles.settingItem} 
+            <TouchableOpacity
+              style={styles.settingItem}
               onPress={toggleAbout}
             >
               <View style={styles.settingInfo}>
-                <Ionicons name="information-circle-outline" size={24} color={colors.primary} />
+                <Ionicons name="information-circle-outline" size={24} color={theme.colors.primary} />
                 <Text style={styles.settingLabel}>{t('about')}</Text>
               </View>
-              <Ionicons name="chevron-forward" size={20} color={colors.text.secondary} />
+              <Ionicons name="chevron-forward" size={20} color={theme.colors.text.secondary} />
             </TouchableOpacity>
           </View>
 
@@ -135,11 +158,11 @@ export default function SettingsScreen() {
                   style={styles.aboutLink}
                   onPress={() => Linking.openURL('https://www.linkedin.com/in/damien-le-borgne-997b991a1/')}
                 >
-                  <Ionicons name="logo-linkedin" size={20} color={colors.primary} />
+                  <Ionicons name="logo-linkedin" size={20} color={theme.colors.primary} />
                   <Text style={styles.aboutLinkText}>Linkedin</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={styles.closeButton}
                   onPress={toggleAbout}
                 >
@@ -154,149 +177,154 @@ export default function SettingsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.main,
-  },
-  header: {
-    padding: spacing.lg,
-    paddingBottom: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border.default,
-    backgroundColor: colors.background.card,
-  },
-  headerTitle: {
-    fontSize: typography.fontSize['2xl'],
-    fontFamily: typography.fontFamily.bold,
-    color: colors.text.primary,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: colors.background.main,
-  },
-  loadingText: {
-    marginTop: spacing.sm,
-    fontSize: typography.fontSize.base,
-    color: colors.text.secondary,
-    fontFamily: typography.fontFamily.regular,
-  },
-  content: {
-    flex: 1,
-    padding: spacing.lg,
-  },
-  section: {
-    marginBottom: spacing.xl,
-  },
-  sectionTitle: {
-    fontSize: typography.fontSize.lg,
-    fontFamily: typography.fontFamily.bold,
-    color: colors.primary,
-    marginBottom: spacing.md,
-  },
-  settingItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border.default,
-  },
-  settingInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  settingLabel: {
-    fontSize: typography.fontSize.base,
-    color: colors.text.primary,
-    marginLeft: spacing.md,
-    fontFamily: typography.fontFamily.regular,
-  },
-  settingControl: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  settingValue: {
-    fontSize: typography.fontSize.base,
-    color: colors.text.secondary,
-    marginRight: spacing.sm,
-    fontFamily: typography.fontFamily.regular,
-  },
-  aboutContainer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: spacing.lg,
-  },
-  aboutContent: {
-    backgroundColor: colors.background.card,
-    borderRadius: borderRadius.lg,
-    padding: spacing.lg,
-    width: '90%',
-    maxWidth: 500,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: colors.border.default,
-    ...theme.shadows.lg,
-  },
-  aboutTitle: {
-    fontSize: typography.fontSize['2xl'],
-    fontFamily: typography.fontFamily.bold,
-    color: colors.text.primary,
-    marginBottom: spacing.xs,
-  },
-  aboutVersion: {
-    fontSize: typography.fontSize.base,
-    color: colors.text.secondary,
-    marginBottom: spacing.md,
-    fontFamily: typography.fontFamily.regular,
-  },
-  aboutDescription: {
-    fontSize: typography.fontSize.base,
-    color: colors.text.secondary,
-    textAlign: 'center',
-    lineHeight: typography.lineHeight.normal * typography.fontSize.base,
-    fontFamily: typography.fontFamily.regular,
-  },
-  aboutDivider: {
-    height: 1,
-    backgroundColor: colors.border.default,
-    width: '100%',
-    marginVertical: spacing.lg,
-  },
-  aboutDeveloper: {
-    fontSize: typography.fontSize.base,
-    color: colors.text.secondary,
-    marginBottom: spacing.md,
-    fontFamily: typography.fontFamily.regular,
-  },
-  aboutLink: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.sm,
-  },
-  aboutLinkText: {
-    fontSize: typography.fontSize.base,
-    color: colors.primary,
-    marginLeft: spacing.sm,
-    fontFamily: typography.fontFamily.semiBold,
-  },
-  closeButton: {
-    marginTop: spacing.lg,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.lg,
-    backgroundColor: colors.primary,
-    borderRadius: borderRadius.md,
-  },
-  closeButtonText: {
-    fontSize: typography.fontSize.base,
-    fontFamily: typography.fontFamily.bold,
-    color: colors.text.primary,
-  },
-});
+// Define styles using the current theme
+const useStyles = () => {
+  const { theme } = useTheme();
+
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background.main
+    },
+    header: {
+      padding: theme.spacing.lg,
+      paddingBottom: theme.spacing.md,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border.default,
+      backgroundColor: theme.colors.background.card
+    },
+    headerTitle: {
+      fontSize: theme.typography.fontSize['2xl'],
+      fontFamily: theme.typography.fontFamily.bold,
+      color: theme.colors.text.primary
+    },
+    loadingContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: theme.colors.background.main
+    },
+    loadingText: {
+      marginTop: theme.spacing.sm,
+      fontSize: theme.typography.fontSize.base,
+      color: theme.colors.text.secondary,
+      fontFamily: theme.typography.fontFamily.regular
+    },
+    content: {
+      flex: 1,
+      padding: theme.spacing.lg
+    },
+    section: {
+      marginBottom: theme.spacing.xl
+    },
+    sectionTitle: {
+      fontSize: theme.typography.fontSize.lg,
+      fontFamily: theme.typography.fontFamily.bold,
+      color: theme.colors.primary,
+      marginBottom: theme.spacing.md
+    },
+    settingItem: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingVertical: theme.spacing.md,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border.default
+    },
+    settingInfo: {
+      flexDirection: 'row',
+      alignItems: 'center'
+    },
+    settingLabel: {
+      fontSize: theme.typography.fontSize.base,
+      color: theme.colors.text.primary,
+      marginLeft: theme.spacing.md,
+      fontFamily: theme.typography.fontFamily.regular
+    },
+    settingControl: {
+      flexDirection: 'row',
+      alignItems: 'center'
+    },
+    settingValue: {
+      fontSize: theme.typography.fontSize.base,
+      color: theme.colors.text.secondary,
+      marginRight: theme.spacing.sm,
+      fontFamily: theme.typography.fontFamily.regular
+    },
+    aboutContainer: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: theme.spacing.lg
+    },
+    aboutContent: {
+      backgroundColor: theme.colors.background.card,
+      borderRadius: theme.borderRadius.lg,
+      padding: theme.spacing.lg,
+      width: '90%',
+      maxWidth: 500,
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: theme.colors.border.default,
+      ...theme.shadows.lg
+    },
+    aboutTitle: {
+      fontSize: theme.typography.fontSize['2xl'],
+      fontFamily: theme.typography.fontFamily.bold,
+      color: theme.colors.text.primary,
+      marginBottom: theme.spacing.xs
+    },
+    aboutVersion: {
+      fontSize: theme.typography.fontSize.base,
+      color: theme.colors.text.secondary,
+      marginBottom: theme.spacing.md,
+      fontFamily: theme.typography.fontFamily.regular
+    },
+    aboutDescription: {
+      fontSize: theme.typography.fontSize.base,
+      color: theme.colors.text.secondary,
+      textAlign: 'center',
+      lineHeight: theme.typography.lineHeight.normal * theme.typography.fontSize.base,
+      fontFamily: theme.typography.fontFamily.regular
+    },
+    aboutDivider: {
+      height: 1,
+      backgroundColor: theme.colors.border.default,
+      width: '100%',
+      marginVertical: theme.spacing.lg
+    },
+    aboutDeveloper: {
+      fontSize: theme.typography.fontSize.base,
+      color: theme.colors.text.secondary,
+      marginBottom: theme.spacing.md,
+      fontFamily: theme.typography.fontFamily.regular
+    },
+    aboutLink: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: theme.spacing.sm
+    },
+    aboutLinkText: {
+      fontSize: theme.typography.fontSize.base,
+      color: theme.colors.primary,
+      marginLeft: theme.spacing.sm,
+      fontFamily: theme.typography.fontFamily.semiBold
+    },
+    closeButton: {
+      marginTop: theme.spacing.lg,
+      paddingVertical: theme.spacing.sm,
+      paddingHorizontal: theme.spacing.lg,
+      backgroundColor: theme.colors.primary,
+      borderRadius: theme.borderRadius.md
+    },
+    closeButtonText: {
+      fontSize: theme.typography.fontSize.base,
+      fontFamily: theme.typography.fontFamily.bold,
+      color: theme.colors.text.primary
+    }
+  });
+};

@@ -17,7 +17,7 @@ import { VictoryAxis, VictoryChart, VictoryLine, VictoryTheme } from 'victory-na
 import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 import { Calendar } from 'react-native-calendars';
 import { useTranslation } from '@/hooks/useTranslation';
-import theme, { colors, typography, spacing, borderRadius } from '@/app/theme/theme';
+import { useTheme } from '@/hooks/useTheme';
 
 interface Measurement {
   date: string;
@@ -66,7 +66,255 @@ const initialWindowWidth = Dimensions.get('window').width;
 const initialBodyWidth = initialWindowWidth * 1.8;
 const initialBodyHeight = initialBodyWidth * 0.8;
 
+// Define styles using the current theme
+const useStyles = () => {
+  const { theme } = useTheme();
+
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background.main,
+    },
+    header: {
+      padding: theme.spacing.lg,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      backgroundColor: theme.colors.background.card,
+      marginBottom: theme.spacing.sm,
+    },
+    dateSelector: {
+      backgroundColor: theme.colors.background.button,
+      paddingVertical: theme.spacing.sm,
+      paddingHorizontal: theme.spacing.md,
+      borderRadius: theme.borderRadius.md,
+      minWidth: 180,
+      height: 50,
+      justifyContent: 'center',
+    },
+    dateText: {
+      color: theme.colors.text.primary,
+      fontFamily: theme.typography.fontFamily.regular,
+      fontSize: theme.typography.fontSize.base,
+      textAlign: 'center',
+    },
+    weightContainer: {
+      backgroundColor: theme.colors.background.button,
+      paddingHorizontal: theme.spacing.md,
+      borderRadius: theme.borderRadius.md,
+      flexDirection: 'row',
+      alignItems: 'baseline',
+      height: 50,
+      justifyContent: 'center',
+      minWidth: 120
+    },
+    weightValue: {
+      fontSize: 32,
+      color: theme.colors.text.warning,
+      fontFamily: theme.typography.fontFamily.semiBold,
+      backgroundColor: 'transparent',
+      textAlign: 'center'
+    },
+    weightLabel: {
+      fontSize: 16,
+      color: theme.colors.text.warning,
+      marginLeft: 6,
+      fontFamily: theme.typography.fontFamily.regular
+    },
+    controls: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      padding: 10,
+      backgroundColor: '#1a1a1a'
+    },
+    viewToggle: {
+      flexDirection: 'row',
+      backgroundColor: '#333',
+      borderRadius: 20,
+      padding: 4,
+      alignSelf: 'center',
+      marginVertical: 10
+    },
+    genderToggle: {
+      flexDirection: 'row',
+      backgroundColor: '#333',
+      borderRadius: 20,
+      padding: 4
+    },
+    bodyContainer: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: '#1a1a1a',
+      marginTop: 10
+    },
+    silhouette: {
+      position: 'absolute',
+      width: '100%',
+      height: '100%',
+      alignItems: 'center',
+      justifyContent: 'center'
+    },
+    measurementLabel: {
+      position: 'absolute',
+      zIndex: 3,
+    },
+    measurementValue: {
+      backgroundColor: theme.colors.background.button,
+      borderRadius: theme.borderRadius.md,
+      paddingVertical: theme.spacing.xs,
+      paddingHorizontal: theme.spacing.sm,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderWidth: 1,
+      ...theme.shadows.sm,
+      minHeight: 36,
+    },
+    measurementText: {
+      fontFamily: theme.typography.fontFamily.semiBold,
+      fontSize: theme.typography.fontSize.sm,
+      textAlign: 'center',
+    },
+    input: {
+      backgroundColor: '#1a1a1a',
+      borderRadius: 8,
+      padding: 8,
+      color: '#fff',
+      fontFamily: 'Inter-Regular',
+      fontSize: 16,
+      textAlign: 'center',
+      minWidth: 80
+    },
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: 'rgba(0, 0, 0, 0.7)',
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: 20
+    },
+    modalContent: {
+      backgroundColor: theme.colors.background.card,
+      borderRadius: theme.borderRadius.lg,
+      padding: theme.spacing.lg,
+      width: '100%',
+      maxWidth: 400,
+      elevation: 5,
+      shadowColor: theme.colors.shadow,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84
+    },
+    historyModalContent: {
+      width: '90%',
+      maxWidth: 500,
+      padding: 24
+    },
+    datePickerContent: {
+      width: '90%',
+      maxWidth: 400,
+      padding: 24
+    },
+    modalHeader: {
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border.default,
+      paddingBottom: theme.spacing.md,
+      marginBottom: theme.spacing.md
+    },
+    modalTitle: {
+      color: theme.colors.text.primary,
+      fontSize: theme.typography.fontSize.xl,
+      fontFamily: theme.typography.fontFamily.semiBold,
+      textAlign: 'center'
+    },
+    modalInput: {
+      backgroundColor: theme.colors.background.input,
+      borderRadius: theme.borderRadius.md,
+      padding: theme.spacing.md,
+      color: theme.colors.text.primary,
+      fontFamily: theme.typography.fontFamily.regular,
+      fontSize: theme.typography.fontSize['2xl'],
+      textAlign: 'center',
+      marginVertical: theme.spacing.lg,
+      borderWidth: 1,
+      borderColor: theme.colors.border.default,
+      height: 60
+    },
+    modalButtons: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      flexWrap: 'wrap',
+      gap: 12,
+      marginTop: 10
+    },
+    modalButton: {
+      padding: 14,
+      borderRadius: 10,
+      minWidth: 110,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginVertical: 5,
+      flex: 1,
+      height: 50
+    },
+    modalSaveButton: {
+      backgroundColor: theme.colors.primary
+    },
+    modalCancelButton: {
+      backgroundColor: theme.colors.background.button
+    },
+    modalHistoryButton: {
+      backgroundColor: theme.colors.info
+    },
+    modalCloseButton: {
+      backgroundColor: theme.colors.background.button,
+      marginTop: theme.spacing.md,
+      color: theme.colors.text.primary,
+      alignSelf: 'center'
+    },
+    modalButtonText: {
+      color: theme.colors.text.primary,
+      fontFamily: theme.typography.fontFamily.semiBold,
+      fontSize: theme.typography.fontSize.base
+    },
+    chartContainer: {
+      backgroundColor: theme.colors.background.input,
+      borderRadius: theme.borderRadius.md,
+      padding: theme.spacing.md,
+      marginVertical: theme.spacing.md
+    },
+    noDataText: {
+      color: theme.colors.text.secondary,
+      fontFamily: theme.typography.fontFamily.regular,
+      fontSize: theme.typography.fontSize.base,
+      textAlign: 'center',
+      marginVertical: theme.spacing.lg
+    },
+    measurementPoint: {
+      position: 'absolute',
+      width: 16,
+      height: 16,
+      borderRadius: 8,
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: 1
+    },
+    pointCircle: {
+      width: 12,
+      height: 12,
+      borderRadius: 6
+    },
+    touchArea: {
+      position: 'absolute',
+      width: 30,
+      height: 30,
+      borderRadius: 15,
+      zIndex: 2,
+    },
+  });
+};
+
 export default function BodyMeasurements() {
+  const { theme } = useTheme();
+  const styles = useStyles();
   const [measurements, setMeasurements] = useState<Measurement>({
     date: new Date().toISOString().split('T')[0],
     weight: 0,
@@ -154,7 +402,7 @@ export default function BodyMeasurements() {
     {
       label: 'Cou',
       key: 'neck',
-      color: colors.measurement.neck,
+      color: theme.colors.measurement.neck,
       position: {
         x: bodyWidth * 0.20,
         y: bodyHeight * 0.15,
@@ -170,7 +418,7 @@ export default function BodyMeasurements() {
     {
       label: 'Épaules',
       key: 'shoulders',
-      color: colors.measurement.shoulders,
+      color: theme.colors.measurement.shoulders,
       position: {
         x: bodyWidth * 0.20,
         y: bodyHeight * 0.23,
@@ -186,7 +434,7 @@ export default function BodyMeasurements() {
     {
       label: 'Poitrine',
       key: 'chest',
-      color: colors.measurement.chest,
+      color: theme.colors.measurement.chest,
       position: {
         x: bodyWidth * 0.28,
         y: bodyHeight * 0.3,
@@ -202,7 +450,7 @@ export default function BodyMeasurements() {
     {
       label: 'Bras',
       key: 'arms',
-      color: colors.measurement.arms,
+      color: theme.colors.measurement.arms,
       position: {
         x: bodyWidth * 0.22,
         y: bodyHeight * 0.3,
@@ -218,7 +466,7 @@ export default function BodyMeasurements() {
     {
       label: 'Avant-bras',
       key: 'forearms',
-      color: colors.measurement.forearms,
+      color: theme.colors.measurement.forearms,
       position: {
         x: bodyWidth * 0.19,
         y: bodyHeight * 0.42,
@@ -234,7 +482,7 @@ export default function BodyMeasurements() {
     {
       label: 'Taille',
       key: 'waist',
-      color: colors.measurement.waist,
+      color: theme.colors.measurement.waist,
       position: {
         x: bodyWidth * 0.28,
         y: bodyHeight * 0.38,
@@ -250,7 +498,7 @@ export default function BodyMeasurements() {
     {
       label: 'Hanches',
       key: 'hips',
-      color: colors.measurement.hips,
+      color: theme.colors.measurement.hips,
       position: {
         x: bodyWidth * 0.28,
         y: bodyHeight * 0.45,
@@ -266,7 +514,7 @@ export default function BodyMeasurements() {
     {
       label: 'Cuisses',
       key: 'thighs',
-      color: colors.measurement.thighs,
+      color: theme.colors.measurement.thighs,
       position: {
         x: bodyWidth * 0.26,
         y: bodyHeight * 0.55,
@@ -282,7 +530,7 @@ export default function BodyMeasurements() {
     {
       label: 'Mollets',
       key: 'calves',
-      color: colors.measurement.calves,
+      color: theme.colors.measurement.calves,
       position: {
         x: bodyWidth * 0.26,
         y: bodyHeight * 0.75,
@@ -295,7 +543,7 @@ export default function BodyMeasurements() {
         }
       }
     }
-  ], [bodyWidth, bodyHeight]);
+  ], [bodyWidth, bodyHeight, theme.colors.measurement]);
 
   const adjustPointPositions = useCallback((points: MeasurementPoint[]) => {
     const adjustedPoints = [...points];
@@ -526,9 +774,9 @@ export default function BodyMeasurements() {
   const chartTheme = {
     axis: {
       style: {
-        axis: { stroke: colors.border.default },
-        tickLabels: { fill: colors.text.secondary, fontSize: typography.fontSize.xs, fontFamily: typography.fontFamily.regular },
-        grid: { stroke: colors.border.default, strokeDasharray: '3,3' },
+        axis: { stroke: theme.colors.border.default },
+        tickLabels: { fill: theme.colors.text.secondary, fontSize: theme.typography.fontSize.xs, fontFamily: theme.typography.fontFamily.regular },
+        grid: { stroke: theme.colors.border.default, strokeDasharray: '3,3' },
       },
     },
     line: {
@@ -542,25 +790,25 @@ export default function BodyMeasurements() {
 
   // Theme pour Calendar
   const calendarTheme = {
-    backgroundColor: colors.background.card, // theme
-    calendarBackground: colors.background.card, // theme
-    textSectionTitleColor: colors.text.primary, // theme
-    selectedDayBackgroundColor: colors.primary, // theme
-    selectedDayTextColor: colors.text.primary, // theme
-    todayTextColor: colors.primary, // theme
-    dayTextColor: colors.text.primary, // theme
-    textDisabledColor: colors.text.disabled, // theme
-    dotColor: colors.primary, // theme
-    selectedDotColor: colors.text.primary, // theme
-    arrowColor: colors.primary, // theme
-    monthTextColor: colors.text.primary, // theme
-    indicatorColor: colors.primary, // theme
-    textDayFontFamily: typography.fontFamily.regular, // theme
-    textMonthFontFamily: typography.fontFamily.semiBold, // theme
-    textDayHeaderFontFamily: typography.fontFamily.regular, // theme
-    textDayFontSize: typography.fontSize.sm, // theme
-    textMonthFontSize: typography.fontSize.lg, // theme
-    textDayHeaderFontSize: typography.fontSize.xs, // theme
+    backgroundColor: theme.colors.background.card, // theme
+    calendarBackground: theme.colors.background.card, // theme
+    textSectionTitleColor: theme.colors.text.primary, // theme
+    selectedDayBackgroundColor: theme.colors.primary, // theme
+    selectedDayTextColor: theme.colors.text.primary, // theme
+    todayTextColor: theme.colors.primary, // theme
+    dayTextColor: theme.colors.text.primary, // theme
+    textDisabledColor: theme.colors.text.disabled, // theme
+    dotColor: theme.colors.primary, // theme
+    selectedDotColor: theme.colors.text.primary, // theme
+    arrowColor: theme.colors.primary, // theme
+    monthTextColor: theme.colors.text.primary, // theme
+    indicatorColor: theme.colors.primary, // theme
+    textDayFontFamily: theme.typography.fontFamily.regular, // theme
+    textMonthFontFamily: theme.typography.fontFamily.semiBold, // theme
+    textDayHeaderFontFamily: theme.typography.fontFamily.regular, // theme
+    textDayFontSize: theme.typography.fontSize.sm, // theme
+    textMonthFontSize: theme.typography.fontSize.lg, // theme
+    textDayHeaderFontSize: theme.typography.fontSize.xs, // theme
   };
 
   return (
@@ -580,7 +828,7 @@ export default function BodyMeasurements() {
             onChangeText={handleWeightChange}
             keyboardType="numeric"
             placeholder="0"
-            placeholderTextColor={colors.text.disabled}
+            placeholderTextColor={theme.colors.text.disabled}
             onBlur={() => saveMeasurements(measurements)}
           />
           <Text style={styles.weightLabel}>kg</Text>
@@ -690,7 +938,7 @@ export default function BodyMeasurements() {
               onChangeText={setInputValue}
               keyboardType="numeric"
               placeholder="0"
-              placeholderTextColor={colors.text.disabled}
+              placeholderTextColor={theme.colors.text.disabled}
               autoFocus
               selectTextOnFocus
             />
@@ -751,7 +999,7 @@ export default function BodyMeasurements() {
                     data={historyData}
                     x="date"
                     y="value"
-                    style={{ data: { stroke: selectedPoint ? selectedPoint.color : colors.primary } }}
+                    style={{ data: { stroke: selectedPoint ? selectedPoint.color : theme.colors.primary } }}
                     interpolation="natural"
                   />
                 </VictoryChart>
@@ -787,17 +1035,17 @@ export default function BodyMeasurements() {
                 allMeasurements.reduce((acc, measurement) => {
                   acc[measurement.date] = {
                     marked: true,
-                    dotColor: colors.primary,
+                    dotColor: theme.colors.primary,
                   };
                   if (measurement.date === selectedDate) {
                     acc[measurement.date] = {
                       ...acc[measurement.date],
                       selected: true,
-                      selectedColor: colors.primary,
+                      selectedColor: theme.colors.primary,
                     };
                   }
                   return acc;
-                }, { [selectedDate]: { selected: true, selectedColor: colors.primary } } as Record<string, any>)
+                }, { [selectedDate]: { selected: true, selectedColor: theme.colors.primary } } as Record<string, any>)
               }
               theme={calendarTheme}
             />
@@ -811,243 +1059,3 @@ export default function BodyMeasurements() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.main,
-  },
-  header: {
-    padding: spacing.lg,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: colors.background.card,
-    marginBottom: spacing.sm,
-  },
-  dateSelector: {
-    backgroundColor: colors.background.button,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
-    borderRadius: borderRadius.md,
-    minWidth: 180,
-    height: 50,
-    justifyContent: 'center',
-  },
-  dateText: {
-    color: colors.text.primary,
-    fontFamily: typography.fontFamily.regular,
-    fontSize: typography.fontSize.base,
-    textAlign: 'center',
-  },
-  weightContainer: {
-    backgroundColor: colors.background.button,
-    paddingHorizontal: spacing.md,
-    borderRadius: borderRadius.md,
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    height: 50,
-    justifyContent: 'center',
-    minWidth: 120
-  },
-  weightValue: {
-    fontSize: 32,
-    color: colors.text.warning,
-    fontFamily: typography.fontFamily.semiBold,
-    backgroundColor: 'transparent',
-    textAlign: 'center'
-  },
-  weightLabel: {
-    fontSize: 16,
-    color: colors.text.warning,
-    marginLeft: 6,
-    fontFamily: typography.fontFamily.regular
-  },
-  controls: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 10,
-    backgroundColor: '#1a1a1a'
-  },
-  viewToggle: {
-    flexDirection: 'row',
-    backgroundColor: '#333',
-    borderRadius: 20,
-    padding: 4,
-    alignSelf: 'center',
-    marginVertical: 10
-  },
-  genderToggle: {
-    flexDirection: 'row',
-    backgroundColor: '#333',
-    borderRadius: 20,
-    padding: 4
-  },
-  bodyContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#1a1a1a',
-    marginTop: 10
-  },
-  silhouette: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-  measurementLabel: {
-    position: 'absolute',
-    zIndex: 3,
-  },
-  measurementValue: {
-    backgroundColor: colors.background.button,
-    borderRadius: borderRadius.md,
-    paddingVertical: spacing.xs,
-    paddingHorizontal: spacing.sm,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    ...theme.shadows.sm,
-    minHeight: 36,
-  },
-  measurementText: {
-    fontFamily: typography.fontFamily.semiBold,
-    fontSize: typography.fontSize.sm,
-    textAlign: 'center',
-  },
-  input: {
-    backgroundColor: '#1a1a1a',
-    borderRadius: 8,
-    padding: 8,
-    color: '#fff',
-    fontFamily: 'Inter-Regular',
-    fontSize: 16,
-    textAlign: 'center',
-    minWidth: 80
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20
-  },
-  modalContent: {
-    backgroundColor: colors.background.card,
-    borderRadius: borderRadius.lg,
-    padding: spacing.lg,
-    width: '100%',
-    maxWidth: 400,
-    elevation: 5,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84
-  },
-  historyModalContent: {
-    width: '90%',
-    maxWidth: 500,
-    padding: 24
-  },
-  datePickerContent: {
-    width: '90%',
-    maxWidth: 400,
-    padding: 24
-  },
-  modalHeader: {
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border.default,
-    paddingBottom: spacing.md,
-    marginBottom: spacing.md
-  },
-  modalTitle: {
-    color: colors.text.primary,
-    fontSize: typography.fontSize.xl,
-    fontFamily: typography.fontFamily.semiBold,
-    textAlign: 'center'
-  },
-  modalInput: {
-    backgroundColor: colors.background.input,
-    borderRadius: borderRadius.md,
-    padding: spacing.md,
-    color: colors.text.primary,
-    fontFamily: typography.fontFamily.regular,
-    fontSize: typography.fontSize['2xl'],
-    textAlign: 'center',
-    marginVertical: spacing.lg,
-    borderWidth: 1,
-    borderColor: colors.border.default,
-    height: 60
-  },
-  modalButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    flexWrap: 'wrap',
-    gap: 12,
-    marginTop: 10
-  },
-  modalButton: {
-    padding: 14,
-    borderRadius: 10,
-    minWidth: 110,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginVertical: 5,
-    flex: 1,
-    height: 50
-  },
-  modalSaveButton: {
-    backgroundColor: colors.primary
-  },
-  modalCancelButton: {
-    backgroundColor: colors.background.button
-  },
-  modalHistoryButton: {
-    backgroundColor: colors.info
-  },
-  modalCloseButton: {
-    backgroundColor: colors.background.button,
-    marginTop: spacing.md,
-    color: colors.text.primary,
-    alignSelf: 'center'
-  },
-  modalButtonText: {
-    color: colors.text.primary,
-    fontFamily: typography.fontFamily.semiBold,
-    fontSize: typography.fontSize.base
-  },
-  chartContainer: {
-    backgroundColor: colors.background.input,
-    borderRadius: borderRadius.md,
-    padding: spacing.md,
-    marginVertical: spacing.md
-  },
-  noDataText: {
-    color: colors.text.secondary,
-    fontFamily: typography.fontFamily.regular,
-    fontSize: typography.fontSize.base,
-    textAlign: 'center',
-    marginVertical: spacing.lg
-  },
-  measurementPoint: {
-    position: 'absolute',
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 1
-  },
-  pointCircle: {
-    width: 12,
-    height: 12,
-    borderRadius: 6
-  },
-  touchArea: {
-    position: 'absolute',
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    zIndex: 2,
-  },
-});

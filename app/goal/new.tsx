@@ -10,12 +10,306 @@ import { Ionicons } from '@expo/vector-icons';
 import { predefinedExercises, muscleGroups } from '@/app/workout/new';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
-import theme, { colors, typography, spacing, borderRadius } from '@/app/theme/theme';
+import { useTheme } from '@/hooks/useTheme';
 
 SplashScreen.preventAutoHideAsync();
 
+// Define styles using the current theme
+const useStyles = () => {
+  const { theme } = useTheme();
+
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background.main,
+    },
+    header: {
+      paddingTop: theme.spacing.xl * 1.5,
+      paddingHorizontal: theme.spacing.lg,
+      paddingBottom: theme.spacing.lg,
+      backgroundColor: theme.colors.background.card,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      ...theme.shadows.md,
+    },
+    title: {
+      fontSize: theme.typography.fontSize['3xl'],
+      fontFamily: theme.typography.fontFamily.bold,
+      color: theme.colors.text.primary,
+    },
+    closeButton: {
+      width: 44,
+      height: 44,
+      borderRadius: theme.borderRadius.full,
+      backgroundColor: theme.colors.background.button,
+      justifyContent: 'center',
+      alignItems: 'center',
+      ...theme.shadows.sm,
+    },
+    content: {
+      flex: 1,
+      padding: theme.spacing.lg,
+    },
+    formCard: {
+      backgroundColor: theme.colors.background.card,
+      borderRadius: theme.borderRadius.lg,
+      padding: theme.spacing.lg,
+      marginBottom: theme.spacing.xl,
+      ...theme.shadows.sm,
+    },
+    sectionTitle: {
+      fontSize: theme.typography.fontSize.xl,
+      fontFamily: theme.typography.fontFamily.semiBold,
+      color: theme.colors.text.primary,
+      marginBottom: theme.spacing.lg,
+      textAlign: 'center',
+    },
+    formGroup: {
+      marginBottom: theme.spacing.base,
+    },
+    formLabel: {
+      color: theme.colors.text.primary,
+      fontFamily: theme.typography.fontFamily.semiBold,
+      fontSize: theme.typography.fontSize.base,
+      marginBottom: theme.spacing.sm,
+    },
+    formInput: {
+      backgroundColor: theme.colors.background.input,
+      borderRadius: theme.borderRadius.md,
+      paddingVertical: theme.spacing.md,
+      paddingHorizontal: theme.spacing.base,
+      color: theme.colors.text.primary,
+      fontFamily: theme.typography.fontFamily.regular,
+      fontSize: theme.typography.fontSize.base,
+      borderWidth: 1,
+      borderColor: theme.colors.border.default,
+      flex: 1,
+      height: 48,
+    },
+    weightInputContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: theme.spacing.sm,
+    },
+    suggestedButton: {
+      backgroundColor: theme.colors.background.button,
+      paddingHorizontal: theme.spacing.base,
+      paddingVertical: theme.spacing.sm,
+      borderRadius: theme.borderRadius.md,
+      height: 48,
+      justifyContent: 'center',
+      alignItems: 'center',
+      minWidth: 80,
+    },
+    suggestedButtonText: {
+      color: theme.colors.text.primary,
+      fontFamily: theme.typography.fontFamily.semiBold,
+      fontSize: theme.typography.fontSize.sm,
+    },
+    saveButton: {
+      backgroundColor: theme.colors.primary,
+      paddingVertical: theme.spacing.lg,
+      borderRadius: theme.borderRadius.base,
+      alignItems: 'center',
+      marginTop: theme.spacing.lg,
+      ...theme.shadows.lg,
+    },
+    saveButtonDisabled: {
+      backgroundColor: theme.colors.background.button,
+      ...theme.shadows.sm,
+    },
+    saveButtonText: {
+      color: theme.colors.text.primary,
+      fontFamily: theme.typography.fontFamily.bold,
+      fontSize: theme.typography.fontSize.lg,
+    },
+    modalOverlay: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.7)', // Keep semi-transparent black
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: theme.zIndex.modal,
+    },
+    modalContainer: {
+      backgroundColor: theme.colors.background.card,
+      borderRadius: theme.borderRadius.lg,
+      padding: theme.spacing.lg,
+      width: '90%',
+      maxHeight: '80%',
+      ...theme.shadows.lg,
+    },
+    modalTitle: {
+      fontSize: theme.typography.fontSize.xl,
+      fontFamily: theme.typography.fontFamily.bold,
+      color: theme.colors.text.primary,
+      marginBottom: theme.spacing.lg,
+      textAlign: 'center',
+    },
+    searchContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: theme.colors.background.input,
+      borderRadius: theme.borderRadius.md,
+      paddingHorizontal: theme.spacing.md,
+      paddingVertical: theme.spacing.sm,
+      marginBottom: theme.spacing.md,
+      ...theme.shadows.sm,
+    },
+    searchIcon: {
+      marginRight: theme.spacing.sm,
+    },
+    searchInput: {
+      backgroundColor: theme.colors.background.input, // Reuse for consistency inside container
+      color: theme.colors.text.primary,
+      fontFamily: theme.typography.fontFamily.regular,
+      fontSize: theme.typography.fontSize.base,
+      flex: 1, // Make search input take available space
+      height: 24, // Match icon size roughly
+      padding: 0, // Remove padding, handled by container
+    },
+    exerciseList: {
+      // No specific styles needed here, ScrollView manages layout
+    },
+    exerciseOption: {
+      paddingVertical: theme.spacing.md,
+      paddingHorizontal: theme.spacing.base,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border.default,
+    },
+    exerciseOptionText: {
+      color: theme.colors.text.primary,
+      fontFamily: theme.typography.fontFamily.regular,
+      fontSize: theme.typography.fontSize.base,
+    },
+    muscleGroupContainer: {
+      marginBottom: theme.spacing.base, // Add margin between groups
+    },
+    muscleGroupHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingVertical: theme.spacing.sm,
+      paddingHorizontal: theme.spacing.md,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border.default,
+      backgroundColor: theme.colors.background.button, // Distinguish header slightly
+      width: '100%', // Ensure header takes full width
+    },
+    muscleGroupTitle: {
+      color: theme.colors.primary,
+      fontFamily: theme.typography.fontFamily.semiBold,
+      fontSize: theme.typography.fontSize.base,
+    },
+    exerciseGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      padding: theme.spacing.sm,
+      gap: theme.spacing.sm,
+      width: '100%',
+      backgroundColor: theme.colors.background.card, // Match card background
+    },
+    exerciseButton: {
+      paddingHorizontal: theme.spacing.md,
+      paddingVertical: theme.spacing.sm,
+      borderRadius: theme.borderRadius.full,
+      backgroundColor: theme.colors.background.input,
+      borderWidth: 1,
+      borderColor: theme.colors.border.default,
+    },
+    exerciseButtonSelected: {
+      backgroundColor: theme.colors.primary,
+      borderColor: theme.colors.primary,
+    },
+    exerciseButtonText: {
+      color: theme.colors.text.secondary,
+      fontFamily: theme.typography.fontFamily.regular,
+      fontSize: theme.typography.fontSize.sm,
+    },
+    exerciseButtonTextSelected: {
+      color: theme.colors.text.primary,
+      fontFamily: theme.typography.fontFamily.semiBold,
+    },
+    cancelButton: {
+      backgroundColor: theme.colors.background.button,
+      borderRadius: theme.borderRadius.md,
+      padding: theme.spacing.md,
+      alignItems: 'center',
+      marginTop: theme.spacing.md,
+    },
+    cancelButtonText: {
+      color: theme.colors.text.primary,
+      fontFamily: theme.typography.fontFamily.semiBold,
+      fontSize: theme.typography.fontSize.base,
+    },
+    exerciseSelectorButton: { // Style for the touchable opacity wrapping the selector text/icon
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      // Reuse formInput styles for appearance consistency
+      backgroundColor: theme.colors.background.input,
+      borderRadius: theme.borderRadius.md,
+      paddingVertical: theme.spacing.md,
+      paddingHorizontal: theme.spacing.base,
+      borderWidth: 1,
+      borderColor: theme.colors.border.default,
+      height: 48,
+      flex: 1,
+    },
+    exerciseSelectorText: { // Style for the text inside the selector button
+      color: theme.colors.text.primary,
+      fontFamily: theme.typography.fontFamily.regular,
+      fontSize: theme.typography.fontSize.base,
+      flex: 1,
+      marginRight: theme.spacing.sm,
+    },
+    loadingIndicator: { // Style for the loading indicator
+      marginLeft: theme.spacing.sm,
+    },
+    // Added for completeness, if used elsewhere
+    useSuggestedButton: {
+      backgroundColor: theme.colors.primary,
+      paddingHorizontal: theme.spacing.base,
+      paddingVertical: theme.spacing.sm,
+      borderRadius: theme.borderRadius.md,
+      marginLeft: theme.spacing.sm,
+      height: 48,
+      justifyContent: 'center',
+      alignItems: 'center',
+      minWidth: 80,
+    },
+    useSuggestedButtonText: {
+      color: theme.colors.text.primary,
+      fontFamily: theme.typography.fontFamily.semiBold,
+      fontSize: theme.typography.fontSize.sm,
+    },
+    suggestedTargetContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: theme.colors.primaryLight,
+      borderRadius: theme.borderRadius.md,
+      padding: theme.spacing.sm,
+      marginTop: theme.spacing.sm,
+      borderWidth: 1,
+      borderColor: theme.colors.primaryBorder,
+    },
+    suggestedTargetText: {
+      color: theme.colors.primary,
+      fontFamily: theme.typography.fontFamily.semiBold,
+      fontSize: theme.typography.fontSize.sm,
+      flex: 1,
+    },
+  });
+};
+
 export default function NewGoalScreen() {
   const { t } = useTranslation();
+  const { theme } = useTheme(); // Get the theme object
+  const styles = useStyles(); // Generate styles based on the theme
   const [newGoalExercise, setNewGoalExercise] = useState('');
   const [newGoalCurrent, setNewGoalCurrent] = useState('');
   const [newGoalTarget, setNewGoalTarget] = useState('');
@@ -196,7 +490,7 @@ export default function NewGoalScreen() {
             router.back();
           }}
         >
-          <X color={colors.text.primary} size={24} />
+          <X color={theme.colors.text.primary} size={24} />
         </TouchableOpacity>
       </View>
 
@@ -210,18 +504,23 @@ export default function NewGoalScreen() {
           <View style={styles.formGroup}>
             <Text style={styles.formLabel}>{t('exercise')}</Text>
             <TouchableOpacity
-              style={styles.formInput}
+              style={styles.exerciseSelectorButton}
               onPress={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 setShowExerciseSelector(true);
               }}
             >
-              <View style={styles.exerciseSelectorButton}>
-                <Text style={[styles.exerciseSelectorText, !newGoalExercise && { color: colors.text.secondary }]}>
-                  {newGoalExercise || t('selectExerciseForGoal')}
-                </Text>
-                <ChevronDown color={colors.text.secondary} size={20} />
-              </View>
+              <Text 
+                style={[
+                  styles.exerciseSelectorText, 
+                  !newGoalExercise && { color: theme.colors.text.secondary }
+                ]}
+                numberOfLines={1}
+                ellipsizeMode='tail'
+              >
+                {newGoalExercise || t('selectExerciseForGoal')}
+              </Text>
+              <ChevronDown color={theme.colors.text.secondary} size={20} />
             </TouchableOpacity>
           </View>
 
@@ -231,7 +530,7 @@ export default function NewGoalScreen() {
               <TextInput
                 style={styles.formInput}
                 placeholder="0"
-                placeholderTextColor={colors.text.secondary}
+                placeholderTextColor={theme.colors.text.secondary}
                 value={newGoalCurrent}
                 onChangeText={setNewGoalCurrent}
                 keyboardType="numeric"
@@ -256,7 +555,7 @@ export default function NewGoalScreen() {
                   }}
                 >
                   {isLoadingLastWorkout ? (
-                    <ActivityIndicator size="small" color={colors.text.primary} />
+                    <ActivityIndicator size="small" color={theme.colors.text.primary} style={styles.loadingIndicator}/>
                   ) : (
                     <Text style={styles.suggestedButtonText}>{t('useLastWorkout')}</Text>
                   )}
@@ -271,7 +570,7 @@ export default function NewGoalScreen() {
               <TextInput
                 style={styles.formInput}
                 placeholder="0"
-                placeholderTextColor="#666"
+                placeholderTextColor={theme.colors.text.disabled}
                 value={newGoalTarget}
                 onChangeText={setNewGoalTarget}
                 keyboardType="numeric"
@@ -317,11 +616,11 @@ export default function NewGoalScreen() {
             <Text style={styles.modalTitle}>{t('selectExerciseForGoal')}</Text>
 
             <View style={styles.searchContainer}>
-              <Ionicons name="search" size={20} color="#999" style={styles.searchIcon} />
+              <Ionicons name="search" size={20} color={theme.colors.text.secondary} style={styles.searchIcon} />
               <TextInput
                 style={styles.searchInput}
                 placeholder={t('searchExercise')}
-                placeholderTextColor="#999"
+                placeholderTextColor={theme.colors.text.secondary}
                 value={searchQuery}
                 onChangeText={setSearchQuery}
                 autoCapitalize="none"
@@ -334,7 +633,7 @@ export default function NewGoalScreen() {
                     setSearchQuery('');
                   }}
                 >
-                  <Ionicons name="close-circle" size={20} color="#999" />
+                  <Ionicons name="close-circle" size={20} color={theme.colors.text.secondary} />
                 </TouchableOpacity>
               )}
             </View>
@@ -386,7 +685,7 @@ export default function NewGoalScreen() {
                       <Ionicons 
                         name={selectedMuscleGroup === muscleGroup ? "chevron-up" : "chevron-down"} 
                         size={20} 
-                        color="#fd8f09" 
+                        color={theme.colors.primary}
                       />
                     </TouchableOpacity>
 
@@ -449,244 +748,3 @@ export default function NewGoalScreen() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.main,
-  },
-  header: {
-    paddingTop: spacing.lg,
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.md,
-    backgroundColor: colors.background.card,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border.default,
-  },
-  title: {
-    fontSize: typography.fontSize['2xl'],
-    fontFamily: typography.fontFamily.bold,
-    color: colors.text.primary,
-  },
-  closeButton: {
-    width: 44,
-    height: 44,
-    borderRadius: borderRadius.full,
-    backgroundColor: colors.background.button,
-    justifyContent: 'center',
-    alignItems: 'center',
-    ...theme.shadows.sm,
-  },
-  content: {
-    flex: 1,
-    padding: spacing.lg,
-  },
-  formCard: {
-    backgroundColor: colors.background.card,
-    borderRadius: borderRadius.lg,
-    padding: spacing.lg,
-    ...theme.shadows.md,
-    marginBottom: spacing.lg,
-  },
-  sectionTitle: {
-    fontSize: typography.fontSize.xl,
-    fontFamily: typography.fontFamily.semiBold,
-    color: colors.text.primary,
-    marginBottom: spacing.lg,
-    borderLeftWidth: 3,
-    borderLeftColor: colors.primary,
-    paddingLeft: spacing.sm,
-  },
-  formGroup: {
-    marginBottom: spacing.lg,
-  },
-  formLabel: {
-    fontSize: typography.fontSize.base,
-    fontFamily: typography.fontFamily.semiBold,
-    color: colors.text.secondary,
-    marginBottom: spacing.sm,
-  },
-  formInput: {
-    backgroundColor: colors.background.input,
-    borderRadius: borderRadius.md,
-    padding: spacing.md,
-    color: colors.text.primary,
-    fontFamily: typography.fontFamily.regular,
-    ...theme.shadows.sm,
-    fontSize: typography.fontSize.base,
-    minHeight: 48,
-    justifyContent: 'center',
-  },
-  exerciseSelectorButton: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    width: '100%',
-  },
-  exerciseSelectorText: {
-    color: colors.text.primary,
-    fontFamily: typography.fontFamily.regular,
-    fontSize: typography.fontSize.base,
-  },
-  weightInputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  suggestedButton: {
-    backgroundColor: colors.primaryLight,
-    borderRadius: borderRadius.md,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
-    marginLeft: spacing.sm,
-    ...theme.shadows.sm,
-    minWidth: 100,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  suggestedButtonText: {
-    color: colors.primary,
-    fontFamily: typography.fontFamily.semiBold,
-    fontSize: typography.fontSize.xs,
-  },
-  saveButton: {
-    backgroundColor: colors.primary,
-    paddingVertical: spacing.md,
-    borderRadius: borderRadius.md,
-    alignItems: 'center',
-    marginTop: spacing.xl,
-    ...theme.shadows.primary,
-  },
-  saveButtonDisabled: {
-    backgroundColor: colors.background.button,
-    ...theme.shadows.sm,
-  },
-  saveButtonText: {
-    color: colors.text.primary,
-    fontFamily: typography.fontFamily.semiBold,
-    fontSize: typography.fontSize.base,
-  },
-  // Exercise Selector Modal
-  modalOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: theme.zIndex.modal,
-  },
-  modalContainer: {
-    backgroundColor: colors.background.card,
-    borderRadius: borderRadius.lg,
-    padding: spacing.lg,
-    width: '90%',
-    maxHeight: '80%',
-    ...theme.shadows.lg,
-  },
-  modalTitle: {
-    fontSize: typography.fontSize.xl,
-    fontFamily: typography.fontFamily.bold,
-    color: colors.text.primary,
-    marginBottom: spacing.lg,
-    textAlign: 'center',
-  },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.background.input,
-    borderRadius: borderRadius.md,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    marginBottom: spacing.md,
-    ...theme.shadows.sm,
-  },
-  searchIcon: {
-    marginRight: spacing.sm,
-  },
-  searchInput: {
-    flex: 1,
-    color: colors.text.primary,
-    fontFamily: typography.fontFamily.regular,
-    fontSize: typography.fontSize.base,
-    padding: 0,
-    height: 24,
-  },
-  exerciseList: {
-    // Pas de styles spécifiques, géré par ScrollView?
-  },
-  exerciseOption: {
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.base,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border.default,
-  },
-  exerciseOptionText: {
-    color: colors.text.primary,
-    fontFamily: typography.fontFamily.regular,
-    fontSize: typography.fontSize.base,
-  },
-  muscleGroupContainer: {
-    marginBottom: spacing.base,
-    backgroundColor: colors.background.card,
-    borderRadius: borderRadius.md,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: colors.border.default,
-  },
-  muscleGroupHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border.default,
-    backgroundColor: colors.background.button,
-  },
-  muscleGroupTitle: {
-    color: colors.primary,
-    fontFamily: typography.fontFamily.semiBold,
-    fontSize: typography.fontSize.base,
-  },
-  exerciseGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    padding: spacing.sm,
-    gap: spacing.sm,
-  },
-  exerciseButton: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: borderRadius.full,
-    backgroundColor: colors.background.input,
-  },
-  exerciseButtonSelected: {
-    backgroundColor: colors.primary,
-  },
-  exerciseButtonText: {
-    color: colors.text.secondary,
-    fontFamily: typography.fontFamily.regular,
-    fontSize: typography.fontSize.sm,
-  },
-  exerciseButtonTextSelected: {
-    color: colors.text.primary,
-    fontFamily: typography.fontFamily.semiBold,
-  },
-  cancelButton: {
-    backgroundColor: colors.background.button,
-    borderRadius: borderRadius.md,
-    padding: spacing.md,
-    alignItems: 'center',
-    marginTop: spacing.md,
-  },
-  cancelButtonText: {
-    color: colors.text.primary,
-    fontFamily: typography.fontFamily.semiBold,
-    fontSize: typography.fontSize.base,
-  }
-});

@@ -19,6 +19,9 @@ export default {
   language: 'Langue',
   english: 'Anglais',
   french: 'Français',
+  theme: 'Thème',
+  dark: 'Sombre',
+  light: 'Clair',
 
   // About section
   aboutTitle: 'BodyWork',
@@ -84,8 +87,8 @@ export default {
   volume: 'Volume',
   repetitions: 'Répétitions',
   goals: 'Objectifs',
-  goalRemaining: 'Encore {remaining}kg pour atteindre ton objectif',
-  goalAchieved: 'Objectif atteint ! 🎉',
+  goalRemaining: '{remaining}kg restants',
+  goalAchieved: 'Objectif atteint !',
   addGoal: 'Ajouter un objectif',
   newGoal: 'Nouvel Objectif',
   currentWeight: 'Poids Actuel',
@@ -164,5 +167,7 @@ export default {
   note: 'Note',
   optionalNote: 'Note optionnelle',
   usePreviousValues: 'Utiliser les valeurs précédentes',
-  notApplicable: 'N/A'
+  notApplicable: 'N/A',
+
+  goalDetails: 'Dets de l\'objectif'
 };

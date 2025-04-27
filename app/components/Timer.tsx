@@ -4,7 +4,7 @@ import { Inter_400Regular, Inter_600SemiBold, useFonts } from '@expo-google-font
 import { Minus, Pause, Play, Plus, RotateCcw } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { useTranslation } from '@/hooks/useTranslation';
-import theme, { colors, typography, spacing, borderRadius } from '@/app/theme/theme';
+import { useTheme } from '@/hooks/useTheme';
 
 interface TimerProps {
   initialTime?: number;
@@ -24,6 +24,8 @@ export default function Timer({
                                 exerciseName = 'Exercise'
                               }: TimerProps) {
   const { t } = useTranslation();
+  const { theme } = useTheme();
+  const styles = useStyles();
   const [workTime, setWorkTime] = useState(mode === 'timer' ? initialTime : 0);
   const [restTimeState, setRestTimeState] = useState(restTime);
   const [isRunning, setIsRunning] = useState(false);
@@ -152,16 +154,16 @@ export default function Timer({
           style={[styles.button, styles.resetButton]}
           onPress={resetTimer}
         >
-          <RotateCcw color={colors.text.primary} size={24} />
+          <RotateCcw color={theme.colors.text.primary} size={24} />
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.button, isRunning ? styles.stopButton : styles.startButton]}
           onPress={toggleTimer}
         >
           {isRunning ? (
-            <Pause color={colors.text.primary} size={32} />
+            <Pause color={theme.colors.text.primary} size={32} />
           ) : (
-            <Play color={colors.text.primary} size={32} />
+            <Play color={theme.colors.text.primary} size={32} />
           )}
         </TouchableOpacity>
         <View style={styles.buttonPlaceholder} />
@@ -170,103 +172,108 @@ export default function Timer({
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: colors.background.card,
-    borderRadius: borderRadius.lg,
-    padding: spacing.lg,
-    alignItems: 'center',
-    width: '100%',
-    ...theme.shadows.md,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '100%',
-    marginBottom: spacing.sm,
-  },
-  exerciseName: {
-    fontSize: typography.fontSize['2xl'],
-    fontFamily: typography.fontFamily.semiBold,
-    color: colors.text.primary,
-    textAlign: 'center',
-  },
-  setsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.md,
-    marginBottom: spacing.lg,
-  },
-  setsLabel: {
-    fontSize: typography.fontSize.base,
-    fontFamily: typography.fontFamily.regular,
-    color: colors.text.secondary,
-  },
-  setsControls: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-  },
-  setsValue: {
-    fontSize: typography.fontSize.lg,
-    fontFamily: typography.fontFamily.semiBold,
-    color: colors.text.primary,
-    minWidth: 60,
-    textAlign: 'center',
-  },
-  timerDisplayContainer: {
-    width: '100%',
-    padding: spacing.xl,
-    borderRadius: borderRadius.lg,
-    alignItems: 'center',
-    marginBottom: spacing.xl,
-  },
-  workTimer: {
-    backgroundColor: colors.success,
-  },
-  restTimer: {
-    backgroundColor: colors.error,
-  },
-  timerLabel: {
-    fontSize: typography.fontSize.base,
-    fontFamily: typography.fontFamily.regular,
-    color: colors.text.primary,
-    marginBottom: spacing.xs,
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-  },
-  time: {
-    fontSize: typography.fontSize['4xl'],
-    fontFamily: typography.fontFamily.bold,
-    color: colors.text.primary,
-  },
-  controls: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    width: '100%',
-    marginTop: spacing.md,
-  },
-  button: {
-    width: 70,
-    height: 70,
-    borderRadius: borderRadius.full,
-    justifyContent: 'center',
-    alignItems: 'center',
-    ...theme.shadows.md,
-  },
-  startButton: {
-    backgroundColor: colors.primary,
-  },
-  stopButton: {
-    backgroundColor: colors.error,
-  },
-  resetButton: {
-    backgroundColor: colors.background.button,
-  },
-  buttonPlaceholder: {
-    width: 70,
-  },
-});
+// Define styles using the current theme
+const useStyles = () => {
+  const { theme } = useTheme();
+
+  return StyleSheet.create({
+    container: {
+      backgroundColor: theme.colors.background.card,
+      borderRadius: theme.borderRadius.lg,
+      padding: theme.spacing.lg,
+      alignItems: 'center',
+      width: '100%',
+      ...theme.shadows.md,
+    },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      width: '100%',
+      marginBottom: theme.spacing.sm,
+    },
+    exerciseName: {
+      fontSize: theme.typography.fontSize['2xl'],
+      fontFamily: theme.typography.fontFamily.semiBold,
+      color: theme.colors.text.primary,
+      textAlign: 'center',
+    },
+    setsContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: theme.spacing.md,
+      marginBottom: theme.spacing.lg,
+    },
+    setsLabel: {
+      fontSize: theme.typography.fontSize.base,
+      fontFamily: theme.typography.fontFamily.regular,
+      color: theme.colors.text.secondary,
+    },
+    setsControls: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: theme.spacing.md,
+    },
+    setsValue: {
+      fontSize: theme.typography.fontSize.lg,
+      fontFamily: theme.typography.fontFamily.semiBold,
+      color: theme.colors.text.primary,
+      minWidth: 60,
+      textAlign: 'center',
+    },
+    timerDisplayContainer: {
+      width: '100%',
+      padding: theme.spacing.xl,
+      borderRadius: theme.borderRadius.lg,
+      alignItems: 'center',
+      marginBottom: theme.spacing.xl,
+    },
+    workTimer: {
+      backgroundColor: theme.colors.success,
+    },
+    restTimer: {
+      backgroundColor: theme.colors.error,
+    },
+    timerLabel: {
+      fontSize: theme.typography.fontSize.base,
+      fontFamily: theme.typography.fontFamily.regular,
+      color: theme.colors.text.primary,
+      marginBottom: theme.spacing.xs,
+      textTransform: 'uppercase',
+      letterSpacing: 1,
+    },
+    time: {
+      fontSize: theme.typography.fontSize['4xl'],
+      fontFamily: theme.typography.fontFamily.bold,
+      color: theme.colors.text.primary,
+    },
+    controls: {
+      flexDirection: 'row',
+      justifyContent: 'space-around',
+      alignItems: 'center',
+      width: '100%',
+      marginTop: theme.spacing.md,
+    },
+    button: {
+      width: 70,
+      height: 70,
+      borderRadius: theme.borderRadius.full,
+      justifyContent: 'center',
+      alignItems: 'center',
+      ...theme.shadows.md,
+    },
+    startButton: {
+      backgroundColor: theme.colors.primary,
+    },
+    stopButton: {
+      backgroundColor: theme.colors.error,
+    },
+    resetButton: {
+      backgroundColor: theme.colors.background.button,
+    },
+    buttonPlaceholder: {
+      width: 70,
+    },
+  });
+};

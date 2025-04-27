@@ -7,7 +7,7 @@ import { format, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useLocalSearchParams, router } from 'expo-router';
 import { useTranslation } from '@/hooks/useTranslation';
-import theme, { colors, typography, spacing, borderRadius } from '@/app/theme/theme';
+import { useTheme } from '@/hooks/useTheme';
 
 interface Workout {
   id: string;
@@ -40,8 +40,103 @@ const formatDate = (date: string): string => {
   return format(parseISO(date), 'dd MMM', { locale: fr });
 };
 
+// Define styles using the current theme
+const useStyles = () => {
+  const { theme } = useTheme();
+
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background.main,
+    },
+    header: {
+      paddingTop: theme.spacing.xl * 2,
+      paddingHorizontal: theme.spacing.lg,
+      paddingBottom: theme.spacing.lg,
+      backgroundColor: theme.colors.background.card,
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    backButton: {
+      marginRight: theme.spacing.base,
+    },
+    title: {
+      fontSize: theme.typography.fontSize['2xl'],
+      fontFamily: theme.typography.fontFamily.bold,
+      color: theme.colors.text.primary,
+    },
+    content: {
+      flex: 1,
+      padding: theme.spacing.lg,
+    },
+    filterSection: {
+      marginBottom: theme.spacing.base,
+    },
+    filterLabel: {
+      fontSize: theme.typography.fontSize.md,
+      fontFamily: theme.typography.fontFamily.regular,
+      color: theme.colors.text.primary,
+      marginBottom: theme.spacing.sm,
+    },
+    filterContainer: {
+      flexDirection: 'row',
+      justifyContent: 'flex-start',
+      marginTop: theme.spacing.xs,
+    },
+    filterButton: {
+      paddingVertical: theme.spacing.sm,
+      paddingHorizontal: theme.spacing.base,
+      borderRadius: theme.borderRadius.full,
+      backgroundColor: theme.colors.background.button,
+      marginRight: theme.spacing.sm,
+    },
+    filterButtonActive: {
+      backgroundColor: theme.colors.primary,
+    },
+    filterText: {
+      color: theme.colors.text.secondary,
+      fontFamily: theme.typography.fontFamily.semiBold,
+    },
+    filterTextActive: {
+      color: theme.colors.text.primary,
+    },
+    chartTypeSelector: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      marginBottom: theme.spacing.base,
+      backgroundColor: theme.colors.background.button,
+      borderRadius: theme.borderRadius.full,
+      padding: theme.spacing.xs,
+    },
+    chartTypeButton: {
+      paddingVertical: theme.spacing.sm,
+      paddingHorizontal: theme.spacing.md,
+      borderRadius: theme.borderRadius.full,
+    },
+    chartTypeButtonActive: {
+      backgroundColor: theme.colors.primary,
+    },
+    chartTypeText: {
+      color: theme.colors.text.secondary,
+      fontFamily: theme.typography.fontFamily.semiBold,
+      fontSize: theme.typography.fontSize.sm,
+    },
+    chartTypeTextActive: {
+      color: theme.colors.text.primary,
+    },
+    chartContainer: {
+      backgroundColor: theme.colors.background.card,
+      borderRadius: theme.borderRadius.lg,
+      padding: theme.spacing.base,
+      marginBottom: theme.spacing.lg,
+    },
+  });
+};
+
 export default function ExerciseDetailsScreen() {
   const { t } = useTranslation();
+  const { theme } = useTheme();
+  const styles = useStyles();
   const params = useLocalSearchParams();
   const exerciseName = params.exercise as string;
   const [workouts, setWorkouts] = useState<Workout[]>([]);
@@ -159,7 +254,7 @@ export default function ExerciseDetailsScreen() {
           style={styles.backButton}
           onPress={() => router.back()}
         >
-          <Ionicons name="arrow-back" size={24} color="#fff" />
+          <Ionicons name="arrow-back" size={24} color={theme.colors.text.primary} />
         </TouchableOpacity>
         <Text style={styles.title}>{exerciseName}</Text>
       </Animated.View>
@@ -224,15 +319,15 @@ export default function ExerciseDetailsScreen() {
             >
               <VictoryAxis
                 style={{
-                  axis: { stroke: '#666' },
-                  tickLabels: { fill: '#fff', fontSize: 12 },
+                  axis: { stroke: theme.colors.border.default },
+                  tickLabels: { fill: theme.colors.text.primary, fontSize: theme.typography.fontSize.sm },
                 }}
               />
               <VictoryAxis
                 dependentAxis
                 style={{
-                  axis: { stroke: '#666' },
-                  tickLabels: { fill: '#fff', fontSize: 12 },
+                  axis: { stroke: theme.colors.border.default },
+                  tickLabels: { fill: theme.colors.text.primary, fontSize: theme.typography.fontSize.sm },
                 }}
               />
               {exerciseData.length > 0 && (
@@ -240,20 +335,20 @@ export default function ExerciseDetailsScreen() {
                   <VictoryLine
                     data={exerciseData}
                     style={{
-                      data: { stroke: '#fd8f09', strokeWidth: 3 },
+                      data: { stroke: theme.colors.primary, strokeWidth: 3 },
                     }}
                   />
                   <VictoryScatter
                     data={exerciseData}
                     size={5}
                     style={{
-                      data: { fill: '#fd8f09' },
+                      data: { fill: theme.colors.primary },
                     }}
                     labels={({ datum }) => `${datum.y}kg`}
                     labelComponent={
                       <VictoryTooltip
-                        style={{ fill: '#fff' }}
-                        flyoutStyle={{ fill: 'rgba(40, 40, 40, 0.9)', stroke: 'none' }}
+                        style={{ fill: theme.colors.text.primary }}
+                        flyoutStyle={{ fill: theme.colors.background.card, stroke: 'none' }}
                       />
                     }
                   />
@@ -273,15 +368,15 @@ export default function ExerciseDetailsScreen() {
             >
               <VictoryAxis
                 style={{
-                  axis: { stroke: '#666' },
-                  tickLabels: { fill: '#fff', fontSize: 12 },
+                  axis: { stroke: theme.colors.border.default },
+                  tickLabels: { fill: theme.colors.text.primary, fontSize: theme.typography.fontSize.sm },
                 }}
               />
               <VictoryAxis
                 dependentAxis
                 style={{
-                  axis: { stroke: '#666' },
-                  tickLabels: { fill: '#fff', fontSize: 12 },
+                  axis: { stroke: theme.colors.border.default },
+                  tickLabels: { fill: theme.colors.text.primary, fontSize: theme.typography.fontSize.sm },
                 }}
               />
               {volumeData.length > 0 && (
@@ -289,20 +384,20 @@ export default function ExerciseDetailsScreen() {
                   <VictoryLine
                     data={volumeData}
                     style={{
-                      data: { stroke: '#6C63FF', strokeWidth: 3 },
+                      data: { stroke: theme.colors.info, strokeWidth: 3 },
                     }}
                   />
                   <VictoryScatter
                     data={volumeData}
                     size={5}
                     style={{
-                      data: { fill: '#6C63FF' },
+                      data: { fill: theme.colors.info },
                     }}
                     labels={({ datum }) => `${datum.y}kg`}
                     labelComponent={
                       <VictoryTooltip
-                        style={{ fill: '#fff' }}
-                        flyoutStyle={{ fill: 'rgba(40, 40, 40, 0.9)', stroke: 'none' }}
+                        style={{ fill: theme.colors.text.primary }}
+                        flyoutStyle={{ fill: theme.colors.background.card, stroke: 'none' }}
                       />
                     }
                   />
@@ -322,15 +417,15 @@ export default function ExerciseDetailsScreen() {
             >
               <VictoryAxis
                 style={{
-                  axis: { stroke: '#666' },
-                  tickLabels: { fill: '#fff', fontSize: 12 },
+                  axis: { stroke: theme.colors.border.default },
+                  tickLabels: { fill: theme.colors.text.primary, fontSize: theme.typography.fontSize.sm },
                 }}
               />
               <VictoryAxis
                 dependentAxis
                 style={{
-                  axis: { stroke: '#666' },
-                  tickLabels: { fill: '#fff', fontSize: 12 },
+                  axis: { stroke: theme.colors.border.default },
+                  tickLabels: { fill: theme.colors.text.primary, fontSize: theme.typography.fontSize.sm },
                 }}
               />
               {repsData.length > 0 && (
@@ -338,20 +433,20 @@ export default function ExerciseDetailsScreen() {
                   <VictoryLine
                     data={repsData}
                     style={{
-                      data: { stroke: '#4ade80', strokeWidth: 3 },
+                      data: { stroke: theme.colors.success, strokeWidth: 3 },
                     }}
                   />
                   <VictoryScatter
                     data={repsData}
                     size={5}
                     style={{
-                      data: { fill: '#4ade80' },
+                      data: { fill: theme.colors.success },
                     }}
                     labels={({ datum }) => `${datum.y} reps`}
                     labelComponent={
                       <VictoryTooltip
-                        style={{ fill: '#fff' }}
-                        flyoutStyle={{ fill: 'rgba(40, 40, 40, 0.9)', stroke: 'none' }}
+                        style={{ fill: theme.colors.text.primary }}
+                        flyoutStyle={{ fill: theme.colors.background.card, stroke: 'none' }}
                       />
                     }
                   />
@@ -364,91 +459,3 @@ export default function ExerciseDetailsScreen() {
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.main,
-  },
-  header: {
-    paddingTop: spacing.xl * 2,
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.lg,
-    backgroundColor: colors.background.card,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  backButton: {
-    marginRight: spacing.base,
-  },
-  title: {
-    fontSize: typography.fontSize['2xl'],
-    fontFamily: typography.fontFamily.bold,
-    color: colors.text.primary,
-  },
-  content: {
-    flex: 1,
-    padding: spacing.lg,
-  },
-  filterSection: {
-    marginBottom: spacing.base,
-  },
-  filterLabel: {
-    fontSize: typography.fontSize.md,
-    fontFamily: typography.fontFamily.regular,
-    color: colors.text.primary,
-    marginBottom: spacing.sm,
-  },
-  filterContainer: {
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    marginTop: spacing.xs,
-  },
-  filterButton: {
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.base,
-    borderRadius: borderRadius.full,
-    backgroundColor: colors.background.button,
-    marginRight: spacing.sm,
-  },
-  filterButtonActive: {
-    backgroundColor: colors.primary,
-  },
-  filterText: {
-    color: colors.text.secondary,
-    fontFamily: typography.fontFamily.semiBold,
-  },
-  filterTextActive: {
-    color: colors.text.primary,
-  },
-  chartTypeSelector: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginBottom: spacing.base,
-    backgroundColor: colors.background.button,
-    borderRadius: borderRadius.full,
-    padding: spacing.xs,
-  },
-  chartTypeButton: {
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
-    borderRadius: borderRadius.full,
-  },
-  chartTypeButtonActive: {
-    backgroundColor: colors.primary,
-  },
-  chartTypeText: {
-    color: colors.text.secondary,
-    fontFamily: typography.fontFamily.semiBold,
-    fontSize: typography.fontSize.sm,
-  },
-  chartTypeTextActive: {
-    color: colors.text.primary,
-  },
-  chartContainer: {
-    backgroundColor: colors.background.card,
-    borderRadius: borderRadius.lg,
-    padding: spacing.base,
-    marginBottom: spacing.lg,
-  },
-});

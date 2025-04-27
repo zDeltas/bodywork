@@ -4,7 +4,7 @@ import { ChevronDown, ChevronUp, Search, Plus } from 'lucide-react-native';
 import Animated, { FadeIn, SlideInRight } from 'react-native-reanimated';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from '@/hooks/useTranslation';
-import theme, { colors, typography, spacing, borderRadius } from '@/app/theme/theme';
+import { useTheme } from '@/hooks/useTheme';
 
 // Import the muscle groups and predefined exercises from the original file
 import { muscleGroups, muscleGroupIcons, predefinedExercises } from '../workout/new';
@@ -27,6 +27,8 @@ export const ExerciseList: React.FC<ExerciseListProps> = ({
   onExerciseSelect,
 }) => {
   const { t } = useTranslation();
+  const { theme } = useTheme();
+  const styles = useStyles();
   const [searchQuery, setSearchQuery] = React.useState('');
   const [expandedMuscleGroups, setExpandedMuscleGroups] = React.useState<string[]>([]);
   const [filteredExercises, setFilteredExercises] = React.useState<{[key: string]: string[]}>({});
@@ -76,17 +78,17 @@ export const ExerciseList: React.FC<ExerciseListProps> = ({
         style={styles.searchContainer}
       >
         <View style={styles.searchInputContainer}>
-          <Search color={colors.text.secondary} size={20} style={styles.searchIcon} />
+          <Search color={theme.colors.text.secondary} size={20} style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
             value={searchQuery}
             onChangeText={setSearchQuery}
             placeholder={t('searchExercises')}
-            placeholderTextColor={colors.text.secondary}
+            placeholderTextColor={theme.colors.text.secondary}
           />
           {searchQuery.length > 0 && (
             <TouchableOpacity onPress={() => setSearchQuery('')}>
-              <ChevronUp color={colors.text.secondary} size={20} />
+              <ChevronUp color={theme.colors.text.secondary} size={20} />
             </TouchableOpacity>
           )}
         </View>
@@ -133,7 +135,7 @@ export const ExerciseList: React.FC<ExerciseListProps> = ({
                 <View style={styles.muscleButtonContent}>
                   {React.createElement(muscleGroupIcons[muscleGroup as keyof typeof muscleGroupIcons], {
                     size: 20,
-                    color: isSelected ? colors.text.primary : colors.primary,
+                    color: isSelected ? theme.colors.text.primary : theme.colors.primary,
                     style: styles.muscleIcon
                   })}
                   <Text style={[
@@ -144,9 +146,9 @@ export const ExerciseList: React.FC<ExerciseListProps> = ({
                   </Text>
                 </View>
                 {isExpanded ? (
-                  <ChevronUp color={isSelected ? colors.text.primary : colors.primary} size={20} />
+                  <ChevronUp color={isSelected ? theme.colors.text.primary : theme.colors.primary} size={20} />
                 ) : (
-                  <ChevronDown color={isSelected ? colors.text.primary : colors.primary} size={20} />
+                  <ChevronDown color={isSelected ? theme.colors.text.primary : theme.colors.primary} size={20} />
                 )}
               </TouchableOpacity>
 
@@ -194,7 +196,7 @@ export const ExerciseList: React.FC<ExerciseListProps> = ({
                           setIsCustomExercise(true);
                         }}
                       >
-                        <Plus color={colors.primary} size={20} />
+                        <Plus color={theme.colors.primary} size={20} />
                         <Text style={styles.customExerciseButtonText}>{t('customExercise')}</Text>
                       </TouchableOpacity>
                     </Animated.View>
@@ -209,98 +211,103 @@ export const ExerciseList: React.FC<ExerciseListProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
-  searchContainer: {
-    marginBottom: spacing.lg,
-  },
-  searchInputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.background.input,
-    borderRadius: borderRadius.md,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-  },
-  searchIcon: {
-    marginRight: spacing.sm,
-  },
-  searchInput: {
-    flex: 1,
-    color: colors.text.primary,
-    fontFamily: typography.fontFamily.regular,
-    fontSize: typography.fontSize.base,
-    height: 30,
-  },
-  collapsibleSection: {
-    marginBottom: spacing.sm,
-    borderRadius: borderRadius.lg,
-    overflow: 'hidden',
-    backgroundColor: colors.background.card,
-  },
-  collapsibleHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md,
-  },
-  collapsibleHeaderSelected: {
-    backgroundColor: colors.primary,
-  },
-  muscleButtonContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  muscleIcon: {
-    marginRight: spacing.sm,
-  },
-  muscleButtonText: {
-    fontFamily: typography.fontFamily.semiBold,
-    fontSize: typography.fontSize.base,
-    color: colors.primary,
-  },
-  muscleButtonTextSelected: {
-    color: colors.text.primary,
-  },
-  collapsibleContent: {
-    paddingHorizontal: spacing.md,
-    paddingBottom: spacing.xs,
-  },
-  exerciseListItem: {
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border.default,
-    marginLeft: spacing.lg,
-  },
-  exerciseListItemSelected: {
-    backgroundColor: colors.primaryLight,
-    borderRadius: borderRadius.sm,
-    borderBottomColor: 'transparent',
-  },
-  exerciseListItemText: {
-    fontFamily: typography.fontFamily.regular,
-    fontSize: typography.fontSize.base,
-    color: colors.text.secondary,
-  },
-  exerciseListItemTextSelected: {
-    color: colors.primary,
-    fontFamily: typography.fontFamily.semiBold,
-  },
-  customExerciseButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.sm,
-    marginTop: spacing.xs,
-    marginLeft: spacing.lg,
-  },
-  customExerciseButtonText: {
-    fontFamily: typography.fontFamily.semiBold,
-    fontSize: typography.fontSize.base,
-    color: colors.primary,
-    marginLeft: spacing.sm,
-  },
-});
+// Define styles using the current theme
+const useStyles = () => {
+  const { theme } = useTheme();
+
+  return StyleSheet.create({
+    searchContainer: {
+      marginBottom: theme.spacing.lg,
+    },
+    searchInputContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: theme.colors.background.input,
+      borderRadius: theme.borderRadius.md,
+      paddingHorizontal: theme.spacing.md,
+      paddingVertical: theme.spacing.sm,
+    },
+    searchIcon: {
+      marginRight: theme.spacing.sm,
+    },
+    searchInput: {
+      flex: 1,
+      color: theme.colors.text.primary,
+      fontFamily: theme.typography.fontFamily.regular,
+      fontSize: theme.typography.fontSize.base,
+      height: 30,
+    },
+    collapsibleSection: {
+      marginBottom: theme.spacing.sm,
+      borderRadius: theme.borderRadius.lg,
+      overflow: 'hidden',
+      backgroundColor: theme.colors.background.card,
+    },
+    collapsibleHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: theme.spacing.md,
+      paddingVertical: theme.spacing.md,
+    },
+    collapsibleHeaderSelected: {
+      backgroundColor: theme.colors.primary,
+    },
+    muscleButtonContent: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    muscleIcon: {
+      marginRight: theme.spacing.sm,
+    },
+    muscleButtonText: {
+      fontFamily: theme.typography.fontFamily.semiBold,
+      fontSize: theme.typography.fontSize.base,
+      color: theme.colors.primary,
+    },
+    muscleButtonTextSelected: {
+      color: theme.colors.text.primary,
+    },
+    collapsibleContent: {
+      paddingHorizontal: theme.spacing.md,
+      paddingBottom: theme.spacing.xs,
+    },
+    exerciseListItem: {
+      paddingVertical: theme.spacing.sm,
+      paddingHorizontal: theme.spacing.sm,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border.default,
+      marginLeft: theme.spacing.lg,
+    },
+    exerciseListItemSelected: {
+      backgroundColor: theme.colors.primaryLight,
+      borderRadius: theme.borderRadius.sm,
+      borderBottomColor: 'transparent',
+    },
+    exerciseListItemText: {
+      fontFamily: theme.typography.fontFamily.regular,
+      fontSize: theme.typography.fontSize.base,
+      color: theme.colors.text.secondary,
+    },
+    exerciseListItemTextSelected: {
+      color: theme.colors.primary,
+      fontFamily: theme.typography.fontFamily.semiBold,
+    },
+    customExerciseButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: theme.spacing.md,
+      paddingHorizontal: theme.spacing.sm,
+      marginTop: theme.spacing.xs,
+      marginLeft: theme.spacing.lg,
+    },
+    customExerciseButtonText: {
+      fontFamily: theme.typography.fontFamily.semiBold,
+      fontSize: theme.typography.fontSize.base,
+      color: theme.colors.primary,
+      marginLeft: theme.spacing.sm,
+    },
+  });
+};
 
 export default ExerciseList;

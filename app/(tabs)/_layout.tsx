@@ -8,7 +8,7 @@ import TimerScreen from '@/app/(tabs)/timer';
 import StatsScreen from '@/app/(tabs)/stats';
 import MeasurementsScreen from '@/app/(tabs)/measurements';
 import SettingsScreen from '@/app/(tabs)/settings';
-import theme, { colors, typography, spacing, borderRadius } from '@/app/theme/theme';
+import { useTheme } from '@/hooks/useTheme';
 import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold, useFonts } from '@expo-google-fonts/inter';
 import * as SplashScreen from 'expo-splash-screen';
 import { useCallback } from 'react';
@@ -22,6 +22,9 @@ interface RenderTabBarProps {
 SplashScreen.preventAutoHideAsync();
 
 export default function TabLayout() {
+  const { theme } = useTheme();
+  const styles = useStyles();
+
   const [fontsLoaded, fontError] = useFonts({
     'Inter-Regular': Inter_400Regular,
     'Inter-SemiBold': Inter_600SemiBold,
@@ -36,7 +39,7 @@ export default function TabLayout() {
 
   const _renderIcon = (routeName: string, selectedTab: string) => {
     const isSelected = routeName === selectedTab;
-    const color = isSelected ? colors.primary : colors.text.secondary;
+    const color = isSelected ? theme.colors.primary : theme.colors.text.secondary;
     const size = 24;
 
     switch (routeName) {
@@ -81,13 +84,13 @@ export default function TabLayout() {
         type="DOWN"
         style={styles.bottomBar}
         height={65}
-        bgColor={colors.background.card}
+        bgColor={theme.colors.background.card}
         initialRouteName="index"
         circlePosition="RIGHT"
         renderCircle={() => (
           <Animated.View style={styles.btnCircleUp}>
             <Plus
-              color={colors.text.primary}
+              color={theme.colors.text.primary}
               size={28}
               onPress={handleAddButtonPress}
             />
@@ -129,31 +132,36 @@ export default function TabLayout() {
   );
 }
 
-const styles = StyleSheet.create({
-  bottomBar: {
-    backgroundColor: colors.background.main,
-  },
-  btnCircleUp: {
-    width: 60,
-    height: 60,
-    borderRadius: borderRadius.full,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.primary,
-    bottom: spacing.lg,
-    ...theme.shadows.primary,
-    shadowColor: colors.primary,
-    shadowOffset: {
-      width: 0,
-      height: 2,
+// Define styles using the current theme
+const useStyles = () => {
+  const { theme } = useTheme();
+
+  return StyleSheet.create({
+    bottomBar: {
+      backgroundColor: theme.colors.background.main,
     },
-    shadowOpacity: 0.3,
-    shadowRadius: 2,
-    elevation: 5,
-  },
-  tabbarItem: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+    btnCircleUp: {
+      width: 60,
+      height: 60,
+      borderRadius: theme.borderRadius.full,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: theme.colors.primary,
+      bottom: theme.spacing.lg,
+      ...theme.shadows.primary,
+      shadowColor: theme.colors.primary,
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.3,
+      shadowRadius: 2,
+      elevation: 5,
+    },
+    tabbarItem: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+  });
+};

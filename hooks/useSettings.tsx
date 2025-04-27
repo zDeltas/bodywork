@@ -6,6 +6,7 @@ interface Settings {
   weightUnit: 'kg' | 'lb';
   gender: 'male' | 'female';
   language: 'en' | 'fr';
+  theme: 'dark' | 'light';
 }
 
 // Default settings
@@ -13,6 +14,7 @@ const defaultSettings: Settings = {
   weightUnit: 'kg',
   gender: 'male',
   language: 'fr',
+  theme: 'dark',
 };
 
 // Create context with default values

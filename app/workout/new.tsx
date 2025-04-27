@@ -8,7 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from '@/hooks/useTranslation';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import ExerciseList from '../components/ExerciseList';
-import theme, { colors, typography, spacing, borderRadius } from '@/app/theme/theme';
+import { useTheme } from '@/hooks/useTheme';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -43,8 +43,361 @@ export const predefinedExercises = {
   'Ceinture abdominale': ['Planche', 'Twists russes', 'Relevés de jambes', 'Crunchs', 'Relevés de genoux suspendu'],
 };
 
+// Define styles using the current theme
+const useStyles = () => {
+  const { theme } = useTheme();
+
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background.main,
+    },
+    header: {
+      paddingTop: theme.spacing.xl * 1.5,
+      paddingHorizontal: theme.spacing.lg,
+      paddingBottom: theme.spacing.lg,
+      backgroundColor: theme.colors.background.card,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      ...theme.shadows.md,
+    },
+    title: {
+      fontSize: theme.typography.fontSize['3xl'],
+      fontFamily: theme.typography.fontFamily.bold,
+      color: theme.colors.text.primary,
+    },
+    closeButton: {
+      width: 44,
+      height: 44,
+      borderRadius: theme.borderRadius.full,
+      backgroundColor: theme.colors.background.button,
+      justifyContent: 'center',
+      alignItems: 'center',
+      ...theme.shadows.sm,
+    },
+    content: {
+      flex: 1,
+      padding: theme.spacing.lg,
+    },
+    customExerciseContainer: {
+      marginBottom: theme.spacing.xl,
+    },
+    input: {
+      backgroundColor: theme.colors.background.card,
+      borderRadius: theme.borderRadius.lg,
+      padding: theme.spacing.base,
+      color: theme.colors.text.primary,
+      fontFamily: theme.typography.fontFamily.regular,
+      marginBottom: theme.spacing.base,
+      ...theme.shadows.sm,
+      fontSize: theme.typography.fontSize.base,
+      borderWidth: 1,
+      borderColor: theme.colors.border.default,
+    },
+    backButton: {
+      marginTop: theme.spacing.md,
+      paddingVertical: theme.spacing.sm,
+      backgroundColor: theme.colors.primaryLight,
+      borderRadius: theme.borderRadius.sm,
+      alignItems: 'center',
+    },
+    backButtonText: {
+      color: theme.colors.primary,
+      fontFamily: theme.typography.fontFamily.semiBold,
+      textAlign: 'center',
+    },
+    sectionTitleContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: theme.spacing.sm,
+    },
+    sectionTitleIcon: {
+      marginRight: theme.spacing.sm,
+    },
+    sectionTitle: {
+      fontSize: theme.typography.fontSize.xl,
+      fontFamily: theme.typography.fontFamily.semiBold,
+      color: theme.colors.text.primary,
+      marginBottom: theme.spacing.base,
+      marginTop: theme.spacing.sm,
+    },
+    seriesContainer: {
+      backgroundColor: theme.colors.background.card,
+      borderRadius: theme.borderRadius.lg,
+      padding: theme.spacing.base,
+      marginBottom: theme.spacing.lg,
+      ...theme.shadows.sm,
+    },
+    seriesHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: theme.spacing.base,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border.default,
+      paddingBottom: theme.spacing.md,
+    },
+    seriesTitle: {
+      color: theme.colors.text.primary,
+      fontFamily: theme.typography.fontFamily.semiBold,
+      fontSize: theme.typography.fontSize.lg,
+    },
+    seriesActions: {
+      flexDirection: 'row',
+      gap: theme.spacing.md,
+    },
+    seriesActionButton: {
+      width: 36,
+      height: 36,
+      borderRadius: theme.borderRadius.full,
+      backgroundColor: theme.colors.background.button,
+      justifyContent: 'center',
+      alignItems: 'center',
+      ...theme.shadows.sm,
+    },
+    serieTypeContainer: {
+      marginBottom: theme.spacing.base,
+    },
+    seriesInputLabel: {
+      color: theme.colors.text.primary,
+      fontFamily: theme.typography.fontFamily.semiBold,
+      fontSize: theme.typography.fontSize.base,
+      marginBottom: theme.spacing.sm,
+    },
+    serieTypeButtonsContainer: {
+      flexDirection: 'row',
+      gap: theme.spacing.md,
+      marginBottom: theme.spacing.sm,
+    },
+    serieTypeButton: {
+      flex: 1,
+      backgroundColor: theme.colors.background.card,
+      borderRadius: theme.borderRadius.lg,
+      padding: theme.spacing.md,
+      borderWidth: 1,
+      borderColor: theme.colors.border.default,
+    },
+    serieTypeButtonSelected: {
+      backgroundColor: theme.colors.primaryLight,
+      borderColor: theme.colors.primaryBorder,
+    },
+    serieTypeButtonText: {
+      color: theme.colors.text.primary,
+      fontFamily: theme.typography.fontFamily.semiBold,
+      fontSize: theme.typography.fontSize.base,
+      marginBottom: theme.spacing.xs,
+      textAlign: 'center',
+    },
+    serieTypeButtonTextSelected: {
+      color: theme.colors.primary,
+    },
+    serieTypeDescription: {
+      color: theme.colors.text.secondary,
+      fontFamily: theme.typography.fontFamily.regular,
+      fontSize: theme.typography.fontSize.sm,
+      textAlign: 'center',
+    },
+    row: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      gap: theme.spacing.sm,
+      marginBottom: theme.spacing.base,
+    },
+    column: {
+      flex: 1,
+    },
+    suggestedWeightContainer: {
+      flexDirection: 'column',
+      alignItems: 'center',
+      backgroundColor: theme.colors.primaryLight,
+      borderRadius: theme.borderRadius.md,
+      padding: theme.spacing.sm,
+      marginBottom: theme.spacing.sm,
+      borderWidth: 1,
+      borderColor: theme.colors.primaryBorder,
+    },
+    suggestedWeightText: {
+      color: theme.colors.primary,
+      fontFamily: theme.typography.fontFamily.semiBold,
+      fontSize: theme.typography.fontSize.sm,
+      marginBottom: theme.spacing.xs,
+      textAlign: 'center',
+    },
+    useSuggestedButton: {
+      backgroundColor: theme.colors.primary,
+      paddingHorizontal: theme.spacing.md,
+      paddingVertical: theme.spacing.xs,
+      borderRadius: theme.borderRadius.xs,
+      ...theme.shadows.primary,
+    },
+    useSuggestedButtonText: {
+      color: theme.colors.text.primary,
+      fontFamily: theme.typography.fontFamily.semiBold,
+      fontSize: theme.typography.fontSize.xs,
+    },
+    compactInput: {
+      backgroundColor: theme.colors.background.card,
+      borderRadius: theme.borderRadius.md,
+      padding: theme.spacing.sm,
+      color: theme.colors.text.primary,
+      fontFamily: theme.typography.fontFamily.regular,
+      marginBottom: theme.spacing.base,
+      ...theme.shadows.sm,
+      fontSize: theme.typography.fontSize.md,
+      borderWidth: 1,
+      borderColor: theme.colors.border.default,
+      textAlign: 'center',
+      height: 44,
+    },
+    disabledLabel: {
+      color: theme.colors.text.disabled,
+    },
+    disabledLabelNote: {
+      color: theme.colors.text.disabled,
+      fontFamily: theme.typography.fontFamily.regular,
+      fontSize: theme.typography.fontSize.sm,
+    },
+    dropdownContainer: {
+      position: 'relative',
+      zIndex: theme.zIndex.dropdown,
+    },
+    dropdownButton: {
+      backgroundColor: theme.colors.background.card,
+      borderRadius: theme.borderRadius.md,
+      padding: theme.spacing.sm,
+      ...theme.shadows.sm,
+      borderWidth: 1,
+      borderColor: theme.colors.border.default,
+      height: 44,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    disabledDropdown: {
+      opacity: 0.7,
+    },
+    disabledDropdownButton: {
+      backgroundColor: theme.colors.background.button,
+      borderColor: theme.colors.border.default,
+    },
+    disabledDropdownButtonText: {
+      color: theme.colors.text.disabled,
+    },
+    dropdownButtonText: {
+      color: theme.colors.text.primary,
+      fontFamily: theme.typography.fontFamily.regular,
+      fontSize: theme.typography.fontSize.md,
+      textAlign: 'center',
+    },
+    dropdownList: {
+      position: 'absolute',
+      top: '100%',
+      left: 0,
+      right: 0,
+      backgroundColor: theme.colors.background.card,
+      borderRadius: theme.borderRadius.lg,
+      marginTop: theme.spacing.xs,
+      padding: theme.spacing.sm,
+      ...theme.shadows.md,
+      borderWidth: 1,
+      borderColor: theme.colors.border.default,
+      zIndex: theme.zIndex.dropdown + 1,
+      elevation: theme.zIndex.dropdown + 1,
+      maxHeight: 200,
+    },
+    dropdownScroll: {
+      maxHeight: 200,
+    },
+    dropdownItem: {
+      paddingVertical: theme.spacing.md,
+      paddingHorizontal: theme.spacing.base,
+      borderRadius: theme.borderRadius.sm,
+    },
+    dropdownItemText: {
+      color: theme.colors.text.primary,
+      fontFamily: theme.typography.fontFamily.regular,
+      fontSize: theme.typography.fontSize.base,
+      textAlign: 'center',
+    },
+    dropdownItemTextSelected: {
+      color: theme.colors.primary,
+      fontFamily: theme.typography.fontFamily.semiBold,
+    },
+    noteContainer: {
+      marginTop: theme.spacing.sm,
+      marginBottom: theme.spacing.base,
+    },
+    noteInput: {
+      backgroundColor: theme.colors.background.card,
+      borderRadius: theme.borderRadius.base,
+      padding: theme.spacing.base,
+      color: theme.colors.text.primary,
+      fontFamily: theme.typography.fontFamily.regular,
+      marginBottom: theme.spacing.base,
+      ...theme.shadows.sm,
+      fontSize: theme.typography.fontSize.base,
+      borderWidth: 1,
+      borderColor: theme.colors.border.default,
+      minHeight: 80,
+      textAlignVertical: 'top',
+    },
+    quickFillContainer: {
+      marginTop: theme.spacing.sm,
+    },
+    quickFillButton: {
+      backgroundColor: theme.colors.primaryLight,
+      paddingVertical: theme.spacing.md,
+      paddingHorizontal: theme.spacing.base,
+      borderRadius: theme.borderRadius.base,
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: theme.colors.primaryBorder,
+    },
+    quickFillButtonText: {
+      color: theme.colors.primary,
+      fontFamily: theme.typography.fontFamily.semiBold,
+      fontSize: theme.typography.fontSize.md,
+    },
+    addSeriesButton: {
+      flexDirection: 'row',
+      backgroundColor: theme.colors.background.button,
+      paddingVertical: theme.spacing.base,
+      paddingHorizontal: theme.spacing.lg,
+      borderRadius: theme.borderRadius.base,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: theme.spacing.xl,
+      ...theme.shadows.sm,
+    },
+    addSeriesButtonText: {
+      color: theme.colors.text.primary,
+      fontFamily: theme.typography.fontFamily.semiBold,
+      fontSize: theme.typography.fontSize.base,
+    },
+    addButton: {
+      backgroundColor: theme.colors.primary,
+      paddingVertical: theme.spacing.lg,
+      borderRadius: theme.borderRadius.base,
+      alignItems: 'center',
+      ...theme.shadows.lg,
+      marginTop: theme.spacing.sm,
+    },
+    addButtonDisabled: {
+      backgroundColor: theme.colors.background.button,
+      ...theme.shadows.sm,
+    },
+    addButtonText: {
+      color: theme.colors.text.primary,
+      fontFamily: theme.typography.fontFamily.bold,
+      fontSize: theme.typography.fontSize.lg,
+    },
+  });
+};
+
 export default function NewWorkoutScreen() {
   const { t } = useTranslation();
+  const { theme } = useTheme();
+  const styles = useStyles();
   const [selectedMuscle, setSelectedMuscle] = useState('');
   const [exercise, setExercise] = useState('');
   const [rpe, setRpe] = useState('');
@@ -274,7 +627,7 @@ export default function NewWorkoutScreen() {
             style={styles.closeButton}
             onPress={() => router.back()}
           >
-            <X color={colors.text.primary} size={24} />
+            <X color={theme.colors.text.primary} size={24} />
           </TouchableOpacity>
         </Animated.View>
       </Animated.View>
@@ -311,7 +664,7 @@ export default function NewWorkoutScreen() {
                 }
               }}
               placeholder={t('enterExerciseName')}
-              placeholderTextColor={colors.text.secondary}
+              placeholderTextColor={theme.colors.text.secondary}
             />
             <TouchableOpacity
               style={styles.backButton}
@@ -326,7 +679,7 @@ export default function NewWorkoutScreen() {
           entering={FadeIn.duration(500).delay(300)} 
         >
           <View style={styles.sectionTitleContainer}>
-            <Layers color={colors.primary} size={24} style={styles.sectionTitleIcon} />
+            <Layers color={theme.colors.primary} size={24} style={styles.sectionTitleIcon} />
             <Animated.Text 
               entering={FadeIn.duration(400)} 
               style={styles.sectionTitle}
@@ -353,7 +706,7 @@ export default function NewWorkoutScreen() {
                         setSeries(newSeries);
                       }}
                     >
-                      <X color={colors.text.primary} size={18} />
+                      <X color={theme.colors.text.primary} size={18} />
                     </TouchableOpacity>
                   )}
                 </View>
@@ -415,7 +768,7 @@ export default function NewWorkoutScreen() {
               <View style={[styles.row]}>
                 <View style={styles.column}>
                   <View style={styles.sectionTitleContainer}>
-                    <Weight color={colors.primary} size={20} style={styles.sectionTitleIcon} />
+                    <Weight color={theme.colors.primary} size={20} style={styles.sectionTitleIcon} />
                     <Text style={styles.seriesInputLabel}>{t('weightKg')}</Text>
                   </View>
                   {index === 0 && suggestedWeight !== null && (
@@ -447,13 +800,13 @@ export default function NewWorkoutScreen() {
                       setSeries(newSeries);
                     }}
                     placeholder="0"
-                    placeholderTextColor={colors.text.secondary}
+                    placeholderTextColor={theme.colors.text.secondary}
                     keyboardType="numeric"
                   />
                 </View>
                 <View style={styles.column}>
                   <View style={styles.sectionTitleContainer}>
-                    <BarChart color={colors.primary} size={20} style={styles.sectionTitleIcon} />
+                    <BarChart color={theme.colors.primary} size={20} style={styles.sectionTitleIcon} />
                     <Text style={styles.seriesInputLabel}>{t('reps')}</Text>
                   </View>
                   <TextInput
@@ -469,13 +822,13 @@ export default function NewWorkoutScreen() {
                       }
                     }}
                     placeholder="0"
-                    placeholderTextColor={colors.text.secondary}
+                    placeholderTextColor={theme.colors.text.secondary}
                     keyboardType="numeric"
                   />
                 </View>
                 <View style={[styles.column]}>
                   <View style={styles.sectionTitleContainer}>
-                    <Gauge color={colors.primary} size={20} style={styles.sectionTitleIcon} />
+                    <Gauge color={theme.colors.primary} size={20} style={styles.sectionTitleIcon} />
                     <Text 
                       style={[
                         styles.seriesInputLabel,
@@ -574,7 +927,7 @@ export default function NewWorkoutScreen() {
                     setSeries(newSeries);
                   }}
                   placeholder={t('optionalNote')}
-                  placeholderTextColor={colors.text.secondary}
+                  placeholderTextColor={theme.colors.text.secondary}
                   multiline
                 />
               </View>
@@ -618,7 +971,7 @@ export default function NewWorkoutScreen() {
               }]);
             }}
           >
-            <Plus color={colors.text.primary} size={20} style={{ marginRight: 8 }} />
+            <Plus color={theme.colors.text.primary} size={20} style={{ marginRight: theme.spacing.sm }} />
             <Text style={styles.addSeriesButtonText}>{t('addSeries')}</Text>
           </TouchableOpacity>
         </Animated.View>
@@ -638,432 +991,3 @@ export default function NewWorkoutScreen() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.main,
-  },
-  serieTypeContainer: {
-    marginBottom: spacing.base,
-  },
-  serieTypeButtonsContainer: {
-    flexDirection: 'row',
-    gap: spacing.md,
-    marginBottom: spacing.sm,
-  },
-  serieTypeButton: {
-    flex: 1,
-    backgroundColor: colors.background.card,
-    borderRadius: borderRadius.lg,
-    padding: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.border.default,
-  },
-  serieTypeButtonSelected: {
-    backgroundColor: colors.primaryLight,
-    borderColor: colors.primaryBorder,
-  },
-  serieTypeButtonText: {
-    color: colors.text.primary,
-    fontFamily: typography.fontFamily.semiBold,
-    fontSize: typography.fontSize.base,
-    marginBottom: spacing.xs,
-    textAlign: 'center',
-  },
-  serieTypeButtonTextSelected: {
-    color: colors.primary,
-  },
-  serieTypeDescription: {
-    color: colors.text.secondary,
-    fontFamily: typography.fontFamily.regular,
-    fontSize: typography.fontSize.sm,
-    textAlign: 'center',
-  },
-  disabledLabel: {
-    color: colors.text.disabled,
-  },
-  disabledLabelNote: {
-    color: colors.text.disabled,
-    fontFamily: typography.fontFamily.regular,
-    fontSize: typography.fontSize.sm,
-  },
-  disabledDropdown: {
-    opacity: 0.7,
-  },
-  disabledDropdownButton: {
-    backgroundColor: colors.background.button,
-    borderColor: colors.border.default,
-  },
-  disabledDropdownButtonText: {
-    color: colors.text.disabled,
-  },
-  dropdownContainer: {
-    position: 'relative',
-    zIndex: theme.zIndex.dropdown,
-    marginBottom: spacing.base,
-  },
-  dropdownButton: {
-    backgroundColor: colors.background.card,
-    borderRadius: borderRadius.md,
-    padding: spacing.sm,
-    ...theme.shadows.sm,
-    borderWidth: 1,
-    borderColor: colors.border.default,
-    height: 44,
-    width: 60,
-  },
-  dropdownButtonText: {
-    color: colors.text.primary,
-    fontFamily: typography.fontFamily.regular,
-    fontSize: typography.fontSize.md,
-    textAlign: 'center',
-  },
-  dropdownList: {
-    position: 'absolute',
-    top: '100%',
-    left: 0,
-    right: 0,
-    backgroundColor: colors.background.card,
-    borderRadius: borderRadius.lg,
-    marginTop: spacing.xs,
-    padding: spacing.sm,
-    ...theme.shadows.md,
-    borderWidth: 1,
-    borderColor: colors.border.default,
-    zIndex: theme.zIndex.dropdown + 1,
-    elevation: theme.zIndex.dropdown + 1,
-    maxHeight: 200,
-  },
-  dropdownScroll: {
-    maxHeight: 200,
-  },
-  dropdownItem: {
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.base,
-    borderRadius: borderRadius.sm,
-  },
-  dropdownItemText: {
-    color: colors.text.primary,
-    fontFamily: typography.fontFamily.regular,
-    fontSize: typography.fontSize.base,
-    textAlign: 'center',
-  },
-  dropdownItemTextSelected: {
-    color: colors.primary,
-    fontFamily: typography.fontFamily.semiBold,
-  },
-  header: {
-    paddingTop: spacing.xl * 1.5,
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.lg,
-    backgroundColor: colors.background.card,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    ...theme.shadows.md,
-  },
-  title: {
-    fontSize: typography.fontSize['3xl'],
-    fontFamily: typography.fontFamily.bold,
-    color: colors.text.primary,
-  },
-  closeButton: {
-    width: 44,
-    height: 44,
-    borderRadius: borderRadius.full,
-    backgroundColor: colors.background.button,
-    justifyContent: 'center',
-    alignItems: 'center',
-    ...theme.shadows.sm,
-  },
-  content: {
-    flex: 1,
-    padding: spacing.lg,
-  },
-  sectionTitle: {
-    fontSize: typography.fontSize.xl,
-    fontFamily: typography.fontFamily.semiBold,
-    color: colors.text.primary,
-    marginBottom: spacing.base,
-    marginTop: spacing.sm,
-  },
-  sectionTitleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.sm,
-  },
-  sectionTitleIcon: {
-    marginRight: spacing.sm,
-  },
-  muscleGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginBottom: spacing.xl,
-    gap: spacing.sm,
-  },
-  muscleButton: {
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
-    borderRadius: borderRadius.full,
-    backgroundColor: colors.background.card,
-    marginRight: spacing.sm,
-    marginBottom: spacing.sm,
-    ...theme.shadows.sm,
-  },
-  muscleButtonSelected: {
-    backgroundColor: colors.primary,
-    ...theme.shadows.primary,
-  },
-  muscleButtonText: {
-    color: colors.text.primary,
-    fontFamily: typography.fontFamily.regular,
-    fontSize: typography.fontSize.md,
-  },
-  muscleButtonTextSelected: {
-    fontFamily: typography.fontFamily.semiBold,
-    color: colors.text.primary,
-  },
-  exerciseGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginBottom: spacing.xl,
-    gap: spacing.sm,
-  },
-  exerciseButton: {
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
-    borderRadius: borderRadius.full,
-    backgroundColor: colors.background.card,
-    marginRight: spacing.sm,
-    marginBottom: spacing.sm,
-    ...theme.shadows.sm,
-  },
-  exerciseButtonSelected: {
-    backgroundColor: colors.primary,
-    ...theme.shadows.primary,
-  },
-  exerciseButtonText: {
-    color: colors.text.primary,
-    fontFamily: typography.fontFamily.regular,
-    fontSize: typography.fontSize.md,
-  },
-  exerciseButtonTextSelected: {
-    fontFamily: typography.fontFamily.semiBold,
-    color: colors.text.primary,
-  },
-  customExerciseContainer: {
-    marginBottom: spacing.xl,
-  },
-  backButton: {
-    marginTop: spacing.md,
-    paddingVertical: spacing.sm,
-    backgroundColor: colors.primaryLight,
-    borderRadius: borderRadius.sm,
-    alignItems: 'center',
-  },
-  backButtonText: {
-    color: colors.primary,
-    fontFamily: typography.fontFamily.semiBold,
-    textAlign: 'center',
-  },
-  input: {
-    backgroundColor: colors.background.card,
-    borderRadius: borderRadius.lg,
-    padding: spacing.base,
-    color: colors.text.primary,
-    fontFamily: typography.fontFamily.regular,
-    marginBottom: spacing.base,
-    ...theme.shadows.sm,
-    fontSize: typography.fontSize.base,
-    borderWidth: 1,
-    borderColor: colors.border.default,
-  },
-  compactInput: {
-    backgroundColor: colors.background.card,
-    borderRadius: borderRadius.md,
-    padding: spacing.sm,
-    color: colors.text.primary,
-    fontFamily: typography.fontFamily.regular,
-    marginBottom: spacing.base,
-    ...theme.shadows.sm,
-    fontSize: typography.fontSize.md,
-    borderWidth: 1,
-    borderColor: colors.border.default,
-    textAlign: 'center',
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: spacing.sm,
-    marginBottom: spacing.base,
-  },
-  column: {
-    flex: 1,
-  },
-  suggestedWeightContainer: {
-    flexDirection: 'column',
-    alignItems: 'center',
-    backgroundColor: 'rgba(253, 143, 9, 0.1)',
-    borderRadius: 10,
-    padding: 8,
-    marginBottom: 8,
-    borderWidth: 1,
-    borderColor: 'rgba(253, 143, 9, 0.3)',
-  },
-  suggestedWeightText: {
-    color: '#fd8f09',
-    fontFamily: 'Inter-SemiBold',
-    fontSize: 12,
-    marginBottom: 4,
-    textAlign: 'center',
-  },
-  useSuggestedButton: {
-    backgroundColor: '#fd8f09',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 6,
-    shadowColor: '#fd8f09',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.3,
-    shadowRadius: 1,
-    elevation: 2,
-  },
-  useSuggestedButtonText: {
-    color: '#fff',
-    fontFamily: 'Inter-SemiBold',
-    fontSize: 11,
-  },
-  addButton: {
-    backgroundColor: '#fd8f09',
-    paddingVertical: 18,
-    borderRadius: 12,
-    alignItems: 'center',
-    shadowColor: '#fd8f09',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4.65,
-    elevation: 8,
-    marginTop: 8,
-  },
-  addButtonDisabled: {
-    backgroundColor: '#333',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-    elevation: 2,
-  },
-  addButtonText: {
-    color: '#fff',
-    fontFamily: 'Inter-Bold',
-    fontSize: 18,
-  },
-  seriesContainer: {
-    backgroundColor: '#1a1a1a',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-    elevation: 2,
-  },
-  seriesHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#333',
-    paddingBottom: 12,
-  },
-  seriesTitle: {
-    color: '#fff',
-    fontFamily: 'Inter-SemiBold',
-    fontSize: 18,
-  },
-  seriesActions: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  seriesActionButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#333',
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-    elevation: 2,
-  },
-  seriesInputLabel: {
-    color: '#fff',
-    fontFamily: 'Inter-SemiBold',
-    fontSize: 16,
-    marginBottom: 8,
-  },
-  noteContainer: {
-    marginTop: 8,
-    marginBottom: 16,
-  },
-  noteInput: {
-    backgroundColor: '#1a1a1a',
-    borderRadius: 12,
-    padding: 16,
-    color: '#fff',
-    fontFamily: 'Inter-Regular',
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-    elevation: 2,
-    fontSize: 16,
-    borderWidth: 1,
-    borderColor: '#333',
-    minHeight: 80,
-    textAlignVertical: 'top',
-  },
-  quickFillContainer: {
-    marginTop: 8,
-  },
-  quickFillButton: {
-    backgroundColor: 'rgba(253, 143, 9, 0.1)',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(253, 143, 9, 0.3)',
-  },
-  quickFillButtonText: {
-    color: '#fd8f09',
-    fontFamily: 'Inter-SemiBold',
-    fontSize: 14,
-  },
-  addSeriesButton: {
-    flexDirection: 'row',
-    backgroundColor: '#333',
-    paddingVertical: 14,
-    paddingHorizontal: 20,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-    elevation: 2,
-  },
-  addSeriesButtonText: {
-    color: '#fff',
-    fontFamily: 'Inter-SemiBold',
-    fontSize: 16,
-  },
-});

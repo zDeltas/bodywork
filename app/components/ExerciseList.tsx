@@ -5,18 +5,52 @@ import Animated, { FadeIn, SlideInRight } from 'react-native-reanimated';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useTheme } from '@/hooks/useTheme';
 
-// Import the muscle groups and predefined exercises from the original file
-import { muscleGroups, predefinedExercises } from '../workout/new';
+// Define muscle groups using translation keys
+export const muscleGroupKeys = [
+  'chest',
+  'back',
+  'legs',
+  'shoulders',
+  'biceps',
+  'triceps',
+  'core'
+];
 
-// Create a mapping of muscle groups to their respective image components
-const muscleImages = {
-  'Poitrine': require('../../assets/images/muscles/chest.png'),
-  'Dos': require('../../assets/images/muscles/back.png'),
-  'Jambes': require('../../assets/images/muscles/legs.png'),
-  'Epaules': require('../../assets/images/muscles/shoulders.png'),
-  'Biceps': require('../../assets/images/muscles/biceps.png'),
-  'Triceps': require('../../assets/images/muscles/triceps.png'),
-  'Ceinture abdominale': require('../../assets/images/muscles/core.png')
+// Function to get translated muscle groups
+export const getMuscleGroups = (t: (key: string) => string) => {
+  return muscleGroupKeys.map(key => t(key));
+};
+
+// Define exercises for each muscle group
+export const predefinedExercisesByKey = {
+  'chest': ['Développé couché', 'Développé incliné', 'Développé décliné', 'Écarté avec haltères', 'Crossover à la poulie'],
+  'back': ['Tractions', 'Tirage vertical', 'Rowing barre', 'Rowing haltère', 'Rowing T-Bar'],
+  'legs': ['Squat', 'Soulevé de terre', 'Presse à jambes', 'Fentes', 'Extension des jambes'],
+  'shoulders': ['Développé militaire', 'Élévations latérales', 'Élévations frontales', 'Oiseau pour deltoïdes postérieurs', 'Haussements d\'épaules'],
+  'biceps': ['Curl barre', 'Curl haltères', 'Curl marteau', 'Curl au pupitre', 'Curl concentration'],
+  'triceps': ['Extension à la poulie', 'Barre au front', 'Extension au-dessus de la tête', 'Dips', 'Développé couché prise serrée'],
+  'core': ['Planche', 'Twists russes', 'Relevés de jambes', 'Crunchs', 'Relevés de genoux suspendu']
+};
+
+// Function to get predefined exercises with translated muscle group names
+export const getPredefinedExercises = (t: (key: string) => string) => {
+  const result: { [key: string]: string[] } = {};
+
+  muscleGroupKeys.forEach(key => {
+    result[t(key)] = predefinedExercisesByKey[key];
+  });
+
+  return result;
+};
+
+const muscleImagesByKey = {
+  'chest': require('../../assets/images/muscles/chest.png'),
+  'back': require('../../assets/images/muscles/back.png'),
+  'legs': require('../../assets/images/muscles/legs.png'),
+  'shoulders': require('../../assets/images/muscles/shoulders.png'),
+  'biceps': require('../../assets/images/muscles/biceps.png'),
+  'triceps': require('../../assets/images/muscles/triceps.png'),
+  'core': require('../../assets/images/muscles/core.png')
 };
 
 
@@ -43,6 +77,10 @@ export const ExerciseList: React.FC<ExerciseListProps> = ({
   const [searchQuery, setSearchQuery] = React.useState('');
   const [expandedMuscleGroups, setExpandedMuscleGroups] = React.useState<string[]>([]);
   const [filteredExercises, setFilteredExercises] = React.useState<{ [key: string]: string[] }>({});
+
+  // Get translated muscle groups and predefined exercises
+  const muscleGroups = getMuscleGroups(t);
+  const predefinedExercises = getPredefinedExercises(t);
 
   // Function to toggle expanded state of a muscle group
   const toggleMuscleGroupExpanded = (muscleGroup: string) => {
@@ -145,7 +183,7 @@ export const ExerciseList: React.FC<ExerciseListProps> = ({
               >
                 <View style={styles.muscleButtonContent}>
                   <Image
-                    source={muscleImages[muscleGroup as keyof typeof muscleImages]}
+                    source={muscleImagesByKey[muscleGroupKeys[index]]}
                     style={[
                       styles.muscleIcon,
                       { width: 32, height: 32 }

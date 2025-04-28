@@ -127,6 +127,8 @@ export default {
   legs: 'Jambes',
   arms: 'Bras',
   shoulders: 'Épaules',
+  biceps: 'Biceps',
+  triceps: 'Triceps',
   core: 'Abdominaux',
   cardio: 'Cardio',
   other: 'Autre',

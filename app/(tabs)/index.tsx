@@ -147,6 +147,7 @@ export default function WorkoutScreen() {
         <View style={styles.calendarSection}>
           <View style={styles.calendarContainer}>
             <Calendar
+              key={theme.colors.background.main}
               theme={{
                 backgroundColor: theme.colors.background.card,
                 calendarBackground: theme.colors.background.card,

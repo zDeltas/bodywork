@@ -1,8 +1,7 @@
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
-import { router } from 'expo-router';
-import { CurvedBottomBar } from 'react-native-curved-bottom-bar';
+import { Tabs } from 'expo-router';
 import { Calendar, ChartLine as LineChart, Clock, Plus, Ruler, Settings } from 'lucide-react-native';
-import Animated from 'react-native-reanimated';
+import { router } from 'expo-router';
 import WorkoutScreen from '@/app/(tabs)/index';
 import TimerScreen from '@/app/(tabs)/timer';
 import StatsScreen from '@/app/(tabs)/stats';
@@ -12,12 +11,6 @@ import { useTheme } from '@/hooks/useTheme';
 import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold, useFonts } from '@expo-google-fonts/inter';
 import * as SplashScreen from 'expo-splash-screen';
 import { useCallback } from 'react';
-
-interface RenderTabBarProps {
-  routeName: string;
-  selectedTab: string;
-  navigate: (routeName: string) => void;
-}
 
 SplashScreen.preventAutoHideAsync();
 
@@ -37,27 +30,6 @@ export default function TabLayout() {
     }
   }, [fontsLoaded, fontError]);
 
-  const _renderIcon = (routeName: string, selectedTab: string) => {
-    const isSelected = routeName === selectedTab;
-    const color = isSelected ? theme.colors.primary : theme.colors.text.secondary;
-    const size = 24;
-
-    switch (routeName) {
-      case 'index':
-        return <Calendar size={size} color={color} />;
-      case 'timer':
-        return <Clock size={size} color={color} />;
-      case 'stats':
-        return <LineChart size={size} color={color} />;
-      case 'measurements':
-        return <Ruler size={size} color={color} />;
-      case 'settings':
-        return <Settings size={size} color={color} />;
-      default:
-        return null;
-    }
-  };
-
   const handleAddButtonPress = () => {
     const today = new Date().toISOString().split('T')[0];
     router.push({
@@ -66,68 +38,86 @@ export default function TabLayout() {
     });
   };
 
-  const renderTabBar = ({ routeName, selectedTab, navigate }: RenderTabBarProps) => {
-    return (
-      <TouchableOpacity onPress={() => navigate(routeName)} style={styles.tabbarItem}>
-        {_renderIcon(routeName, selectedTab)}
-      </TouchableOpacity>
-    );
-  };
-
   if (!fontsLoaded && !fontError) {
     return null;
   }
 
   return (
     <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
-      <CurvedBottomBar.Navigator
-        type="DOWN"
-        style={styles.bottomBar}
-        height={65}
-        bgColor={theme.colors.background.card}
-        initialRouteName="index"
-        circlePosition="RIGHT"
-        renderCircle={() => (
-          <Animated.View style={styles.btnCircleUp}>
-            <Plus
-              color={theme.colors.text.primary}
-              size={28}
-              onPress={handleAddButtonPress}
-            />
-          </Animated.View>
-        )}
-        tabBar={renderTabBar}>
-        <CurvedBottomBar.Screen
+      <Tabs
+        screenOptions={{
+          tabBarActiveTintColor: theme.colors.primary,
+          tabBarInactiveTintColor: theme.colors.text.secondary,
+          tabBarStyle: {
+            backgroundColor: theme.colors.background.card,
+            borderTopWidth: 0,
+            elevation: 0,
+            shadowOpacity: 0,
+            height: 60,
+            paddingBottom: 10,
+          },
+          tabBarLabelStyle: {
+            fontFamily: 'Inter-Regular',
+            fontSize: 12,
+          },
+          headerShown: false,
+        }}
+      >
+        <Tabs.Screen
           name="index"
-          position="LEFT"
-          component={WorkoutScreen}
-          options={{ headerShown: false }}
+          options={{
+            title: "Workouts",
+            tabBarIcon: ({ color, size }) => (
+              <Calendar size={size} color={color} />
+            ),
+          }}
         />
-        <CurvedBottomBar.Screen
+        <Tabs.Screen
           name="timer"
-          position="LEFT"
-          component={TimerScreen}
-          options={{ headerShown: false }}
+          options={{
+            title: "Timer",
+            tabBarIcon: ({ color, size }) => (
+              <Clock size={size} color={color} />
+            ),
+          }}
         />
-        <CurvedBottomBar.Screen
+        <Tabs.Screen
           name="stats"
-          position="LEFT"
-          component={StatsScreen}
-          options={{ headerShown: false }}
+          options={{
+            title: "Stats",
+            tabBarIcon: ({ color, size }) => (
+              <LineChart size={size} color={color} />
+            ),
+          }}
         />
-        <CurvedBottomBar.Screen
+        <Tabs.Screen
           name="measurements"
-          position="LEFT"
-          component={MeasurementsScreen}
-          options={{ headerShown: false }}
+          options={{
+            title: "Measures",
+            tabBarIcon: ({ color, size }) => (
+              <Ruler size={size} color={color} />
+            ),
+          }}
         />
-        <CurvedBottomBar.Screen
+        <Tabs.Screen
           name="settings"
-          position="LEFT"
-          component={SettingsScreen}
-          options={{ headerShown: false }}
+          options={{
+            title: "Settings",
+            tabBarIcon: ({ color, size }) => (
+              <Settings size={size} color={color} />
+            ),
+          }}
         />
-      </CurvedBottomBar.Navigator>
+      </Tabs>
+
+      {/* Floating Action Button */}
+      <TouchableOpacity
+        style={styles.floatingButton}
+        onPress={handleAddButtonPress}
+        activeOpacity={0.8}
+      >
+        <Plus color={theme.colors.text.primary} size={28} />
+      </TouchableOpacity>
     </View>
   );
 }
@@ -137,17 +127,16 @@ const useStyles = () => {
   const { theme } = useTheme();
 
   return StyleSheet.create({
-    bottomBar: {
-      backgroundColor: theme.colors.background.main,
-    },
-    btnCircleUp: {
+    floatingButton: {
+      position: 'absolute',
       width: 60,
       height: 60,
       borderRadius: theme.borderRadius.full,
       alignItems: 'center',
       justifyContent: 'center',
       backgroundColor: theme.colors.primary,
-      bottom: theme.spacing.lg,
+      bottom: 70,
+      right: theme.spacing.base,
       ...theme.shadows.primary,
       shadowColor: theme.colors.primary,
       shadowOffset: {
@@ -157,11 +146,7 @@ const useStyles = () => {
       shadowOpacity: 0.3,
       shadowRadius: 2,
       elevation: 5,
-    },
-    tabbarItem: {
-      flex: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
+      zIndex: 999,
     },
   });
 };

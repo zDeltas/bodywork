@@ -9,6 +9,13 @@ import { useTheme } from '@/hooks/useTheme';
 // Import the muscle groups and predefined exercises from the original file
 import { muscleGroups, muscleGroupIcons, predefinedExercises } from '../workout/new';
 
+import BackMuscle from '@/assets/images/muscles/back.png';
+import ChestMuscle from '@/assets/images/muscles/chest.png';
+import BicepsMuscle from '@/assets/images/muscles/biceps.png';
+import TricepsMuscle from '@/assets/images/muscles/triceps.png';
+import ShouldersMuscle from '@/assets/images/muscles/shoulders.png';
+
+
 interface ExerciseListProps {
   selectedMuscle: string;
   setSelectedMuscle: (muscleGroup: string) => void;
@@ -17,6 +24,15 @@ interface ExerciseListProps {
   setIsCustomExercise?: (isCustom: boolean) => void;
   onExerciseSelect?: (exercise: string) => void;
 }
+
+export const muscleGroupIcons = {
+  'Dos': BackMuscle,
+  'Poitrine': ChestMuscle,
+  'Biceps': BicepsMuscle,
+  'Triceps': TricepsMuscle,
+  'Épaules': ShouldersMuscle,
+};
+
 
 export const ExerciseList: React.FC<ExerciseListProps> = ({
   selectedMuscle,

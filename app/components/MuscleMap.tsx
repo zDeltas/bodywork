@@ -1,12 +1,6 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Pressable, Text } from 'react-native';
-import Animated, {
-  useAnimatedStyle,
-  withSpring,
-  useSharedValue,
-  withTiming
-} from 'react-native-reanimated';
-import { router } from 'expo-router';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import Body, { ExtendedBodyPart, Slug } from 'react-native-body-highlighter';
 import { differenceInHours } from 'date-fns';
 import { useSettings } from '@/hooks/useSettings';
@@ -30,29 +24,29 @@ interface MuscleMapProps {
 }
 
 const muscleSlugs: Record<string, Slug> = {
-  CHEST: "chest" as Slug,
-  ABS: "abs" as Slug,
-  BICEPS: "biceps" as Slug,
-  UPPER_BACK: "upper-back" as Slug,
-  LOWER_BACK: "lower-back" as Slug,
-  TRICEPS: "triceps" as Slug,
-  DELTOIDS: "deltoids" as Slug,
-  TRAPEZIUS: "trapezius" as Slug,
-  QUADRICEPS: "quadriceps" as Slug,
-  CALVES: "calves" as Slug,
-  HAMSTRING: "hamstring" as Slug,
-  GLUTEAL: "gluteal" as Slug,
-  FOREARM: "forearm" as Slug,
-  ADDUCTORS: "adductors" as Slug,
-  HAIR: "hair" as Slug,
-  NECK: "neck" as Slug,
-  HANDS: "hands" as Slug,
-  FEET: "feet" as Slug,
-  HEAD: "head" as Slug,
-  ANKLES: "ankles" as Slug,
-  TIBIALIS: "tibialis" as Slug,
-  OBLIQUES: "obliques" as Slug,
-  KNEES: "knees" as Slug,
+  CHEST: 'chest' as Slug,
+  ABS: 'abs' as Slug,
+  BICEPS: 'biceps' as Slug,
+  UPPER_BACK: 'upper-back' as Slug,
+  LOWER_BACK: 'lower-back' as Slug,
+  TRICEPS: 'triceps' as Slug,
+  DELTOIDS: 'deltoids' as Slug,
+  TRAPEZIUS: 'trapezius' as Slug,
+  QUADRICEPS: 'quadriceps' as Slug,
+  CALVES: 'calves' as Slug,
+  HAMSTRING: 'hamstring' as Slug,
+  GLUTEAL: 'gluteal' as Slug,
+  FOREARM: 'forearm' as Slug,
+  ADDUCTORS: 'adductors' as Slug,
+  HAIR: 'hair' as Slug,
+  NECK: 'neck' as Slug,
+  HANDS: 'hands' as Slug,
+  FEET: 'feet' as Slug,
+  HEAD: 'head' as Slug,
+  ANKLES: 'ankles' as Slug,
+  TIBIALIS: 'tibialis' as Slug,
+  OBLIQUES: 'obliques' as Slug,
+  KNEES: 'knees' as Slug
 };
 
 const muscleGroupToSlug: Record<string, Slug> = {
@@ -62,7 +56,7 @@ const muscleGroupToSlug: Record<string, Slug> = {
   'Shoulders': muscleSlugs.DELTOIDS,
   'Biceps': muscleSlugs.BICEPS,
   'Triceps': muscleSlugs.TRICEPS,
-  'Core': muscleSlugs.ABS,
+  'Core': muscleSlugs.ABS
 };
 
 export default function MuscleMap({ workouts }: MuscleMapProps) {
@@ -84,7 +78,7 @@ export default function MuscleMap({ workouts }: MuscleMapProps) {
   };
 
   const containerStyle = useAnimatedStyle(() => ({
-    transform: [{ rotateY: `${rotationValue.value}deg` }],
+    transform: [{ rotateY: `${rotationValue.value}deg` }]
   }));
 
   // Calculer l'état de repos des muscles
@@ -179,66 +173,66 @@ const useStyles = () => {
       padding: theme.spacing.md,
       borderRadius: theme.borderRadius.lg,
       width: '100%',
-      ...theme.shadows.md,
+      ...theme.shadows.md
     },
     viewToggle: {
       flexDirection: 'row',
       marginBottom: theme.spacing.md,
       backgroundColor: theme.colors.background.button,
       borderRadius: theme.borderRadius.full,
-      padding: theme.spacing.xs,
+      padding: theme.spacing.xs
     },
     toggleButton: {
       paddingHorizontal: theme.spacing.lg,
       paddingVertical: theme.spacing.sm,
-      borderRadius: theme.borderRadius.full,
+      borderRadius: theme.borderRadius.full
     },
     toggleButtonActive: {
-      backgroundColor: theme.colors.primary,
+      backgroundColor: theme.colors.primary
     },
     toggleText: {
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.semiBold,
-      fontSize: theme.typography.fontSize.sm,
+      fontSize: theme.typography.fontSize.sm
     },
     bodyContainer: {
       width: '100%',
       alignItems: 'center',
       justifyContent: 'center',
-      marginBottom: theme.spacing.md,
+      marginBottom: theme.spacing.md
     },
     legend: {
       backgroundColor: theme.colors.background.main,
       borderRadius: theme.borderRadius.md,
       padding: theme.spacing.md,
       marginTop: theme.spacing.lg,
-      width: '100%',
+      width: '100%'
     },
     legendTitle: {
       fontSize: theme.typography.fontSize.base,
       fontFamily: theme.typography.fontFamily.semiBold,
       color: theme.colors.text.primary,
       marginBottom: theme.spacing.sm,
-      textAlign: 'center',
+      textAlign: 'center'
     },
     legendItems: {
       flexDirection: 'row',
-      justifyContent: 'space-around',
+      justifyContent: 'space-around'
     },
     legendItem: {
       flexDirection: 'row',
-      alignItems: 'center',
+      alignItems: 'center'
     },
     legendColor: {
       width: 16,
       height: 16,
       borderRadius: 8,
-      marginRight: theme.spacing.sm,
+      marginRight: theme.spacing.sm
     },
     legendText: {
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.regular,
-      fontSize: theme.typography.fontSize.sm,
-    },
+      fontSize: theme.typography.fontSize.sm
+    }
   });
 };

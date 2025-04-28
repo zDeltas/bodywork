@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Define the shape of our settings
@@ -14,7 +14,7 @@ const defaultSettings: Settings = {
   weightUnit: 'kg',
   gender: 'male',
   language: 'fr',
-  theme: 'dark',
+  theme: 'dark'
 };
 
 // Create context with default values
@@ -26,8 +26,9 @@ interface SettingsContextType {
 
 const SettingsContext = createContext<SettingsContextType>({
   settings: defaultSettings,
-  updateSettings: async () => {},
-  isLoading: true,
+  updateSettings: async () => {
+  },
+  isLoading: true
 });
 
 // Storage keys

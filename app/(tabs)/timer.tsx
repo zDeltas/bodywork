@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import Timer from '../components/Timer';
@@ -27,7 +27,7 @@ const useStyles = () => {
   return StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: theme.colors.background.main,
+      backgroundColor: theme.colors.background.main
     },
     header: {
       paddingTop: theme.spacing.xl * 2,
@@ -36,51 +36,51 @@ const useStyles = () => {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      backgroundColor: theme.colors.background.card,
+      backgroundColor: theme.colors.background.card
     },
     title: {
       fontSize: theme.typography.fontSize['3xl'],
       fontFamily: theme.typography.fontFamily.bold,
-      color: theme.colors.text.primary,
+      color: theme.colors.text.primary
     },
     modeSelector: {
       flexDirection: 'row',
       backgroundColor: theme.colors.background.button,
       borderRadius: theme.borderRadius.full,
-      padding: theme.spacing.xs,
+      padding: theme.spacing.xs
     },
     modeButton: {
       paddingVertical: theme.spacing.sm,
       paddingHorizontal: theme.spacing.lg,
-      borderRadius: theme.borderRadius.full,
+      borderRadius: theme.borderRadius.full
     },
     modeButtonActive: {
-      backgroundColor: theme.colors.primary,
+      backgroundColor: theme.colors.primary
     },
     modeText: {
       fontFamily: theme.typography.fontFamily.semiBold,
       fontSize: theme.typography.fontSize.sm,
-      color: theme.colors.text.secondary,
+      color: theme.colors.text.secondary
     },
     modeTextActive: {
-      color: theme.colors.text.primary,
+      color: theme.colors.text.primary
     },
     content: {
       flex: 1,
-      padding: theme.spacing.lg,
+      padding: theme.spacing.lg
     },
     sectionTitle: {
       fontSize: theme.typography.fontSize.xl,
       fontFamily: theme.typography.fontFamily.bold,
       color: theme.colors.text.primary,
       marginBottom: theme.spacing.md,
-      marginTop: theme.spacing.lg,
+      marginTop: theme.spacing.lg
     },
     timeGrid: {
       flexDirection: 'row',
       flexWrap: 'wrap',
       justifyContent: 'space-between',
-      marginBottom: theme.spacing.lg,
+      marginBottom: theme.spacing.lg
     },
     timeButton: {
       width: '48%',
@@ -89,21 +89,21 @@ const useStyles = () => {
       padding: theme.spacing.md,
       marginBottom: theme.spacing.md,
       alignItems: 'center',
-      ...theme.shadows.sm,
+      ...theme.shadows.sm
     },
     timeButtonActive: {
       backgroundColor: theme.colors.primary,
       borderColor: theme.colors.primary,
-      borderWidth: 2,
+      borderWidth: 2
     },
     timeText: {
       fontFamily: theme.typography.fontFamily.semiBold,
       fontSize: theme.typography.fontSize.base,
-      color: theme.colors.text.primary,
+      color: theme.colors.text.primary
     },
     timeTextActive: {
       color: theme.colors.text.primary,
-      fontWeight: 'bold',
+      fontWeight: 'bold'
     },
     customTimeButton: {
       width: '48%',
@@ -112,20 +112,20 @@ const useStyles = () => {
       padding: theme.spacing.md,
       marginBottom: theme.spacing.md,
       alignItems: 'center',
-      ...theme.shadows.sm,
+      ...theme.shadows.sm
     },
     customTimeButtonActive: {
       backgroundColor: theme.colors.primary,
       borderColor: theme.colors.primary,
-      borderWidth: 2,
+      borderWidth: 2
     },
     customTimeText: {
       fontFamily: theme.typography.fontFamily.semiBold,
       fontSize: theme.typography.fontSize.base,
-      color: theme.colors.text.primary,
+      color: theme.colors.text.primary
     },
     customTimeTextActive: {
-      color: theme.colors.text.primary,
+      color: theme.colors.text.primary
     },
     input: {
       backgroundColor: theme.colors.background.input,
@@ -134,7 +134,7 @@ const useStyles = () => {
       marginBottom: theme.spacing.lg,
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.regular,
-      fontSize: theme.typography.fontSize.base,
+      fontSize: theme.typography.fontSize.base
     },
     setsContainer: {
       flexDirection: 'row',
@@ -143,16 +143,16 @@ const useStyles = () => {
       backgroundColor: theme.colors.background.card,
       borderRadius: theme.borderRadius.md,
       padding: theme.spacing.lg,
-      marginBottom: theme.spacing.lg,
+      marginBottom: theme.spacing.lg
     },
     setsLabel: {
       fontFamily: theme.typography.fontFamily.semiBold,
       fontSize: theme.typography.fontSize.base,
-      color: theme.colors.text.primary,
+      color: theme.colors.text.primary
     },
     setsControls: {
       flexDirection: 'row',
-      alignItems: 'center',
+      alignItems: 'center'
     },
     setsButton: {
       width: 40,
@@ -160,7 +160,7 @@ const useStyles = () => {
       borderRadius: 20,
       backgroundColor: theme.colors.background.button,
       justifyContent: 'center',
-      alignItems: 'center',
+      alignItems: 'center'
     },
     setsValue: {
       fontFamily: theme.typography.fontFamily.bold,
@@ -168,7 +168,7 @@ const useStyles = () => {
       color: theme.colors.text.primary,
       marginHorizontal: theme.spacing.md,
       minWidth: 30,
-      textAlign: 'center',
+      textAlign: 'center'
     },
     startButton: {
       backgroundColor: theme.colors.primary,
@@ -176,13 +176,13 @@ const useStyles = () => {
       padding: theme.spacing.md,
       alignItems: 'center',
       marginTop: theme.spacing.lg,
-      ...theme.shadows.md,
+      ...theme.shadows.md
     },
     startButtonText: {
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.semiBold,
-      fontSize: theme.typography.fontSize.lg,
-    },
+      fontSize: theme.typography.fontSize.lg
+    }
   });
 };
 
@@ -422,28 +422,28 @@ export default function TimerScreen() {
         styles={{
           backgroundColor: theme.colors.background.card,
           pickerContainer: {
-            backgroundColor: theme.colors.background.card,
+            backgroundColor: theme.colors.background.card
           },
           pickerItem: {
             color: theme.colors.text.primary,
-            fontSize: theme.typography.fontSize['3xl'],
+            fontSize: theme.typography.fontSize['3xl']
           },
           pickerLabel: {
             color: theme.colors.text.primary,
             fontSize: theme.typography.fontSize.xl,
-            right: -20,
+            right: -20
           },
           theme: 'dark',
           pickerLabelContainer: {
-            width: 60,
+            width: 60
           },
           pickerItemContainer: {
-            width: 150,
+            width: 150
           },
           confirmButton: {
             backgroundColor: theme.colors.primary,
-            borderColor: theme.colors.primary,
-          },
+            borderColor: theme.colors.primary
+          }
         }}
         hideHours={true}
         padWithNItems={1}
@@ -467,28 +467,28 @@ export default function TimerScreen() {
         styles={{
           backgroundColor: theme.colors.background.card,
           pickerContainer: {
-            backgroundColor: theme.colors.background.card,
+            backgroundColor: theme.colors.background.card
           },
           pickerItem: {
             color: theme.colors.text.primary,
-            fontSize: theme.typography.fontSize['3xl'],
+            fontSize: theme.typography.fontSize['3xl']
           },
           pickerLabel: {
             color: theme.colors.text.primary,
             fontSize: theme.typography.fontSize.xl,
-            right: -20,
+            right: -20
           },
           theme: 'dark',
           pickerLabelContainer: {
-            width: 60,
+            width: 60
           },
           pickerItemContainer: {
-            width: 150,
+            width: 150
           },
           confirmButton: {
             backgroundColor: theme.colors.primary,
-            borderColor: theme.colors.primary,
-          },
+            borderColor: theme.colors.primary
+          }
         }}
         hideHours={true}
         padWithNItems={1}

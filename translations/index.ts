@@ -3,7 +3,7 @@ import fr from './fr';
 
 export const translations = {
   en,
-  fr,
+  fr
 };
 
 // Create a type for the translation keys based on the English translations

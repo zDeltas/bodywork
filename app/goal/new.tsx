@@ -1,13 +1,22 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert, ActivityIndicator } from 'react-native';
-import { useFonts, Inter_400Regular, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
+import {
+  ActivityIndicator,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from 'react-native';
+import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold, useFonts } from '@expo-google-fonts/inter';
 import * as SplashScreen from 'expo-splash-screen';
 import { router } from 'expo-router';
-import { X, ChevronDown } from 'lucide-react-native';
+import { ChevronDown, X } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Ionicons } from '@expo/vector-icons';
-import { predefinedExercises, muscleGroups } from '@/app/workout/new';
+import { muscleGroups, predefinedExercises } from '@/app/workout/new';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { useTheme } from '@/hooks/useTheme';
@@ -21,7 +30,7 @@ const useStyles = () => {
   return StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: theme.colors.background.main,
+      backgroundColor: theme.colors.background.main
     },
     header: {
       paddingTop: theme.spacing.xl * 1.5,
@@ -31,12 +40,12 @@ const useStyles = () => {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      ...theme.shadows.md,
+      ...theme.shadows.md
     },
     title: {
       fontSize: theme.typography.fontSize['3xl'],
       fontFamily: theme.typography.fontFamily.bold,
-      color: theme.colors.text.primary,
+      color: theme.colors.text.primary
     },
     closeButton: {
       width: 44,
@@ -45,34 +54,34 @@ const useStyles = () => {
       backgroundColor: theme.colors.background.button,
       justifyContent: 'center',
       alignItems: 'center',
-      ...theme.shadows.sm,
+      ...theme.shadows.sm
     },
     content: {
       flex: 1,
-      padding: theme.spacing.lg,
+      padding: theme.spacing.lg
     },
     formCard: {
       backgroundColor: theme.colors.background.card,
       borderRadius: theme.borderRadius.lg,
       padding: theme.spacing.lg,
       marginBottom: theme.spacing.xl,
-      ...theme.shadows.sm,
+      ...theme.shadows.sm
     },
     sectionTitle: {
       fontSize: theme.typography.fontSize.xl,
       fontFamily: theme.typography.fontFamily.semiBold,
       color: theme.colors.text.primary,
       marginBottom: theme.spacing.lg,
-      textAlign: 'center',
+      textAlign: 'center'
     },
     formGroup: {
-      marginBottom: theme.spacing.base,
+      marginBottom: theme.spacing.base
     },
     formLabel: {
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.semiBold,
       fontSize: theme.typography.fontSize.base,
-      marginBottom: theme.spacing.sm,
+      marginBottom: theme.spacing.sm
     },
     formInput: {
       backgroundColor: theme.colors.background.input,
@@ -85,12 +94,12 @@ const useStyles = () => {
       borderWidth: 1,
       borderColor: theme.colors.border.default,
       flex: 1,
-      height: 48,
+      height: 48
     },
     weightInputContainer: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: theme.spacing.sm,
+      gap: theme.spacing.sm
     },
     suggestedButton: {
       backgroundColor: theme.colors.background.button,
@@ -100,12 +109,12 @@ const useStyles = () => {
       height: 48,
       justifyContent: 'center',
       alignItems: 'center',
-      minWidth: 80,
+      minWidth: 80
     },
     suggestedButtonText: {
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.semiBold,
-      fontSize: theme.typography.fontSize.sm,
+      fontSize: theme.typography.fontSize.sm
     },
     saveButton: {
       backgroundColor: theme.colors.primary,
@@ -113,16 +122,16 @@ const useStyles = () => {
       borderRadius: theme.borderRadius.base,
       alignItems: 'center',
       marginTop: theme.spacing.lg,
-      ...theme.shadows.lg,
+      ...theme.shadows.lg
     },
     saveButtonDisabled: {
       backgroundColor: theme.colors.background.button,
-      ...theme.shadows.sm,
+      ...theme.shadows.sm
     },
     saveButtonText: {
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.bold,
-      fontSize: theme.typography.fontSize.lg,
+      fontSize: theme.typography.fontSize.lg
     },
     modalOverlay: {
       position: 'absolute',
@@ -133,7 +142,7 @@ const useStyles = () => {
       backgroundColor: 'rgba(0, 0, 0, 0.7)', // Keep semi-transparent black
       justifyContent: 'center',
       alignItems: 'center',
-      zIndex: theme.zIndex.modal,
+      zIndex: theme.zIndex.modal
     },
     modalContainer: {
       backgroundColor: theme.colors.background.card,
@@ -141,14 +150,14 @@ const useStyles = () => {
       padding: theme.spacing.lg,
       width: '90%',
       maxHeight: '80%',
-      ...theme.shadows.lg,
+      ...theme.shadows.lg
     },
     modalTitle: {
       fontSize: theme.typography.fontSize.xl,
       fontFamily: theme.typography.fontFamily.bold,
       color: theme.colors.text.primary,
       marginBottom: theme.spacing.lg,
-      textAlign: 'center',
+      textAlign: 'center'
     },
     searchContainer: {
       flexDirection: 'row',
@@ -158,10 +167,10 @@ const useStyles = () => {
       paddingHorizontal: theme.spacing.md,
       paddingVertical: theme.spacing.sm,
       marginBottom: theme.spacing.md,
-      ...theme.shadows.sm,
+      ...theme.shadows.sm
     },
     searchIcon: {
-      marginRight: theme.spacing.sm,
+      marginRight: theme.spacing.sm
     },
     searchInput: {
       backgroundColor: theme.colors.background.input, // Reuse for consistency inside container
@@ -170,7 +179,7 @@ const useStyles = () => {
       fontSize: theme.typography.fontSize.base,
       flex: 1, // Make search input take available space
       height: 24, // Match icon size roughly
-      padding: 0, // Remove padding, handled by container
+      padding: 0 // Remove padding, handled by container
     },
     exerciseList: {
       // No specific styles needed here, ScrollView manages layout
@@ -179,15 +188,15 @@ const useStyles = () => {
       paddingVertical: theme.spacing.md,
       paddingHorizontal: theme.spacing.base,
       borderBottomWidth: 1,
-      borderBottomColor: theme.colors.border.default,
+      borderBottomColor: theme.colors.border.default
     },
     exerciseOptionText: {
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.regular,
-      fontSize: theme.typography.fontSize.base,
+      fontSize: theme.typography.fontSize.base
     },
     muscleGroupContainer: {
-      marginBottom: theme.spacing.base, // Add margin between groups
+      marginBottom: theme.spacing.base // Add margin between groups
     },
     muscleGroupHeader: {
       flexDirection: 'row',
@@ -198,12 +207,12 @@ const useStyles = () => {
       borderBottomWidth: 1,
       borderBottomColor: theme.colors.border.default,
       backgroundColor: theme.colors.background.button, // Distinguish header slightly
-      width: '100%', // Ensure header takes full width
+      width: '100%' // Ensure header takes full width
     },
     muscleGroupTitle: {
       color: theme.colors.primary,
       fontFamily: theme.typography.fontFamily.semiBold,
-      fontSize: theme.typography.fontSize.base,
+      fontSize: theme.typography.fontSize.base
     },
     exerciseGrid: {
       flexDirection: 'row',
@@ -211,7 +220,7 @@ const useStyles = () => {
       padding: theme.spacing.sm,
       gap: theme.spacing.sm,
       width: '100%',
-      backgroundColor: theme.colors.background.card, // Match card background
+      backgroundColor: theme.colors.background.card // Match card background
     },
     exerciseButton: {
       paddingHorizontal: theme.spacing.md,
@@ -219,32 +228,32 @@ const useStyles = () => {
       borderRadius: theme.borderRadius.full,
       backgroundColor: theme.colors.background.input,
       borderWidth: 1,
-      borderColor: theme.colors.border.default,
+      borderColor: theme.colors.border.default
     },
     exerciseButtonSelected: {
       backgroundColor: theme.colors.primary,
-      borderColor: theme.colors.primary,
+      borderColor: theme.colors.primary
     },
     exerciseButtonText: {
       color: theme.colors.text.secondary,
       fontFamily: theme.typography.fontFamily.regular,
-      fontSize: theme.typography.fontSize.sm,
+      fontSize: theme.typography.fontSize.sm
     },
     exerciseButtonTextSelected: {
       color: theme.colors.text.primary,
-      fontFamily: theme.typography.fontFamily.semiBold,
+      fontFamily: theme.typography.fontFamily.semiBold
     },
     cancelButton: {
       backgroundColor: theme.colors.background.button,
       borderRadius: theme.borderRadius.md,
       padding: theme.spacing.md,
       alignItems: 'center',
-      marginTop: theme.spacing.md,
+      marginTop: theme.spacing.md
     },
     cancelButtonText: {
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.semiBold,
-      fontSize: theme.typography.fontSize.base,
+      fontSize: theme.typography.fontSize.base
     },
     exerciseSelectorButton: { // Style for the touchable opacity wrapping the selector text/icon
       flexDirection: 'row',
@@ -258,17 +267,17 @@ const useStyles = () => {
       borderWidth: 1,
       borderColor: theme.colors.border.default,
       height: 48,
-      flex: 1,
+      flex: 1
     },
     exerciseSelectorText: { // Style for the text inside the selector button
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.regular,
       fontSize: theme.typography.fontSize.base,
       flex: 1,
-      marginRight: theme.spacing.sm,
+      marginRight: theme.spacing.sm
     },
     loadingIndicator: { // Style for the loading indicator
-      marginLeft: theme.spacing.sm,
+      marginLeft: theme.spacing.sm
     },
     // Added for completeness, if used elsewhere
     useSuggestedButton: {
@@ -280,12 +289,12 @@ const useStyles = () => {
       height: 48,
       justifyContent: 'center',
       alignItems: 'center',
-      minWidth: 80,
+      minWidth: 80
     },
     useSuggestedButtonText: {
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.semiBold,
-      fontSize: theme.typography.fontSize.sm,
+      fontSize: theme.typography.fontSize.sm
     },
     suggestedTargetContainer: {
       flexDirection: 'row',
@@ -295,14 +304,14 @@ const useStyles = () => {
       padding: theme.spacing.sm,
       marginTop: theme.spacing.sm,
       borderWidth: 1,
-      borderColor: theme.colors.primaryBorder,
+      borderColor: theme.colors.primaryBorder
     },
     suggestedTargetText: {
       color: theme.colors.primary,
       fontFamily: theme.typography.fontFamily.semiBold,
       fontSize: theme.typography.fontSize.sm,
-      flex: 1,
-    },
+      flex: 1
+    }
   });
 };
 
@@ -323,7 +332,7 @@ export default function NewGoalScreen() {
   const [fontsLoaded] = useFonts({
     'Inter-Regular': Inter_400Regular,
     'Inter-SemiBold': Inter_600SemiBold,
-    'Inter-Bold': Inter_700Bold,
+    'Inter-Bold': Inter_700Bold
   });
 
   const onLayoutRootView = useCallback(async () => {
@@ -483,7 +492,7 @@ export default function NewGoalScreen() {
     <View style={styles.container} onLayout={onLayoutRootView}>
       <View style={styles.header}>
         <Text style={styles.title}>{t('addGoal')}</Text>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.closeButton}
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -495,8 +504,8 @@ export default function NewGoalScreen() {
       </View>
 
       <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: 100 }}>
-        <Animated.View 
-          entering={FadeIn.duration(400).delay(100)} 
+        <Animated.View
+          entering={FadeIn.duration(400).delay(100)}
           style={styles.formCard}
         >
           <Text style={styles.sectionTitle}>{t('goalDetails')}</Text>
@@ -510,13 +519,13 @@ export default function NewGoalScreen() {
                 setShowExerciseSelector(true);
               }}
             >
-              <Text 
+              <Text
                 style={[
-                  styles.exerciseSelectorText, 
+                  styles.exerciseSelectorText,
                   !newGoalExercise && { color: theme.colors.text.secondary }
                 ]}
                 numberOfLines={1}
-                ellipsizeMode='tail'
+                ellipsizeMode="tail"
               >
                 {newGoalExercise || t('selectExerciseForGoal')}
               </Text>
@@ -555,7 +564,7 @@ export default function NewGoalScreen() {
                   }}
                 >
                   {isLoadingLastWorkout ? (
-                    <ActivityIndicator size="small" color={theme.colors.text.primary} style={styles.loadingIndicator}/>
+                    <ActivityIndicator size="small" color={theme.colors.text.primary} style={styles.loadingIndicator} />
                   ) : (
                     <Text style={styles.suggestedButtonText}>{t('useLastWorkout')}</Text>
                   )}
@@ -589,7 +598,7 @@ export default function NewGoalScreen() {
             </View>
           </View>
 
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[styles.saveButton, (!newGoalExercise || !newGoalCurrent || !newGoalTarget) && styles.saveButtonDisabled]}
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -604,13 +613,13 @@ export default function NewGoalScreen() {
 
       {/* Exercise Selector Modal */}
       {showExerciseSelector && (
-        <Animated.View 
-          entering={FadeIn.duration(300)} 
+        <Animated.View
+          entering={FadeIn.duration(300)}
           exiting={FadeOut.duration(300)}
           style={styles.modalOverlay}
         >
-          <Animated.View 
-            entering={FadeIn.duration(400).delay(100)} 
+          <Animated.View
+            entering={FadeIn.duration(400).delay(100)}
             style={styles.modalContainer}
           >
             <Text style={styles.modalTitle}>{t('selectExerciseForGoal')}</Text>
@@ -627,7 +636,7 @@ export default function NewGoalScreen() {
                 autoCorrect={false}
               />
               {searchQuery.length > 0 && (
-                <TouchableOpacity 
+                <TouchableOpacity
                   onPress={() => {
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                     setSearchQuery('');
@@ -674,7 +683,7 @@ export default function NewGoalScreen() {
               <ScrollView style={styles.exerciseList}>
                 {muscleGroups.map((muscleGroup) => (
                   <View key={muscleGroup} style={styles.muscleGroupContainer}>
-                    <TouchableOpacity 
+                    <TouchableOpacity
                       style={styles.muscleGroupHeader}
                       onPress={() => {
                         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -682,9 +691,9 @@ export default function NewGoalScreen() {
                       }}
                     >
                       <Text style={styles.muscleGroupTitle}>{muscleGroup}</Text>
-                      <Ionicons 
-                        name={selectedMuscleGroup === muscleGroup ? "chevron-up" : "chevron-down"} 
-                        size={20} 
+                      <Ionicons
+                        name={selectedMuscleGroup === muscleGroup ? 'chevron-up' : 'chevron-down'}
+                        size={20}
                         color={theme.colors.primary}
                       />
                     </TouchableOpacity>
@@ -696,7 +705,7 @@ export default function NewGoalScreen() {
                             key={ex}
                             style={[
                               styles.exerciseButton,
-                              newGoalExercise === ex && styles.exerciseButtonSelected,
+                              newGoalExercise === ex && styles.exerciseButtonSelected
                             ]}
                             onPress={async () => {
                               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -720,7 +729,7 @@ export default function NewGoalScreen() {
                           >
                             <Text style={[
                               styles.exerciseButtonText,
-                              newGoalExercise === ex && styles.exerciseButtonTextSelected,
+                              newGoalExercise === ex && styles.exerciseButtonTextSelected
                             ]}>
                               {ex}
                             </Text>

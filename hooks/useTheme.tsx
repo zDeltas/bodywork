@@ -7,12 +7,12 @@ import lightTheme from '@/app/theme/lightTheme';
  */
 export const useTheme = () => {
   const { settings } = useSettings();
-  
+
   // Return the appropriate theme based on the user's preference
   const theme = settings.theme === 'light' ? lightTheme : darkTheme;
-  
+
   return {
     theme,
-    isDarkMode: settings.theme === 'dark',
+    isDarkMode: settings.theme === 'dark'
   };
 };

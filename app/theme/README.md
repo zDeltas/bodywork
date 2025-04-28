@@ -1,6 +1,7 @@
 # Bodywork App Theme
 
-This directory contains the styling configuration for the Bodywork application. It provides a consistent and reusable styling system that can be used throughout the app.
+This directory contains the styling configuration for the Bodywork application. It provides a consistent and reusable
+styling system that can be used throughout the app.
 
 ## Structure
 

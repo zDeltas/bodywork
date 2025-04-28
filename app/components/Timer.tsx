@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, Vibration, View } from 'react-native';
 import { Inter_400Regular, Inter_600SemiBold, useFonts } from '@expo-google-fonts/inter';
-import { Minus, Pause, Play, Plus, RotateCcw } from 'lucide-react-native';
+import { Pause, Play, RotateCcw } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useTheme } from '@/hooks/useTheme';
@@ -183,57 +183,57 @@ const useStyles = () => {
       padding: theme.spacing.lg,
       alignItems: 'center',
       width: '100%',
-      ...theme.shadows.md,
+      ...theme.shadows.md
     },
     header: {
       flexDirection: 'row',
       justifyContent: 'center',
       alignItems: 'center',
       width: '100%',
-      marginBottom: theme.spacing.sm,
+      marginBottom: theme.spacing.sm
     },
     exerciseName: {
       fontSize: theme.typography.fontSize['2xl'],
       fontFamily: theme.typography.fontFamily.semiBold,
       color: theme.colors.text.primary,
-      textAlign: 'center',
+      textAlign: 'center'
     },
     setsContainer: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
       gap: theme.spacing.md,
-      marginBottom: theme.spacing.lg,
+      marginBottom: theme.spacing.lg
     },
     setsLabel: {
       fontSize: theme.typography.fontSize.base,
       fontFamily: theme.typography.fontFamily.regular,
-      color: theme.colors.text.secondary,
+      color: theme.colors.text.secondary
     },
     setsControls: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: theme.spacing.md,
+      gap: theme.spacing.md
     },
     setsValue: {
       fontSize: theme.typography.fontSize.lg,
       fontFamily: theme.typography.fontFamily.semiBold,
       color: theme.colors.text.primary,
       minWidth: 60,
-      textAlign: 'center',
+      textAlign: 'center'
     },
     timerDisplayContainer: {
       width: '100%',
       padding: theme.spacing.xl,
       borderRadius: theme.borderRadius.lg,
       alignItems: 'center',
-      marginBottom: theme.spacing.xl,
+      marginBottom: theme.spacing.xl
     },
     workTimer: {
-      backgroundColor: theme.colors.success,
+      backgroundColor: theme.colors.success
     },
     restTimer: {
-      backgroundColor: theme.colors.error,
+      backgroundColor: theme.colors.error
     },
     timerLabel: {
       fontSize: theme.typography.fontSize.base,
@@ -241,19 +241,19 @@ const useStyles = () => {
       color: theme.colors.text.primary,
       marginBottom: theme.spacing.xs,
       textTransform: 'uppercase',
-      letterSpacing: 1,
+      letterSpacing: 1
     },
     time: {
       fontSize: theme.typography.fontSize['4xl'],
       fontFamily: theme.typography.fontFamily.bold,
-      color: theme.colors.text.primary,
+      color: theme.colors.text.primary
     },
     controls: {
       flexDirection: 'row',
       justifyContent: 'space-around',
       alignItems: 'center',
       width: '100%',
-      marginTop: theme.spacing.md,
+      marginTop: theme.spacing.md
     },
     button: {
       width: 70,
@@ -261,19 +261,19 @@ const useStyles = () => {
       borderRadius: theme.borderRadius.full,
       justifyContent: 'center',
       alignItems: 'center',
-      ...theme.shadows.md,
+      ...theme.shadows.md
     },
     startButton: {
-      backgroundColor: theme.colors.primary,
+      backgroundColor: theme.colors.primary
     },
     stopButton: {
-      backgroundColor: theme.colors.error,
+      backgroundColor: theme.colors.error
     },
     resetButton: {
-      backgroundColor: theme.colors.background.button,
+      backgroundColor: theme.colors.background.button
     },
     buttonPlaceholder: {
-      width: 70,
-    },
+      width: 70
+    }
   });
 };

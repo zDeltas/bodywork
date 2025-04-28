@@ -3,25 +3,11 @@
  * This file exports all theme-related files for easy importing
  */
 
-import darkTheme, { 
-  colors, 
-  typography, 
-  spacing, 
-  borderRadius, 
-  shadows, 
-  zIndex, 
-  layout as themeLayout 
-} from './theme';
+import darkTheme, { borderRadius, colors, layout as themeLayout, shadows, spacing, typography, zIndex } from './theme';
 
 import lightTheme from './lightTheme';
 
-import components, { 
-  buttons, 
-  cards, 
-  inputs, 
-  text, 
-  layout as componentLayout 
-} from './components';
+import components, { buttons, cards, inputs, layout as componentLayout, text } from './components';
 
 import { useDynamicStyles } from './dynamicComponents';
 

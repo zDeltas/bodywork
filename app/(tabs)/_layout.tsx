@@ -1,12 +1,6 @@
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
-import { Tabs } from 'expo-router';
+import { router, Tabs } from 'expo-router';
 import { Calendar, ChartLine as LineChart, Clock, Plus, Ruler, Settings } from 'lucide-react-native';
-import { router } from 'expo-router';
-import WorkoutScreen from '@/app/(tabs)/index';
-import TimerScreen from '@/app/(tabs)/timer';
-import StatsScreen from '@/app/(tabs)/stats';
-import MeasurementsScreen from '@/app/(tabs)/measurements';
-import SettingsScreen from '@/app/(tabs)/settings';
 import { useTheme } from '@/hooks/useTheme';
 import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold, useFonts } from '@expo-google-fonts/inter';
 import * as SplashScreen from 'expo-splash-screen';
@@ -21,7 +15,7 @@ export default function TabLayout() {
   const [fontsLoaded, fontError] = useFonts({
     'Inter-Regular': Inter_400Regular,
     'Inter-SemiBold': Inter_600SemiBold,
-    'Inter-Bold': Inter_700Bold,
+    'Inter-Bold': Inter_700Bold
   });
 
   const onLayoutRootView = useCallback(async () => {
@@ -54,58 +48,58 @@ export default function TabLayout() {
             elevation: 0,
             shadowOpacity: 0,
             height: 60,
-            paddingBottom: 10,
+            paddingBottom: 10
           },
           tabBarLabelStyle: {
             fontFamily: 'Inter-Regular',
-            fontSize: 12,
+            fontSize: 12
           },
-          headerShown: false,
+          headerShown: false
         }}
       >
         <Tabs.Screen
           name="index"
           options={{
-            title: "Workouts",
+            title: 'Workouts',
             tabBarIcon: ({ color, size }) => (
               <Calendar size={size} color={color} />
-            ),
+            )
           }}
         />
         <Tabs.Screen
           name="timer"
           options={{
-            title: "Timer",
+            title: 'Timer',
             tabBarIcon: ({ color, size }) => (
               <Clock size={size} color={color} />
-            ),
+            )
           }}
         />
         <Tabs.Screen
           name="stats"
           options={{
-            title: "Stats",
+            title: 'Stats',
             tabBarIcon: ({ color, size }) => (
               <LineChart size={size} color={color} />
-            ),
+            )
           }}
         />
         <Tabs.Screen
           name="measurements"
           options={{
-            title: "Measures",
+            title: 'Measures',
             tabBarIcon: ({ color, size }) => (
               <Ruler size={size} color={color} />
-            ),
+            )
           }}
         />
         <Tabs.Screen
           name="settings"
           options={{
-            title: "Settings",
+            title: 'Settings',
             tabBarIcon: ({ color, size }) => (
               <Settings size={size} color={color} />
-            ),
+            )
           }}
         />
       </Tabs>
@@ -141,12 +135,12 @@ const useStyles = () => {
       shadowColor: theme.colors.primary,
       shadowOffset: {
         width: 0,
-        height: 2,
+        height: 2
       },
       shadowOpacity: 0.3,
       shadowRadius: 2,
       elevation: 5,
-      zIndex: 999,
-    },
+      zIndex: 999
+    }
   });
 };

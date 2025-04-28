@@ -4,9 +4,9 @@ module.exports = {
     {
       files: ['*.ts', '*.tsx', '*.d.ts'],
       parserOptions: {
-        project: './tsconfig.json',
-      },
-    },
+        project: './tsconfig.json'
+      }
+    }
   ],
   rules: {
     'react-hooks/rules-of-hooks': 'error',
@@ -14,6 +14,6 @@ module.exports = {
     'react-native/no-inline-styles': 'warn',
     'react-native/no-unused-styles': 'error',
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
-    'no-console': ['warn', { allow: ['warn', 'error'] }],
-  },
+    'no-console': ['warn', { allow: ['warn', 'error'] }]
+  }
 };

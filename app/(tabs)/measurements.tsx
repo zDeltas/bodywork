@@ -1,5 +1,4 @@
-import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
-import { useCallback } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import BodyMeasurements from '@/app/components/BodyMeasurements';
 import { Check } from 'lucide-react-native';
@@ -14,7 +13,7 @@ const useStyles = () => {
   return StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: theme.colors.background.main,
+      backgroundColor: theme.colors.background.main
     },
     header: {
       paddingTop: theme.spacing.xl * 2,
@@ -23,12 +22,12 @@ const useStyles = () => {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      backgroundColor: theme.colors.background.card,
+      backgroundColor: theme.colors.background.card
     },
     title: {
       fontSize: theme.typography.fontSize['3xl'],
       fontFamily: theme.typography.fontFamily.bold,
-      color: theme.colors.text.primary,
+      color: theme.colors.text.primary
     },
     saveButton: {
       width: 44,
@@ -37,8 +36,8 @@ const useStyles = () => {
       backgroundColor: theme.colors.primary,
       justifyContent: 'center',
       alignItems: 'center',
-      ...theme.shadows.primary,
-    },
+      ...theme.shadows.primary
+    }
   });
 };
 

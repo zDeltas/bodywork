@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Dimensions,
   Modal,
@@ -13,7 +13,7 @@ import {
 import Svg, { Line } from 'react-native-svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Body from 'react-native-body-highlighter';
-import { VictoryAxis, VictoryChart, VictoryLine, VictoryTheme } from 'victory-native';
+import { VictoryAxis, VictoryChart, VictoryLine } from 'victory-native';
 import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 import { Calendar } from 'react-native-calendars';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -73,7 +73,7 @@ const useStyles = () => {
   return StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: theme.colors.background.main,
+      backgroundColor: theme.colors.background.main
     },
     header: {
       padding: theme.spacing.lg,
@@ -81,7 +81,7 @@ const useStyles = () => {
       justifyContent: 'space-between',
       alignItems: 'center',
       backgroundColor: theme.colors.background.card,
-      marginBottom: theme.spacing.sm,
+      marginBottom: theme.spacing.sm
     },
     dateSelector: {
       backgroundColor: theme.colors.background.button,
@@ -90,13 +90,13 @@ const useStyles = () => {
       borderRadius: theme.borderRadius.md,
       minWidth: 180,
       height: 50,
-      justifyContent: 'center',
+      justifyContent: 'center'
     },
     dateText: {
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.regular,
       fontSize: theme.typography.fontSize.base,
-      textAlign: 'center',
+      textAlign: 'center'
     },
     weightContainer: {
       backgroundColor: theme.colors.background.button,
@@ -156,7 +156,7 @@ const useStyles = () => {
     },
     measurementLabel: {
       position: 'absolute',
-      zIndex: 3,
+      zIndex: 3
     },
     measurementValue: {
       backgroundColor: theme.colors.background.button,
@@ -167,12 +167,12 @@ const useStyles = () => {
       justifyContent: 'center',
       borderWidth: 1,
       ...theme.shadows.sm,
-      minHeight: 36,
+      minHeight: 36
     },
     measurementText: {
       fontFamily: theme.typography.fontFamily.semiBold,
       fontSize: theme.typography.fontSize.sm,
-      textAlign: 'center',
+      textAlign: 'center'
     },
     input: {
       backgroundColor: '#1a1a1a',
@@ -307,8 +307,8 @@ const useStyles = () => {
       width: 30,
       height: 30,
       borderRadius: 15,
-      zIndex: 2,
-    },
+      zIndex: 2
+    }
   });
 };
 
@@ -775,17 +775,21 @@ export default function BodyMeasurements() {
     axis: {
       style: {
         axis: { stroke: theme.colors.border.default },
-        tickLabels: { fill: theme.colors.text.secondary, fontSize: theme.typography.fontSize.xs, fontFamily: theme.typography.fontFamily.regular },
-        grid: { stroke: theme.colors.border.default, strokeDasharray: '3,3' },
-      },
+        tickLabels: {
+          fill: theme.colors.text.secondary,
+          fontSize: theme.typography.fontSize.xs,
+          fontFamily: theme.typography.fontFamily.regular
+        },
+        grid: { stroke: theme.colors.border.default, strokeDasharray: '3,3' }
+      }
     },
     line: {
       style: {
         data: {
-          strokeWidth: 2,
-        },
-      },
-    },
+          strokeWidth: 2
+        }
+      }
+    }
   };
 
   // Theme pour Calendar
@@ -808,7 +812,7 @@ export default function BodyMeasurements() {
     textDayHeaderFontFamily: theme.typography.fontFamily.regular, // theme
     textDayFontSize: theme.typography.fontSize.sm, // theme
     textMonthFontSize: theme.typography.fontSize.lg, // theme
-    textDayHeaderFontSize: theme.typography.fontSize.xs, // theme
+    textDayHeaderFontSize: theme.typography.fontSize.xs // theme
   };
 
   return (
@@ -943,7 +947,8 @@ export default function BodyMeasurements() {
               selectTextOnFocus
             />
             <View style={styles.modalButtons}>
-              <TouchableOpacity style={[styles.modalButton, styles.modalCancelButton]} onPress={() => setShowModal(false)}>
+              <TouchableOpacity style={[styles.modalButton, styles.modalCancelButton]}
+                                onPress={() => setShowModal(false)}>
                 <Text style={styles.modalButtonText}>Annuler</Text>
               </TouchableOpacity>
               <TouchableOpacity style={[styles.modalButton, styles.modalSaveButton]} onPress={handleModalSave}>
@@ -952,7 +957,10 @@ export default function BodyMeasurements() {
               {selectedPoint && allMeasurements.length > 1 && (
                 <TouchableOpacity
                   style={[styles.modalButton, styles.modalHistoryButton]}
-                  onPress={() => { setShowModal(false); loadHistoryData(selectedPoint.key); }}
+                  onPress={() => {
+                    setShowModal(false);
+                    loadHistoryData(selectedPoint.key);
+                  }}
                 >
                   <Text style={styles.modalButtonText}>Historique</Text>
                 </TouchableOpacity>
@@ -1009,7 +1017,8 @@ export default function BodyMeasurements() {
                 {historyData.length === 0 ? 'Aucune donnée disponible' : 'Pas assez de données pour afficher un graphique'}
               </Text>
             )}
-            <TouchableOpacity style={[styles.modalButton, styles.modalCloseButton]} onPress={() => setShowHistory(false)}>
+            <TouchableOpacity style={[styles.modalButton, styles.modalCloseButton]}
+                              onPress={() => setShowHistory(false)}>
               <Text style={styles.modalButtonText}>{t('close')}</Text>
             </TouchableOpacity>
           </Pressable>
@@ -1035,13 +1044,13 @@ export default function BodyMeasurements() {
                 allMeasurements.reduce((acc, measurement) => {
                   acc[measurement.date] = {
                     marked: true,
-                    dotColor: theme.colors.primary,
+                    dotColor: theme.colors.primary
                   };
                   if (measurement.date === selectedDate) {
                     acc[measurement.date] = {
                       ...acc[measurement.date],
                       selected: true,
-                      selectedColor: theme.colors.primary,
+                      selectedColor: theme.colors.primary
                     };
                   }
                   return acc;
@@ -1049,7 +1058,8 @@ export default function BodyMeasurements() {
               }
               theme={calendarTheme}
             />
-            <TouchableOpacity style={[styles.modalButton, styles.modalCloseButton]} onPress={() => setShowDatePicker(false)}>
+            <TouchableOpacity style={[styles.modalButton, styles.modalCloseButton]}
+                              onPress={() => setShowDatePicker(false)}>
               <Text style={styles.modalButtonText}>Fermer</Text>
             </TouchableOpacity>
           </Pressable>

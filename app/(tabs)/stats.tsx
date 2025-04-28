@@ -1,5 +1,15 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Alert, Animated, Dimensions, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+  Alert,
+  Animated,
+  Dimensions,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from 'react-native';
 import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold, useFonts } from '@expo-google-fonts/inter';
 import * as SplashScreen from 'expo-splash-screen';
 import { VictoryLabel, VictoryPie } from 'victory-native';
@@ -144,25 +154,25 @@ const useStyles = () => {
     container: {
       flex: 1,
       backgroundColor: theme.colors.background.main,
-      paddingTop: theme.spacing.lg,
+      paddingTop: theme.spacing.lg
     },
     scrollViewContent: {
-      paddingBottom: theme.spacing.xl * 2,
+      paddingBottom: theme.spacing.xl * 2
     },
     header: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
       paddingHorizontal: theme.spacing.lg,
-      marginBottom: theme.spacing.lg,
+      marginBottom: theme.spacing.lg
     },
     title: {
       fontSize: theme.typography.fontSize['3xl'],
       fontFamily: theme.typography.fontFamily.bold,
-      color: theme.colors.text.primary,
+      color: theme.colors.text.primary
     },
     iconButton: {
-      padding: theme.spacing.sm,
+      padding: theme.spacing.sm
     },
     searchContainer: {
       flexDirection: 'row',
@@ -171,17 +181,17 @@ const useStyles = () => {
       borderRadius: theme.borderRadius.md,
       paddingHorizontal: theme.spacing.md,
       marginHorizontal: theme.spacing.lg,
-      marginBottom: theme.spacing.lg,
+      marginBottom: theme.spacing.lg
     },
     searchIcon: {
-      marginRight: theme.spacing.sm,
+      marginRight: theme.spacing.sm
     },
     searchInput: {
       flex: 1,
       height: 44,
       color: theme.colors.text.primary,
       fontSize: theme.typography.fontSize.base,
-      fontFamily: theme.typography.fontFamily.regular,
+      fontFamily: theme.typography.fontFamily.regular
     },
     periodSelector: {
       flexDirection: 'row',
@@ -190,135 +200,135 @@ const useStyles = () => {
       marginBottom: theme.spacing.xl,
       backgroundColor: theme.colors.background.card,
       borderRadius: theme.borderRadius.md,
-      paddingVertical: theme.spacing.xs,
+      paddingVertical: theme.spacing.xs
     },
     periodButton: {
       paddingVertical: theme.spacing.sm,
       paddingHorizontal: theme.spacing.lg,
-      borderRadius: theme.borderRadius.sm,
+      borderRadius: theme.borderRadius.sm
     },
     periodButtonActive: {
-      backgroundColor: theme.colors.primary,
+      backgroundColor: theme.colors.primary
     },
     periodText: {
       fontFamily: theme.typography.fontFamily.semiBold,
       fontSize: theme.typography.fontSize.sm,
-      color: theme.colors.text.secondary,
+      color: theme.colors.text.secondary
     },
     periodTextActive: {
-      color: theme.colors.text.primary,
+      color: theme.colors.text.primary
     },
     sectionContainer: {
       marginBottom: theme.spacing.xl,
-      paddingHorizontal: theme.spacing.lg,
+      paddingHorizontal: theme.spacing.lg
     },
     sectionTitle: {
       fontSize: theme.typography.fontSize.xl,
       fontFamily: theme.typography.fontFamily.bold,
       color: theme.colors.text.primary,
-      marginBottom: theme.spacing.md,
+      marginBottom: theme.spacing.md
     },
     card: {
       backgroundColor: theme.colors.background.card,
       borderRadius: theme.borderRadius.lg,
       padding: theme.spacing.lg,
       marginBottom: theme.spacing.lg,
-      ...theme.shadows.md,
+      ...theme.shadows.md
     },
     kpiContainer: {
       flexDirection: 'row',
       justifyContent: 'space-between',
-      marginBottom: theme.spacing.lg,
+      marginBottom: theme.spacing.lg
     },
     kpiItem: {
-      alignItems: 'center',
+      alignItems: 'center'
     },
     kpiValue: {
       fontSize: theme.typography.fontSize['2xl'],
       fontFamily: theme.typography.fontFamily.bold,
-      color: theme.colors.primary,
+      color: theme.colors.primary
     },
     kpiLabel: {
       fontSize: theme.typography.fontSize.sm,
       fontFamily: theme.typography.fontFamily.regular,
       color: theme.colors.text.secondary,
-      marginTop: theme.spacing.xs,
+      marginTop: theme.spacing.xs
     },
     chartContainer: {
       marginBottom: theme.spacing.xl,
-      paddingHorizontal: theme.spacing.lg,
+      paddingHorizontal: theme.spacing.lg
     },
     chartHeader: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      marginBottom: theme.spacing.md,
+      marginBottom: theme.spacing.md
     },
     chartTitle: {
       fontSize: theme.typography.fontSize.lg,
       fontFamily: theme.typography.fontFamily.semiBold,
-      color: theme.colors.text.primary,
+      color: theme.colors.text.primary
     },
     chart: {
       height: 250,
-      alignItems: 'center',
+      alignItems: 'center'
     },
     centeredLabel: {
       position: 'absolute',
       top: '45%',
       left: 0,
       right: 0,
-      alignItems: 'center',
+      alignItems: 'center'
     },
     centeredLabelTextValue: {
       fontSize: theme.typography.fontSize['3xl'],
       fontFamily: theme.typography.fontFamily.bold,
-      color: theme.colors.text.primary,
+      color: theme.colors.text.primary
     },
     centeredLabelTextLabel: {
       fontSize: theme.typography.fontSize.sm,
       fontFamily: theme.typography.fontFamily.regular,
       color: theme.colors.text.secondary,
-      marginTop: -theme.spacing.xs,
+      marginTop: -theme.spacing.xs
     },
     muscleMapContainer: {
       height: 350,
-      marginBottom: theme.spacing.lg,
+      marginBottom: theme.spacing.lg
     },
     exerciseListContainer: {
       marginBottom: theme.spacing.xl,
-      paddingHorizontal: theme.spacing.lg,
+      paddingHorizontal: theme.spacing.lg
     },
     listSectionHeader: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      marginBottom: theme.spacing.md,
+      marginBottom: theme.spacing.md
     },
     viewAllButton: {
       paddingVertical: theme.spacing.xs,
-      paddingHorizontal: theme.spacing.sm,
+      paddingHorizontal: theme.spacing.sm
     },
     viewAllText: {
       color: theme.colors.primary,
       fontFamily: theme.typography.fontFamily.semiBold,
-      fontSize: theme.typography.fontSize.sm,
+      fontSize: theme.typography.fontSize.sm
     },
     accordionContainer: {
       backgroundColor: theme.colors.background.card,
       borderRadius: theme.borderRadius.lg,
       marginBottom: theme.spacing.sm,
-      overflow: 'hidden',
+      overflow: 'hidden'
     },
     accordionHeader: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      padding: theme.spacing.base,
+      padding: theme.spacing.base
     },
     accordionHeaderContent: {
       flexDirection: 'row',
-      alignItems: 'center',
+      alignItems: 'center'
     },
     muscleGroupIcon: {
       width: 32,
@@ -326,16 +336,16 @@ const useStyles = () => {
       borderRadius: theme.borderRadius.full,
       justifyContent: 'center',
       alignItems: 'center',
-      marginRight: theme.spacing.md,
+      marginRight: theme.spacing.md
     },
     accordionTitle: {
       fontSize: theme.typography.fontSize.base,
       fontFamily: theme.typography.fontFamily.semiBold,
-      color: theme.colors.text.primary,
+      color: theme.colors.text.primary
     },
     accordionContent: {
       paddingHorizontal: theme.spacing.base,
-      paddingBottom: theme.spacing.sm,
+      paddingBottom: theme.spacing.sm
     },
     exerciseItem: {
       flexDirection: 'row',
@@ -343,26 +353,26 @@ const useStyles = () => {
       alignItems: 'center',
       paddingVertical: theme.spacing.md,
       borderBottomWidth: 1,
-      borderBottomColor: theme.colors.border.default,
+      borderBottomColor: theme.colors.border.default
     },
     exerciseItemText: {
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.regular,
-      fontSize: theme.typography.fontSize.base,
+      fontSize: theme.typography.fontSize.base
     },
     favoriteButton: {
-      padding: theme.spacing.sm,
+      padding: theme.spacing.sm
     },
     noExercisesContainer: {
       padding: theme.spacing.base,
       alignItems: 'center',
-      justifyContent: 'center',
+      justifyContent: 'center'
     },
     noExercisesText: {
       color: theme.colors.text.secondary,
       fontFamily: theme.typography.fontFamily.regular,
       fontSize: theme.typography.fontSize.sm,
-      textAlign: 'center',
+      textAlign: 'center'
     },
     closeButton: {
       backgroundColor: theme.colors.background.button,
@@ -370,124 +380,124 @@ const useStyles = () => {
       paddingVertical: theme.spacing.md,
       marginHorizontal: theme.spacing.lg,
       marginTop: theme.spacing.base,
-      alignItems: 'center',
+      alignItems: 'center'
     },
     closeButtonText: {
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.semiBold,
-      fontSize: theme.typography.fontSize.base,
+      fontSize: theme.typography.fontSize.base
     },
     goalItem: {
-      marginBottom: theme.spacing.lg,
+      marginBottom: theme.spacing.lg
     },
     goalHeader: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      marginBottom: theme.spacing.sm,
+      marginBottom: theme.spacing.sm
     },
     goalHeaderRight: {
       flexDirection: 'row',
-      alignItems: 'center',
+      alignItems: 'center'
     },
     goalTitle: {
       fontSize: theme.typography.fontSize.base,
       fontFamily: theme.typography.fontFamily.semiBold,
-      color: theme.colors.text.primary,
+      color: theme.colors.text.primary
     },
     goalValues: {
       fontSize: theme.typography.fontSize.sm,
-      marginRight: theme.spacing.sm,
+      marginRight: theme.spacing.sm
     },
     deleteGoalButton: {
-      padding: theme.spacing.xs,
+      padding: theme.spacing.xs
     },
     goalCurrent: {
       color: theme.colors.text.primary,
-      fontFamily: theme.typography.fontFamily.bold,
+      fontFamily: theme.typography.fontFamily.bold
     },
     goalSeparator: {
       color: theme.colors.text.secondary,
-      fontFamily: theme.typography.fontFamily.regular,
+      fontFamily: theme.typography.fontFamily.regular
     },
     goalTarget: {
       color: theme.colors.primary,
-      fontFamily: theme.typography.fontFamily.bold,
+      fontFamily: theme.typography.fontFamily.bold
     },
     goalProgressContainer: {
       height: 8,
       backgroundColor: theme.colors.background.button,
       borderRadius: theme.borderRadius.xs,
       overflow: 'hidden',
-      marginBottom: theme.spacing.sm,
+      marginBottom: theme.spacing.sm
     },
     goalProgressBar: {
       height: '100%',
-      borderRadius: theme.borderRadius.xs,
+      borderRadius: theme.borderRadius.xs
     },
     goalProgressLow: {
-      backgroundColor: theme.colors.error,
+      backgroundColor: theme.colors.error
     },
     goalProgressMedium: {
-      backgroundColor: theme.colors.primary,
+      backgroundColor: theme.colors.primary
     },
     goalProgressHigh: {
-      backgroundColor: theme.colors.success,
+      backgroundColor: theme.colors.success
     },
     goalProgressText: {
       fontSize: theme.typography.fontSize.sm,
       fontFamily: theme.typography.fontFamily.regular,
-      color: theme.colors.text.secondary,
+      color: theme.colors.text.secondary
     },
     addGoalButton: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
       paddingVertical: theme.spacing.md,
-      marginTop: theme.spacing.sm,
+      marginTop: theme.spacing.sm
     },
     addGoalText: {
       color: theme.colors.primary,
       fontFamily: theme.typography.fontFamily.semiBold,
-      marginLeft: theme.spacing.sm,
+      marginLeft: theme.spacing.sm
     },
     statsContainer: {
       backgroundColor: theme.colors.background.card,
       borderRadius: theme.borderRadius.lg,
       padding: theme.spacing.base,
-      marginBottom: theme.spacing.lg,
+      marginBottom: theme.spacing.lg
     },
     statsGrid: {
       flexDirection: 'row',
       justifyContent: 'space-between',
-      marginBottom: theme.spacing.md,
+      marginBottom: theme.spacing.md
     },
     statCard: {
       flex: 1,
       borderRadius: theme.borderRadius.lg,
       overflow: 'hidden',
-      marginHorizontal: theme.spacing.xs,
+      marginHorizontal: theme.spacing.xs
     },
     statGradient: {
       padding: theme.spacing.base,
       borderRadius: theme.borderRadius.lg,
-      alignItems: 'center',
+      alignItems: 'center'
     },
     statIcon: {
-      marginBottom: theme.spacing.sm,
+      marginBottom: theme.spacing.sm
     },
     statLabel: {
       fontSize: theme.typography.fontSize.sm,
       fontFamily: theme.typography.fontFamily.regular,
       color: theme.colors.text.primary,
       marginBottom: theme.spacing.xs,
-      textAlign: 'center',
+      textAlign: 'center'
     },
     statValue: {
       fontSize: theme.typography.fontSize.xl,
       fontFamily: theme.typography.fontFamily.bold,
       color: theme.colors.text.primary,
-      textAlign: 'center',
+      textAlign: 'center'
     },
     modalOverlay: {
       position: 'absolute',
@@ -499,7 +509,7 @@ const useStyles = () => {
       justifyContent: 'center',
       alignItems: 'center',
       zIndex: theme.zIndex.modal,
-      elevation: 5,
+      elevation: 5
     },
     modalContainer: {
       backgroundColor: theme.colors.background.card,
@@ -509,23 +519,23 @@ const useStyles = () => {
       maxWidth: 400,
       borderWidth: 1,
       borderColor: theme.colors.border.default,
-      ...theme.shadows.lg,
+      ...theme.shadows.lg
     },
     modalTitle: {
       fontSize: theme.typography.fontSize.xl,
       fontFamily: theme.typography.fontFamily.bold,
       color: theme.colors.text.primary,
       marginBottom: theme.spacing.lg,
-      textAlign: 'center',
+      textAlign: 'center'
     },
     formGroup: {
-      marginBottom: theme.spacing.base,
+      marginBottom: theme.spacing.base
     },
     formLabel: {
       fontSize: theme.typography.fontSize.base,
       fontFamily: theme.typography.fontFamily.semiBold,
       color: theme.colors.text.secondary,
-      marginBottom: theme.spacing.sm,
+      marginBottom: theme.spacing.sm
     },
     formInput: {
       backgroundColor: theme.colors.background.input,
@@ -535,12 +545,12 @@ const useStyles = () => {
       fontFamily: theme.typography.fontFamily.regular,
       fontSize: theme.typography.fontSize.base,
       borderWidth: 1,
-      borderColor: theme.colors.border.default,
+      borderColor: theme.colors.border.default
     },
     modalButtons: {
       flexDirection: 'row',
       justifyContent: 'space-between',
-      marginTop: theme.spacing.lg,
+      marginTop: theme.spacing.lg
     },
     cancelButton: {
       flex: 1,
@@ -548,12 +558,12 @@ const useStyles = () => {
       borderRadius: theme.borderRadius.md,
       padding: theme.spacing.md,
       marginRight: theme.spacing.sm,
-      alignItems: 'center',
+      alignItems: 'center'
     },
     cancelButtonText: {
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.semiBold,
-      fontSize: theme.typography.fontSize.base,
+      fontSize: theme.typography.fontSize.base
     },
     saveButton: {
       flex: 1,
@@ -561,115 +571,115 @@ const useStyles = () => {
       borderRadius: theme.borderRadius.md,
       padding: theme.spacing.md,
       marginLeft: theme.spacing.sm,
-      alignItems: 'center',
+      alignItems: 'center'
     },
     saveButtonText: {
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.semiBold,
-      fontSize: theme.typography.fontSize.base,
+      fontSize: theme.typography.fontSize.base
     },
     noGoalsContainer: {
       padding: theme.spacing.lg,
       alignItems: 'center',
-      justifyContent: 'center',
+      justifyContent: 'center'
     },
     noGoalsText: {
       color: theme.colors.text.secondary,
       fontFamily: theme.typography.fontFamily.regular,
       fontSize: theme.typography.fontSize.base,
-      textAlign: 'center',
+      textAlign: 'center'
     },
     exerciseSelectorButton: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      width: '100%',
+      width: '100%'
     },
     exerciseSelectorText: {
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.regular,
-      fontSize: theme.typography.fontSize.base,
+      fontSize: theme.typography.fontSize.base
     },
     weightInputContainer: {
       flexDirection: 'row',
-      alignItems: 'center',
+      alignItems: 'center'
     },
     suggestedButton: {
       backgroundColor: theme.colors.primaryLight,
       borderRadius: theme.borderRadius.md,
       paddingVertical: theme.spacing.sm,
       paddingHorizontal: theme.spacing.md,
-      marginLeft: theme.spacing.sm,
+      marginLeft: theme.spacing.sm
     },
     suggestedButtonText: {
       color: theme.colors.primary,
       fontFamily: theme.typography.fontFamily.semiBold,
-      fontSize: theme.typography.fontSize.xs,
+      fontSize: theme.typography.fontSize.xs
     },
     exerciseList: {
       maxHeight: 300,
       marginVertical: theme.spacing.base,
       borderColor: theme.colors.border.default,
       borderWidth: 1,
-      borderRadius: theme.borderRadius.md,
+      borderRadius: theme.borderRadius.md
     },
     exerciseOption: {
       paddingVertical: theme.spacing.md,
       paddingHorizontal: theme.spacing.base,
       borderBottomWidth: 1,
-      borderBottomColor: theme.colors.border.default,
+      borderBottomColor: theme.colors.border.default
     },
     exerciseOptionText: {
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.regular,
-      fontSize: theme.typography.fontSize.base,
+      fontSize: theme.typography.fontSize.base
     },
     chartTitleContainer: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      marginBottom: theme.spacing.base,
+      marginBottom: theme.spacing.base
     },
     filterContainer: {
       flexDirection: 'row',
       justifyContent: 'space-around',
       backgroundColor: theme.colors.background.card,
       borderRadius: theme.borderRadius.md,
-      padding: theme.spacing.xs,
+      padding: theme.spacing.xs
     },
     filterButton: {
       paddingVertical: theme.spacing.sm,
       paddingHorizontal: theme.spacing.lg,
-      borderRadius: theme.borderRadius.sm,
+      borderRadius: theme.borderRadius.sm
     },
     filterButtonActive: {
-      backgroundColor: theme.colors.primary,
+      backgroundColor: theme.colors.primary
     },
     filterText: {
       fontFamily: theme.typography.fontFamily.semiBold,
       fontSize: theme.typography.fontSize.sm,
-      color: theme.colors.text.secondary,
+      color: theme.colors.text.secondary
     },
     filterTextActive: {
-      color: theme.colors.text.primary,
+      color: theme.colors.text.primary
     },
     chipsContainer: {
-      padding: theme.spacing.sm,
+      padding: theme.spacing.sm
     },
     chip: {
       padding: theme.spacing.sm,
       borderRadius: theme.borderRadius.full,
       backgroundColor: theme.colors.background.card,
-      marginRight: theme.spacing.sm,
+      marginRight: theme.spacing.sm
     },
     chipIcon: {
-      marginRight: theme.spacing.sm,
+      marginRight: theme.spacing.sm
     },
     chipText: {
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.regular,
-      fontSize: theme.typography.fontSize.base,
-    },
+      fontSize: theme.typography.fontSize.base
+    }
   });
 };
 
@@ -677,7 +687,7 @@ export default function StatsScreen() {
   const { t } = useTranslation();
   const { theme } = useTheme();
   const styles = useStyles();
-  
+
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [selectedPeriod, setSelectedPeriod] = useState('1m');
   const [searchQuery, setSearchQuery] = useState('');
@@ -1078,8 +1088,8 @@ export default function StatsScreen() {
   }
 
   return (
-    <ScrollView 
-      style={styles.container} 
+    <ScrollView
+      style={styles.container}
       contentContainerStyle={styles.scrollViewContent}
       onLayout={onLayoutRootView}
     >
@@ -1101,8 +1111,12 @@ export default function StatsScreen() {
           end={{ x: 1, y: 1 }}
           style={styles.statGradient}
         >
-          <Text 
-            style={[styles.kpiLabel, { marginBottom: theme.spacing.base, color: theme.colors.text.primary, textAlign: 'left' }]}
+          <Text
+            style={[styles.kpiLabel, {
+              marginBottom: theme.spacing.base,
+              color: theme.colors.text.primary,
+              textAlign: 'left'
+            }]}
           >
             {bestProgressExercise
               ? t('progressionText').replace('{progress}', bestProgressExercise.progress.toString()).replace('{exercise}', bestProgressExercise.exercise)
@@ -1430,7 +1444,8 @@ export default function StatsScreen() {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               }}
             >
-              <Text style={[styles.filterText, selectedPeriod === '1m' && styles.filterTextActive]}>{t('oneMonth')}</Text>
+              <Text
+                style={[styles.filterText, selectedPeriod === '1m' && styles.filterTextActive]}>{t('oneMonth')}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.filterButton, selectedPeriod === '3m' && styles.filterButtonActive]}
@@ -1439,7 +1454,8 @@ export default function StatsScreen() {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               }}
             >
-              <Text style={[styles.filterText, selectedPeriod === '3m' && styles.filterTextActive]}>{t('threeMonths')}</Text>
+              <Text
+                style={[styles.filterText, selectedPeriod === '3m' && styles.filterTextActive]}>{t('threeMonths')}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.filterButton, selectedPeriod === '6m' && styles.filterButtonActive]}
@@ -1448,7 +1464,8 @@ export default function StatsScreen() {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               }}
             >
-              <Text style={[styles.filterText, selectedPeriod === '6m' && styles.filterTextActive]}>{t('sixMonths')}</Text>
+              <Text
+                style={[styles.filterText, selectedPeriod === '6m' && styles.filterTextActive]}>{t('sixMonths')}</Text>
             </TouchableOpacity>
           </View>
         </View>

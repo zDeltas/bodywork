@@ -10,14 +10,14 @@ const {
 // Configure SVG Transformer
 config.transformer = {
   ...transformer,
-  babelTransformerPath: require.resolve('react-native-svg-transformer'),
+  babelTransformerPath: require.resolve('react-native-svg-transformer')
 };
 
 // Configure extensions
 config.resolver = {
   ...resolver,
   assetExts: resolver.assetExts.filter((ext) => ext !== 'svg'),
-  sourceExts: [...resolver.sourceExts, 'svg'],
+  sourceExts: [...resolver.sourceExts, 'svg']
 };
 
 module.exports = wrapWithReanimatedMetroConfig(config);

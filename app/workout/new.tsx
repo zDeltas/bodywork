@@ -1,12 +1,11 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Pressable } from 'react-native';
-import { useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import { router, useLocalSearchParams } from 'expo-router';
-import { X, Plus, Heart, Activity, Dumbbell, Footprints, Hammer, Weight, BarChart, Layers, Gauge } from 'lucide-react-native';
+import { BarChart, Gauge, Layers, Plus, Weight, X } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from '@/hooks/useTranslation';
-import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import Animated, { FadeIn } from 'react-native-reanimated';
 import ExerciseList from '../components/ExerciseList';
 import { useTheme } from '@/hooks/useTheme';
 
@@ -19,19 +18,8 @@ export const muscleGroups = [
   'Epaules',
   'Biceps',
   'Triceps',
-  'Ceinture abdominale',
+  'Ceinture abdominale'
 ];
-
-// Mapping of muscle groups to their respective icons
-export const muscleGroupIcons = {
-  'Poitrine': Heart,
-  'Dos': Activity,
-  'Jambes': Footprints,
-  'Epaules': Hammer,
-  'Biceps': Dumbbell,
-  'Triceps': Dumbbell,
-  'Ceinture abdominale': Activity,
-};
 
 export const predefinedExercises = {
   'Poitrine': ['Développé couché', 'Développé incliné', 'Développé décliné', 'Écarté avec haltères', 'Crossover à la poulie'],
@@ -40,7 +28,7 @@ export const predefinedExercises = {
   'Epaules': ['Développé militaire', 'Élévations latérales', 'Élévations frontales', 'Oiseau pour deltoïdes postérieurs', 'Haussements d\'épaules'],
   'Biceps': ['Curl barre', 'Curl haltères', 'Curl marteau', 'Curl au pupitre', 'Curl concentration'],
   'Triceps': ['Extension à la poulie', 'Barre au front', 'Extension au-dessus de la tête', 'Dips', 'Développé couché prise serrée'],
-  'Ceinture abdominale': ['Planche', 'Twists russes', 'Relevés de jambes', 'Crunchs', 'Relevés de genoux suspendu'],
+  'Ceinture abdominale': ['Planche', 'Twists russes', 'Relevés de jambes', 'Crunchs', 'Relevés de genoux suspendu']
 };
 
 // Define styles using the current theme
@@ -50,7 +38,7 @@ const useStyles = () => {
   return StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: theme.colors.background.main,
+      backgroundColor: theme.colors.background.main
     },
     header: {
       paddingTop: theme.spacing.xl * 1.5,
@@ -60,12 +48,12 @@ const useStyles = () => {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      ...theme.shadows.md,
+      ...theme.shadows.md
     },
     title: {
       fontSize: theme.typography.fontSize['3xl'],
       fontFamily: theme.typography.fontFamily.bold,
-      color: theme.colors.text.primary,
+      color: theme.colors.text.primary
     },
     closeButton: {
       width: 44,
@@ -74,14 +62,14 @@ const useStyles = () => {
       backgroundColor: theme.colors.background.button,
       justifyContent: 'center',
       alignItems: 'center',
-      ...theme.shadows.sm,
+      ...theme.shadows.sm
     },
     content: {
       flex: 1,
-      padding: theme.spacing.lg,
+      padding: theme.spacing.lg
     },
     customExerciseContainer: {
-      marginBottom: theme.spacing.xl,
+      marginBottom: theme.spacing.xl
     },
     input: {
       backgroundColor: theme.colors.background.card,
@@ -93,41 +81,41 @@ const useStyles = () => {
       ...theme.shadows.sm,
       fontSize: theme.typography.fontSize.base,
       borderWidth: 1,
-      borderColor: theme.colors.border.default,
+      borderColor: theme.colors.border.default
     },
     backButton: {
       marginTop: theme.spacing.md,
       paddingVertical: theme.spacing.sm,
       backgroundColor: theme.colors.primaryLight,
       borderRadius: theme.borderRadius.sm,
-      alignItems: 'center',
+      alignItems: 'center'
     },
     backButtonText: {
       color: theme.colors.primary,
       fontFamily: theme.typography.fontFamily.semiBold,
-      textAlign: 'center',
+      textAlign: 'center'
     },
     sectionTitleContainer: {
       flexDirection: 'row',
       alignItems: 'center',
-      marginBottom: theme.spacing.sm,
+      marginBottom: theme.spacing.sm
     },
     sectionTitleIcon: {
-      marginRight: theme.spacing.sm,
+      marginRight: theme.spacing.sm
     },
     sectionTitle: {
       fontSize: theme.typography.fontSize.xl,
       fontFamily: theme.typography.fontFamily.semiBold,
       color: theme.colors.text.primary,
       marginBottom: theme.spacing.base,
-      marginTop: theme.spacing.sm,
+      marginTop: theme.spacing.sm
     },
     seriesContainer: {
       backgroundColor: theme.colors.background.card,
       borderRadius: theme.borderRadius.lg,
       padding: theme.spacing.base,
       marginBottom: theme.spacing.lg,
-      ...theme.shadows.sm,
+      ...theme.shadows.sm
     },
     seriesHeader: {
       flexDirection: 'row',
@@ -136,16 +124,16 @@ const useStyles = () => {
       marginBottom: theme.spacing.base,
       borderBottomWidth: 1,
       borderBottomColor: theme.colors.border.default,
-      paddingBottom: theme.spacing.md,
+      paddingBottom: theme.spacing.md
     },
     seriesTitle: {
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.semiBold,
-      fontSize: theme.typography.fontSize.lg,
+      fontSize: theme.typography.fontSize.lg
     },
     seriesActions: {
       flexDirection: 'row',
-      gap: theme.spacing.md,
+      gap: theme.spacing.md
     },
     seriesActionButton: {
       width: 36,
@@ -154,21 +142,21 @@ const useStyles = () => {
       backgroundColor: theme.colors.background.button,
       justifyContent: 'center',
       alignItems: 'center',
-      ...theme.shadows.sm,
+      ...theme.shadows.sm
     },
     serieTypeContainer: {
-      marginBottom: theme.spacing.base,
+      marginBottom: theme.spacing.base
     },
     seriesInputLabel: {
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.semiBold,
       fontSize: theme.typography.fontSize.base,
-      marginBottom: theme.spacing.sm,
+      marginBottom: theme.spacing.sm
     },
     serieTypeButtonsContainer: {
       flexDirection: 'row',
       gap: theme.spacing.md,
-      marginBottom: theme.spacing.sm,
+      marginBottom: theme.spacing.sm
     },
     serieTypeButton: {
       flex: 1,
@@ -176,36 +164,36 @@ const useStyles = () => {
       borderRadius: theme.borderRadius.lg,
       padding: theme.spacing.md,
       borderWidth: 1,
-      borderColor: theme.colors.border.default,
+      borderColor: theme.colors.border.default
     },
     serieTypeButtonSelected: {
       backgroundColor: theme.colors.primaryLight,
-      borderColor: theme.colors.primaryBorder,
+      borderColor: theme.colors.primaryBorder
     },
     serieTypeButtonText: {
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.semiBold,
       fontSize: theme.typography.fontSize.base,
       marginBottom: theme.spacing.xs,
-      textAlign: 'center',
+      textAlign: 'center'
     },
     serieTypeButtonTextSelected: {
-      color: theme.colors.primary,
+      color: theme.colors.primary
     },
     serieTypeDescription: {
       color: theme.colors.text.secondary,
       fontFamily: theme.typography.fontFamily.regular,
       fontSize: theme.typography.fontSize.sm,
-      textAlign: 'center',
+      textAlign: 'center'
     },
     row: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       gap: theme.spacing.sm,
-      marginBottom: theme.spacing.base,
+      marginBottom: theme.spacing.base
     },
     column: {
-      flex: 1,
+      flex: 1
     },
     suggestedWeightContainer: {
       flexDirection: 'column',
@@ -215,26 +203,26 @@ const useStyles = () => {
       padding: theme.spacing.sm,
       marginBottom: theme.spacing.sm,
       borderWidth: 1,
-      borderColor: theme.colors.primaryBorder,
+      borderColor: theme.colors.primaryBorder
     },
     suggestedWeightText: {
       color: theme.colors.primary,
       fontFamily: theme.typography.fontFamily.semiBold,
       fontSize: theme.typography.fontSize.sm,
       marginBottom: theme.spacing.xs,
-      textAlign: 'center',
+      textAlign: 'center'
     },
     useSuggestedButton: {
       backgroundColor: theme.colors.primary,
       paddingHorizontal: theme.spacing.md,
       paddingVertical: theme.spacing.xs,
       borderRadius: theme.borderRadius.xs,
-      ...theme.shadows.primary,
+      ...theme.shadows.primary
     },
     useSuggestedButtonText: {
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.semiBold,
-      fontSize: theme.typography.fontSize.xs,
+      fontSize: theme.typography.fontSize.xs
     },
     compactInput: {
       backgroundColor: theme.colors.background.card,
@@ -248,19 +236,19 @@ const useStyles = () => {
       borderWidth: 1,
       borderColor: theme.colors.border.default,
       textAlign: 'center',
-      height: 44,
+      height: 44
     },
     disabledLabel: {
-      color: theme.colors.text.disabled,
+      color: theme.colors.text.disabled
     },
     disabledLabelNote: {
       color: theme.colors.text.disabled,
       fontFamily: theme.typography.fontFamily.regular,
-      fontSize: theme.typography.fontSize.sm,
+      fontSize: theme.typography.fontSize.sm
     },
     dropdownContainer: {
       position: 'relative',
-      zIndex: theme.zIndex.dropdown,
+      zIndex: theme.zIndex.dropdown
     },
     dropdownButton: {
       backgroundColor: theme.colors.background.card,
@@ -271,23 +259,23 @@ const useStyles = () => {
       borderColor: theme.colors.border.default,
       height: 44,
       alignItems: 'center',
-      justifyContent: 'center',
+      justifyContent: 'center'
     },
     disabledDropdown: {
-      opacity: 0.7,
+      opacity: 0.7
     },
     disabledDropdownButton: {
       backgroundColor: theme.colors.background.button,
-      borderColor: theme.colors.border.default,
+      borderColor: theme.colors.border.default
     },
     disabledDropdownButtonText: {
-      color: theme.colors.text.disabled,
+      color: theme.colors.text.disabled
     },
     dropdownButtonText: {
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.regular,
       fontSize: theme.typography.fontSize.md,
-      textAlign: 'center',
+      textAlign: 'center'
     },
     dropdownList: {
       position: 'absolute',
@@ -303,29 +291,29 @@ const useStyles = () => {
       borderColor: theme.colors.border.default,
       zIndex: theme.zIndex.dropdown + 1,
       elevation: theme.zIndex.dropdown + 1,
-      maxHeight: 200,
+      maxHeight: 200
     },
     dropdownScroll: {
-      maxHeight: 200,
+      maxHeight: 200
     },
     dropdownItem: {
       paddingVertical: theme.spacing.md,
       paddingHorizontal: theme.spacing.base,
-      borderRadius: theme.borderRadius.sm,
+      borderRadius: theme.borderRadius.sm
     },
     dropdownItemText: {
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.regular,
       fontSize: theme.typography.fontSize.base,
-      textAlign: 'center',
+      textAlign: 'center'
     },
     dropdownItemTextSelected: {
       color: theme.colors.primary,
-      fontFamily: theme.typography.fontFamily.semiBold,
+      fontFamily: theme.typography.fontFamily.semiBold
     },
     noteContainer: {
       marginTop: theme.spacing.sm,
-      marginBottom: theme.spacing.base,
+      marginBottom: theme.spacing.base
     },
     noteInput: {
       backgroundColor: theme.colors.background.card,
@@ -339,10 +327,10 @@ const useStyles = () => {
       borderWidth: 1,
       borderColor: theme.colors.border.default,
       minHeight: 80,
-      textAlignVertical: 'top',
+      textAlignVertical: 'top'
     },
     quickFillContainer: {
-      marginTop: theme.spacing.sm,
+      marginTop: theme.spacing.sm
     },
     quickFillButton: {
       backgroundColor: theme.colors.primaryLight,
@@ -351,12 +339,12 @@ const useStyles = () => {
       borderRadius: theme.borderRadius.base,
       alignItems: 'center',
       borderWidth: 1,
-      borderColor: theme.colors.primaryBorder,
+      borderColor: theme.colors.primaryBorder
     },
     quickFillButtonText: {
       color: theme.colors.primary,
       fontFamily: theme.typography.fontFamily.semiBold,
-      fontSize: theme.typography.fontSize.md,
+      fontSize: theme.typography.fontSize.md
     },
     addSeriesButton: {
       flexDirection: 'row',
@@ -367,12 +355,12 @@ const useStyles = () => {
       alignItems: 'center',
       justifyContent: 'center',
       marginBottom: theme.spacing.xl,
-      ...theme.shadows.sm,
+      ...theme.shadows.sm
     },
     addSeriesButtonText: {
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.semiBold,
-      fontSize: theme.typography.fontSize.base,
+      fontSize: theme.typography.fontSize.base
     },
     addButton: {
       backgroundColor: theme.colors.primary,
@@ -380,17 +368,17 @@ const useStyles = () => {
       borderRadius: theme.borderRadius.base,
       alignItems: 'center',
       ...theme.shadows.lg,
-      marginTop: theme.spacing.sm,
+      marginTop: theme.spacing.sm
     },
     addButtonDisabled: {
       backgroundColor: theme.colors.background.button,
-      ...theme.shadows.sm,
+      ...theme.shadows.sm
     },
     addButtonText: {
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.bold,
-      fontSize: theme.typography.fontSize.lg,
-    },
+      fontSize: theme.typography.fontSize.lg
+    }
   });
 };
 
@@ -401,7 +389,14 @@ export default function NewWorkoutScreen() {
   const [selectedMuscle, setSelectedMuscle] = useState('');
   const [exercise, setExercise] = useState('');
   const [rpe, setRpe] = useState('');
-  const [series, setSeries] = useState<Array<{weight: string, reps: string, note: string, rpe: string, showRpeDropdown?: boolean, type: 'warmUp' | 'workingSet'}>>([{
+  const [series, setSeries] = useState<Array<{
+    weight: string,
+    reps: string,
+    note: string,
+    rpe: string,
+    showRpeDropdown?: boolean,
+    type: 'warmUp' | 'workingSet'
+  }>>([{
     weight: '',
     reps: '',
     note: '',
@@ -574,7 +569,7 @@ export default function NewWorkoutScreen() {
       // Process series
       const processedSeries = validSeries.map(s => {
         // For warm-up sets, RPE is not applicable
-        const rpeValue = s.type === 'warmUp' 
+        const rpeValue = s.type === 'warmUp'
           ? 0  // Use 0 to indicate N/A for warm-up sets
           : (parseInt(s.rpe) || parseInt(rpe) || 7); // Default to 7 for working sets if not specified
 
@@ -593,7 +588,7 @@ export default function NewWorkoutScreen() {
         exercise,
         series: processedSeries,
         rpe: parseInt(rpe) || 0, // Keep global RPE for backward compatibility
-        date: selectedDate ? `${selectedDate}T${new Date().toTimeString().split(' ')[0]}` : new Date().toISOString(),
+        date: selectedDate ? `${selectedDate}T${new Date().toTimeString().split(' ')[0]}` : new Date().toISOString()
       };
 
       const existingWorkouts = await AsyncStorage.getItem('workouts');
@@ -612,18 +607,18 @@ export default function NewWorkoutScreen() {
 
   return (
     <View style={styles.container}>
-      <Animated.View 
-        entering={FadeIn.duration(500)} 
+      <Animated.View
+        entering={FadeIn.duration(500)}
         style={styles.header}
       >
-        <Animated.Text 
-          entering={FadeIn.duration(600).delay(100)} 
+        <Animated.Text
+          entering={FadeIn.duration(600).delay(100)}
           style={styles.title}
         >
           {t('newWorkout')}
         </Animated.Text>
         <Animated.View entering={FadeIn.duration(600).delay(200)}>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.closeButton}
             onPress={() => router.back()}
           >
@@ -632,8 +627,8 @@ export default function NewWorkoutScreen() {
         </Animated.View>
       </Animated.View>
 
-      <ScrollView 
-        style={[styles.content, { zIndex: 1 }]} 
+      <ScrollView
+        style={[styles.content, { zIndex: 1 }]}
         contentContainerStyle={{ paddingBottom: 120 }}
         showsVerticalScrollIndicator={false}
       >
@@ -650,8 +645,8 @@ export default function NewWorkoutScreen() {
 
         {/* Custom Exercise Input */}
         {isCustomExercise && selectedMuscle && (
-          <Animated.View 
-            entering={FadeIn.duration(400)} 
+          <Animated.View
+            entering={FadeIn.duration(400)}
             style={styles.customExerciseContainer}
           >
             <TextInput
@@ -675,13 +670,13 @@ export default function NewWorkoutScreen() {
           </Animated.View>
         )}
 
-        <Animated.View 
-          entering={FadeIn.duration(500).delay(300)} 
+        <Animated.View
+          entering={FadeIn.duration(500).delay(300)}
         >
           <View style={styles.sectionTitleContainer}>
             <Layers color={theme.colors.primary} size={24} style={styles.sectionTitleIcon} />
-            <Animated.Text 
-              entering={FadeIn.duration(400)} 
+            <Animated.Text
+              entering={FadeIn.duration(400)}
               style={styles.sectionTitle}
             >
               {t('series')}
@@ -689,9 +684,9 @@ export default function NewWorkoutScreen() {
           </View>
 
           {series.map((item, index) => (
-            <Animated.View 
+            <Animated.View
               key={index}
-              entering={FadeIn.duration(400).delay(100 + index * 50)} 
+              entering={FadeIn.duration(400).delay(100 + index * 50)}
               style={styles.seriesContainer}
             >
               <View style={styles.seriesHeader}>
@@ -722,11 +717,11 @@ export default function NewWorkoutScreen() {
                     ]}
                     onPress={() => {
                       const newSeries = [...series];
-                      newSeries[index] = {...newSeries[index], type: 'warmUp'};
+                      newSeries[index] = { ...newSeries[index], type: 'warmUp' };
                       setSeries(newSeries);
                     }}
                   >
-                    <Text 
+                    <Text
                       style={[
                         styles.serieTypeButtonText,
                         item.type === 'warmUp' && styles.serieTypeButtonTextSelected
@@ -746,11 +741,11 @@ export default function NewWorkoutScreen() {
                     ]}
                     onPress={() => {
                       const newSeries = [...series];
-                      newSeries[index] = {...newSeries[index], type: 'workingSet'};
+                      newSeries[index] = { ...newSeries[index], type: 'workingSet' };
                       setSeries(newSeries);
                     }}
                   >
-                    <Text 
+                    <Text
                       style={[
                         styles.serieTypeButtonText,
                         item.type === 'workingSet' && styles.serieTypeButtonTextSelected
@@ -772,8 +767,8 @@ export default function NewWorkoutScreen() {
                     <Text style={styles.seriesInputLabel}>{t('weightKg')}</Text>
                   </View>
                   {index === 0 && suggestedWeight !== null && (
-                    <Animated.View 
-                      entering={FadeIn.duration(400).delay(100)} 
+                    <Animated.View
+                      entering={FadeIn.duration(400).delay(100)}
                       style={styles.suggestedWeightContainer}
                     >
                       <Text style={styles.suggestedWeightText}>
@@ -782,7 +777,7 @@ export default function NewWorkoutScreen() {
                       <TouchableOpacity
                         onPress={() => {
                           const newSeries = [...series];
-                          newSeries[index] = {...newSeries[index], weight: suggestedWeight.toString()};
+                          newSeries[index] = { ...newSeries[index], weight: suggestedWeight.toString() };
                           setSeries(newSeries);
                         }}
                         style={styles.useSuggestedButton}
@@ -796,7 +791,7 @@ export default function NewWorkoutScreen() {
                     value={item.weight}
                     onChangeText={(value) => {
                       const newSeries = [...series];
-                      newSeries[index] = {...newSeries[index], weight: value};
+                      newSeries[index] = { ...newSeries[index], weight: value };
                       setSeries(newSeries);
                     }}
                     placeholder="0"
@@ -814,7 +809,7 @@ export default function NewWorkoutScreen() {
                     value={item.reps}
                     onChangeText={(value) => {
                       const newSeries = [...series];
-                      newSeries[index] = {...newSeries[index], reps: value};
+                      newSeries[index] = { ...newSeries[index], reps: value };
                       setSeries(newSeries);
 
                       if (index === 0 && exercise && value && (item.rpe || rpe)) {
@@ -829,7 +824,7 @@ export default function NewWorkoutScreen() {
                 <View style={[styles.column]}>
                   <View style={styles.sectionTitleContainer}>
                     <Gauge color={theme.colors.primary} size={20} style={styles.sectionTitleIcon} />
-                    <Text 
+                    <Text
                       style={[
                         styles.seriesInputLabel,
                         item.type === 'warmUp' && styles.disabledLabel
@@ -841,9 +836,9 @@ export default function NewWorkoutScreen() {
                       )}
                     </Text>
                   </View>
-                  <View 
+                  <View
                     style={[
-                      styles.dropdownContainer, 
+                      styles.dropdownContainer,
                       { position: 'relative' },
                       item.type === 'warmUp' && styles.disabledDropdown
                     ]}
@@ -859,14 +854,14 @@ export default function NewWorkoutScreen() {
                           // Toggle dropdown visibility for this specific series
                           const newSeries = [...series];
                           newSeries[index] = {
-                            ...newSeries[index], 
+                            ...newSeries[index],
                             showRpeDropdown: !item.showRpeDropdown
                           };
                           setSeries(newSeries);
                         }
                       }}
                     >
-                      <Text 
+                      <Text
                         style={[
                           styles.dropdownButtonText,
                           item.type === 'warmUp' && styles.disabledDropdownButtonText
@@ -888,7 +883,7 @@ export default function NewWorkoutScreen() {
 
                                 const newSeries = [...series];
                                 newSeries[index] = {
-                                  ...newSeries[index], 
+                                  ...newSeries[index],
                                   rpe: rpeValue,
                                   showRpeDropdown: false
                                 };
@@ -899,7 +894,7 @@ export default function NewWorkoutScreen() {
                                 }
                               }}
                             >
-                              <Text 
+                              <Text
                                 style={[
                                   styles.dropdownItemText,
                                   item.rpe === value.toString() && styles.dropdownItemTextSelected
@@ -923,7 +918,7 @@ export default function NewWorkoutScreen() {
                   value={item.note}
                   onChangeText={(value) => {
                     const newSeries = [...series];
-                    newSeries[index] = {...newSeries[index], note: value};
+                    newSeries[index] = { ...newSeries[index], note: value };
                     setSeries(newSeries);
                   }}
                   placeholder={t('optionalNote')}
@@ -961,11 +956,11 @@ export default function NewWorkoutScreen() {
           <TouchableOpacity
             style={styles.addSeriesButton}
             onPress={() => {
-              setSeries([...series, { 
-                weight: '', 
-                reps: '', 
-                note: '', 
-                rpe: '', 
+              setSeries([...series, {
+                weight: '',
+                reps: '',
+                note: '',
+                rpe: '',
                 showRpeDropdown: false,
                 type: 'workingSet' // Default to working set for new series
               }]);
@@ -979,7 +974,7 @@ export default function NewWorkoutScreen() {
         <Animated.View
           entering={FadeIn.duration(500).delay(500)}
         >
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[styles.addButton, (!exercise || !selectedMuscle) && styles.addButtonDisabled]}
             onPress={saveWorkout}
             disabled={!exercise || !selectedMuscle}

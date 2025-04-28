@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image } from 'react-native';
 import { ChevronDown, ChevronUp, Search, Plus } from 'lucide-react-native';
 import Animated, { FadeIn, SlideInRight } from 'react-native-reanimated';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -7,13 +7,18 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { useTheme } from '@/hooks/useTheme';
 
 // Import the muscle groups and predefined exercises from the original file
-import { muscleGroups, muscleGroupIcons, predefinedExercises } from '../workout/new';
+import { muscleGroups, predefinedExercises } from '../workout/new';
 
-import BackMuscle from '@/assets/images/muscles/back.png';
-import ChestMuscle from '@/assets/images/muscles/chest.png';
-import BicepsMuscle from '@/assets/images/muscles/biceps.png';
-import TricepsMuscle from '@/assets/images/muscles/triceps.png';
-import ShouldersMuscle from '@/assets/images/muscles/shoulders.png';
+// Create a mapping of muscle groups to their respective image components
+const muscleImages = {
+  'Poitrine': require('../../assets/images/muscles/chest.png'),
+  'Dos': require('../../assets/images/muscles/back.png'),
+  'Jambes': require('../../assets/images/muscles/legs.png'),
+  'Epaules': require('../../assets/images/muscles/shoulders.png'),
+  'Biceps': require('../../assets/images/muscles/biceps.png'),
+  'Triceps': require('../../assets/images/muscles/triceps.png'),
+  'Ceinture abdominale': require('../../assets/images/muscles/core.png'),
+};
 
 
 interface ExerciseListProps {
@@ -24,15 +29,6 @@ interface ExerciseListProps {
   setIsCustomExercise?: (isCustom: boolean) => void;
   onExerciseSelect?: (exercise: string) => void;
 }
-
-export const muscleGroupIcons = {
-  'Dos': BackMuscle,
-  'Poitrine': ChestMuscle,
-  'Biceps': BicepsMuscle,
-  'Triceps': TricepsMuscle,
-  'Épaules': ShouldersMuscle,
-};
-
 
 export const ExerciseList: React.FC<ExerciseListProps> = ({
   selectedMuscle,
@@ -51,8 +47,8 @@ export const ExerciseList: React.FC<ExerciseListProps> = ({
 
   // Function to toggle expanded state of a muscle group
   const toggleMuscleGroupExpanded = (muscleGroup: string) => {
-    setExpandedMuscleGroups(prev => 
-      prev.includes(muscleGroup) 
+    setExpandedMuscleGroups(prev =>
+      prev.includes(muscleGroup)
         ? prev.filter(group => group !== muscleGroup)
         : [...prev, muscleGroup]
     );
@@ -69,7 +65,7 @@ export const ExerciseList: React.FC<ExerciseListProps> = ({
     const filtered: {[key: string]: string[]} = {};
 
     Object.entries(predefinedExercises).forEach(([muscleGroup, exercises]) => {
-      const matchingExercises = exercises.filter(ex => 
+      const matchingExercises = exercises.filter(ex =>
         ex.toLowerCase().includes(query)
       );
 
@@ -149,11 +145,14 @@ export const ExerciseList: React.FC<ExerciseListProps> = ({
                 }}
               >
                 <View style={styles.muscleButtonContent}>
-                  {React.createElement(muscleGroupIcons[muscleGroup as keyof typeof muscleGroupIcons], {
-                    size: 20,
-                    color: isSelected ? theme.colors.text.primary : theme.colors.primary,
-                    style: styles.muscleIcon
-                  })}
+                  <Image
+                    source={muscleImages[muscleGroup as keyof typeof muscleImages]}
+                    style={[
+                      styles.muscleIcon,
+                      { width: 32, height: 32 }
+                    ]}
+                    resizeMode="contain"
+                  />
                   <Text style={[
                     styles.muscleButtonText,
                     isSelected && styles.muscleButtonTextSelected,
@@ -275,6 +274,7 @@ const useStyles = () => {
     },
     muscleIcon: {
       marginRight: theme.spacing.sm,
+      borderRadius: 40,
     },
     muscleButtonText: {
       fontFamily: theme.typography.fontFamily.semiBold,

@@ -171,5 +171,54 @@ export default {
   usePreviousValues: 'Use previous values',
   notApplicable: 'N/A',
 
-  goalDetails: 'Goal Details'
+  goalDetails: 'Goal Details',
+
+  // Exercise names - Chest
+  exercise_chest_benchPress: 'Bench Press',
+  exercise_chest_inclineBenchPress: 'Incline Bench Press',
+  exercise_chest_declineBenchPress: 'Decline Bench Press',
+  exercise_chest_dumbbellFlyes: 'Dumbbell Flyes',
+  exercise_chest_cableCrossover: 'Cable Crossover',
+
+  // Exercise names - Back
+  exercise_back_pullUps: 'Pull-ups',
+  exercise_back_latPulldown: 'Lat Pulldown',
+  exercise_back_barbellRow: 'Barbell Row',
+  exercise_back_dumbbellRow: 'Dumbbell Row',
+  exercise_back_tBarRow: 'T-Bar Row',
+
+  // Exercise names - Legs
+  exercise_legs_squat: 'Squat',
+  exercise_legs_deadlift: 'Deadlift',
+  exercise_legs_legPress: 'Leg Press',
+  exercise_legs_lunges: 'Lunges',
+  exercise_legs_legExtension: 'Leg Extension',
+
+  // Exercise names - Shoulders
+  exercise_shoulders_militaryPress: 'Military Press',
+  exercise_shoulders_lateralRaises: 'Lateral Raises',
+  exercise_shoulders_frontRaises: 'Front Raises',
+  exercise_shoulders_rearDeltFlyes: 'Rear Delt Flyes',
+  exercise_shoulders_shrugs: 'Shrugs',
+
+  // Exercise names - Biceps
+  exercise_biceps_barbellCurl: 'Barbell Curl',
+  exercise_biceps_dumbbellCurl: 'Dumbbell Curl',
+  exercise_biceps_hammerCurl: 'Hammer Curl',
+  exercise_biceps_preacherCurl: 'Preacher Curl',
+  exercise_biceps_concentrationCurl: 'Concentration Curl',
+
+  // Exercise names - Triceps
+  exercise_triceps_cableExtension: 'Cable Extension',
+  exercise_triceps_skullCrushers: 'Skull Crushers',
+  exercise_triceps_overheadExtension: 'Overhead Extension',
+  exercise_triceps_dips: 'Dips',
+  exercise_triceps_closegripBenchPress: 'Close-grip Bench Press',
+
+  // Exercise names - Core
+  exercise_core_plank: 'Plank',
+  exercise_core_russianTwist: 'Russian Twist',
+  exercise_core_legRaises: 'Leg Raises',
+  exercise_core_crunches: 'Crunches',
+  exercise_core_hangingKneeRaises: 'Hanging Knee Raises'
 };

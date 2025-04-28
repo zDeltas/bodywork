@@ -171,5 +171,54 @@ export default {
   usePreviousValues: 'Utiliser les valeurs précédentes',
   notApplicable: 'N/A',
 
-  goalDetails: 'Dets de l\'objectif'
+  goalDetails: 'Dets de l\'objectif',
+
+  // Exercise names - Chest
+  exercise_chest_benchPress: 'Développé couché',
+  exercise_chest_inclineBenchPress: 'Développé incliné',
+  exercise_chest_declineBenchPress: 'Développé décliné',
+  exercise_chest_dumbbellFlyes: 'Écarté avec haltères',
+  exercise_chest_cableCrossover: 'Crossover à la poulie',
+
+  // Exercise names - Back
+  exercise_back_pullUps: 'Tractions',
+  exercise_back_latPulldown: 'Tirage vertical',
+  exercise_back_barbellRow: 'Rowing barre',
+  exercise_back_dumbbellRow: 'Rowing haltère',
+  exercise_back_tBarRow: 'Rowing T-Bar',
+
+  // Exercise names - Legs
+  exercise_legs_squat: 'Squat',
+  exercise_legs_deadlift: 'Soulevé de terre',
+  exercise_legs_legPress: 'Presse à jambes',
+  exercise_legs_lunges: 'Fentes',
+  exercise_legs_legExtension: 'Extension des jambes',
+
+  // Exercise names - Shoulders
+  exercise_shoulders_militaryPress: 'Développé militaire',
+  exercise_shoulders_lateralRaises: 'Élévations latérales',
+  exercise_shoulders_frontRaises: 'Élévations frontales',
+  exercise_shoulders_rearDeltFlyes: 'Oiseau pour deltoïdes postérieurs',
+  exercise_shoulders_shrugs: 'Haussements d\'épaules',
+
+  // Exercise names - Biceps
+  exercise_biceps_barbellCurl: 'Curl barre',
+  exercise_biceps_dumbbellCurl: 'Curl haltères',
+  exercise_biceps_hammerCurl: 'Curl marteau',
+  exercise_biceps_preacherCurl: 'Curl au pupitre',
+  exercise_biceps_concentrationCurl: 'Curl concentration',
+
+  // Exercise names - Triceps
+  exercise_triceps_cableExtension: 'Extension à la poulie',
+  exercise_triceps_skullCrushers: 'Barre au front',
+  exercise_triceps_overheadExtension: 'Extension au-dessus de la tête',
+  exercise_triceps_dips: 'Dips',
+  exercise_triceps_closegripBenchPress: 'Développé couché prise serrée',
+
+  // Exercise names - Core
+  exercise_core_plank: 'Planche',
+  exercise_core_russianTwist: 'Twists russes',
+  exercise_core_legRaises: 'Relevés de jambes',
+  exercise_core_crunches: 'Crunchs',
+  exercise_core_hangingKneeRaises: 'Relevés de genoux suspendu'
 };

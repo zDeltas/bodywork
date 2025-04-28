@@ -118,7 +118,7 @@ export default function NewWorkoutScreen() {
       console.error('Error calculating suggested weight:', error);
       setSuggestedWeight(null);
     }
-  }, []);
+  }, [setSuggestedWeight]);
 
   // Function to try to calculate suggested weight based on exercise, reps, and RPE
   const tryCalculateSuggestedWeight = useCallback(async (selectedExercise: string) => {

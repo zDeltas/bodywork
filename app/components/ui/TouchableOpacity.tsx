@@ -7,13 +7,12 @@ interface TouchableOpacityProps extends React.ComponentProps<typeof RNTouchableO
   size?: 'sm' | 'md' | 'lg';
 }
 
-export function TouchableOpacity({ 
+export default function TouchableOpacity({
   variant = 'default',
   size = 'md',
   style,
   ...props 
 }: TouchableOpacityProps) {
-  const { theme } = useTheme();
   const styles = useStyles();
 
   return (

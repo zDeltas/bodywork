@@ -6,13 +6,12 @@ interface CardProps extends ViewProps {
   variant?: 'default' | 'highlighted' | 'secondary';
 }
 
-export function Card({
+export default function Card({
   variant = 'default',
   style,
   children,
   ...props
 }: CardProps) {
-  const { theme } = useTheme();
   const styles = useStyles();
 
   return (

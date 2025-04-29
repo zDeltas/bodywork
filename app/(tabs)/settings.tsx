@@ -9,6 +9,7 @@ import { useSettings } from '@/hooks/useSettings';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useTheme } from '@/hooks/useTheme';
 import { useCSVExport } from '@/hooks/useCSVExport';
+import { Header } from '../components/Header';
 
 export default function SettingsScreen() {
   const { settings, updateSettings, isLoading } = useSettings();
@@ -50,11 +51,7 @@ export default function SettingsScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="light" />
-
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>{t('settings')}</Text>
-      </View>
-
+      <Header title={t('settings')} showBackButton={false} />
       {isLoading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={theme.colors.primary} />
@@ -209,18 +206,6 @@ const useStyles = () => {
     container: {
       flex: 1,
       backgroundColor: theme.colors.background.main
-    },
-    header: {
-      padding: theme.spacing.lg,
-      paddingBottom: theme.spacing.md,
-      borderBottomWidth: 1,
-      borderBottomColor: theme.colors.border.default,
-      backgroundColor: theme.colors.background.card
-    },
-    headerTitle: {
-      fontSize: theme.typography.fontSize['2xl'],
-      fontFamily: theme.typography.fontFamily.bold,
-      color: theme.colors.text.primary
     },
     loadingContainer: {
       flex: 1,

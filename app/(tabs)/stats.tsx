@@ -13,34 +13,26 @@ import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold, useFonts } from '@e
 import * as SplashScreen from 'expo-splash-screen';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { differenceInDays, format, getWeek, parseISO, startOfWeek, subMonths } from 'date-fns';
+import { differenceInDays, format, parseISO, subMonths } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useTranslation } from '@/hooks/useTranslation';
 import { router } from 'expo-router';
-import ExerciseList, { muscleGroupKeys, predefinedExercisesByKey } from '@/app/components/ExerciseList';
+import { muscleGroupKeys, predefinedExercisesByKey } from '@/app/components/ExerciseList';
 import { useTheme } from '@/hooks/useTheme';
 import KpiMotivation from '@/app/components/KpiMotivation';
-import GoalSection from '@/app/components/GoalSection';
-import MuscleDistribution from '@/app/components/MuscleDistribution';
-import MuscleRestState from '@/app/components/MuscleRestState';
-import { Workout, Series } from '@/types/workout';
-import { TranslationKey } from '@/translations';
-import StatsHeader from '@/app/components/stats/StatsHeader';
+import { Workout } from '@/types/workout';
 import StatsExerciseList from '@/app/components/stats/StatsExerciseList';
 import StatsGoals from '@/app/components/stats/StatsGoals';
 import StatsMuscleDistribution from '@/app/components/stats/StatsMuscleDistribution';
 import StatsMuscleRestState from '@/app/components/stats/StatsMuscleRestState';
+import Header from '@/app/components/Header';
 
-// Define MuscleGroupKey type
 type MuscleGroupKey = typeof muscleGroupKeys[number];
 
-// Define CategoryKey type for UI categories
 type CategoryKey = MuscleGroupKey | 'arms' | 'cardio' | 'other';
 
-// Define ExerciseName type based on the exercise values
 type ExerciseName = string;
 
-// Define period type
 type Period = '1m' | '3m' | '6m';
 
 // Define Goal interface
@@ -438,148 +430,140 @@ export default function StatsScreen() {
   }
 
   return (
-    <ScrollView
-      ref={scrollViewRef}
-      style={styles.container}
-      contentContainerStyle={styles.scrollViewContent}
-      onLayout={onLayoutRootView}
-    >
-      <StatsHeader
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-      />
+    <View style={styles.container}>
+      <Header title={t('stats.title')} showBackButton={false} />
+      <ScrollView style={styles.content} ref={scrollViewRef}>
+        <KpiMotivation
+          fadeAnim={fadeAnim}
+          bestProgressExercise={bestProgressExercise}
+          monthlyProgress={monthlyProgress}
+          trainingFrequency={trainingFrequency}
+          totalSets={totalSets}
+          totalWorkouts={workouts.length}
+        />
 
-      <KpiMotivation
-        fadeAnim={fadeAnim}
-        bestProgressExercise={bestProgressExercise}
-        monthlyProgress={monthlyProgress}
-        trainingFrequency={trainingFrequency}
-        totalSets={totalSets}
-        totalWorkouts={workouts.length}
-      />
+        <StatsExerciseList
+          selectedMuscle={selectedMuscle}
+          setSelectedMuscle={setSelectedMuscle}
+          selectedExercise={selectedExercise}
+          setSelectedExercise={setSelectedExercise}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          exerciseOptions={exerciseOptions}
+          onExerciseSelect={(exercise) => {
+            handleSelectExercise(exercise as ExerciseName);
+            router.push({
+              pathname: '/components/exerciseDetails',
+              params: { exercise }
+            });
+          }}
+          onMuscleSelect={(muscleGroup) => {
+            setSelectedMuscle(muscleGroup);
+            if (graphsSectionRef.current) {
+              graphsSectionRef.current.measureLayout(
+                findNodeHandle(scrollViewRef.current) as number,
+                (_, y) => {
+                  scrollViewRef.current?.scrollTo({ y, animated: true });
+                },
+                () => console.error('Failed to measure layout')
+              );
+            }
+          }}
+        />
 
-      <StatsExerciseList
-        selectedMuscle={selectedMuscle}
-        setSelectedMuscle={setSelectedMuscle}
-        selectedExercise={selectedExercise}
-        setSelectedExercise={setSelectedExercise}
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        exerciseOptions={exerciseOptions}
-        onExerciseSelect={(exercise) => {
-          handleSelectExercise(exercise as ExerciseName);
-          router.push({
-            pathname: '/components/exerciseDetails',
-            params: { exercise }
-          });
-        }}
-        onMuscleSelect={(muscleGroup) => {
-          setSelectedMuscle(muscleGroup);
-          if (graphsSectionRef.current) {
-            graphsSectionRef.current.measureLayout(
-              findNodeHandle(scrollViewRef.current) as number,
-              (_, y) => {
-                scrollViewRef.current?.scrollTo({ y, animated: true });
-              },
-              () => console.error('Failed to measure layout')
-            );
-          }
-        }}
-      />
+        <StatsGoals
+          fadeAnim={fadeAnim}
+          goals={goals}
+          setGoals={setGoals}
+          workouts={workouts}
+          getCurrentWeight={getCurrentWeight}
+        />
 
-      <StatsGoals
-        fadeAnim={fadeAnim}
-        goals={goals}
-        setGoals={setGoals}
-        workouts={workouts}
-        getCurrentWeight={getCurrentWeight}
-      />
+        <StatsMuscleDistribution
+          fadeAnim={fadeAnim}
+          selectedPeriod={selectedPeriod}
+          setSelectedPeriod={setSelectedPeriod}
+          graphsSectionRef={graphsSectionRef}
+        />
 
-      <StatsMuscleDistribution
-        fadeAnim={fadeAnim}
-        selectedPeriod={selectedPeriod}
-        setSelectedPeriod={setSelectedPeriod}
-        graphsSectionRef={graphsSectionRef}
-      />
+        <StatsMuscleRestState
+          fadeAnim={fadeAnim}
+          workouts={adaptedWorkouts}
+        />
 
-      <StatsMuscleRestState
-        fadeAnim={fadeAnim}
-        workouts={adaptedWorkouts}
-      />
+        {/* Exercise Selector Modal */}
+        {showExerciseSelector && (
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContainer}>
+              <Text style={styles.modalTitle}>{t('selectExerciseForGoal')}</Text>
 
-      {/* Exercise Selector Modal */}
-      {showExerciseSelector && (
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>{t('selectExerciseForGoal')}</Text>
+              <View style={styles.searchContainer}>
+                <Ionicons name="search" size={20} color="#999" style={styles.searchIcon} />
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder={t('searchExercise')}
+                  placeholderTextColor="#999"
+                  value={searchQuery}
+                  onChangeText={setSearchQuery}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                />
+                {searchQuery.length > 0 && (
+                  <TouchableOpacity onPress={() => setSearchQuery('')}>
+                    <Ionicons name="close-circle" size={20} color="#999" />
+                  </TouchableOpacity>
+                )}
+              </View>
 
-            <View style={styles.searchContainer}>
-              <Ionicons name="search" size={20} color="#999" style={styles.searchIcon} />
-              <TextInput
-                style={styles.searchInput}
-                placeholder={t('searchExercise')}
-                placeholderTextColor="#999"
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
-              {searchQuery.length > 0 && (
-                <TouchableOpacity onPress={() => setSearchQuery('')}>
-                  <Ionicons name="close-circle" size={20} color="#999" />
-                </TouchableOpacity>
-              )}
-            </View>
+              <ScrollView style={styles.exerciseList}>
+                {exerciseOptions
+                  .filter(ex => {
+                    const exerciseKey = ex as ExerciseName;
+                    return exerciseKey in predefinedExercisesByKey && ex.toLowerCase().includes(searchQuery.toLowerCase());
+                  })
+                  .map((ex, index) => {
+                    const exerciseKey = ex as ExerciseName;
+                    if (!(exerciseKey in predefinedExercisesByKey)) {
+                      return null;
+                    }
+                    return (
+                      <TouchableOpacity
+                        key={index}
+                        style={styles.exerciseOption}
+                        onPress={() => {
+                          setNewGoalExercise(exerciseKey);
+                          setShowExerciseSelector(false);
 
-            <ScrollView style={styles.exerciseList}>
-              {exerciseOptions
-                .filter(ex => {
-                  const exerciseKey = ex as ExerciseName;
-                  return exerciseKey in predefinedExercisesByKey && ex.toLowerCase().includes(searchQuery.toLowerCase());
-                })
-                .map((ex, index) => {
-                  const exerciseKey = ex as ExerciseName;
-                  if (!(exerciseKey in predefinedExercisesByKey)) {
-                    return null;
-                  }
-                  return (
-                    <TouchableOpacity
-                      key={index}
-                      style={styles.exerciseOption}
-                      onPress={() => {
-                        setNewGoalExercise(exerciseKey);
-                        setShowExerciseSelector(false);
+                          // Auto-populate current weight and suggest target
+                          const currentWeight = getCurrentWeight(exerciseKey);
+                          if (currentWeight !== null) {
+                            setNewGoalCurrent(currentWeight.toString());
 
-                        // Auto-populate current weight and suggest target
-                        const currentWeight = getCurrentWeight(exerciseKey);
-                        if (currentWeight !== null) {
-                          setNewGoalCurrent(currentWeight.toString());
-
-                          // Update suggested target
-                          const target = suggestTargetWeight(currentWeight);
-                          if (target !== null) {
-                            setSuggestedTarget(target);
+                            // Update suggested target
+                            const target = suggestTargetWeight(currentWeight);
+                            if (target !== null) {
+                              setSuggestedTarget(target);
+                            }
                           }
-                        }
-                      }}
-                    >
-                      <Text style={styles.exerciseOptionText}>{ex}</Text>
-                    </TouchableOpacity>
-                  );
-                })}
-            </ScrollView>
+                        }}
+                      >
+                        <Text style={styles.exerciseOptionText}>{ex}</Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+              </ScrollView>
 
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={() => setShowExerciseSelector(false)}
-            >
-              <Text style={styles.cancelButtonText}>{t('cancel')}</Text>
-            </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={() => setShowExerciseSelector(false)}
+              >
+                <Text style={styles.cancelButtonText}>{t('cancel')}</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      )}
-
-    </ScrollView>
+        )}
+      </ScrollView>
+    </View>
   );
 }
 
@@ -589,11 +573,10 @@ const useStyles = () => {
   return StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: theme.colors.background.main,
-      paddingTop: theme.spacing.lg
+      backgroundColor: theme.colors.background.main
     },
-    scrollViewContent: {
-      paddingBottom: theme.spacing.xl * 2
+    content: {
+      flex: 1
     },
     header: {
       flexDirection: 'row',

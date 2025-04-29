@@ -11,6 +11,7 @@ import * as Haptics from 'expo-haptics';
 import { TranslationKey } from '@/translations';
 import { useTheme } from '@/hooks/useTheme';
 import Text from '../components/ui/Text';
+import { Header } from '../components/Header';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -227,10 +228,7 @@ export default function TimerScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text variant="heading" style={styles.title}>
-          Timer
-        </Text>
+      <Header title={t('timer')} showBackButton={false} rightComponent={
         <View style={styles.modeSelector}>
           <TouchableOpacity
             style={[styles.modeButton, mode === 'timer' && styles.modeButtonActive]}
@@ -249,7 +247,7 @@ export default function TimerScreen() {
             </Text>
           </TouchableOpacity>
         </View>
-      </View>
+      } />
 
       <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: 100 }}>
         {mode === 'timer' && (

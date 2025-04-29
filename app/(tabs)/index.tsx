@@ -7,21 +7,8 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { useTheme } from '@/hooks/useTheme';
 import { Activity, Dumbbell, Layers, Repeat } from 'lucide-react-native';
 import { Ionicons } from '@expo/vector-icons';
-
-interface Series {
-  weight: number;
-  reps: number;
-  note: string;
-  rpe: number;
-  type: 'warmUp' | 'workingSet';
-}
-
-interface Workout {
-  id: string;
-  exercise: string;
-  date: string;
-  series: Series[];
-}
+import Header from '@/app/components/Header';
+import { Workout } from '@/types/workout';
 
 LocaleConfig.locales['fr'] = {
   monthNames: [
@@ -146,12 +133,11 @@ export default function WorkoutScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>{t('appTitle')}</Text>
-        <TouchableOpacity onPress={navigateToSettings} style={styles.settingsButton}>
+      <Header title={t('appTitle')} showBackButton={false} rightComponent={
+        <TouchableOpacity onPress={navigateToSettings}>
           <Ionicons name="settings-outline" size={24} color={theme.colors.primary} />
         </TouchableOpacity>
-      </View>
+      } />
       <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: 100 }}>
         <View style={styles.calendarContainer}>
           <Calendar
@@ -255,32 +241,8 @@ const useStyles = () => {
       flex: 1,
       backgroundColor: theme.colors.background.main
     },
-    header: {
-      padding: theme.spacing.lg,
-      paddingBottom: theme.spacing.md,
-      borderBottomWidth: 1,
-      borderBottomColor: theme.colors.border.default,
-      backgroundColor: theme.colors.background.card,
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center'
-    },
-    headerTitle: {
-      fontSize: theme.typography.fontSize['2xl'],
-      fontFamily: theme.typography.fontFamily.bold,
-      color: theme.colors.text.primary
-    },
-    settingsButton: {
-      padding: theme.spacing.sm
-    },
-    scrollContainer: {
-      flex: 1,
-      backgroundColor: theme.colors.background.main
-    },
-    calendar: {
-      borderBottomWidth: 1,
-      borderBottomColor: theme.colors.border.default,
-      paddingBottom: 10
+    content: {
+      flex: 1
     },
     workoutCard: {
       padding: 10,
@@ -303,10 +265,6 @@ const useStyles = () => {
       justifyContent: 'space-between',
       width: '100%',
       marginBottom: theme.spacing.sm
-    },
-    content: {
-      flex: 1,
-      padding: theme.spacing.lg
     },
     workoutInfoItem: {
       flexDirection: 'row',

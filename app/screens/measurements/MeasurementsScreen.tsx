@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { colors } from '../../theme/theme';
 import { MeasurementForm } from '../../components/measurements/MeasurementForm';
 import { MeasurementChart } from '../../components/measurements/MeasurementChart';
 import { MeasurementBodyMap } from '../../components/measurements/MeasurementBodyMap';
-import { MeasurementHistory } from '../../components/measurements/MeasurementHistory';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Slug } from 'react-native-body-highlighter';
 import Text from '../../components/ui/Text';
 import { useTheme } from '@/hooks/useTheme';
+import MeasurementHistory from '@/app/components/measurements/MeasurementHistory';
 
 interface Measurement {
   date: string;
@@ -56,7 +56,7 @@ const measurementSlugs: Record<string, Slug> = {
   SHOULDERS: 'deltoids' as Slug,
   THIGHS: 'quadriceps' as Slug,
   CALVES: 'calves' as Slug,
-  NECK: 'neck' as Slug,
+  NECK: 'neck' as Slug
 };
 
 const STORAGE_KEY = '@measurements';
@@ -77,8 +77,8 @@ export default function MeasurementsScreen() {
       shoulders: 0,
       thighs: 0,
       calves: 0,
-      neck: 0,
-    },
+      neck: 0
+    }
   });
 
   useEffect(() => {
@@ -109,22 +109,22 @@ export default function MeasurementsScreen() {
       ...prev,
       measurements: {
         ...prev.measurements,
-        [key]: parseFloat(value) || 0,
-      },
+        [key]: parseFloat(value) || 0
+      }
     }));
   };
 
   const handleWeightChange = (value: string) => {
     setCurrentMeasurement((prev) => ({
       ...prev,
-      weight: parseFloat(value) || 0,
+      weight: parseFloat(value) || 0
     }));
   };
 
   const handleDateChange = (date: string) => {
     setCurrentMeasurement((prev) => ({
       ...prev,
-      date,
+      date
     }));
   };
 
@@ -144,66 +144,66 @@ export default function MeasurementsScreen() {
         shoulders: 0,
         thighs: 0,
         calves: 0,
-        neck: 0,
-      },
+        neck: 0
+      }
     });
   };
 
   const measurementPoints: MeasurementPoint[] = [
-    { 
-      label: 'Chest', 
-      key: 'CHEST', 
+    {
+      label: 'Chest',
+      key: 'CHEST',
       color: colors.primary,
       position: { x: 50, y: 30, side: 'right' as const, labelX: 60, labelY: 30 }
     },
-    { 
-      label: 'Waist', 
-      key: 'WAIST', 
+    {
+      label: 'Waist',
+      key: 'WAIST',
       color: colors.primary,
       position: { x: 50, y: 45, side: 'right' as const, labelX: 60, labelY: 45 }
     },
-    { 
-      label: 'Hips', 
-      key: 'HIPS', 
+    {
+      label: 'Hips',
+      key: 'HIPS',
       color: colors.primary,
       position: { x: 50, y: 60, side: 'right' as const, labelX: 60, labelY: 60 }
     },
-    { 
-      label: 'Arms', 
-      key: 'ARMS', 
+    {
+      label: 'Arms',
+      key: 'ARMS',
       color: colors.primary,
       position: { x: 25, y: 35, side: 'left' as const, labelX: 15, labelY: 35 }
     },
-    { 
-      label: 'Forearms', 
-      key: 'FOREARMS', 
+    {
+      label: 'Forearms',
+      key: 'FOREARMS',
       color: colors.primary,
       position: { x: 20, y: 45, side: 'left' as const, labelX: 10, labelY: 45 }
     },
-    { 
-      label: 'Shoulders', 
-      key: 'SHOULDERS', 
+    {
+      label: 'Shoulders',
+      key: 'SHOULDERS',
       color: colors.primary,
       position: { x: 30, y: 25, side: 'left' as const, labelX: 20, labelY: 25 }
     },
-    { 
-      label: 'Thighs', 
-      key: 'THIGHS', 
+    {
+      label: 'Thighs',
+      key: 'THIGHS',
       color: colors.primary,
       position: { x: 45, y: 70, side: 'right' as const, labelX: 55, labelY: 70 }
     },
-    { 
-      label: 'Calves', 
-      key: 'CALVES', 
+    {
+      label: 'Calves',
+      key: 'CALVES',
       color: colors.primary,
       position: { x: 45, y: 85, side: 'right' as const, labelX: 55, labelY: 85 }
     },
-    { 
-      label: 'Neck', 
-      key: 'NECK', 
+    {
+      label: 'Neck',
+      key: 'NECK',
       color: colors.primary,
       position: { x: 50, y: 15, side: 'right' as const, labelX: 60, labelY: 15 }
-    },
+    }
   ];
 
   return (
@@ -227,7 +227,7 @@ export default function MeasurementsScreen() {
             <MeasurementChart
               data={measurements.map((m) => ({
                 date: m.date,
-                value: m.weight,
+                value: m.weight
               }))}
               title="Weight Progress"
             />
@@ -248,23 +248,23 @@ export default function MeasurementsScreen() {
 const useStyles = (theme: any) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background.main,
+    backgroundColor: colors.background.main
   },
   header: {
     padding: 16,
-    marginBottom: 16,
+    marginBottom: 16
   },
   content: {
-    padding: 16,
+    padding: 16
   },
   saveButton: {
     backgroundColor: colors.primary,
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',
-    marginTop: 16,
+    marginTop: 16
   },
   saveButtonText: {
     textAlign: 'center'
-  },
+  }
 }); 

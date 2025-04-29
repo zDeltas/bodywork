@@ -1,10 +1,10 @@
-import { StyleSheet, TouchableOpacity, View, ScrollView } from 'react-native';
+import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import BodyMeasurements from '@/app/components/BodyMeasurements';
 import { Check } from 'lucide-react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { useTranslation } from '@/hooks/useTranslation';
-import { Header } from '../components/Header';
+import Header from '@/app/components/Header';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -27,7 +27,7 @@ const useStyles = () => {
       ...theme.shadows.primary
     },
     content: {
-      flex: 1,
+      flex: 1
     }
   });
 };

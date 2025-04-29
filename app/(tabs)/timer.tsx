@@ -11,7 +11,7 @@ import * as Haptics from 'expo-haptics';
 import { TranslationKey } from '@/translations';
 import { useTheme } from '@/hooks/useTheme';
 import Text from '../components/ui/Text';
-import { Header } from '../components/Header';
+import Header from '@/app/components/Header';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -110,7 +110,7 @@ const useStyles = (theme: any) => {
       color: theme.colors.text.primary
     },
     timeValueActive: {
-      color: theme.colors.text.primary,
+      color: theme.colors.text.primary
     },
     customTimeButton: {
       width: '48%',

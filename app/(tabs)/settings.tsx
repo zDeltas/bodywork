@@ -9,7 +9,7 @@ import { useSettings } from '@/hooks/useSettings';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useTheme } from '@/hooks/useTheme';
 import { useCSVExport } from '@/hooks/useCSVExport';
-import { Header } from '../components/Header';
+import Header from '@/app/components/Header';
 
 export default function SettingsScreen() {
   const { settings, updateSettings, isLoading } = useSettings();

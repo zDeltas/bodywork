@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
-import { X } from 'lucide-react-native';
+import { ChevronLeft } from 'lucide-react-native';
 import { router } from 'expo-router';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import Text from './ui/Text';
@@ -28,7 +28,7 @@ export default function Header({ title, showBackButton = true, rightComponent }:
             style={styles.backButton}
             onPress={() => router.back()}
           >
-            <X color={theme.colors.text.primary} size={24} />
+            <ChevronLeft color={theme.colors.text.primary} size={24} />
           </TouchableOpacity>
         )}
       </View>
@@ -53,7 +53,7 @@ const useStyles = () => {
       justifyContent: 'space-between',
       alignItems: 'center',
       paddingHorizontal: theme.spacing.lg,
-      paddingVertical: theme.spacing.md + 8,
+      paddingVertical: theme.spacing.base + 8,
       backgroundColor: theme.colors.background.main
     },
     leftContainer: {

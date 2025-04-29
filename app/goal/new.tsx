@@ -2,13 +2,12 @@ import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  Modal,
   ScrollView,
   StyleSheet,
-  Text,
   TextInput,
   TouchableOpacity,
-  View,
-  Modal
+  View
 } from 'react-native';
 import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold, useFonts } from '@expo-google-fonts/inter';
 import * as SplashScreen from 'expo-splash-screen';
@@ -16,13 +15,12 @@ import { router } from 'expo-router';
 import { ChevronDown, X } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from '@/hooks/useTranslation';
-import { Ionicons } from '@expo/vector-icons';
-import { getMuscleGroups, getPredefinedExercises } from '@/app/components/ExerciseList';
-import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import ExerciseList, { getMuscleGroups, getPredefinedExercises } from '@/app/components/ExerciseList';
+import Animated, { FadeIn } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { useTheme } from '@/hooks/useTheme';
-import ExerciseList from '@/app/components/ExerciseList';
-import { Text as UiText } from '@/components/ui/Text';
+import Header from '@/app/components/Header';
+import Text from '@/app/components/ui/Text';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -515,19 +513,7 @@ export default function NewGoalScreen() {
 
   return (
     <View style={styles.container} onLayout={onLayoutRootView}>
-      <View style={styles.header}>
-        <Text variant="heading" style={styles.title}>{t('addGoal')}</Text>
-        <TouchableOpacity
-          style={styles.closeButton}
-          onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            router.back();
-          }}
-        >
-          <X color={theme.colors.text.primary} size={24} />
-        </TouchableOpacity>
-      </View>
-
+      <Header title={t('addGoal')} showBackButton={true} />
       <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: 100 }}>
         <Animated.View
           entering={FadeIn.duration(400).delay(100)}
@@ -668,7 +654,7 @@ export default function NewGoalScreen() {
                   setNewGoalExercise(exercise);
                   // Ferme la modale uniquement lors de la sélection d'un exercice
                   setShowExerciseSelector(false);
-                  
+
                   // Auto-populate current weight and suggest target
                   setIsLoadingLastWorkout(true);
                   const currentWeightPromise = getCurrentWeight(exercise);

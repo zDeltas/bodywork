@@ -13,10 +13,25 @@ import Text from '../components/ui/Text';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useTheme } from '@/hooks/useTheme';
 import { Series, Workout } from '@/types/workout';
+import Header from '@/app/components/Header';
+import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold, useFonts } from '@expo-google-fonts/inter';
 
 SplashScreen.preventAutoHideAsync();
 
 export default function NewWorkoutScreen() {
+
+  const [fontsLoaded] = useFonts({
+    'Inter-Regular': Inter_400Regular,
+    'Inter-SemiBold': Inter_600SemiBold,
+    'Inter-Bold': Inter_700Bold
+  });
+
+  const onLayoutRootView = useCallback(async () => {
+    if (fontsLoaded) {
+      await SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded]);
+
   const { t } = useTranslation();
   const { theme } = useTheme();
   const styles = useStyles();
@@ -230,32 +245,9 @@ export default function NewWorkoutScreen() {
   const isAnyRpeDropdownOpen = series.some(s => s.showRpeDropdown);
 
   return (
-    <View style={styles.container}>
-      <Animated.View
-        entering={FadeIn.duration(500)}
-        style={styles.header}
-      >
-        <Animated.Text
-          entering={FadeIn.duration(600).delay(100)}
-          style={styles.title}
-        >
-          {t('newWorkout')}
-        </Animated.Text>
-        <Animated.View entering={FadeIn.duration(600).delay(200)}>
-          <TouchableOpacity
-            style={styles.closeButton}
-            onPress={() => router.back()}
-          >
-            <X color={theme.colors.text.primary} size={24} />
-          </TouchableOpacity>
-        </Animated.View>
-      </Animated.View>
-
-      <ScrollView
-        style={[styles.content, { zIndex: 1 }]}
-        contentContainerStyle={{ paddingBottom: 120 }}
-        showsVerticalScrollIndicator={false}
-      >
+    <View style={styles.container} onLayout={onLayoutRootView}>
+      <Header title={t('newWorkout')} showBackButton={true} />
+      <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: 100 }}>
         <TouchableOpacity
           style={styles.dateButton}
           onPress={() => setShowCalendar(true)}

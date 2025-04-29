@@ -5,6 +5,7 @@ export default {
   errorLoadingWorkouts: 'Error loading workouts:',
   errorSavingWorkouts: 'Error saving workouts:',
   appTitle: 'Body Work',
+  noWorkoutForDate: 'No workout recorded for this date',
 
   // Settings screen
   settings: 'Settings',

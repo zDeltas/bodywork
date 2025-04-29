@@ -169,65 +169,71 @@ export default function WorkoutScreen() {
             enableSwipeMonths={true}
           />
         </View>
-        {filteredWorkouts.map(workout => (
-          <View key={workout.id} style={styles.workoutCard}>
-            <View style={styles.workoutDetailsCard}>
-              <Text style={styles.workoutTitle}>{workout.exercise}</Text>
-              <Text
-                style={styles.workoutDate}>{new Date(workout.date).toLocaleString(language === 'fr' ? 'fr-FR' : 'en-US', {
-                day: '2-digit',
-                month: '2-digit',
-                year: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit'
-              })}</Text>
-              {(() => {
-                const info = getWorkingSetInfo(workout);
-                const isWarmUp = workout.series && workout.series.length > 0 && workout.series[0].type === 'warmUp';
-                let rpeBg = theme.colors.primary;
-                if (info.rpe >= 8) rpeBg = '#e74c3c';
-                else if (info.rpe >= 5) rpeBg = '#f5c542';
-                return (
-                  <>
-                    <View style={styles.workoutTypeBadgeContainer}>
-                      <Text style={[styles.workoutTypeBadge, {
-                        backgroundColor: isWarmUp ? theme.colors.text.disabled : theme.colors.primary,
-                        color: theme.colors.background.main
-                      }]}>
-                        {isWarmUp ? t('warmUpSeries') : t('workingSeries')}
-                      </Text>
-                    </View>
-                    <View style={styles.workoutInfoRow}>
-                      <View style={styles.workoutInfoItem}>
-                        <Dumbbell size={18} color={theme.colors.primary} style={styles.workoutInfoIcon} />
-                        <Text style={styles.workoutInfoValue}>{info.weight}kg</Text>
+        {filteredWorkouts.length > 0 ? (
+          filteredWorkouts.map(workout => (
+            <View key={workout.id} style={styles.workoutCard}>
+              <View style={styles.workoutDetailsCard}>
+                <Text style={styles.workoutTitle}>{workout.exercise}</Text>
+                <Text
+                  style={styles.workoutDate}>{new Date(workout.date).toLocaleString(language === 'fr' ? 'fr-FR' : 'en-US', {
+                  day: '2-digit',
+                  month: '2-digit',
+                  year: '2-digit',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}</Text>
+                {(() => {
+                  const info = getWorkingSetInfo(workout);
+                  const isWarmUp = workout.series && workout.series.length > 0 && workout.series[0].type === 'warmUp';
+                  let rpeBg = theme.colors.primary;
+                  if (info.rpe >= 8) rpeBg = '#e74c3c';
+                  else if (info.rpe >= 5) rpeBg = '#f5c542';
+                  return (
+                    <>
+                      <View style={styles.workoutTypeBadgeContainer}>
+                        <Text style={[styles.workoutTypeBadge, {
+                          backgroundColor: isWarmUp ? theme.colors.text.disabled : theme.colors.primary,
+                          color: theme.colors.background.main
+                        }]}>
+                          {isWarmUp ? t('warmUpSeries') : t('workingSeries')}
+                        </Text>
                       </View>
-                      <View style={styles.workoutInfoItem}>
-                        <Repeat size={18} color={theme.colors.primary} style={styles.workoutInfoIcon} />
-                        <Text style={styles.workoutInfoValue}>{info.reps}</Text>
+                      <View style={styles.workoutInfoRow}>
+                        <View style={styles.workoutInfoItem}>
+                          <Dumbbell size={18} color={theme.colors.primary} style={styles.workoutInfoIcon} />
+                          <Text style={styles.workoutInfoValue}>{info.weight}kg</Text>
+                        </View>
+                        <View style={styles.workoutInfoItem}>
+                          <Repeat size={18} color={theme.colors.primary} style={styles.workoutInfoIcon} />
+                          <Text style={styles.workoutInfoValue}>{info.reps}</Text>
+                        </View>
+                        <View style={styles.workoutInfoItem}>
+                          <Layers size={18} color={theme.colors.primary} style={styles.workoutInfoIcon} />
+                          <Text style={styles.workoutInfoValue}>{info.sets}</Text>
+                        </View>
+                        {info.rpe && info.rpe > 0 && (
+                          <View style={[styles.rpeBadge, { backgroundColor: rpeBg }]}>
+                            <Activity size={14} color={theme.colors.background.main} style={styles.rpeBadgeIcon} />
+                            <Text style={styles.rpeBadgeText}>RPE {info.rpe}</Text>
+                          </View>
+                        )}
                       </View>
-                      <View style={styles.workoutInfoItem}>
-                        <Layers size={18} color={theme.colors.primary} style={styles.workoutInfoIcon} />
-                        <Text style={styles.workoutInfoValue}>{info.sets}</Text>
-                      </View>
-                      {info.rpe && info.rpe > 0 && (
-                        <View style={[styles.rpeBadge, { backgroundColor: rpeBg }]}>
-                          <Activity size={14} color={theme.colors.background.main} style={styles.rpeBadgeIcon} />
-                          <Text style={styles.rpeBadgeText}>RPE {info.rpe}</Text>
+                      {workout.series && workout.series.length > 0 && workout.series[0].note && (
+                        <View style={styles.workoutNoteBox}>
+                          <Text style={styles.workoutNoteText}>{workout.series[0].note}</Text>
                         </View>
                       )}
-                    </View>
-                    {workout.series && workout.series.length > 0 && workout.series[0].note && (
-                      <View style={styles.workoutNoteBox}>
-                        <Text style={styles.workoutNoteText}>{workout.series[0].note}</Text>
-                      </View>
-                    )}
-                  </>
-                );
-              })()}
+                    </>
+                  );
+                })()}
+              </View>
             </View>
+          ))
+        ) : (
+          <View style={styles.noWorkoutContainer}>
+            <Text style={styles.noWorkoutText}>{t('noWorkoutForDate')}</Text>
           </View>
-        ))}
+        )}
       </ScrollView>
     </View>
   );
@@ -332,6 +338,18 @@ const useStyles = () => {
       fontSize: theme.typography.fontSize.sm,
       color: theme.colors.text.secondary,
       marginBottom: theme.spacing.sm
+    },
+    noWorkoutContainer: {
+      padding: theme.spacing.base,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginTop: theme.spacing.lg
+    },
+    noWorkoutText: {
+      fontFamily: theme.typography.fontFamily.regular,
+      fontSize: theme.typography.fontSize.base,
+      color: theme.colors.text.secondary,
+      textAlign: 'center'
     },
     calendarContainer: {
       borderRadius: theme.borderRadius.lg,

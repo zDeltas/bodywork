@@ -5,6 +5,7 @@ export default {
   errorLoadingWorkouts: 'Erreur lors du chargement des séances:',
   errorSavingWorkouts: 'Erreur lors de la sauvegarde des séances:',
   appTitle: 'Body Work',
+  noWorkoutForDate: 'Aucune séance enregistrée pour cette date',
 
   // Settings screen
   settings: 'Réglages',

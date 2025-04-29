@@ -1,75 +1,136 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { View, Text, StyleSheet, Platform, StatusBar, useWindowDimensions, TouchableOpacity } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/hooks/useTheme';
-import { ChevronLeft } from 'lucide-react-native';
 import { router } from 'expo-router';
-import Animated, { FadeIn } from 'react-native-reanimated';
-import Text from './ui/Text';
-import TouchableOpacity from './ui/TouchableOpacity';
+import { Ionicons } from '@expo/vector-icons';
 
 interface HeaderProps {
   title: string;
-  showBackButton?: boolean;
+  largeTitle?: boolean;
+  leftComponent?: React.ReactNode;
   rightComponent?: React.ReactNode;
+  showBackButton?: boolean;
+  onBack?: () => void;
 }
 
-export default function Header({ title, showBackButton = true, rightComponent }: HeaderProps) {
-  const { theme } = useTheme();
-  const styles = useStyles();
+const Header: React.FC<HeaderProps> = ({
+  title,
+  largeTitle = false,
+  leftComponent,
+  rightComponent,
+  showBackButton = false,
+  onBack,
+}) => {
+  const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
+  const { theme, isDarkMode } = useTheme();
+
+  const handleBack = () => {
+    if (onBack) {
+      onBack();
+    } else {
+      router.back();
+    }
+  };
+
+  // Calcul des dimensions selon la plateforme
+  const statusBarHeight = Platform.select({
+    ios: insets.top,
+    android: StatusBar.currentHeight || 0,
+  }) ?? 0;
+
+  const navBarHeight = Platform.select({
+    ios: largeTitle ? 96 : 44,
+    android: 56,
+  }) ?? 44;
+
+  const totalHeight = statusBarHeight + navBarHeight;
 
   return (
-    <Animated.View
-      entering={FadeIn.duration(500)}
-      style={styles.header}
-    >
-      <View style={styles.leftContainer}>
-        {showBackButton && (
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => router.back()}
-          >
-            <ChevronLeft color={theme.colors.text.primary} size={24} />
-          </TouchableOpacity>
-        )}
+    <View style={[headerStyles.container, { height: totalHeight, backgroundColor: theme.colors.background.main }]}>
+      <StatusBar
+        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+        backgroundColor={theme.colors.background.main}
+      />
+      <View style={[headerStyles.navBar, { height: navBarHeight }]}>
+        <View style={headerStyles.leftContainer}>
+          {showBackButton && (
+            <TouchableOpacity onPress={handleBack} style={headerStyles.backButton}>
+              <Ionicons
+                name={Platform.OS === 'ios' ? 'chevron-back' : 'arrow-back'}
+                size={24}
+                color={theme.colors.text.primary}
+              />
+            </TouchableOpacity>
+          )}
+          {leftComponent}
+        </View>
+        <Text
+          style={[
+            headerStyles.title,
+            largeTitle && headerStyles.largeTitle,
+            { color: theme.colors.text.primary },
+          ]}
+          numberOfLines={1}
+        >
+          {title}
+        </Text>
+        <View style={headerStyles.rightContainer}>
+          {rightComponent}
+        </View>
       </View>
-
-      <Text variant="heading" style={styles.title}>
-        {title}
-      </Text>
-
-      <View style={styles.rightContainer}>
-        {rightComponent}
-      </View>
-    </Animated.View>
+    </View>
   );
-}
+};
 
-const useStyles = () => {
-  const { theme } = useTheme();
+const headerStyles = StyleSheet.create({
+  container: {
+    width: '100%',
+  },
+  statusBar: {
+    width: '100%',
+  },
+  navBar: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+  },
+  leftContainer: {
+    minWidth: 44,
+    height: 44,
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+    flexDirection: 'row',
+  },
+  rightContainer: {
+    minWidth: 44,
+    height: 44,
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+  },
+  title: {
+    fontSize: 17,
+    fontWeight: '600',
+    textAlign: 'center',
+    flex: 1,
+    marginHorizontal: 8,
+  },
+  largeTitle: {
+    fontSize: 34,
+    fontWeight: '700',
+    textAlign: 'left',
+    marginLeft: 16,
+  },
+  backButton: {
+    width: 44,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 8,
+  },
+});
 
-  return StyleSheet.create({
-    header: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      paddingHorizontal: theme.spacing.lg,
-      paddingVertical: theme.spacing.base + 8,
-      backgroundColor: theme.colors.background.main
-    },
-    leftContainer: {
-      width: 40,
-      alignItems: 'flex-start'
-    },
-    rightContainer: {
-      width: 40,
-      alignItems: 'flex-end'
-    },
-    title: {
-      flex: 1,
-      textAlign: 'center'
-    },
-    backButton: {
-      padding: theme.spacing.sm
-    }
-  });
-}; 
+export default Header; 

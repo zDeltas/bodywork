@@ -1,15 +1,17 @@
 import React from 'react';
-import { Text as RNText, TextProps as RNTextProps, StyleSheet } from 'react-native';
+import { Text as RNText, TextProps as RNTextProps, StyleSheet, Platform } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
+import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 
 export interface TextProps extends RNTextProps {
   variant?: 'heading' | 'subheading' | 'body' | 'caption';
   color?: string;
+  weight?: 'regular' | 'medium' | 'semibold' | 'bold';
 }
 
 const Text = React.forwardRef<RNText, TextProps>((props, ref) => {
   const { theme } = useTheme();
-  const { variant = 'body', style, color, ...rest } = props;
+  const { variant = 'body', style, color, weight = 'regular', ...rest } = props;
 
   const getTextStyle = () => {
     switch (variant) {
@@ -24,12 +26,28 @@ const Text = React.forwardRef<RNText, TextProps>((props, ref) => {
     }
   };
 
+  const getFontWeight = () => {
+    switch (weight) {
+      case 'medium':
+        return Platform.OS === 'ios' ? '500' : '400';
+      case 'semibold':
+        return Platform.OS === 'ios' ? '600' : '500';
+      case 'bold':
+        return Platform.OS === 'ios' ? '700' : '600';
+      default:
+        return Platform.OS === 'ios' ? '400' : '300';
+    }
+  };
+
   return (
     <RNText
       ref={ref}
       style={[
         getTextStyle(),
-        { color: color || theme.colors.text.primary },
+        { 
+          color: color || theme.colors.text.primary,
+          fontWeight: getFontWeight(),
+        },
         style,
       ]}
       {...rest}
@@ -39,22 +57,27 @@ const Text = React.forwardRef<RNText, TextProps>((props, ref) => {
 
 const styles = StyleSheet.create({
   heading: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 8,
+    fontSize: Platform.OS === 'ios' ? 24 : 22,
+    lineHeight: Platform.OS === 'ios' ? 32 : 30,
+    marginBottom: Platform.OS === 'ios' ? 8 : 6,
+    letterSpacing: Platform.OS === 'ios' ? -0.5 : 0,
   },
   subheading: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 6,
+    fontSize: Platform.OS === 'ios' ? 18 : 16,
+    lineHeight: Platform.OS === 'ios' ? 24 : 22,
+    marginBottom: Platform.OS === 'ios' ? 6 : 4,
+    letterSpacing: Platform.OS === 'ios' ? -0.3 : 0,
   },
   body: {
-    fontSize: 16,
-    lineHeight: 24,
+    fontSize: Platform.OS === 'ios' ? 16 : 14,
+    lineHeight: Platform.OS === 'ios' ? 24 : 22,
+    letterSpacing: Platform.OS === 'ios' ? -0.2 : 0,
   },
   caption: {
-    fontSize: 14,
+    fontSize: Platform.OS === 'ios' ? 14 : 12,
+    lineHeight: Platform.OS === 'ios' ? 20 : 18,
     color: '#666',
+    letterSpacing: Platform.OS === 'ios' ? -0.1 : 0,
   },
 });
 

@@ -4,23 +4,43 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import { SettingsProvider } from '@/hooks/useSettings';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 export default function RootLayout() {
   useFrameworkReady();
 
   return (
     <SettingsProvider>
-      <GestureHandlerRootView>
-        <View style={{ flex: 1 }}>
-          <StatusBar style="light" />
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="workout/new" options={{ presentation: 'modal' }} />
-            <Stack.Screen name="goal/new" options={{ presentation: 'modal' }} />
-          </Stack>
-        </View>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <SafeAreaProvider>
+          <SafeAreaView style={{ flex: 1 }}>
+            <Stack
+              screenOptions={{ 
+                headerShown: false,
+                animation: Platform.OS === 'ios' ? 'default' : 'fade',
+                contentStyle: { backgroundColor: 'transparent' }
+              }}
+            >
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen 
+                name="workout/new" 
+                options={{ 
+                  presentation: 'modal',
+                  animation: Platform.OS === 'ios' ? 'slide_from_bottom' : 'fade'
+                }} 
+              />
+              <Stack.Screen 
+                name="goal/new" 
+                options={{ 
+                  presentation: 'modal',
+                  animation: Platform.OS === 'ios' ? 'slide_from_bottom' : 'fade'
+                }} 
+              />
+            </Stack>
+          </SafeAreaView>
+        </SafeAreaProvider>
       </GestureHandlerRootView>
     </SettingsProvider>
   );

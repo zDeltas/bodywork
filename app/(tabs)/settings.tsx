@@ -50,7 +50,6 @@ export default function SettingsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar style="light" />
       <Header title={t('settings')} showBackButton={false} />
       {isLoading ? (
         <View style={styles.loadingContainer}>

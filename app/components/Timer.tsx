@@ -1,12 +1,16 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { StyleSheet, TouchableOpacity, Vibration, View } from 'react-native';
-import { Inter_400Regular, Inter_600SemiBold, useFonts } from '@expo-google-fonts/inter';
+import { Platform, StyleSheet, TouchableOpacity, Vibration, View } from 'react-native';
+import {
+  Inter_400Regular as InterRegular,
+  Inter_600SemiBold as InterSemiBold,
+  useFonts
+} from '@expo-google-fonts/inter';
 import { Pause, Play, RotateCcw } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useTheme } from '@/hooks/useTheme';
-import { Inter_400Regular as InterRegular, Inter_600SemiBold as InterSemiBold } from '@expo-google-fonts/inter';
 import Text from './ui/Text';
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 
 interface TimerProps {
   initialTime?: number;
@@ -40,24 +44,29 @@ export default function Timer({
 
   const handleWorkComplete = useCallback(() => {
     if (mode === 'timer') {
-      Vibration.vibrate([0, 500, 200, 500]);
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      if (Platform.OS === 'ios') {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      } else {
+        Vibration.vibrate([0, 500, 200, 500]);
+      }
       setIsRunning(true);
     }
   }, [mode]);
 
   const handleRestComplete = useCallback(() => {
-    Vibration.vibrate([0, 500, 200, 500]);
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-
+    if (Platform.OS === 'ios') {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } else {
+      Vibration.vibrate([0, 500, 200, 500]);
+    }
+    setIsResting(false);
+    setCurrentSet(prev => prev + 1);
     if (currentSet < sets) {
-      setCurrentSet(prev => prev + 1);
-      setIsRunning(true);
+      setWorkTime(initialTime);
     } else {
       onComplete?.();
-      setIsRunning(false);
     }
-  }, [currentSet, sets, onComplete]);
+  }, [currentSet, sets, initialTime, onComplete]);
 
   useEffect(() => {
     if (!isRunning) {
@@ -128,48 +137,51 @@ export default function Timer({
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
+      <Animated.View
+        entering={FadeIn.duration(300)}
+        exiting={FadeOut.duration(300)}
+        style={styles.content}
+      >
         <Text style={styles.exerciseName}>{exerciseName}</Text>
-      </View>
-
-      <View style={styles.setsContainer}>
-        <Text style={styles.setsLabel}>{t('sets')}</Text>
-        <View style={styles.setsControls}>
-          <Text style={styles.setsValue}>{currentSet} / {sets}</Text>
-        </View>
-      </View>
-
-      <View style={[
-        styles.timerDisplayContainer,
-        isResting ? styles.restTimer : styles.workTimer
-      ]}>
-        <Text style={styles.timerLabel}>
-          {isResting ? t('restTime') : (mode === 'timer' ? t('workTime') : t('stopwatch'))}
+        <Text style={styles.setInfo}>
+          {t('sets')} {currentSet}/{sets}
         </Text>
         <Text style={styles.time}>
           {formatTime(isResting ? restTimeState : workTime)}
         </Text>
-      </View>
-
-      <View style={styles.controls}>
-        <TouchableOpacity
-          style={[styles.button, styles.resetButton]}
-          onPress={resetTimer}
-        >
-          <RotateCcw color={theme.colors.text.primary} size={24} />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.button, isRunning ? styles.stopButton : styles.startButton]}
-          onPress={toggleTimer}
-        >
-          {isRunning ? (
-            <Pause color={theme.colors.text.primary} size={32} />
-          ) : (
-            <Play color={theme.colors.text.primary} size={32} />
-          )}
-        </TouchableOpacity>
-        <View style={styles.buttonPlaceholder} />
-      </View>
+        <View style={styles.controls}>
+          <Animated.View
+            entering={FadeIn.springify()}
+            exiting={FadeOut.springify()}
+          >
+            <TouchableOpacity
+              style={styles.button}
+              onPress={toggleTimer}
+              activeOpacity={0.7}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              {isRunning ? (
+                <Pause size={24} color={theme.colors.text.primary} />
+              ) : (
+                <Play size={24} color={theme.colors.text.primary} />
+              )}
+            </TouchableOpacity>
+          </Animated.View>
+          <Animated.View
+            entering={FadeIn.springify()}
+            exiting={FadeOut.springify()}
+          >
+            <TouchableOpacity
+              style={styles.button}
+              onPress={resetTimer}
+              activeOpacity={0.7}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <RotateCcw size={24} color={theme.colors.text.primary} />
+            </TouchableOpacity>
+          </Animated.View>
+        </View>
+      </Animated.View>
     </View>
   );
 }
@@ -180,102 +192,54 @@ const useStyles = () => {
 
   return StyleSheet.create({
     container: {
-      backgroundColor: theme.colors.background.card,
-      borderRadius: theme.borderRadius.lg,
-      padding: theme.spacing.lg,
-      alignItems: 'center',
-      width: '100%',
-      ...theme.shadows.md
-    },
-    header: {
-      flexDirection: 'row',
+      flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
-      width: '100%',
-      marginBottom: theme.spacing.sm
+      padding: Platform.OS === 'ios' ? 20 : 16
+    },
+    content: {
+      alignItems: 'center',
+      width: '100%'
     },
     exerciseName: {
-      fontSize: theme.typography.fontSize['2xl'],
-      fontFamily: theme.typography.fontFamily.semiBold,
-      color: theme.colors.text.primary,
+      fontSize: Platform.OS === 'ios' ? 24 : 20,
+      fontWeight: '600',
+      marginBottom: 8,
       textAlign: 'center'
     },
-    setsContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: theme.spacing.md,
-      marginBottom: theme.spacing.lg
-    },
-    setsLabel: {
-      fontSize: theme.typography.fontSize.base,
-      fontFamily: theme.typography.fontFamily.regular,
-      color: theme.colors.text.secondary
-    },
-    setsControls: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: theme.spacing.md
-    },
-    setsValue: {
-      fontSize: theme.typography.fontSize.lg,
-      fontFamily: theme.typography.fontFamily.semiBold,
-      color: theme.colors.text.primary,
-      minWidth: 60,
-      textAlign: 'center'
-    },
-    timerDisplayContainer: {
-      width: '100%',
-      padding: theme.spacing.xl,
-      borderRadius: theme.borderRadius.lg,
-      alignItems: 'center',
-      marginBottom: theme.spacing.xl
-    },
-    workTimer: {
-      backgroundColor: theme.colors.success
-    },
-    restTimer: {
-      backgroundColor: theme.colors.error
-    },
-    timerLabel: {
-      fontSize: theme.typography.fontSize.base,
-      fontFamily: theme.typography.fontFamily.regular,
-      color: theme.colors.text.primary,
-      marginBottom: theme.spacing.xs,
-      textTransform: 'uppercase',
-      letterSpacing: 1
+    setInfo: {
+      fontSize: Platform.OS === 'ios' ? 18 : 16,
+      marginBottom: 16,
+      opacity: 0.7
     },
     time: {
-      fontSize: theme.typography.fontSize['4xl'],
-      fontFamily: theme.typography.fontFamily.bold,
-      color: theme.colors.text.primary
+      fontSize: Platform.OS === 'ios' ? 72 : 64,
+      fontWeight: '700',
+      marginBottom: 32
     },
     controls: {
       flexDirection: 'row',
-      justifyContent: 'space-around',
-      alignItems: 'center',
-      width: '100%',
-      marginTop: theme.spacing.md
+      justifyContent: 'center',
+      gap: Platform.OS === 'ios' ? 24 : 20
     },
     button: {
-      width: 70,
-      height: 70,
-      borderRadius: theme.borderRadius.full,
+      width: Platform.OS === 'ios' ? 56 : 48,
+      height: Platform.OS === 'ios' ? 56 : 48,
+      borderRadius: Platform.OS === 'ios' ? 28 : 24,
+      backgroundColor: theme.colors.background.button,
       justifyContent: 'center',
       alignItems: 'center',
-      ...theme.shadows.md
-    },
-    startButton: {
-      backgroundColor: theme.colors.primary
-    },
-    stopButton: {
-      backgroundColor: theme.colors.error
-    },
-    resetButton: {
-      backgroundColor: theme.colors.background.button
-    },
-    buttonPlaceholder: {
-      width: 70
+      ...Platform.select({
+        ios: {
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.1,
+          shadowRadius: 4
+        },
+        android: {
+          elevation: 4
+        }
+      })
     }
   });
 };

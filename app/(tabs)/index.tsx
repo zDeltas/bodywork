@@ -133,7 +133,7 @@ export default function WorkoutScreen() {
 
   return (
     <View style={styles.container}>
-      <Header title={t('appTitle')} showBackButton={false} rightComponent={
+      <Header title={t('appTitle')} rightComponent={
         <TouchableOpacity onPress={navigateToSettings}>
           <Ionicons name="settings-outline" size={24} color={theme.colors.primary} />
         </TouchableOpacity>

@@ -22,6 +22,7 @@ import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { useTheme } from '@/hooks/useTheme';
 import ExerciseList from '@/app/components/ExerciseList';
+import { Text as UiText } from '@/components/ui/Text';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -45,9 +46,7 @@ const useStyles = () => {
       ...theme.shadows.md
     },
     title: {
-      fontSize: theme.typography.fontSize['3xl'],
-      fontFamily: theme.typography.fontFamily.bold,
-      color: theme.colors.text.primary
+      marginBottom: theme.spacing.xl
     },
     closeButton: {
       width: 44,
@@ -70,11 +69,7 @@ const useStyles = () => {
       ...theme.shadows.sm
     },
     sectionTitle: {
-      fontSize: theme.typography.fontSize.xl,
-      fontFamily: theme.typography.fontFamily.semiBold,
-      color: theme.colors.text.primary,
-      marginBottom: theme.spacing.lg,
-      textAlign: 'center'
+      marginBottom: theme.spacing.md
     },
     formGroup: {
       marginBottom: theme.spacing.base
@@ -327,6 +322,15 @@ const useStyles = () => {
       fontFamily: theme.typography.fontFamily.semiBold,
       fontSize: theme.typography.fontSize.sm,
       flex: 1
+    },
+    goalTypeDescription: {
+      marginBottom: theme.spacing.lg
+    },
+    inputLabel: {
+      marginBottom: theme.spacing.sm
+    },
+    inputDescription: {
+      marginTop: theme.spacing.xs
     }
   });
 };
@@ -512,7 +516,7 @@ export default function NewGoalScreen() {
   return (
     <View style={styles.container} onLayout={onLayoutRootView}>
       <View style={styles.header}>
-        <Text style={styles.title}>{t('addGoal')}</Text>
+        <Text variant="heading" style={styles.title}>{t('addGoal')}</Text>
         <TouchableOpacity
           style={styles.closeButton}
           onPress={() => {
@@ -529,10 +533,10 @@ export default function NewGoalScreen() {
           entering={FadeIn.duration(400).delay(100)}
           style={styles.formCard}
         >
-          <Text style={styles.sectionTitle}>{t('goalDetails')}</Text>
+          <Text variant="subheading" style={styles.sectionTitle}>{t('goalDetails')}</Text>
 
           <View style={styles.formGroup}>
-            <Text style={styles.formLabel}>{t('exercise')}</Text>
+            <Text variant="body" style={styles.formLabel}>{t('exercise')}</Text>
             <TouchableOpacity
               style={styles.exerciseSelectorButton}
               onPress={() => {
@@ -555,7 +559,8 @@ export default function NewGoalScreen() {
           </View>
 
           <View style={styles.formGroup}>
-            <Text style={styles.formLabel}>{t('currentWeight')}</Text>
+            <Text variant="body" style={styles.formLabel}>{t('currentWeight')}</Text>
+            <Text variant="caption" style={styles.inputDescription}>{t('currentWeightDescription')}</Text>
             <View style={styles.weightInputContainer}>
               <TextInput
                 style={styles.formInput}
@@ -595,7 +600,8 @@ export default function NewGoalScreen() {
           </View>
 
           <View style={styles.formGroup}>
-            <Text style={styles.formLabel}>{t('targetWeight')}</Text>
+            <Text variant="body" style={styles.formLabel}>{t('targetWeight')}</Text>
+            <Text variant="caption" style={styles.inputDescription}>{t('targetWeightDescription')}</Text>
             <View style={styles.weightInputContainer}>
               <TextInput
                 style={styles.formInput}

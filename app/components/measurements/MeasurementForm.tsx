@@ -1,7 +1,9 @@
 import React from 'react';
-import { View, TextInput, StyleSheet, Text } from 'react-native';
+import { View, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
-import { colors } from '../../theme/theme';
+import { colors } from '@/app/theme';
+import Text from '../ui/Text';
+
 
 interface Measurement {
   date: string;
@@ -26,6 +28,7 @@ interface MeasurementFormProps {
   onMeasurementChange: (key: MeasurementKey, value: string) => void;
   onWeightChange: (value: string) => void;
   onDateChange: (date: string) => void;
+  onSave: () => void;
 }
 
 export const MeasurementForm: React.FC<MeasurementFormProps> = ({
@@ -33,6 +36,7 @@ export const MeasurementForm: React.FC<MeasurementFormProps> = ({
   onMeasurementChange,
   onWeightChange,
   onDateChange,
+  onSave,
 }) => {
   const { isDarkMode } = useTheme();
 
@@ -51,7 +55,7 @@ export const MeasurementForm: React.FC<MeasurementFormProps> = ({
   return (
     <View style={styles.container}>
       <View style={styles.inputGroup}>
-        <Text style={[styles.label, { color: colors.text.primary }]}>Date</Text>
+        <Text variant="body">Date</Text>
         <TextInput
           style={[
             styles.input,
@@ -69,7 +73,7 @@ export const MeasurementForm: React.FC<MeasurementFormProps> = ({
       </View>
 
       <View style={styles.inputGroup}>
-        <Text style={[styles.label, { color: colors.text.primary }]}>Weight (kg)</Text>
+        <Text variant="body">Weight (kg)</Text>
         <TextInput
           style={[
             styles.input,
@@ -89,7 +93,7 @@ export const MeasurementForm: React.FC<MeasurementFormProps> = ({
 
       {measurementPoints.map((point) => (
         <View key={point.key} style={styles.inputGroup}>
-          <Text style={[styles.label, { color: colors.text.primary }]}>{point.label}</Text>
+          <Text variant="body">{point.label}</Text>
           <TextInput
             style={[
               styles.input,
@@ -107,6 +111,13 @@ export const MeasurementForm: React.FC<MeasurementFormProps> = ({
           />
         </View>
       ))}
+
+      <TouchableOpacity
+        style={[styles.saveButton, { backgroundColor: colors.primary }]}
+        onPress={onSave}
+      >
+        <Text variant="body" style={styles.saveButtonText}>Save Measurements</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -119,10 +130,6 @@ const styles = StyleSheet.create({
   inputGroup: {
     marginBottom: 16,
   },
-  label: {
-    color: colors.text.primary,
-    marginBottom: 4,
-  },
   input: {
     borderWidth: 1,
     borderColor: colors.border.default,
@@ -130,6 +137,16 @@ const styles = StyleSheet.create({
     padding: 8,
     marginBottom: 8,
     color: colors.text.primary,
+  },
+  saveButton: {
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 16,
+  },
+  saveButtonText: {
+    color: colors.text.primary,
+    fontWeight: 'bold',
   },
 });
 

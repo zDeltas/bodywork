@@ -1,9 +1,10 @@
 import React, { useCallback } from 'react';
-import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import { ChevronDown, ChevronUp, Plus, Search } from 'lucide-react-native';
 import Animated, { FadeIn, SlideInRight } from 'react-native-reanimated';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useTheme } from '@/hooks/useTheme';
+import Text from './ui/Text';
 
 type MuscleGroupKey = 'chest' | 'back' | 'legs' | 'shoulders' | 'biceps' | 'triceps' | 'core';
 
@@ -193,10 +194,7 @@ export const ExerciseList: React.FC<ExerciseListProps> = ({
                     ]}
                     resizeMode="contain"
                   />
-                  <Text style={[
-                    styles.muscleButtonText,
-                    isSelected && styles.muscleButtonTextSelected
-                  ]}>
+                  <Text variant="body" style={styles.muscleButtonText}>
                     {muscleGroup}
                   </Text>
                 </View>
@@ -231,10 +229,7 @@ export const ExerciseList: React.FC<ExerciseListProps> = ({
                           }
                         }}
                       >
-                        <Text style={[
-                          styles.exerciseListItemText,
-                          exercise === ex && styles.exerciseListItemTextSelected
-                        ]}>
+                        <Text variant="body" style={styles.exerciseName}>
                           {ex}
                         </Text>
                       </TouchableOpacity>
@@ -252,7 +247,7 @@ export const ExerciseList: React.FC<ExerciseListProps> = ({
                         }}
                       >
                         <Plus color={theme.colors.primary} size={20} />
-                        <Text style={styles.customExerciseButtonText}>{t('customExercise')}</Text>
+                        <Text variant="body" style={styles.customExerciseButtonText}>{t('customExercise')}</Text>
                       </TouchableOpacity>
                     </Animated.View>
                   )}
@@ -338,14 +333,11 @@ const useStyles = () => {
       borderRadius: theme.borderRadius.sm,
       borderBottomColor: 'transparent'
     },
-    exerciseListItemText: {
-      fontFamily: theme.typography.fontFamily.regular,
-      fontSize: theme.typography.fontSize.base,
-      color: theme.colors.text.secondary
+    exerciseName: {
+      marginBottom: theme.spacing.xs
     },
-    exerciseListItemTextSelected: {
-      color: theme.colors.primary,
-      fontFamily: theme.typography.fontFamily.semiBold
+    exerciseMuscle: {
+      marginTop: theme.spacing.xs
     },
     customExerciseButton: {
       flexDirection: 'row',
@@ -356,10 +348,7 @@ const useStyles = () => {
       marginLeft: theme.spacing.lg
     },
     customExerciseButtonText: {
-      fontFamily: theme.typography.fontFamily.semiBold,
-      fontSize: theme.typography.fontSize.base,
-      color: theme.colors.primary,
-      marginLeft: theme.spacing.sm
+      textAlign: 'center'
     }
   });
 };

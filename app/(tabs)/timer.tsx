@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import Timer from '../components/Timer';
 import { Minus, Plus } from 'lucide-react-native';
@@ -10,6 +10,7 @@ import { Audio } from 'expo-av';
 import * as Haptics from 'expo-haptics';
 import { TranslationKey } from '@/translations';
 import { useTheme } from '@/hooks/useTheme';
+import Text from '../components/ui/Text';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -21,9 +22,7 @@ const WORKOUT_TIMES = {
 };
 
 // Define styles using the current theme
-const useStyles = () => {
-  const { theme } = useTheme();
-
+const useStyles = (theme: any) => {
   return StyleSheet.create({
     container: {
       flex: 1,
@@ -196,7 +195,7 @@ const useStyles = () => {
 export default function TimerScreen() {
   const { t } = useTranslation();
   const { theme } = useTheme();
-  const styles = useStyles();
+  const styles = useStyles(theme);
   const [mode, setMode] = useState<'timer' | 'stopwatch'>('timer');
   const [selectedTime, setSelectedTime] = useState(60);
   const [selectedRestTime, setSelectedRestTime] = useState(60);
@@ -229,7 +228,9 @@ export default function TimerScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>{t('timer')}</Text>
+        <Text variant="heading" style={styles.title}>
+          Timer
+        </Text>
         <View style={styles.modeSelector}>
           <TouchableOpacity
             style={[styles.modeButton, mode === 'timer' && styles.modeButtonActive]}

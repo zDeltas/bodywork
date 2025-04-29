@@ -6,6 +6,7 @@
 
 import { StyleSheet } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
+import { UIText } from './ui/Text';
 
 /**
  * Hook to get component styles based on the current theme
@@ -201,6 +202,18 @@ export const useDynamicStyles = () => {
     secondary: {
       color: theme.colors.text.secondary,
       fontFamily: theme.typography.fontFamily.regular
+    },
+    title: {
+      marginBottom: theme.spacing.lg
+    },
+    subtitle: {
+      marginBottom: theme.spacing.md
+    },
+    description: {
+      marginBottom: theme.spacing.base
+    },
+    caption: {
+      marginTop: theme.spacing.xs
     }
   });
 

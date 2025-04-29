@@ -1,10 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, Vibration, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, Vibration, View } from 'react-native';
 import { Inter_400Regular, Inter_600SemiBold, useFonts } from '@expo-google-fonts/inter';
 import { Pause, Play, RotateCcw } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useTheme } from '@/hooks/useTheme';
+import { Inter_400Regular as InterRegular, Inter_600SemiBold as InterSemiBold } from '@expo-google-fonts/inter';
+import Text from './ui/Text';
 
 interface TimerProps {
   initialTime?: number;
@@ -32,8 +34,8 @@ export default function Timer({
   const [currentSet, setCurrentSet] = useState(1);
   const [isResting, setIsResting] = useState(false);
   const [fontsLoaded] = useFonts({
-    'Inter-Regular': Inter_400Regular,
-    'Inter-SemiBold': Inter_600SemiBold
+    'Inter-Regular': InterRegular,
+    'Inter-SemiBold': InterSemiBold
   });
 
   const handleWorkComplete = useCallback(() => {

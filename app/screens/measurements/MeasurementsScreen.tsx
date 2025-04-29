@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity, Text } from 'react-native';
+import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { colors } from '../../theme/theme';
 import { MeasurementForm } from '../../components/measurements/MeasurementForm';
 import { MeasurementChart } from '../../components/measurements/MeasurementChart';
@@ -7,6 +7,8 @@ import { MeasurementBodyMap } from '../../components/measurements/MeasurementBod
 import { MeasurementHistory } from '../../components/measurements/MeasurementHistory';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Slug } from 'react-native-body-highlighter';
+import Text from '../../components/ui/Text';
+import { useTheme } from '@/hooks/useTheme';
 
 interface Measurement {
   date: string;
@@ -60,6 +62,8 @@ const measurementSlugs: Record<string, Slug> = {
 const STORAGE_KEY = '@measurements';
 
 export default function MeasurementsScreen() {
+  const { theme } = useTheme();
+  const styles = useStyles(theme);
   const [measurements, setMeasurements] = useState<Measurement[]>([]);
   const [currentMeasurement, setCurrentMeasurement] = useState<Measurement>({
     date: new Date().toISOString().split('T')[0],
@@ -204,62 +208,54 @@ export default function MeasurementsScreen() {
 
   return (
     <ScrollView style={styles.container}>
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Current Measurements</Text>
+      <View style={styles.header}>
+        <Text variant="heading">Mesures</Text>
+      </View>
+      <ScrollView style={styles.content}>
         <MeasurementForm
           measurement={currentMeasurement}
           onMeasurementChange={handleMeasurementChange}
           onWeightChange={handleWeightChange}
           onDateChange={handleDateChange}
+          onSave={handleSave}
         />
-        <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-          <Text style={styles.saveButtonText}>Save Measurements</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Body Map</Text>
-        <MeasurementBodyMap
-          points={measurementPoints}
-          onPointPress={(point: MeasurementPoint) => {
-            // Handle point press if needed
-          }}
-        />
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Progress Chart</Text>
-        <MeasurementChart
-          data={measurements.map((m) => ({
-            date: m.date,
-            value: m.weight,
-          }))}
-          title="Weight Progress"
-        />
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Measurement History</Text>
-        <MeasurementHistory measurements={measurements} />
-      </View>
+        {measurements.length > 0 && (
+          <>
+            <Text variant="subheading">Historique</Text>
+            <MeasurementHistory measurements={measurements} />
+            <Text variant="subheading">Graphique</Text>
+            <MeasurementChart
+              data={measurements.map((m) => ({
+                date: m.date,
+                value: m.weight,
+              }))}
+              title="Weight Progress"
+            />
+            <Text variant="subheading">Carte corporelle</Text>
+            <MeasurementBodyMap
+              points={measurementPoints}
+              onPointPress={(point: MeasurementPoint) => {
+                // Handle point press if needed
+              }}
+            />
+          </>
+        )}
+      </ScrollView>
     </ScrollView>
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = (theme: any) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background.main,
   },
-  section: {
+  header: {
     padding: 16,
     marginBottom: 16,
   },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: colors.text.primary,
-    marginBottom: 16,
+  content: {
+    padding: 16,
   },
   saveButton: {
     backgroundColor: colors.primary,
@@ -269,8 +265,6 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   saveButtonText: {
-    color: colors.text.primary,
-    fontSize: 16,
-    fontWeight: 'bold',
+    textAlign: 'center'
   },
 }); 

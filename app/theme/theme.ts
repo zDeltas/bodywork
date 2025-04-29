@@ -75,15 +75,15 @@ export const typography = {
 
   // Font sizes
   fontSize: {
-    xs: 11,
-    sm: 12,
-    md: 14,
+    xs: 12,
+    sm: 14,
+    md: 16,
     base: 16,
     lg: 18,
     xl: 20,
     '2xl': 24,
-    '3xl': 32,
-    '4xl': 64
+    '3xl': 28,
+    '4xl': 32
   },
 
   // Line heights

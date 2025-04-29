@@ -1,8 +1,9 @@
 import React from 'react';
-import { Animated, StyleSheet, Text, View } from 'react-native';
+import { Animated, StyleSheet, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useTheme } from '@/hooks/useTheme';
+import Text from './ui/Text';
 
 interface KpiMotivationProps {
   fadeAnim: Animated.Value;
@@ -39,6 +40,7 @@ const KpiMotivation: React.FC<KpiMotivationProps> = ({
         style={styles.statGradient}
       >
         <Text
+          variant="subheading"
           style={[styles.kpiLabel, {
             marginBottom: theme.spacing.base,
             color: theme.colors.text.primary,
@@ -53,16 +55,22 @@ const KpiMotivation: React.FC<KpiMotivationProps> = ({
         </Text>
         <View style={styles.kpiContainer}>
           <View style={styles.kpiItem}>
-            <Text style={styles.kpiValue}>{trainingFrequency}%</Text>
-            <Text style={styles.kpiLabel}>{t('attendance')}</Text>
+            <Text variant="heading" style={styles.kpiValue}>
+              {trainingFrequency}%
+            </Text>
+            <Text variant="caption">{t('attendance')}</Text>
           </View>
           <View style={styles.kpiItem}>
-            <Text style={styles.kpiValue}>{totalSets}</Text>
-            <Text style={styles.kpiLabel}>{t('series')}</Text>
+            <Text variant="heading" style={styles.kpiValue}>
+              {totalSets}
+            </Text>
+            <Text variant="caption">{t('series')}</Text>
           </View>
           <View style={styles.kpiItem}>
-            <Text style={styles.kpiValue}>{totalWorkouts}</Text>
-            <Text style={styles.kpiLabel}>{t('sessions')}</Text>
+            <Text variant="heading" style={styles.kpiValue}>
+              {totalWorkouts}
+            </Text>
+            <Text variant="caption">{t('sessions')}</Text>
           </View>
         </View>
       </LinearGradient>

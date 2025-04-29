@@ -1,8 +1,9 @@
 import React, { useCallback, useState, Dispatch, SetStateAction } from 'react';
-import { Animated, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Animated, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useTheme } from '@/hooks/useTheme';
 import GoalSection from '@/app/components/GoalSection';
+import Text from '../ui/Text';
 
 interface Goal {
   exercise: string;

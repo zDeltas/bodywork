@@ -1,17 +1,18 @@
 import React, { useCallback, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, Modal } from 'react-native';
+import { Modal, Pressable, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import { router, useLocalSearchParams } from 'expo-router';
-import { BarChart, Calendar, Gauge, Layers, Plus, Weight, X, ChevronDown } from 'lucide-react-native';
+import { BarChart, Calendar, ChevronDown, Gauge, Layers, Plus, Weight, X } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useTranslation } from '@/hooks/useTranslation';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import ExerciseList from '../components/ExerciseList';
-import { useTheme } from '@/hooks/useTheme';
-import { Workout, Series } from '@/types/workout';
 import { Calendar as RNCalendar } from 'react-native-calendars';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import Text from '../components/ui/Text';
+import { useTranslation } from '@/hooks/useTranslation';
+import { useTheme } from '@/hooks/useTheme';
+import { Series, Workout } from '@/types/workout';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -255,12 +256,12 @@ export default function NewWorkoutScreen() {
         contentContainerStyle={{ paddingBottom: 120 }}
         showsVerticalScrollIndicator={false}
       >
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.dateButton}
           onPress={() => setShowCalendar(true)}
         >
           <Calendar color={theme.colors.primary} size={20} style={styles.dateButtonIcon} />
-          <Text style={styles.dateButtonText}>
+          <Text variant="body" style={styles.dateButtonText}>
             {format(new Date(selectedDate), 'EEEE d MMMM yyyy', { locale: fr })}
           </Text>
         </TouchableOpacity>
@@ -274,7 +275,7 @@ export default function NewWorkoutScreen() {
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
               <View style={styles.modalHeader}>
-                <Text style={styles.modalTitle}>{t('selectDate')}</Text>
+                <Text variant="heading" style={styles.modalTitle}>{t('selectDate')}</Text>
                 <TouchableOpacity
                   style={styles.modalCloseButton}
                   onPress={() => setShowCalendar(false)}
@@ -328,7 +329,7 @@ export default function NewWorkoutScreen() {
           <View style={styles.modalOverlay}>
             <View style={[styles.modalContent, { height: '80%' }]}>
               <View style={styles.modalHeader}>
-                <Text style={styles.modalTitle}>{t('selectExercise')}</Text>
+                <Text variant="heading" style={styles.modalTitle}>{t('selectExercise')}</Text>
                 <TouchableOpacity
                   style={styles.modalCloseButton}
                   onPress={() => setShowExerciseSelector(false)}
@@ -358,7 +359,7 @@ export default function NewWorkoutScreen() {
           style={styles.exerciseButton}
           onPress={() => setShowExerciseSelector(true)}
         >
-          <Text style={[styles.exerciseButtonText, !exercise && { color: theme.colors.text.secondary }]}>
+          <Text variant="body" style={[styles.exerciseButtonText, !exercise && { color: theme.colors.text.secondary }]}>
             {exercise || t('selectExercise')}
           </Text>
           <ChevronDown color={theme.colors.text.secondary} size={20} />
@@ -369,12 +370,9 @@ export default function NewWorkoutScreen() {
         >
           <View style={styles.sectionTitleContainer}>
             <Layers color={theme.colors.primary} size={24} style={styles.sectionTitleIcon} />
-            <Animated.Text
-              entering={FadeIn.duration(400)}
-              style={styles.sectionTitle}
-            >
+            <Text variant="heading" style={styles.sectionTitle}>
               {t('series')}
-            </Animated.Text>
+            </Text>
           </View>
 
           {series.map((item, index) => (
@@ -384,7 +382,7 @@ export default function NewWorkoutScreen() {
               style={styles.seriesContainer}
             >
               <View style={styles.seriesHeader}>
-                <Text style={styles.seriesTitle}>{t('serie')} {index + 1}</Text>
+                <Text variant="subheading" style={styles.seriesTitle}>{t('serie')} {index + 1}</Text>
                 <View style={styles.seriesActions}>
                   {index > 0 && (
                     <TouchableOpacity
@@ -402,7 +400,7 @@ export default function NewWorkoutScreen() {
               </View>
 
               <View style={styles.serieTypeContainer}>
-                <Text style={styles.seriesInputLabel}>{t('serieType')}</Text>
+                <Text variant="body" style={styles.seriesInputLabel}>{t('serieType')}</Text>
                 <View style={styles.serieTypeButtonsContainer}>
                   <TouchableOpacity
                     style={[
@@ -423,7 +421,7 @@ export default function NewWorkoutScreen() {
                     >
                       {t('warmUp')}
                     </Text>
-                    <Text style={styles.serieTypeDescription}>
+                    <Text variant="caption" style={styles.serieTypeDescription}>
                       {t('warmUpDescription')}
                     </Text>
                   </TouchableOpacity>
@@ -447,7 +445,7 @@ export default function NewWorkoutScreen() {
                     >
                       {t('workingSet')}
                     </Text>
-                    <Text style={styles.serieTypeDescription}>
+                    <Text variant="caption" style={styles.serieTypeDescription}>
                       {t('workingSetDescription')}
                     </Text>
                   </TouchableOpacity>
@@ -458,14 +456,14 @@ export default function NewWorkoutScreen() {
                 <View style={styles.column}>
                   <View style={styles.sectionTitleContainer}>
                     <Weight color={theme.colors.primary} size={20} style={styles.sectionTitleIcon} />
-                    <Text style={styles.seriesInputLabel}>{t('weightKg')}</Text>
+                    <Text variant="body" style={styles.seriesInputLabel}>{t('weightKg')}</Text>
                   </View>
                   {index === 0 && suggestedWeight !== null && (
                     <Animated.View
                       entering={FadeIn.duration(400).delay(100)}
                       style={styles.suggestedWeightContainer}
                     >
-                      <Text style={styles.suggestedWeightText}>
+                      <Text variant="caption" style={styles.suggestedWeightText}>
                         {t('suggested')}: {suggestedWeight} kg
                       </Text>
                       <TouchableOpacity
@@ -476,7 +474,7 @@ export default function NewWorkoutScreen() {
                         }}
                         style={styles.useSuggestedButton}
                       >
-                        <Text style={styles.useSuggestedButtonText}>{t('use')}</Text>
+                        <Text variant="body" style={styles.useSuggestedButtonText}>{t('use')}</Text>
                       </TouchableOpacity>
                     </Animated.View>
                   )}
@@ -496,7 +494,7 @@ export default function NewWorkoutScreen() {
                 <View style={styles.column}>
                   <View style={styles.sectionTitleContainer}>
                     <BarChart color={theme.colors.primary} size={20} style={styles.sectionTitleIcon} />
-                    <Text style={styles.seriesInputLabel}>{t('reps')}</Text>
+                    <Text variant="body" style={styles.seriesInputLabel}>{t('reps')}</Text>
                   </View>
                   <TextInput
                     style={styles.compactInput}
@@ -528,18 +526,18 @@ export default function NewWorkoutScreen() {
                   >
                     {t('rpe')}
                     {item.type === 'warmUp' && (
-                      <Text style={styles.disabledLabelNote}> ({t('notApplicable')})</Text>
+                      <Text variant="caption" style={styles.disabledLabelNote}> ({t('notApplicable')})</Text>
                     )}
                   </Text>
                 </View>
                 {item.type === 'warmUp' ? (
                   <View style={[styles.rpeButtonGrid, styles.disabledDropdown]}>
-                    <Text style={styles.disabledDropdownButtonText}>{t('notApplicable')}</Text>
+                    <Text variant="body" style={styles.disabledDropdownButtonText}>{t('notApplicable')}</Text>
                   </View>
                 ) : (
                   <>
                     <View style={styles.rpeButtonRow}>
-                      {[1,2,3,4,5].map((value) => (
+                      {[1, 2, 3, 4, 5].map((value) => (
                         <Pressable
                           key={value}
                           style={[styles.rpeButtonModern, item.rpe === value.toString() && styles.rpeButtonModernSelected]}
@@ -556,12 +554,13 @@ export default function NewWorkoutScreen() {
                             }
                           }}
                         >
-                          <Text style={[styles.rpeButtonModernText, item.rpe === value.toString() && styles.rpeButtonModernTextSelected]}>{value}</Text>
+                          <Text variant="body"
+                                style={[styles.rpeButtonModernText, item.rpe === value.toString() && styles.rpeButtonModernTextSelected]}>{value}</Text>
                         </Pressable>
                       ))}
                     </View>
                     <View style={styles.rpeButtonRow}>
-                      {[6,7,8,9,10].map((value) => (
+                      {[6, 7, 8, 9, 10].map((value) => (
                         <Pressable
                           key={value}
                           style={[styles.rpeButtonModern, item.rpe === value.toString() && styles.rpeButtonModernSelected]}
@@ -578,7 +577,8 @@ export default function NewWorkoutScreen() {
                             }
                           }}
                         >
-                          <Text style={[styles.rpeButtonModernText, item.rpe === value.toString() && styles.rpeButtonModernTextSelected]}>{value}</Text>
+                          <Text variant="body"
+                                style={[styles.rpeButtonModernText, item.rpe === value.toString() && styles.rpeButtonModernTextSelected]}>{value}</Text>
                         </Pressable>
                       ))}
                     </View>
@@ -587,7 +587,7 @@ export default function NewWorkoutScreen() {
               </View>
 
               <View style={styles.noteContainer}>
-                <Text style={styles.seriesInputLabel}>{t('note')}</Text>
+                <Text variant="body" style={styles.seriesInputLabel}>{t('note')}</Text>
                 <TextInput
                   style={styles.noteInput}
                   value={item.note}
@@ -621,7 +621,7 @@ export default function NewWorkoutScreen() {
                       setSeries(newSeries);
                     }}
                   >
-                    <Text style={styles.quickFillButtonText}>{t('usePreviousValues')}</Text>
+                    <Text variant="body" style={styles.quickFillButtonText}>{t('usePreviousValues')}</Text>
                   </TouchableOpacity>
                 </View>
               )}
@@ -643,7 +643,7 @@ export default function NewWorkoutScreen() {
               }}
             >
               <Plus color={theme.colors.text.primary} size={20} style={{ marginRight: theme.spacing.sm }} />
-              <Text style={styles.addSeriesButtonText}>{t('addSeries')}</Text>
+              <Text variant="body" style={styles.addSeriesButtonText}>{t('addSeries')}</Text>
             </TouchableOpacity>
           )}
         </Animated.View>
@@ -657,7 +657,7 @@ export default function NewWorkoutScreen() {
               onPress={saveWorkout}
               disabled={!exercise || !selectedMuscle}
             >
-              <Text style={styles.addButtonText}>{t('addExercise')}</Text>
+              <Text variant="body" style={styles.addButtonText}>{t('addExercise')}</Text>
             </TouchableOpacity>
           )}
         </Animated.View>
@@ -1034,7 +1034,7 @@ const useStyles = () => {
     },
     rpeButtonSelected: {
       backgroundColor: theme.colors.primary,
-      borderColor: theme.colors.primary,
+      borderColor: theme.colors.primary
     },
     rpeButtonText: {
       color: theme.colors.text.primary,
@@ -1128,9 +1128,8 @@ const useStyles = () => {
       marginBottom: theme.spacing.lg
     },
     modalTitle: {
-      fontSize: theme.typography.fontSize.xl,
-      fontFamily: theme.typography.fontFamily.bold,
-      color: theme.colors.text.primary
+      textAlign: 'center',
+      marginBottom: theme.spacing.lg
     },
     modalCloseButton: {
       width: 44,

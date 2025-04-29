@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View, TouchableOpacity } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import Body, { ExtendedBodyPart, Slug } from 'react-native-body-highlighter';
 import { differenceInHours } from 'date-fns';
 import { useSettings } from '@/hooks/useSettings';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useTheme } from '@/hooks/useTheme';
-
-const AnimatedText = Animated.createAnimatedComponent(Text);
+import Text from './ui/Text';
 
 interface Workout {
   id: string;
@@ -120,16 +119,16 @@ export default function MuscleMap({ workouts }: MuscleMapProps) {
         <Pressable
           style={[styles.toggleButton, selectedView === 'front' && styles.toggleButtonActive]}
           onPress={() => handleViewChange('front')}>
-          <AnimatedText style={[styles.toggleText]}>
+          <Text style={[styles.toggleText]}>
             {t('frontView')}
-          </AnimatedText>
+          </Text>
         </Pressable>
         <Pressable
           style={[styles.toggleButton, selectedView === 'back' && styles.toggleButtonActive]}
           onPress={() => handleViewChange('back')}>
-          <AnimatedText style={[styles.toggleText]}>
+          <Text style={[styles.toggleText]}>
             {t('backView')}
-          </AnimatedText>
+          </Text>
         </Pressable>
       </View>
       <Animated.View style={[styles.bodyContainer, containerStyle]}>

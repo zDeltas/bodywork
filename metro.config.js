@@ -1,4 +1,5 @@
 const { getDefaultConfig } = require('expo/metro-config');
+const path = require('path');
 
 // Create the base configuration
 const config = getDefaultConfig(__dirname);
@@ -13,11 +14,14 @@ config.transformer = {
   babelTransformerPath: require.resolve('react-native-svg-transformer')
 };
 
-// Configure extensions
+// Configure extensions and paths
 config.resolver = {
   ...resolver,
   assetExts: resolver.assetExts.filter((ext) => ext !== 'svg'),
-  sourceExts: [...resolver.sourceExts, 'svg']
+  sourceExts: [...resolver.sourceExts, 'svg'],
+  extraNodeModules: {
+    '@': path.resolve(__dirname, 'app')
+  }
 };
 
 module.exports = wrapWithReanimatedMetroConfig(config);

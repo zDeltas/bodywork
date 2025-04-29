@@ -5,12 +5,12 @@ import {
   Inter_600SemiBold as InterSemiBold,
   useFonts
 } from '@expo-google-fonts/inter';
-import { Pause, Play, RotateCcw } from 'lucide-react-native';
+import { Minus, Pause, Play, Plus, RotateCcw } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useTheme } from '@/hooks/useTheme';
 import Text from './ui/Text';
-import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import Animated, { FadeIn, FadeOut, withSpring } from 'react-native-reanimated';
 
 interface TimerProps {
   initialTime?: number;
@@ -19,16 +19,18 @@ interface TimerProps {
   sets?: number;
   restTime?: number;
   exerciseName?: string;
+  onSetsChange?: (sets: number) => void;
 }
 
 export default function Timer({
-                                initialTime = 60,
-                                mode = 'timer',
-                                onComplete,
-                                sets = 1,
-                                restTime = 60,
-                                exerciseName = 'Exercise'
-                              }: TimerProps) {
+  initialTime = 60,
+  mode = 'timer',
+  onComplete,
+  sets = 1,
+  restTime = 60,
+  exerciseName = 'Exercise',
+  onSetsChange
+}: TimerProps) {
   const { t } = useTranslation();
   const { theme } = useTheme();
   const styles = useStyles();
@@ -43,15 +45,19 @@ export default function Timer({
   });
 
   const handleWorkComplete = useCallback(() => {
-    if (mode === 'timer') {
+    if (currentSet < sets) {
       if (Platform.OS === 'ios') {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       } else {
         Vibration.vibrate([0, 500, 200, 500]);
       }
-      setIsRunning(true);
+      setIsResting(true);
+      setRestTimeState(restTime);
+    } else {
+      setIsRunning(false);
+      onComplete?.();
     }
-  }, [mode]);
+  }, [currentSet, sets, restTime, onComplete]);
 
   const handleRestComplete = useCallback(() => {
     if (Platform.OS === 'ios') {
@@ -64,9 +70,19 @@ export default function Timer({
     if (currentSet < sets) {
       setWorkTime(initialTime);
     } else {
+      setIsRunning(false);
       onComplete?.();
     }
   }, [currentSet, sets, initialTime, onComplete]);
+
+  const handleSetChange = useCallback((newSets: number) => {
+    const updatedSets = Math.max(1, newSets);
+    onSetsChange?.(updatedSets);
+    if (currentSet > updatedSets) {
+      setCurrentSet(updatedSets);
+    }
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  }, [currentSet, onSetsChange]);
 
   useEffect(() => {
     if (!isRunning) {
@@ -83,8 +99,6 @@ export default function Timer({
         if (isResting) {
           setRestTimeState(prev => {
             if (prev <= 1) {
-              setIsRunning(false);
-              setIsResting(false);
               handleRestComplete();
               return restTime;
             }
@@ -94,14 +108,12 @@ export default function Timer({
           if (mode === 'timer') {
             setWorkTime(prev => {
               if (prev <= 1) {
-                setIsRunning(false);
-                setIsResting(true);
                 handleWorkComplete();
                 return initialTime;
               }
               return prev - 1;
             });
-          } else { // mode stopwatch
+          } else {
             setWorkTime(prev => prev + 1);
           }
         }
@@ -109,7 +121,7 @@ export default function Timer({
     }
 
     return () => clearInterval(interval);
-  }, [isRunning, isResting, initialTime, restTime, mode, handleWorkComplete, handleRestComplete]);
+  }, [isRunning, isResting, mode, handleWorkComplete, handleRestComplete, initialTime, restTime]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -140,53 +152,71 @@ export default function Timer({
       <Animated.View
         entering={FadeIn.duration(300)}
         exiting={FadeOut.duration(300)}
-        style={styles.content}
+        style={[
+          styles.content,
+          { backgroundColor: isResting ? theme.colors.error : theme.colors.success, borderRadius: 28 }
+        ]}
       >
-        <Text style={styles.exerciseName}>{exerciseName}</Text>
-        <Text style={styles.setInfo}>
-          {t('sets')} {currentSet}/{sets}
-        </Text>
-        <Text style={styles.time}>
-          {formatTime(isResting ? restTimeState : workTime)}
-        </Text>
-        <View style={styles.controls}>
-          <Animated.View
-            entering={FadeIn.springify()}
-            exiting={FadeOut.springify()}
-          >
+        <View style={styles.contentInner}>
+          <Text style={[styles.phaseText, { color: theme.colors.background.main }]}>
+            {isResting ? 'REST' : 'WORK'}
+          </Text>
+          
+          <View style={styles.setsContainer}>
             <TouchableOpacity
-              style={styles.button}
-              onPress={toggleTimer}
-              activeOpacity={0.7}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              style={[styles.setButton, { opacity: currentSet <= 1 ? 0.5 : 1 }]}
+              onPress={() => setCurrentSet(prev => Math.max(1, prev - 1))}
+              disabled={currentSet <= 1}
             >
-              {isRunning ? (
-                <Pause size={24} color={theme.colors.text.primary} />
-              ) : (
-                <Play size={24} color={theme.colors.text.primary} />
-              )}
+              <Minus size={16} color={theme.colors.background.main} />
             </TouchableOpacity>
-          </Animated.View>
-          <Animated.View
-            entering={FadeIn.springify()}
-            exiting={FadeOut.springify()}
-          >
+            
+            <Text style={[styles.setInfo, { color: theme.colors.background.main }]}>
+              {t('series')} {currentSet}/{sets}
+            </Text>
+            
             <TouchableOpacity
-              style={styles.button}
-              onPress={resetTimer}
-              activeOpacity={0.7}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              style={[styles.setButton, { opacity: currentSet >= sets ? 0.5 : 1 }]}
+              onPress={() => setCurrentSet(prev => Math.min(sets, prev + 1))}
+              disabled={currentSet >= sets}
             >
-              <RotateCcw size={24} color={theme.colors.text.primary} />
+              <Plus size={16} color={theme.colors.background.main} />
             </TouchableOpacity>
-          </Animated.View>
+          </View>
+
+          <Text style={[styles.time, { color: theme.colors.background.main }]}>
+            {formatTime(isResting ? restTimeState : workTime)}
+          </Text>
         </View>
       </Animated.View>
+      
+      <View style={styles.controls}>
+        <TouchableOpacity
+          style={[
+            styles.button,
+            { backgroundColor: isRunning ? theme.colors.error : theme.colors.success }
+          ]}
+          onPress={toggleTimer}
+          activeOpacity={0.7}
+        >
+          {isRunning ? (
+            <Pause size={24} color={theme.colors.background.main} strokeWidth={2.5} />
+          ) : (
+            <Play size={24} color={theme.colors.background.main} strokeWidth={2.5} />
+          )}
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.button, { backgroundColor: theme.colors.background.card }]}
+          onPress={resetTimer}
+          activeOpacity={0.7}
+        >
+          <RotateCcw size={22} color={theme.colors.text.primary} strokeWidth={2} />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
 
-// Define styles using the current theme
 const useStyles = () => {
   const { theme } = useTheme();
 
@@ -195,46 +225,81 @@ const useStyles = () => {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
-      padding: Platform.OS === 'ios' ? 20 : 16
+      width: '100%',
+      gap: 24
     },
     content: {
-      alignItems: 'center',
-      width: '100%'
+      width: '100%',
+      paddingVertical: 32,
+      paddingHorizontal: 20,
+      ...Platform.select({
+        ios: {
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.15,
+          shadowRadius: 12
+        },
+        android: {
+          elevation: 8
+        }
+      })
     },
-    exerciseName: {
-      fontSize: Platform.OS === 'ios' ? 24 : 20,
-      fontWeight: '600',
-      marginBottom: 8,
-      textAlign: 'center'
+    contentInner: {
+      alignItems: 'center',
+      gap: 12
+    },
+    setsContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 12,
+      marginVertical: 4
+    },
+    setButton: {
+      width: 28,
+      height: 28,
+      borderRadius: 14,
+      backgroundColor: 'rgba(255, 255, 255, 0.2)',
+      justifyContent: 'center',
+      alignItems: 'center'
     },
     setInfo: {
-      fontSize: Platform.OS === 'ios' ? 18 : 16,
-      marginBottom: 16,
-      opacity: 0.7
+      fontSize: Platform.OS === 'ios' ? 22 : 20,
+      fontWeight: '600',
+      opacity: 0.9,
+      textAlign: 'center',
+      minWidth: 100
     },
     time: {
       fontSize: Platform.OS === 'ios' ? 72 : 64,
       fontWeight: '700',
-      marginBottom: 32
+      textAlign: 'center',
+      includeFontPadding: false,
+      lineHeight: Platform.OS === 'ios' ? 84 : 76
+    },
+    phaseText: {
+      fontSize: Platform.OS === 'ios' ? 24 : 22,
+      fontWeight: '600',
+      textTransform: 'uppercase',
+      letterSpacing: 1
     },
     controls: {
       flexDirection: 'row',
       justifyContent: 'center',
-      gap: Platform.OS === 'ios' ? 24 : 20
+      gap: 16
     },
     button: {
-      width: Platform.OS === 'ios' ? 56 : 48,
-      height: Platform.OS === 'ios' ? 56 : 48,
-      borderRadius: Platform.OS === 'ios' ? 28 : 24,
-      backgroundColor: theme.colors.background.button,
+      width: 56,
+      height: 56,
+      borderRadius: 28,
       justifyContent: 'center',
       alignItems: 'center',
       ...Platform.select({
         ios: {
           shadowColor: '#000',
           shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.1,
-          shadowRadius: 4
+          shadowOpacity: 0.15,
+          shadowRadius: 6
         },
         android: {
           elevation: 4

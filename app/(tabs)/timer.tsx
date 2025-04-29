@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, TouchableOpacity, View, Platform } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import Timer from '../components/Timer';
-import { Minus, Plus } from 'lucide-react-native';
+import { Minus, Plus, Timer as TimerIcon, Clock } from 'lucide-react-native';
 import { useTranslation } from '@/hooks/useTranslation';
 import { TimerPickerModal } from 'react-native-timer-picker';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -51,8 +51,11 @@ const useStyles = (theme: any) => {
     },
     modeButton: {
       paddingVertical: theme.spacing.sm,
-      paddingHorizontal: theme.spacing.lg,
-      borderRadius: theme.borderRadius.full
+      paddingHorizontal: theme.spacing.md,
+      borderRadius: theme.borderRadius.full,
+      justifyContent: 'center',
+      alignItems: 'center',
+      minWidth: 44
     },
     modeButtonActive: {
       backgroundColor: theme.colors.primary
@@ -67,7 +70,12 @@ const useStyles = (theme: any) => {
     },
     content: {
       flex: 1,
-      padding: theme.spacing.lg
+      padding: theme.spacing.lg,
+      paddingBottom: theme.spacing.xl * 2
+    },
+    timerContainer: {
+      width: '100%',
+      paddingHorizontal: 20
     },
     sectionTitle: {
       fontSize: theme.typography.fontSize.xl,
@@ -146,34 +154,34 @@ const useStyles = (theme: any) => {
     setsContainer: {
       flexDirection: 'row',
       alignItems: 'center',
-      justifyContent: 'space-between',
-      backgroundColor: theme.colors.background.card,
-      borderRadius: theme.borderRadius.md,
-      padding: theme.spacing.lg,
-      marginBottom: theme.spacing.lg
-    },
-    setsLabel: {
-      fontFamily: theme.typography.fontFamily.semiBold,
-      fontSize: theme.typography.fontSize.base,
-      color: theme.colors.text.primary
-    },
-    setsControls: {
-      flexDirection: 'row',
-      alignItems: 'center'
+      justifyContent: 'center',
+      gap: 16,
+      marginBottom: 24,
+      width: '100%'
     },
     setsButton: {
       width: 40,
       height: 40,
       borderRadius: 20,
-      backgroundColor: theme.colors.background.button,
+      backgroundColor: theme.colors.background.card,
       justifyContent: 'center',
-      alignItems: 'center'
+      alignItems: 'center',
+      ...Platform.select({
+        ios: {
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.1,
+          shadowRadius: 4
+        },
+        android: {
+          elevation: 2
+        }
+      })
     },
     setsValue: {
+      fontSize: theme.typography.fontSize.xl,
       fontFamily: theme.typography.fontFamily.bold,
-      fontSize: theme.typography.fontSize.lg,
       color: theme.colors.text.primary,
-      marginHorizontal: theme.spacing.md,
       minWidth: 30,
       textAlign: 'center'
     },
@@ -234,17 +242,19 @@ export default function TimerScreen() {
             style={[styles.modeButton, mode === 'timer' && styles.modeButtonActive]}
             onPress={() => setMode('timer')}
           >
-            <Text style={[styles.modeText, mode === 'timer' && styles.modeTextActive]}>
-              {t('timer')}
-            </Text>
+            <TimerIcon 
+              size={20} 
+              color={mode === 'timer' ? theme.colors.text.primary : theme.colors.text.secondary}
+            />
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.modeButton, mode === 'stopwatch' && styles.modeButtonActive]}
             onPress={() => setMode('stopwatch')}
           >
-            <Text style={[styles.modeText, mode === 'stopwatch' && styles.modeTextActive]}>
-              {t('stopwatch')}
-            </Text>
+            <Clock 
+              size={20} 
+              color={mode === 'stopwatch' ? theme.colors.text.primary : theme.colors.text.secondary}
+            />
           </TouchableOpacity>
         </View>
       } />
@@ -385,20 +395,21 @@ export default function TimerScreen() {
               </TouchableOpacity>
             </View>
 
-            <Text style={styles.sectionTitle}>{t('sets')}</Text>
+            <Text style={styles.sectionTitle}>{t('series')}</Text>
             <View style={styles.setsContainer}>
               <TouchableOpacity
-                style={styles.setsButton}
+                style={[styles.setsButton, { opacity: sets <= 1 ? 0.5 : 1 }]}
                 onPress={() => setSets(prev => Math.max(1, prev - 1))}
+                disabled={sets <= 1}
               >
-                <Minus color={theme.colors.text.primary} size={24} />
+                <Minus size={20} color={theme.colors.text.primary} />
               </TouchableOpacity>
               <Text style={styles.setsValue}>{sets}</Text>
               <TouchableOpacity
                 style={styles.setsButton}
                 onPress={() => setSets(prev => prev + 1)}
               >
-                <Plus color={theme.colors.text.primary} size={24} />
+                <Plus size={20} color={theme.colors.text.primary} />
               </TouchableOpacity>
             </View>
           </>
@@ -411,6 +422,7 @@ export default function TimerScreen() {
             onComplete={handleTimerComplete}
             sets={sets}
             restTime={selectedRestTime}
+            onSetsChange={setSets}
             exerciseName={exerciseName || t('exercise')}
           />
         </View>

@@ -105,6 +105,13 @@ const useStyles = () => {
       color: theme.colors.text.primary,
       fontWeight: 'bold'
     },
+    timeValue: {
+      fontFamily: theme.typography.fontFamily.semiBold,
+      color: theme.colors.text.primary
+    },
+    timeValueActive: {
+      color: theme.colors.text.primary,
+    },
     customTimeButton: {
       width: '48%',
       backgroundColor: theme.colors.background.card,

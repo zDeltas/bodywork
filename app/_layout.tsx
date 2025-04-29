@@ -1,5 +1,4 @@
 import 'react-native-reanimated';
-import 'react-native-svg';
 import React from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -19,6 +18,7 @@ export default function RootLayout() {
           <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen name="workout/new" options={{ presentation: 'modal' }} />
+            <Stack.Screen name="goal/new" options={{ presentation: 'modal' }} />
           </Stack>
         </View>
       </GestureHandlerRootView>

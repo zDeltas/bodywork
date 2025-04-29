@@ -198,7 +198,6 @@ const useStyles = () => {
       width: '100%',
       maxWidth: 400,
       elevation: 5,
-      shadowColor: theme.colors.shadow,
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.25,
       shadowRadius: 3.84

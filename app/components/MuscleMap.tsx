@@ -170,10 +170,7 @@ const useStyles = () => {
       flex: 1,
       alignItems: 'center',
       backgroundColor: theme.colors.background.card,
-      padding: theme.spacing.md,
-      borderRadius: theme.borderRadius.lg,
       width: '100%',
-      ...theme.shadows.md
     },
     viewToggle: {
       flexDirection: 'row',

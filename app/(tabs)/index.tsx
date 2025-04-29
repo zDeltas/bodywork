@@ -3,19 +3,24 @@ import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-nati
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
-import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useTheme } from '@/hooks/useTheme';
+import { Activity, Dumbbell, Layers, Repeat } from 'lucide-react-native';
+import { Ionicons } from '@expo/vector-icons';
+
+interface Series {
+  weight: number;
+  reps: number;
+  note: string;
+  rpe: number;
+  type: 'warmUp' | 'workingSet';
+}
 
 interface Workout {
   id: string;
   exercise: string;
-  muscleGroup: string;
-  weight: number;
-  reps: number;
-  sets: number;
   date: string;
-  rpe?: number;
+  series: Series[];
 }
 
 LocaleConfig.locales['fr'] = {
@@ -68,6 +73,31 @@ export default function WorkoutScreen() {
   const { theme } = useTheme();
   const styles = useStyles();
 
+  // Helper function to find the first working set in a series
+  const getWorkingSetInfo = (workout: Workout) => {
+    if (workout.series && workout.series.length > 0) {
+      // Find the first working set or default to the first series
+      const workingSet = workout.series.find(s => s.type === 'workingSet') || workout.series[0];
+      // Count working sets
+      const workingSetsCount = workout.series.filter(s => s.type === 'workingSet').length;
+
+      return {
+        weight: workingSet.weight || 0,
+        reps: workingSet.reps || 0,
+        sets: workingSetsCount || 0,
+        rpe: workingSet.rpe || 0
+      };
+    }
+
+    // Fallback to empty values if no series
+    return {
+      weight: 0,
+      reps: 0,
+      sets: 0,
+      rpe: 0
+    };
+  };
+
   useEffect(() => {
     const loadWorkouts = async () => {
       try {
@@ -104,133 +134,119 @@ export default function WorkoutScreen() {
     return acc;
   }, {} as { [key: string]: { marked?: boolean; dotColor?: string; selected?: boolean } });
 
-  // Ajouter la date d'aujourd'hui si elle n'est pas déjà marquée
-  const today = new Date().toISOString().split('T')[0];
-  if (!markedDates[today]) {
-    markedDates[today] = { dotColor: theme.colors.primary };
-  }
-  if (today === selectedDate) {
-    markedDates[today].selected = true;
-  } else {
-    markedDates[today].marked = true;
-  }
-
-  // Assurez-vous que la date sélectionnée est toujours marquée comme selected
-  if (!markedDates[selectedDate]) {
-    markedDates[selectedDate] = { selected: true };
-  }
-
-  const selectedDateWorkouts = workouts.filter(workout =>
-    new Date(workout.date).toISOString().split('T')[0] === selectedDate
-  );
-
-  // Formater la date pour affichage
-  const locale = language === 'fr' ? 'fr-FR' : 'en-US';
-  LocaleConfig.defaultLocale = language;
-
-  const formattedDate = new Date(selectedDate).toLocaleDateString(locale, {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric'
+  // Filter workouts for the selected date
+  const filteredWorkouts = workouts.filter(workout => {
+    const workoutDate = new Date(workout.date).toISOString().split('T')[0];
+    return workoutDate === selectedDate;
   });
-  const capitalizedDate = formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
+
+  const navigateToSettings = () => {
+    router.push('/settings');
+  };
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>{t('appTitle')}</Text>
+        <Text style={styles.headerTitle}>{t('appTitle')}</Text>
+        <TouchableOpacity onPress={navigateToSettings} style={styles.settingsButton}>
+          <Ionicons name="settings-outline" size={24} color={theme.colors.primary} />
+        </TouchableOpacity>
       </View>
-
       <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: 100 }}>
-        <View style={styles.calendarSection}>
-          <View style={styles.calendarContainer}>
-            <Calendar
-              key={theme.colors.background.main}
-              theme={{
-                backgroundColor: theme.colors.background.card,
-                calendarBackground: theme.colors.background.card,
-                textSectionTitleColor: theme.colors.text.secondary,
-                textSectionTitleDisabledColor: theme.colors.border.default,
-                selectedDayBackgroundColor: theme.colors.primary,
-                selectedDayTextColor: theme.colors.text.primary,
-                todayTextColor: theme.colors.primary,
-                dayTextColor: theme.colors.text.primary,
-                textDisabledColor: theme.colors.text.disabled,
-                dotColor: theme.colors.primary,
-                selectedDotColor: theme.colors.text.primary,
-                arrowColor: theme.colors.primary,
-                monthTextColor: theme.colors.text.primary,
-                indicatorColor: theme.colors.primary,
-                textDayFontFamily: theme.typography.fontFamily.regular,
-                textMonthFontFamily: theme.typography.fontFamily.semiBold,
-                textDayHeaderFontFamily: theme.typography.fontFamily.regular,
-                textDayFontSize: theme.typography.fontSize.base,
-                textMonthFontSize: theme.typography.fontSize.lg,
-                textDayHeaderFontSize: theme.typography.fontSize.md
-              }}
-              markedDates={markedDates}
-              onDayPress={(day: { dateString: string }) => setSelectedDate(day.dateString)}
-              enableSwipeMonths={true}
-            />
-          </View>
+        <View style={styles.calendarContainer}>
+          <Calendar
+            key={theme.colors.background.main}
+            theme={{
+              backgroundColor: theme.colors.background.card,
+              calendarBackground: theme.colors.background.card,
+              textSectionTitleColor: theme.colors.text.secondary,
+              textSectionTitleDisabledColor: theme.colors.border.default,
+              selectedDayBackgroundColor: theme.colors.primary,
+              selectedDayTextColor: theme.colors.text.primary,
+              todayTextColor: theme.colors.primary,
+              dayTextColor: theme.colors.text.primary,
+              textDisabledColor: theme.colors.text.disabled,
+              dotColor: theme.colors.primary,
+              selectedDotColor: theme.colors.text.primary,
+              arrowColor: theme.colors.primary,
+              monthTextColor: theme.colors.text.primary,
+              indicatorColor: theme.colors.primary,
+              textDayFontFamily: theme.typography.fontFamily.regular,
+              textMonthFontFamily: theme.typography.fontFamily.semiBold,
+              textDayHeaderFontFamily: theme.typography.fontFamily.regular,
+              textDayFontSize: theme.typography.fontSize.base,
+              textMonthFontSize: theme.typography.fontSize.lg,
+              textDayHeaderFontSize: theme.typography.fontSize.md
+            }}
+            markedDates={markedDates}
+            onDayPress={(day: { dateString: string }) => setSelectedDate(day.dateString)}
+            enableSwipeMonths={true}
+          />
         </View>
-
-        <View style={styles.dateHeader}>
-          <Text style={styles.dateHeaderText}>{capitalizedDate}</Text>
-        </View>
-
-        {selectedDateWorkouts.length === 0 ? (
-          <Animated.View
-            entering={FadeIn.duration(300)}
-            exiting={FadeOut.duration(300)}
-            style={styles.emptyState}
-          >
-            <Text style={styles.emptyStateText}>{t('noWorkoutsToday')}</Text>
-            <TouchableOpacity
-              style={styles.startButton}
-              onPress={() => router.push({
-                pathname: '/workout/new',
-                params: { selectedDate }
-              })}
-            >
-              <Text style={styles.startButtonText}>{t('startWorkout')}</Text>
-            </TouchableOpacity>
-          </Animated.View>
-        ) : (
-          <View style={styles.workoutsContainer}>
-            {selectedDateWorkouts.map((workout) => (
-              <Animated.View
-                key={workout.id}
-                style={styles.workoutCard}
-                entering={FadeIn.duration(300)}
-                exiting={FadeOut.duration(300)}
-              >
-                <View style={styles.workoutHeader}>
-                  <Text style={styles.workoutTitle}>{workout.exercise}</Text>
-                  <Text style={styles.workoutDate}>
-                    {new Date(workout.date).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })}
-                  </Text>
-                </View>
-                <Text style={styles.workoutMuscle}>{workout.muscleGroup}</Text>
-                <View style={styles.workoutDetails}>
-                  <Text style={styles.workoutDetail}>{t('weight')}: {workout.weight}kg</Text>
-                  <Text style={styles.workoutDetail}>{t('reps')}: {workout.reps}</Text>
-                  <Text style={styles.workoutDetail}>{t('sets')}: {workout.sets}</Text>
-                  {workout.rpe && workout.rpe > 0 && (
-                    <Text style={styles.workoutDetail}>RPE: {workout.rpe}</Text>
-                  )}
-                </View>
-              </Animated.View>
-            ))}
+        {filteredWorkouts.map(workout => (
+          <View key={workout.id} style={styles.workoutCard}>
+            <View style={styles.workoutDetailsCard}>
+              <Text style={styles.workoutTitle}>{workout.exercise}</Text>
+              <Text
+                style={styles.workoutDate}>{new Date(workout.date).toLocaleString(language === 'fr' ? 'fr-FR' : 'en-US', {
+                day: '2-digit',
+                month: '2-digit',
+                year: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+              })}</Text>
+              {(() => {
+                const info = getWorkingSetInfo(workout);
+                const isWarmUp = workout.series && workout.series.length > 0 && workout.series[0].type === 'warmUp';
+                let rpeBg = theme.colors.primary;
+                if (info.rpe >= 8) rpeBg = '#e74c3c';
+                else if (info.rpe >= 5) rpeBg = '#f5c542';
+                return (
+                  <>
+                    <View style={styles.workoutTypeBadgeContainer}>
+                      <Text style={[styles.workoutTypeBadge, {
+                        backgroundColor: isWarmUp ? theme.colors.text.disabled : theme.colors.primary,
+                        color: theme.colors.background.main
+                      }]}>
+                        {isWarmUp ? t('warmUpSeries') : t('workingSeries')}
+                      </Text>
+                    </View>
+                    <View style={styles.workoutInfoRow}>
+                      <View style={styles.workoutInfoItem}>
+                        <Dumbbell size={18} color={theme.colors.primary} style={styles.workoutInfoIcon} />
+                        <Text style={styles.workoutInfoValue}>{info.weight}kg</Text>
+                      </View>
+                      <View style={styles.workoutInfoItem}>
+                        <Repeat size={18} color={theme.colors.primary} style={styles.workoutInfoIcon} />
+                        <Text style={styles.workoutInfoValue}>{info.reps}</Text>
+                      </View>
+                      <View style={styles.workoutInfoItem}>
+                        <Layers size={18} color={theme.colors.primary} style={styles.workoutInfoIcon} />
+                        <Text style={styles.workoutInfoValue}>{info.sets}</Text>
+                      </View>
+                      {info.rpe && info.rpe > 0 && (
+                        <View style={[styles.rpeBadge, { backgroundColor: rpeBg }]}>
+                          <Activity size={14} color={theme.colors.background.main} style={styles.rpeBadgeIcon} />
+                          <Text style={styles.rpeBadgeText}>RPE {info.rpe}</Text>
+                        </View>
+                      )}
+                    </View>
+                    {workout.series && workout.series.length > 0 && workout.series[0].note && (
+                      <View style={styles.workoutNoteBox}>
+                        <Text style={styles.workoutNoteText}>{workout.series[0].note}</Text>
+                      </View>
+                    )}
+                  </>
+                );
+              })()}
+            </View>
           </View>
-        )}
+        ))}
       </ScrollView>
     </View>
   );
 }
 
-// Define styles using the current theme
 const useStyles = () => {
   const { theme } = useTheme();
 
@@ -240,111 +256,129 @@ const useStyles = () => {
       backgroundColor: theme.colors.background.main
     },
     header: {
-      paddingTop: theme.spacing.xl * 2,
-      paddingHorizontal: theme.spacing.lg,
-      paddingBottom: theme.spacing.lg,
+      padding: theme.spacing.lg,
+      paddingBottom: theme.spacing.md,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border.default,
+      backgroundColor: theme.colors.background.card,
       flexDirection: 'row',
       justifyContent: 'space-between',
-      alignItems: 'center',
-      backgroundColor: theme.colors.background.card
+      alignItems: 'center'
     },
-    title: {
-      fontSize: theme.typography.fontSize['3xl'],
+    headerTitle: {
+      fontSize: theme.typography.fontSize['2xl'],
       fontFamily: theme.typography.fontFamily.bold,
       color: theme.colors.text.primary
+    },
+    settingsButton: {
+      padding: theme.spacing.sm
+    },
+    scrollContainer: {
+      flex: 1,
+      backgroundColor: theme.colors.background.main
+    },
+    calendar: {
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border.default,
+      paddingBottom: 10
+    },
+    workoutCard: {
+      padding: 10,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border.default
+    },
+    workoutDetailsCard: {
+      backgroundColor: theme.colors.background.card,
+      borderRadius: theme.borderRadius.lg,
+      padding: theme.spacing.base,
+      marginTop: theme.spacing.xs,
+      marginBottom: theme.spacing.xs,
+      flexDirection: 'column',
+      alignItems: 'flex-start',
+      ...theme.shadows.sm
+    },
+    workoutInfoRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      width: '100%',
+      marginBottom: theme.spacing.sm
     },
     content: {
       flex: 1,
       padding: theme.spacing.lg
     },
-    calendarSection: {
-      marginBottom: theme.spacing.base
+    workoutInfoItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginRight: theme.spacing.lg
+    },
+    workoutInfoIcon: {
+      marginRight: theme.spacing.xs
+    },
+    workoutInfoValue: {
+      fontFamily: theme.typography.fontFamily.semiBold,
+      fontSize: theme.typography.fontSize.base,
+      color: theme.colors.text.primary
+    },
+    rpeBadge: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      borderRadius: 16,
+      paddingVertical: 2,
+      paddingHorizontal: 10,
+      marginLeft: theme.spacing.sm
+    },
+    rpeBadgeText: {
+      color: theme.colors.background.main,
+      fontFamily: theme.typography.fontFamily.bold,
+      fontSize: theme.typography.fontSize.sm,
+      marginLeft: 4
+    },
+    rpeBadgeIcon: {
+      marginRight: 2
+    },
+    workoutTypeBadgeContainer: {
+      marginBottom: theme.spacing.xs
+    },
+    workoutTypeBadge: {
+      fontFamily: theme.typography.fontFamily.semiBold,
+      fontSize: theme.typography.fontSize.sm,
+      paddingVertical: 2,
+      paddingHorizontal: 10,
+      borderRadius: 12,
+      overflow: 'hidden',
+      alignSelf: 'flex-start'
+    },
+    workoutNoteBox: {
+      backgroundColor: theme.colors.background.card,
+      borderRadius: theme.borderRadius.base,
+      padding: theme.spacing.sm,
+      marginTop: theme.spacing.xs,
+      alignSelf: 'stretch'
+    },
+    workoutNoteText: {
+      fontFamily: theme.typography.fontFamily.regular,
+      color: theme.colors.text.secondary,
+      fontSize: theme.typography.fontSize.sm,
+      fontStyle: 'italic'
+    },
+    workoutTitle: {
+      fontFamily: theme.typography.fontFamily.bold,
+      fontSize: theme.typography.fontSize.lg,
+      color: theme.colors.text.primary,
+      marginBottom: theme.spacing.xs
+    },
+    workoutDate: {
+      fontFamily: theme.typography.fontFamily.regular,
+      fontSize: theme.typography.fontSize.sm,
+      color: theme.colors.text.secondary,
+      marginBottom: theme.spacing.sm
     },
     calendarContainer: {
       borderRadius: theme.borderRadius.lg,
       overflow: 'hidden',
-      backgroundColor: theme.colors.background.card,
       ...theme.shadows.md
-    },
-    dateHeader: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      paddingHorizontal: theme.spacing.xs,
-      marginBottom: theme.spacing.base,
-      marginTop: theme.spacing.sm
-    },
-    dateHeaderText: {
-      fontSize: theme.typography.fontSize.xl,
-      fontFamily: theme.typography.fontFamily.semiBold,
-      color: theme.colors.text.primary
-    },
-    workoutsContainer: {
-      marginTop: theme.spacing.sm
-    },
-    emptyState: {
-      backgroundColor: theme.colors.background.card,
-      borderRadius: theme.borderRadius.lg,
-      padding: theme.spacing.xl,
-      alignItems: 'center',
-      ...theme.shadows.sm
-    },
-    emptyStateText: {
-      fontFamily: theme.typography.fontFamily.regular,
-      color: theme.colors.text.disabled,
-      marginBottom: theme.spacing.base
-    },
-    startButton: {
-      backgroundColor: theme.colors.primary,
-      paddingHorizontal: theme.spacing.xl,
-      paddingVertical: theme.spacing.md,
-      borderRadius: theme.borderRadius.sm,
-      ...theme.shadows.primary
-    },
-    startButtonText: {
-      color: theme.colors.text.primary,
-      fontFamily: theme.typography.fontFamily.semiBold,
-      fontSize: theme.typography.fontSize.base
-    },
-    workoutCard: {
-      backgroundColor: theme.colors.background.card,
-      borderRadius: theme.borderRadius.lg,
-      padding: theme.spacing.base,
-      marginBottom: theme.spacing.base,
-      ...theme.shadows.sm,
-      borderLeftWidth: 4,
-      borderLeftColor: theme.colors.primary
-    },
-    workoutHeader: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      marginBottom: theme.spacing.sm
-    },
-    workoutTitle: {
-      fontSize: theme.typography.fontSize.lg,
-      fontFamily: theme.typography.fontFamily.semiBold,
-      color: theme.colors.text.primary
-    },
-    workoutDate: {
-      fontSize: theme.typography.fontSize.sm,
-      fontFamily: theme.typography.fontFamily.regular,
-      color: theme.colors.text.disabled
-    },
-    workoutMuscle: {
-      fontSize: theme.typography.fontSize.base,
-      fontFamily: theme.typography.fontFamily.regular,
-      color: theme.colors.primary,
-      marginBottom: theme.spacing.md
-    },
-    workoutDetails: {
-      flexDirection: 'row',
-      justifyContent: 'space-between'
-    },
-    workoutDetail: {
-      fontSize: theme.typography.fontSize.sm,
-      fontFamily: theme.typography.fontFamily.regular,
-      color: theme.colors.text.primary
     }
   });
 };

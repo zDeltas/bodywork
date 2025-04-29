@@ -1,13 +1,17 @@
 import React, { useCallback, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, Modal } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import { router, useLocalSearchParams } from 'expo-router';
-import { BarChart, Gauge, Layers, Plus, Weight, X } from 'lucide-react-native';
+import { BarChart, Calendar, Gauge, Layers, Plus, Weight, X } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from '@/hooks/useTranslation';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import ExerciseList from '../components/ExerciseList';
 import { useTheme } from '@/hooks/useTheme';
+import { Workout, Series } from '@/types/workout';
+import { Calendar as RNCalendar } from 'react-native-calendars';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -36,7 +40,8 @@ export default function NewWorkoutScreen() {
   const [suggestedWeight, setSuggestedWeight] = useState<number | null>(null);
   const [isCustomExercise, setIsCustomExercise] = useState(false);
   const params = useLocalSearchParams();
-  const selectedDate = params.selectedDate as string;
+  const [selectedDate, setSelectedDate] = useState(params.selectedDate as string || new Date().toISOString().split('T')[0]);
+  const [showCalendar, setShowCalendar] = useState(false);
 
   // Function to calculate suggested weight based on previous workouts
   const calculateSuggestedWeight = useCallback(async (selectedExercise: string, inputReps: string, inputRpe: string) => {
@@ -56,8 +61,8 @@ export default function NewWorkoutScreen() {
 
       // Filter workouts for the same exercise
       const sameExerciseWorkouts = workouts.filter(
-        (w: any) => w.exercise === selectedExercise
-      ).sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        (w: Workout) => w.exercise === selectedExercise
+      ).sort((a: Workout, b: Workout) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
       // If no previous workouts for this exercise, return null
       if (sameExerciseWorkouts.length === 0) {
@@ -68,32 +73,17 @@ export default function NewWorkoutScreen() {
       // Get the most recent workout for this exercise
       const lastWorkout = sameExerciseWorkouts[0];
 
-      // If the last workout doesn't have RPE, we can't calculate
-      if (!lastWorkout.rpe) {
-        // If the last workout has series, use the weight from the first series
-        if (lastWorkout.series && lastWorkout.series.length > 0) {
-          setSuggestedWeight(lastWorkout.series[0].weight);
-        } else {
-          setSuggestedWeight(lastWorkout.weight);
-        }
+      // If the last workout doesn't have series, we can't calculate
+      if (!lastWorkout.series || lastWorkout.series.length === 0) {
+        setSuggestedWeight(null);
         return;
       }
 
-      // Get the weight, reps, and RPE from the last workout
-      let lastWeight, lastReps, lastRpe;
-
-      // If the last workout has series, use the values from the first working set
-      if (lastWorkout.series && lastWorkout.series.length > 0) {
-        // Find the first working set in the series
-        const workingSet = lastWorkout.series.find((s: any) => s.type === 'workingSet') || lastWorkout.series[0];
-        lastWeight = parseFloat(workingSet.weight) || 0;
-        lastReps = parseInt(workingSet.reps) || 0;
-        lastRpe = parseInt(workingSet.rpe) || parseInt(lastWorkout.rpe) || 0;
-      } else {
-        lastWeight = lastWorkout.weight;
-        lastReps = lastWorkout.reps;
-        lastRpe = lastWorkout.rpe;
-      }
+      // Find the first working set in the series
+      const workingSet = lastWorkout.series.find((s: Series) => s.type === 'workingSet') || lastWorkout.series[0];
+      const lastWeight = workingSet.weight;
+      const lastReps = workingSet.reps;
+      const lastRpe = workingSet.rpe;
 
       const currentReps = parseInt(inputReps);
       const currentRpe = parseInt(inputRpe);
@@ -138,34 +128,35 @@ export default function NewWorkoutScreen() {
 
       const workouts = JSON.parse(existingWorkouts);
       const sameExerciseWorkouts = workouts
-        .filter((w: any) => w.exercise === selectedExercise)
-        .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        .filter((w: Workout) => w.exercise === selectedExercise)
+        .sort((a: Workout, b: Workout) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
       if (sameExerciseWorkouts.length === 0) return;
 
       const lastWorkout = sameExerciseWorkouts[0];
+      const lastWorkingSet = lastWorkout.series.find((s: Series) => s.type === 'workingSet') || lastWorkout.series[0];
 
       // If we have reps but no RPE, use the last workout's RPE
-      if (currentReps && !currentRpe && lastWorkout.rpe) {
-        calculateSuggestedWeight(selectedExercise, currentReps, lastWorkout.rpe.toString());
+      if (currentReps && !currentRpe) {
+        calculateSuggestedWeight(selectedExercise, currentReps, lastWorkingSet.rpe.toString());
       }
       // If we have RPE but no reps, use the last workout's reps
-      else if (!currentReps && currentRpe && lastWorkout.reps) {
-        calculateSuggestedWeight(selectedExercise, lastWorkout.reps.toString(), currentRpe);
+      else if (!currentReps && currentRpe) {
+        calculateSuggestedWeight(selectedExercise, lastWorkingSet.reps.toString(), currentRpe);
       }
       // If we have neither, use both from the last workout
-      else if (!currentReps && !currentRpe && lastWorkout.reps && lastWorkout.rpe) {
+      else if (!currentReps && !currentRpe) {
         // Update the first series with the reps from the last workout
         const newSeries = [...series];
         if (newSeries.length > 0) {
           newSeries[0] = {
             ...newSeries[0],
-            reps: lastWorkout.reps.toString()
+            reps: lastWorkingSet.reps.toString()
           };
           setSeries(newSeries);
         }
-        setRpe(lastWorkout.rpe.toString());
-        calculateSuggestedWeight(selectedExercise, lastWorkout.reps.toString(), lastWorkout.rpe.toString());
+        setRpe(lastWorkingSet.rpe.toString());
+        calculateSuggestedWeight(selectedExercise, lastWorkingSet.reps.toString(), lastWorkingSet.rpe.toString());
       }
     } catch (error) {
       console.error('Error loading previous workouts:', error);
@@ -234,6 +225,8 @@ export default function NewWorkoutScreen() {
     }
   };
 
+  const isAnyRpeDropdownOpen = series.some(s => s.showRpeDropdown);
+
   return (
     <View style={styles.container}>
       <Animated.View
@@ -261,6 +254,69 @@ export default function NewWorkoutScreen() {
         contentContainerStyle={{ paddingBottom: 120 }}
         showsVerticalScrollIndicator={false}
       >
+        <TouchableOpacity 
+          style={styles.dateButton}
+          onPress={() => setShowCalendar(true)}
+        >
+          <Calendar color={theme.colors.primary} size={20} style={styles.dateButtonIcon} />
+          <Text style={styles.dateButtonText}>
+            {format(new Date(selectedDate), 'EEEE d MMMM yyyy', { locale: fr })}
+          </Text>
+        </TouchableOpacity>
+
+        <Modal
+          visible={showCalendar}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={() => setShowCalendar(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalTitle}>{t('selectDate')}</Text>
+                <TouchableOpacity
+                  style={styles.modalCloseButton}
+                  onPress={() => setShowCalendar(false)}
+                >
+                  <X color={theme.colors.text.primary} size={24} />
+                </TouchableOpacity>
+              </View>
+              <RNCalendar
+                theme={{
+                  backgroundColor: theme.colors.background.card,
+                  calendarBackground: theme.colors.background.card,
+                  textSectionTitleColor: theme.colors.text.secondary,
+                  textSectionTitleDisabledColor: theme.colors.border.default,
+                  selectedDayBackgroundColor: theme.colors.primary,
+                  selectedDayTextColor: theme.colors.text.primary,
+                  todayTextColor: theme.colors.primary,
+                  dayTextColor: theme.colors.text.primary,
+                  textDisabledColor: theme.colors.text.disabled,
+                  dotColor: theme.colors.primary,
+                  selectedDotColor: theme.colors.text.primary,
+                  arrowColor: theme.colors.primary,
+                  monthTextColor: theme.colors.text.primary,
+                  indicatorColor: theme.colors.primary,
+                  textDayFontFamily: theme.typography.fontFamily.regular,
+                  textMonthFontFamily: theme.typography.fontFamily.semiBold,
+                  textDayHeaderFontFamily: theme.typography.fontFamily.regular,
+                  textDayFontSize: theme.typography.fontSize.base,
+                  textMonthFontSize: theme.typography.fontSize.lg,
+                  textDayHeaderFontSize: theme.typography.fontSize.md
+                }}
+                markedDates={{
+                  [selectedDate]: { selected: true }
+                }}
+                onDayPress={(day: { dateString: string }) => {
+                  setSelectedDate(day.dateString);
+                  setShowCalendar(false);
+                }}
+                enableSwipeMonths={true}
+              />
+            </View>
+          </View>
+        </Modal>
+
         <ExerciseList
           selectedMuscle={selectedMuscle}
           setSelectedMuscle={setSelectedMuscle}
@@ -450,94 +506,75 @@ export default function NewWorkoutScreen() {
                     keyboardType="numeric"
                   />
                 </View>
-                <View style={[styles.column]}>
-                  <View style={styles.sectionTitleContainer}>
-                    <Gauge color={theme.colors.primary} size={20} style={styles.sectionTitleIcon} />
-                    <Text
-                      style={[
-                        styles.seriesInputLabel,
-                        item.type === 'warmUp' && styles.disabledLabel
-                      ]}
-                    >
-                      {t('rpe')}
-                      {item.type === 'warmUp' && (
-                        <Text style={styles.disabledLabelNote}> ({t('notApplicable')})</Text>
-                      )}
-                    </Text>
-                  </View>
-                  <View
+              </View>
+              {/* Grille RPE sous weight et reps */}
+              <View style={styles.rpeSectionContainer}>
+                <View style={styles.sectionTitleContainer}>
+                  <Gauge color={theme.colors.primary} size={20} style={styles.sectionTitleIcon} />
+                  <Text
                     style={[
-                      styles.dropdownContainer,
-                      { position: 'relative' },
-                      item.type === 'warmUp' && styles.disabledDropdown
+                      styles.seriesInputLabel,
+                      item.type === 'warmUp' && styles.disabledLabel
                     ]}
                   >
-                    <Pressable
-                      style={[
-                        styles.dropdownButton,
-                        item.type === 'warmUp' && styles.disabledDropdownButton
-                      ]}
-                      onPress={() => {
-                        // Only allow RPE selection for working sets
-                        if (item.type === 'workingSet') {
-                          // Toggle dropdown visibility for this specific series
-                          const newSeries = [...series];
-                          newSeries[index] = {
-                            ...newSeries[index],
-                            showRpeDropdown: !item.showRpeDropdown
-                          };
-                          setSeries(newSeries);
-                        }
-                      }}
-                    >
-                      <Text
-                        style={[
-                          styles.dropdownButtonText,
-                          item.type === 'warmUp' && styles.disabledDropdownButtonText
-                        ]}
-                      >
-                        {item.type === 'warmUp' ? t('notApplicable') : (item.rpe || t('select'))}
-                      </Text>
-                    </Pressable>
-
-                    {item.showRpeDropdown && item.type === 'workingSet' && (
-                      <View style={[styles.dropdownList, { position: 'absolute', zIndex: 99999 }]}>
-                        <ScrollView style={styles.dropdownScroll}>
-                          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((value) => (
-                            <Pressable
-                              key={value}
-                              style={styles.dropdownItem}
-                              onPress={() => {
-                                const rpeValue = value.toString();
-
-                                const newSeries = [...series];
-                                newSeries[index] = {
-                                  ...newSeries[index],
-                                  rpe: rpeValue,
-                                  showRpeDropdown: false
-                                };
-                                setSeries(newSeries);
-
-                                if (index === 0 && exercise && item.reps && rpeValue && item.type === 'workingSet') {
-                                  calculateSuggestedWeight(exercise, item.reps, rpeValue);
-                                }
-                              }}
-                            >
-                              <Text
-                                style={[
-                                  styles.dropdownItemText,
-                                  item.rpe === value.toString() && styles.dropdownItemTextSelected
-                                ]}
-                              >
-                                {value}
-                              </Text>
-                            </Pressable>
-                          ))}
-                        </ScrollView>
-                      </View>
+                    {t('rpe')}
+                    {item.type === 'warmUp' && (
+                      <Text style={styles.disabledLabelNote}> ({t('notApplicable')})</Text>
                     )}
-                  </View>
+                  </Text>
                 </View>
+                {item.type === 'warmUp' ? (
+                  <View style={[styles.rpeButtonGrid, styles.disabledDropdown]}>
+                    <Text style={styles.disabledDropdownButtonText}>{t('notApplicable')}</Text>
+                  </View>
+                ) : (
+                  <>
+                    <View style={styles.rpeButtonRow}>
+                      {[1,2,3,4,5].map((value) => (
+                        <Pressable
+                          key={value}
+                          style={[styles.rpeButtonModern, item.rpe === value.toString() && styles.rpeButtonModernSelected]}
+                          onPress={() => {
+                            const rpeValue = value.toString();
+                            const newSeries = [...series];
+                            newSeries[index] = {
+                              ...newSeries[index],
+                              rpe: rpeValue
+                            };
+                            setSeries(newSeries);
+                            if (index === 0 && exercise && item.reps && rpeValue) {
+                              calculateSuggestedWeight(exercise, item.reps, rpeValue);
+                            }
+                          }}
+                        >
+                          <Text style={[styles.rpeButtonModernText, item.rpe === value.toString() && styles.rpeButtonModernTextSelected]}>{value}</Text>
+                        </Pressable>
+                      ))}
+                    </View>
+                    <View style={styles.rpeButtonRow}>
+                      {[6,7,8,9,10].map((value) => (
+                        <Pressable
+                          key={value}
+                          style={[styles.rpeButtonModern, item.rpe === value.toString() && styles.rpeButtonModernSelected]}
+                          onPress={() => {
+                            const rpeValue = value.toString();
+                            const newSeries = [...series];
+                            newSeries[index] = {
+                              ...newSeries[index],
+                              rpe: rpeValue
+                            };
+                            setSeries(newSeries);
+                            if (index === 0 && exercise && item.reps && rpeValue) {
+                              calculateSuggestedWeight(exercise, item.reps, rpeValue);
+                            }
+                          }}
+                        >
+                          <Text style={[styles.rpeButtonModernText, item.rpe === value.toString() && styles.rpeButtonModernTextSelected]}>{value}</Text>
+                        </Pressable>
+                      ))}
+                    </View>
+                  </>
+                )}
               </View>
 
               <View style={styles.noteContainer}>
@@ -582,34 +619,38 @@ export default function NewWorkoutScreen() {
             </Animated.View>
           ))}
 
-          <TouchableOpacity
-            style={styles.addSeriesButton}
-            onPress={() => {
-              setSeries([...series, {
-                weight: '',
-                reps: '',
-                note: '',
-                rpe: '',
-                showRpeDropdown: false,
-                type: 'workingSet' // Default to working set for new series
-              }]);
-            }}
-          >
-            <Plus color={theme.colors.text.primary} size={20} style={{ marginRight: theme.spacing.sm }} />
-            <Text style={styles.addSeriesButtonText}>{t('addSeries')}</Text>
-          </TouchableOpacity>
+          {!isAnyRpeDropdownOpen && (
+            <TouchableOpacity
+              style={styles.addSeriesButton}
+              onPress={() => {
+                setSeries([...series, {
+                  weight: '',
+                  reps: '',
+                  note: '',
+                  rpe: '',
+                  showRpeDropdown: false,
+                  type: 'workingSet' // Default to working set for new series
+                }]);
+              }}
+            >
+              <Plus color={theme.colors.text.primary} size={20} style={{ marginRight: theme.spacing.sm }} />
+              <Text style={styles.addSeriesButtonText}>{t('addSeries')}</Text>
+            </TouchableOpacity>
+          )}
         </Animated.View>
 
         <Animated.View
           entering={FadeIn.duration(500).delay(500)}
         >
-          <TouchableOpacity
-            style={[styles.addButton, (!exercise || !selectedMuscle) && styles.addButtonDisabled]}
-            onPress={saveWorkout}
-            disabled={!exercise || !selectedMuscle}
-          >
-            <Text style={styles.addButtonText}>{t('addExercise')}</Text>
-          </TouchableOpacity>
+          {!isAnyRpeDropdownOpen && (
+            <TouchableOpacity
+              style={[styles.addButton, (!exercise || !selectedMuscle) && styles.addButtonDisabled]}
+              onPress={saveWorkout}
+              disabled={!exercise || !selectedMuscle}
+            >
+              <Text style={styles.addButtonText}>{t('addExercise')}</Text>
+            </TouchableOpacity>
+          )}
         </Animated.View>
       </ScrollView>
     </View>
@@ -873,12 +914,12 @@ const useStyles = () => {
       ...theme.shadows.md,
       borderWidth: 1,
       borderColor: theme.colors.border.default,
-      zIndex: theme.zIndex.dropdown + 1,
-      elevation: theme.zIndex.dropdown + 1,
-      maxHeight: 200
+      zIndex: 9999,
+      elevation: 9999,
+      maxHeight: 400
     },
     dropdownScroll: {
-      maxHeight: 200
+      maxHeight: 600
     },
     dropdownItem: {
       paddingVertical: theme.spacing.md,
@@ -962,6 +1003,134 @@ const useStyles = () => {
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.bold,
       fontSize: theme.typography.fontSize.lg
+    },
+    rpeButtonGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: theme.spacing.xs,
+      justifyContent: 'center',
+      marginTop: theme.spacing.sm,
+      marginBottom: theme.spacing.base
+    },
+    rpeButton: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      backgroundColor: theme.colors.background.button,
+      alignItems: 'center',
+      justifyContent: 'center',
+      margin: theme.spacing.xs,
+      borderWidth: 1,
+      borderColor: theme.colors.border.default
+    },
+    rpeButtonSelected: {
+      backgroundColor: theme.colors.primary,
+      borderColor: theme.colors.primary,
+    },
+    rpeButtonText: {
+      color: theme.colors.text.primary,
+      fontFamily: theme.typography.fontFamily.semiBold,
+      fontSize: theme.typography.fontSize.base
+    },
+    rpeButtonTextSelected: {
+      color: theme.colors.background.main
+    },
+    rpeSectionContainer: {
+      marginTop: theme.spacing.base,
+      marginBottom: theme.spacing.base
+    },
+    rpeButtonRow: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      marginBottom: theme.spacing.xs
+    },
+    rpeButtonModern: {
+      width: 44,
+      height: 44,
+      borderRadius: 22,
+      backgroundColor: theme.colors.background.button,
+      alignItems: 'center',
+      justifyContent: 'center',
+      margin: theme.spacing.xs,
+      borderWidth: 2,
+      borderColor: theme.colors.border.default,
+      shadowColor: theme.colors.primary,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.08,
+      shadowRadius: 4,
+      elevation: 2,
+      transitionDuration: '150ms'
+    },
+    rpeButtonModernSelected: {
+      backgroundColor: theme.colors.primary,
+      borderColor: theme.colors.primary,
+      shadowColor: theme.colors.primary,
+      shadowOpacity: 0.25,
+      elevation: 6,
+      transform: [{ scale: 1.12 }]
+    },
+    rpeButtonModernText: {
+      color: theme.colors.text.primary,
+      fontFamily: theme.typography.fontFamily.semiBold,
+      fontSize: theme.typography.fontSize.lg
+    },
+    rpeButtonModernTextSelected: {
+      color: theme.colors.background.main
+    },
+    calendarContainer: {
+      borderRadius: theme.borderRadius.lg,
+      overflow: 'hidden',
+      marginBottom: theme.spacing.lg,
+      ...theme.shadows.md
+    },
+    dateButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: theme.colors.background.card,
+      padding: theme.spacing.base,
+      borderRadius: theme.borderRadius.lg,
+      marginBottom: theme.spacing.lg,
+      ...theme.shadows.sm
+    },
+    dateButtonIcon: {
+      marginRight: theme.spacing.sm
+    },
+    dateButtonText: {
+      color: theme.colors.text.primary,
+      fontFamily: theme.typography.fontFamily.semiBold,
+      fontSize: theme.typography.fontSize.base
+    },
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      justifyContent: 'flex-end'
+    },
+    modalContent: {
+      backgroundColor: theme.colors.background.card,
+      borderTopLeftRadius: theme.borderRadius.lg,
+      borderTopRightRadius: theme.borderRadius.lg,
+      padding: theme.spacing.lg,
+      ...theme.shadows.lg
+    },
+    modalHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: theme.spacing.lg
+    },
+    modalTitle: {
+      fontSize: theme.typography.fontSize.xl,
+      fontFamily: theme.typography.fontFamily.bold,
+      color: theme.colors.text.primary
+    },
+    modalCloseButton: {
+      width: 44,
+      height: 44,
+      borderRadius: theme.borderRadius.full,
+      backgroundColor: theme.colors.background.button,
+      justifyContent: 'center',
+      alignItems: 'center',
+      ...theme.shadows.sm
     }
   });
 };

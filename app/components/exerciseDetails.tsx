@@ -8,17 +8,7 @@ import { fr } from 'date-fns/locale';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useTheme } from '@/hooks/useTheme';
-
-interface Workout {
-  id: string;
-  exercise: string;
-  muscleGroup: string;
-  weight: number;
-  reps: number;
-  sets: number;
-  date: string;
-  rpe?: number;
-}
+import { Workout, Series } from '@/types/workout';
 
 interface ExerciseData {
   x: string;
@@ -129,123 +119,25 @@ const useStyles = () => {
       borderRadius: theme.borderRadius.lg,
       padding: theme.spacing.base,
       marginBottom: theme.spacing.lg
+    },
+    addButton: {
+      marginLeft: 'auto',
+      width: 44,
+      height: 44,
+      borderRadius: theme.borderRadius.full,
+      backgroundColor: theme.colors.background.button,
+      justifyContent: 'center',
+      alignItems: 'center'
     }
   });
 };
 
-export default function ExerciseDetailsScreen() {
-  const { t } = useTranslation();
-  const { theme } = useTheme();
-  const styles = useStyles();
-  const params = useLocalSearchParams();
-  const exerciseName = params.exercise as string;
-  const [workouts, setWorkouts] = useState<Workout[]>([]);
-  const [selectedPeriod, setSelectedPeriod] = useState('1m');
-  const [selectedChartType, setSelectedChartType] = useState<'1rm' | 'volume' | 'reps'>('1rm');
-
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(0)).current;
-
-  // Load workouts from AsyncStorage
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        // Load workouts
-        const storedWorkouts = await AsyncStorage.getItem('workouts');
-        if (storedWorkouts) {
-          setWorkouts(JSON.parse(storedWorkouts));
-        }
-      } catch (error) {
-        console.error(t('errorLoadingWorkouts'), error);
-      }
-    };
-
-    loadData();
-  }, []);
-
-  useEffect(() => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 500,
-        useNativeDriver: true
-      }),
-      Animated.spring(slideAnim, {
-        toValue: 1,
-        friction: 8,
-        tension: 40,
-        useNativeDriver: true
-      })
-    ]).start();
-  }, []);
-
-  // Filtrer les séances selon la période sélectionnée
-  const getFilteredWorkouts = () => {
-    const now = new Date();
-    let startDate: Date;
-
-    switch (selectedPeriod) {
-      case '1m':
-        startDate = new Date(now.setMonth(now.getMonth() - 1));
-        break;
-      case '3m':
-        startDate = new Date(now.setMonth(now.getMonth() - 3));
-        break;
-      case '6m':
-        startDate = new Date(now.setMonth(now.getMonth() - 6));
-        break;
-      default:
-        startDate = new Date(now.setMonth(now.getMonth() - 1));
-    }
-
-    return workouts.filter(workout =>
-      new Date(workout.date) >= startDate && workout.exercise === exerciseName
-    );
-  };
-
-  // Calculer les données pour les graphiques
-  const calculateChartData = () => {
-    const filteredWorkouts = getFilteredWorkouts();
-
-    const exerciseData: ExerciseData[] = [];
-    const volumeData: ExerciseData[] = [];
-    const repsData: ExerciseData[] = [];
-
-    filteredWorkouts.forEach(workout => {
-      // Données pour 1RM
-      const estimated1RM = calculateEstimated1RM(workout.weight, workout.reps);
-      exerciseData.push({
-        x: formatDate(workout.date),
-        y: estimated1RM
-      });
-
-      // Données de volume
-      const volume = calculateVolume(workout.weight, workout.reps, workout.sets);
-      volumeData.push({
-        x: formatDate(workout.date),
-        y: volume
-      });
-
-      // Données de répétitions
-      repsData.push({
-        x: formatDate(workout.date),
-        y: workout.reps
-      });
-    });
-
-    // Sort data by date
-    exerciseData.sort((a, b) => new Date(a.x).getTime() - new Date(b.x).getTime());
-    volumeData.sort((a, b) => new Date(a.x).getTime() - new Date(b.x).getTime());
-    repsData.sort((a, b) => new Date(a.x).getTime() - new Date(b.x).getTime());
-
-    return {
-      exerciseData,
-      volumeData,
-      repsData
-    };
-  };
-
-  const { exerciseData, volumeData, repsData } = calculateChartData();
+const ExerciseDetails = ({ workout }: { workout: Workout }) => {
+  // Get the first working set or the first series if no working set
+  const workingSet = workout.series.find(s => s.type === 'workingSet') || workout.series[0];
+  
+  const estimated1RM = calculateEstimated1RM(workingSet.weight, workingSet.reps);
+  const volume = calculateVolume(workingSet.weight, workingSet.reps, workout.series.length);
 
   return (
     <ScrollView style={styles.container}>
@@ -259,7 +151,16 @@ export default function ExerciseDetailsScreen() {
         >
           <Ionicons name="arrow-back" size={24} color={theme.colors.text.primary} />
         </TouchableOpacity>
-        <Text style={styles.title}>{exerciseName}</Text>
+        <Text style={styles.title}>{workout.exercise}</Text>
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={() => router.push({
+            pathname: '/workout/new',
+            params: { exercise: workout.exercise }
+          })}
+        >
+          <Ionicons name="add-circle" size={24} color={theme.colors.primary} />
+        </TouchableOpacity>
       </Animated.View>
 
       <View style={styles.content}>
@@ -463,4 +364,6 @@ export default function ExerciseDetailsScreen() {
       </View>
     </ScrollView>
   );
-}
+};
+
+export default ExerciseDetails;

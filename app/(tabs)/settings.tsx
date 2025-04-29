@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ActivityIndicator, Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
@@ -8,11 +8,13 @@ import * as Haptics from 'expo-haptics';
 import { useSettings } from '@/hooks/useSettings';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useTheme } from '@/hooks/useTheme';
+import { useCSVExport } from '@/hooks/useCSVExport';
 
 export default function SettingsScreen() {
   const { settings, updateSettings, isLoading } = useSettings();
   const { t, language } = useTranslation();
   const { theme } = useTheme();
+  const { isExporting, exportWorkoutsToCSV } = useCSVExport();
   const styles = useStyles();
   const [showAbout, setShowAbout] = useState(false);
 
@@ -128,6 +130,28 @@ export default function SettingsScreen() {
 
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>{t('application')}</Text>
+
+            <TouchableOpacity
+              style={styles.settingItem}
+              onPress={async () => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                const result = await exportWorkoutsToCSV();
+                if (!result.success) {
+                  Alert.alert(t('error'), result.message);
+                }
+              }}
+              disabled={isExporting}
+            >
+              <View style={styles.settingInfo}>
+                <Ionicons name="download-outline" size={24} color={theme.colors.primary} />
+                <Text style={styles.settingLabel}>{t('exportData')}</Text>
+              </View>
+              {isExporting ? (
+                <ActivityIndicator size="small" color={theme.colors.primary} />
+              ) : (
+                <Ionicons name="chevron-forward" size={20} color={theme.colors.text.secondary} />
+              )}
+            </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.settingItem}

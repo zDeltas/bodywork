@@ -10,6 +10,12 @@ export default {
   settings: 'Settings',
   loadingSettings: 'Loading settings...',
   preferences: 'Preferences',
+  exportData: 'Export Data',
+  exportToCSV: 'Export to CSV',
+  noWorkoutsToExport: 'No workouts to export',
+  exportSuccess: 'Export successful',
+  sharingNotAvailable: 'Sharing is not available on this device',
+  exportError: 'Error exporting workouts',
   gender: 'Gender',
   male: 'Male',
   female: 'Female',
@@ -48,6 +54,8 @@ export default {
   reps: 'Reps',
   sets: 'Sets',
   rpe: 'RPE',
+  warmUpSeries: 'Warm-up Series',
+  workingSeries: 'Working Series',
 
   // Timer screen
   timer: 'Timer',
@@ -67,9 +75,15 @@ export default {
   long: 'Long',
   veryLong: 'Very Long',
 
-
   // Stats screen
-  stats: 'Analysis & Charts',
+  stats: {
+    title: 'Analysis & Charts',
+    overview: 'Overview',
+    totalWorkouts: 'Total Workouts',
+    totalExercises: 'Total Exercises',
+    totalVolume: 'Total Volume',
+    avgWorkoutTime: 'Avg. Workout Time'
+  },
   period: 'Period:',
   muscleGroup: 'Muscle group:',
   allGroups: 'All groups',
@@ -170,6 +184,7 @@ export default {
   optionalNote: 'Optional note',
   usePreviousValues: 'Use previous values',
   notApplicable: 'N/A',
+  selectDate: 'Select a date',
 
   goalDetails: 'Goal Details',
 

@@ -16,10 +16,11 @@ import { ChevronDown, X } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Ionicons } from '@expo/vector-icons';
-import { muscleGroups, predefinedExercises } from '@/app/workout/new';
+import { getMuscleGroups, getPredefinedExercises } from '@/app/components/ExerciseList';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { useTheme } from '@/hooks/useTheme';
+import ExerciseList from '@/app/components/ExerciseList';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -149,8 +150,14 @@ const useStyles = () => {
       borderRadius: theme.borderRadius.lg,
       padding: theme.spacing.lg,
       width: '90%',
-      maxHeight: '80%',
+      height: '80%',
+      minHeight: 400,
       ...theme.shadows.lg
+    },
+    modalContent: {
+      flex: 1,
+      marginBottom: theme.spacing.lg,
+      height: '100%'
     },
     modalTitle: {
       fontSize: theme.typography.fontSize.xl,
@@ -327,7 +334,7 @@ export default function NewGoalScreen() {
   const [suggestedTarget, setSuggestedTarget] = useState<number | null>(null);
   const [showExerciseSelector, setShowExerciseSelector] = useState(false);
   const [isLoadingLastWorkout, setIsLoadingLastWorkout] = useState(false);
-  const [selectedMuscleGroup, setSelectedMuscleGroup] = useState<string | null>(null);
+  const [selectedMuscleGroup, setSelectedMuscleGroup] = useState<string>('');
 
   const [fontsLoaded] = useFonts({
     'Inter-Regular': Inter_400Regular,
@@ -365,6 +372,8 @@ export default function NewGoalScreen() {
         const uniqueExercises = Array.from(new Set(parsedWorkouts.map((w: any) => w.exercise)));
 
         // Combine with predefined exercises
+        const muscleGroups = getMuscleGroups(t as (key: string) => string);
+        const predefinedExercises = getPredefinedExercises(t as (key: string) => string);
         const predefinedExercisesList = Object.values(predefinedExercises).flat();
         const allExercises = Array.from(new Set([
           ...uniqueExercises,
@@ -483,6 +492,9 @@ export default function NewGoalScreen() {
     }
   };
 
+  const handleMuscleGroupSelect = (muscleGroup: string) => {
+    setSelectedMuscleGroup(muscleGroup);
+  };
 
   if (!fontsLoaded) {
     return null;
@@ -624,123 +636,43 @@ export default function NewGoalScreen() {
           >
             <Text style={styles.modalTitle}>{t('selectExerciseForGoal')}</Text>
 
-            <View style={styles.searchContainer}>
-              <Ionicons name="search" size={20} color={theme.colors.text.secondary} style={styles.searchIcon} />
-              <TextInput
-                style={styles.searchInput}
-                placeholder={t('searchExercise')}
-                placeholderTextColor={theme.colors.text.secondary}
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
-              {searchQuery.length > 0 && (
-                <TouchableOpacity
-                  onPress={() => {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    setSearchQuery('');
-                  }}
-                >
-                  <Ionicons name="close-circle" size={20} color={theme.colors.text.secondary} />
-                </TouchableOpacity>
-              )}
-            </View>
-
-            {searchQuery ? (
-              <ScrollView style={styles.exerciseList}>
-                {exerciseOptions
-                  .filter(ex => ex.toLowerCase().includes(searchQuery.toLowerCase()))
-                  .map((ex, index) => (
-                    <TouchableOpacity
-                      key={index}
-                      style={styles.exerciseOption}
-                      onPress={async () => {
-                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                        setNewGoalExercise(ex);
-                        setShowExerciseSelector(false);
-
-                        // Auto-populate current weight and suggest target
-                        setIsLoadingLastWorkout(true);
-                        const currentWeight = await getCurrentWeight(ex);
-                        if (currentWeight) {
-                          setNewGoalCurrent(currentWeight.toString());
-
-                          // Update suggested target
-                          const target = suggestTargetWeight(currentWeight);
-                          if (target) {
-                            setSuggestedTarget(target);
-                          }
+            <ScrollView 
+              style={styles.modalContent} 
+              contentContainerStyle={{ flexGrow: 1 }}
+              showsVerticalScrollIndicator={true}
+            >
+              <ExerciseList
+                selectedMuscle={selectedMuscleGroup as string}
+                setSelectedMuscle={(muscleGroup) => {
+                  // Ne ferme pas la modale lors de la sélection d'un groupe musculaire
+                  handleMuscleGroupSelect(muscleGroup);
+                }}
+                exercise={newGoalExercise}
+                setExercise={(exercise) => {
+                  setNewGoalExercise(exercise);
+                  // Ferme la modale uniquement lors de la sélection d'un exercice
+                  setShowExerciseSelector(false);
+                  
+                  // Auto-populate current weight and suggest target
+                  setIsLoadingLastWorkout(true);
+                  const currentWeightPromise = getCurrentWeight(exercise);
+                  if (currentWeightPromise) {
+                    currentWeightPromise.then(currentWeight => {
+                      if (currentWeight) {
+                        setNewGoalCurrent(currentWeight.toString());
+                        const target = suggestTargetWeight(currentWeight);
+                        if (target) {
+                          setSuggestedTarget(target);
                         }
-                        setIsLoadingLastWorkout(false);
-                      }}
-                    >
-                      <Text style={styles.exerciseOptionText}>{ex}</Text>
-                    </TouchableOpacity>
-                  ))}
-              </ScrollView>
-            ) : (
-              <ScrollView style={styles.exerciseList}>
-                {muscleGroups.map((muscleGroup) => (
-                  <View key={muscleGroup} style={styles.muscleGroupContainer}>
-                    <TouchableOpacity
-                      style={styles.muscleGroupHeader}
-                      onPress={() => {
-                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                        setSelectedMuscleGroup(selectedMuscleGroup === muscleGroup ? null : muscleGroup);
-                      }}
-                    >
-                      <Text style={styles.muscleGroupTitle}>{muscleGroup}</Text>
-                      <Ionicons
-                        name={selectedMuscleGroup === muscleGroup ? 'chevron-up' : 'chevron-down'}
-                        size={20}
-                        color={theme.colors.primary}
-                      />
-                    </TouchableOpacity>
-
-                    {selectedMuscleGroup === muscleGroup && (
-                      <View style={styles.exerciseGrid}>
-                        {predefinedExercises[muscleGroup as keyof typeof predefinedExercises].map((ex) => (
-                          <TouchableOpacity
-                            key={ex}
-                            style={[
-                              styles.exerciseButton,
-                              newGoalExercise === ex && styles.exerciseButtonSelected
-                            ]}
-                            onPress={async () => {
-                              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                              setNewGoalExercise(ex);
-                              setShowExerciseSelector(false);
-
-                              // Auto-populate current weight and suggest target
-                              setIsLoadingLastWorkout(true);
-                              const currentWeight = await getCurrentWeight(ex);
-                              if (currentWeight) {
-                                setNewGoalCurrent(currentWeight.toString());
-
-                                // Update suggested target
-                                const target = suggestTargetWeight(currentWeight);
-                                if (target) {
-                                  setSuggestedTarget(target);
-                                }
-                              }
-                              setIsLoadingLastWorkout(false);
-                            }}
-                          >
-                            <Text style={[
-                              styles.exerciseButtonText,
-                              newGoalExercise === ex && styles.exerciseButtonTextSelected
-                            ]}>
-                              {ex}
-                            </Text>
-                          </TouchableOpacity>
-                        ))}
-                      </View>
-                    )}
-                  </View>
-                ))}
-              </ScrollView>
-            )}
+                      }
+                      setIsLoadingLastWorkout(false);
+                    });
+                  } else {
+                    setIsLoadingLastWorkout(false);
+                  }
+                }}
+              />
+            </ScrollView>
 
             <TouchableOpacity
               style={styles.cancelButton}

@@ -15,6 +15,11 @@ export const colors = {
   primaryBorder: 'rgba(253, 143, 9, 0.3)',
 
   // Secondary colors
+  secondary: '#a600e7', // Couleur secondaire
+  secondaryLight: 'rgba(166, 0, 231, 0.1)',
+  secondaryBorder: 'rgba(166, 0, 231, 0.3)',
+
+  // Secondary colors
   success: '#22c55e', // Green - for success states, workout timer
   error: '#ef4444',   // Red - for error states, rest timer
   warning: '#f59e0b', // Added warning color

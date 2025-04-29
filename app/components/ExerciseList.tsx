@@ -60,6 +60,7 @@ interface ExerciseListProps {
   setExercise: (exercise: string) => void;
   setIsCustomExercise?: (isCustom: boolean) => void;
   onExerciseSelect?: (exercise: string) => void;
+  onMuscleSelect?: (muscleGroup: string) => void;
 }
 
 export const ExerciseList: React.FC<ExerciseListProps> = ({
@@ -68,7 +69,8 @@ export const ExerciseList: React.FC<ExerciseListProps> = ({
                                                             exercise,
                                                             setExercise,
                                                             setIsCustomExercise,
-                                                            onExerciseSelect
+                                                            onExerciseSelect,
+                                                            onMuscleSelect
                                                           }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
@@ -173,9 +175,11 @@ export const ExerciseList: React.FC<ExerciseListProps> = ({
                   toggleMuscleGroupExpanded(muscleGroup);
                   if (selectedMuscle !== muscleGroup) {
                     setSelectedMuscle(muscleGroup);
-                    setExercise('');
                     if (setIsCustomExercise) {
                       setIsCustomExercise(false);
+                    }
+                    if (onMuscleSelect) {
+                      onMuscleSelect(muscleGroup);
                     }
                   }
                 }}

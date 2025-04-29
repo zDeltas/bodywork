@@ -258,3 +258,6 @@ export const useDynamicStyles = () => {
     layout
   };
 };
+
+// Export the hook as default
+export default useDynamicStyles;

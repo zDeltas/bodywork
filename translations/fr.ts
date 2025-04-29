@@ -10,6 +10,12 @@ export default {
   settings: 'Réglages',
   loadingSettings: 'Chargement des réglages...',
   preferences: 'Préférences',
+  exportData: 'Exporter les données',
+  exportToCSV: 'Exporter en CSV',
+  noWorkoutsToExport: 'Aucune séance à exporter',
+  exportSuccess: 'Exportation réussie',
+  sharingNotAvailable: 'Le partage n\'est pas disponible sur cet appareil',
+  exportError: 'Erreur lors de l\'exportation des séances',
   gender: 'Genre',
   male: 'Homme',
   female: 'Femme',
@@ -48,6 +54,8 @@ export default {
   reps: 'Réps',
   sets: 'Séries',
   rpe: 'RPE',
+  warmUpSeries: 'Série d\'échauffement',
+  workingSeries: 'Série de travail',
 
   // Timer screen
   timer: 'Minuteur',
@@ -67,9 +75,15 @@ export default {
   long: 'Long',
   veryLong: 'Très Long',
 
-
   // Stats screen
-  stats: 'Analyse & Graphiques',
+  stats: {
+    title: 'Analyse & Graphiques',
+    overview: 'Aperçu',
+    totalWorkouts: 'Séances totales',
+    totalExercises: 'Exercices totaux',
+    totalVolume: 'Volume total',
+    avgWorkoutTime: 'Durée moyenne'
+  },
   period: 'Période:',
   muscleGroup: 'Groupe musculaire:',
   allGroups: 'Tous les groupes',
@@ -170,6 +184,7 @@ export default {
   optionalNote: 'Note optionnelle',
   usePreviousValues: 'Utiliser les valeurs précédentes',
   notApplicable: 'N/A',
+  selectDate: 'Sélectionner une date',
 
   goalDetails: 'Dets de l\'objectif',
 

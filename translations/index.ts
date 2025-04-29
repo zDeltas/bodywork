@@ -7,7 +7,11 @@ export const translations = {
 };
 
 // Create a type for the translation keys based on the English translations
-export type TranslationKey = keyof typeof en;
+type NestedKeys<T> = {
+  [K in keyof T & string]: T[K] extends object ? `${K}.${keyof T[K] & string}` : K;
+}[keyof T & string];
+
+export type TranslationKey = NestedKeys<typeof en>;
 
 // Export the available languages
 export type Language = 'en' | 'fr';

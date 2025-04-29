@@ -9,7 +9,18 @@ export const useTranslation = () => {
 
   // Function to get a translation by key
   const t = (key: TranslationKey): string => {
-    return translations[language][key] as string;
+    const keys = key.split('.');
+    let value: any = translations[language];
+    
+    for (const k of keys) {
+      value = value[k];
+      if (value === undefined) {
+        console.warn(`Translation key not found: ${key}`);
+        return key;
+      }
+    }
+    
+    return value as string;
   };
 
   return {

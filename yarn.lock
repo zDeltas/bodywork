@@ -1432,13 +1432,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@expo/json-file@npm:^9.0.2, @expo/json-file@npm:^9.1.2":
-  version: 9.1.2
-  resolution: "@expo/json-file@npm:9.1.2"
+"@expo/json-file@npm:^9.0.2, @expo/json-file@npm:^9.1.3":
+  version: 9.1.3
+  resolution: "@expo/json-file@npm:9.1.3"
   dependencies:
     "@babel/code-frame": "npm:~7.10.4"
     json5: "npm:^2.2.3"
-  checksum: 10c0/2d2d10c716027c2538bebbbceb103a2045c60afe9bb3d58875e5cfe24f25f6cb096d7b90fa91290a90a328b3596372fd7723ed573ed682c4e1e81135a5bde2f0
+  checksum: 10c0/e3c5b9cdf7f5aeb1abe8a70c5aab9286a056cd957203b51011057515c0b5ae84679cd9386f9c40d10586a4804ae822fa37d2fcf16000d7c8d2bb93c11b26778f
   languageName: node
   linkType: hard
 
@@ -1489,26 +1489,26 @@ __metadata:
   linkType: hard
 
 "@expo/osascript@npm:^2.1.6":
-  version: 2.2.2
-  resolution: "@expo/osascript@npm:2.2.2"
+  version: 2.2.3
+  resolution: "@expo/osascript@npm:2.2.3"
   dependencies:
     "@expo/spawn-async": "npm:^1.7.2"
     exec-async: "npm:^2.2.0"
-  checksum: 10c0/39bd5c2500f3bc9b2b6d088c7ceeaad074ee1daf488309e301adee854c93474da039d62feb8fbe799333454c93730dd8ab38d1b570fb265409124915810be851
+  checksum: 10c0/70bf1d75e6f1ee148d3911698ac6a77423b8528000f17dcf5b0ddac44f9166d83e451797a4d34c465d400df7e57bf2e0da89348d43121a25de88a84b5be135ad
   languageName: node
   linkType: hard
 
 "@expo/package-manager@npm:^1.7.2":
-  version: 1.8.2
-  resolution: "@expo/package-manager@npm:1.8.2"
+  version: 1.8.3
+  resolution: "@expo/package-manager@npm:1.8.3"
   dependencies:
-    "@expo/json-file": "npm:^9.1.2"
+    "@expo/json-file": "npm:^9.1.3"
     "@expo/spawn-async": "npm:^1.7.2"
     chalk: "npm:^4.0.0"
     npm-package-arg: "npm:^11.0.0"
     ora: "npm:^3.4.0"
     resolve-workspace-root: "npm:^2.0.0"
-  checksum: 10c0/b87ea5475073ae98a243f5706998e8b8d28548ae039ea47ec9659c4c172b3f8ad73dd13f3af600fe7eb2eb2e9f39eaad7cd1c305bb12f919df7d321b0e7d6519
+  checksum: 10c0/55b1d0b83ebadd9504fa66966a9f7ed844d6e0878e694dd80ab4f61a5634e641d2fb11016ed62fedd2283bbe54b8e95e2069ffb2a655e7e080d6416a26ca109f
   languageName: node
   linkType: hard
 
@@ -2607,11 +2607,11 @@ __metadata:
   linkType: hard
 
 "@types/node@npm:*":
-  version: 22.15.0
-  resolution: "@types/node@npm:22.15.0"
+  version: 22.15.3
+  resolution: "@types/node@npm:22.15.3"
   dependencies:
     undici-types: "npm:~6.21.0"
-  checksum: 10c0/f60c716f473ec7cbb6fffd8488d29a9ea697f4f5d71c1ebca72e17cdce1c7df054c295122a2589463c44490d875f485f9251ada3c3167bdbe4fbe8a677059780
+  checksum: 10c0/2879f012d1aeba0bfdb5fed80d165f4f2cb3d1f2e1f98a24b18d4a211b4ace7d64bf2622784c78355982ffc1081ba79d0934efc2fb8353913e5871a63609661f
   languageName: node
   linkType: hard
 
@@ -3453,6 +3453,7 @@ __metadata:
     expo-linking: "npm:~7.0.5"
     expo-router: "npm:^4.0.20"
     expo-secure-store: "npm:14.0.1"
+    expo-sharing: "npm:13.0.1"
     expo-splash-screen: "npm:^0.29.21"
     expo-status-bar: "npm:~2.0.1"
     expo-symbols: "npm:^0.2.2"
@@ -4631,9 +4632,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.5.73":
-  version: 1.5.142
-  resolution: "electron-to-chromium@npm:1.5.142"
-  checksum: 10c0/05bc0c695a4b7c6fac499700199bfd90d767eea352e67171f005920a225e42fa08dc62ba0d31523fcd2e9b49e25aab133f82270e784888fb5c3c032f6607cdeb
+  version: 1.5.143
+  resolution: "electron-to-chromium@npm:1.5.143"
+  checksum: 10c0/2868655af1b32784395475b1f58d6363c837b198f64cb23e0fbcf1a45f682187cbf2b2aea1df6e4584a4d1a7c7c4ced04a9a09c24644ae0b216af6bdc1501cf5
   languageName: node
   linkType: hard
 
@@ -5450,6 +5451,15 @@ __metadata:
   peerDependencies:
     expo: "*"
   checksum: 10c0/c2ad36f7ae8aea5b95ebc117f302974de6ad403f0b98b259f9dfcadc441f5c40c2170472e4e95832ad6cf8bcd37614dfb3757a4de1f7631ea9493c61cb7b2ab3
+  languageName: node
+  linkType: hard
+
+"expo-sharing@npm:13.0.1":
+  version: 13.0.1
+  resolution: "expo-sharing@npm:13.0.1"
+  peerDependencies:
+    expo: "*"
+  checksum: 10c0/ecbd03c51fff90dc88dd06a7c8e8c5d5aeab564fc4c23893cef2734ca65e5525957cb700899a5a723e07e74b53056419ce5496b94442afaad35d7e62e42b4b12
   languageName: node
   linkType: hard
 

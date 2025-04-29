@@ -3,17 +3,7 @@ import { Animated, StyleSheet, View } from 'react-native';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useTheme } from '@/hooks/useTheme';
 import MuscleRestState from '@/app/components/MuscleRestState';
-
-interface Workout {
-  id: string;
-  exercise: string;
-  muscleGroup: string;
-  weight: number;
-  reps: number;
-  sets: number;
-  date: string;
-  rpe?: number;
-}
+import { Workout } from '@/types/workout';
 
 interface StatsMuscleRestStateProps {
   fadeAnim: Animated.Value;

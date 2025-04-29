@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Pressable, StyleSheet, View, TouchableOpacity } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import Body, { ExtendedBodyPart, Slug } from 'react-native-body-highlighter';
 import { differenceInHours } from 'date-fns';
@@ -7,16 +7,7 @@ import { useSettings } from '@/hooks/useSettings';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useTheme } from '@/hooks/useTheme';
 import Text from './ui/Text';
-
-interface Workout {
-  id: string;
-  exercise: string;
-  muscleGroup: string;
-  weight: number;
-  reps: number;
-  sets: number;
-  date: string;
-}
+import { Workout } from '@/types/workout';
 
 interface MuscleMapProps {
   workouts: Workout[];
@@ -169,7 +160,7 @@ const useStyles = () => {
       flex: 1,
       alignItems: 'center',
       backgroundColor: theme.colors.background.card,
-      width: '100%',
+      width: '100%'
     },
     viewToggle: {
       flexDirection: 'row',

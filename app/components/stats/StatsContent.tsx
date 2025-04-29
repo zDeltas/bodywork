@@ -3,8 +3,8 @@ import { StyleSheet, View } from 'react-native';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useTheme } from '@/hooks/useTheme';
 import Animated, { FadeIn } from 'react-native-reanimated';
-import { Card } from '../ui/Card';
-import { Text } from '../ui/Text';
+import Text from '@/app/components/ui/Text';
+import Card from '@/app/components/ui/Card';
 
 interface StatsContentProps {
   searchQuery: string;

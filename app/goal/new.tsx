@@ -7,7 +7,8 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View
+  View,
+  Modal
 } from 'react-native';
 import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold, useFonts } from '@expo-google-fonts/inter';
 import * as SplashScreen from 'expo-splash-screen';
@@ -140,24 +141,23 @@ const useStyles = () => {
       left: 0,
       right: 0,
       bottom: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.7)', // Keep semi-transparent black
-      justifyContent: 'center',
-      alignItems: 'center',
-      zIndex: theme.zIndex.modal
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      justifyContent: 'flex-end'
     },
     modalContainer: {
       backgroundColor: theme.colors.background.card,
-      borderRadius: theme.borderRadius.lg,
+      borderTopLeftRadius: theme.borderRadius.lg,
+      borderTopRightRadius: theme.borderRadius.lg,
       padding: theme.spacing.lg,
-      width: '90%',
+      width: '100%',
       height: '80%',
-      minHeight: 400,
       ...theme.shadows.lg
     },
-    modalContent: {
-      flex: 1,
-      marginBottom: theme.spacing.lg,
-      height: '100%'
+    modalHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: theme.spacing.lg
     },
     modalTitle: {
       fontSize: theme.typography.fontSize.xl,
@@ -165,6 +165,15 @@ const useStyles = () => {
       color: theme.colors.text.primary,
       marginBottom: theme.spacing.lg,
       textAlign: 'center'
+    },
+    modalCloseButton: {
+      width: 44,
+      height: 44,
+      borderRadius: theme.borderRadius.full,
+      backgroundColor: theme.colors.background.button,
+      justifyContent: 'center',
+      alignItems: 'center',
+      ...theme.shadows.sm
     },
     searchContainer: {
       flexDirection: 'row',
@@ -624,23 +633,24 @@ export default function NewGoalScreen() {
       </ScrollView>
 
       {/* Exercise Selector Modal */}
-      {showExerciseSelector && (
-        <Animated.View
-          entering={FadeIn.duration(300)}
-          exiting={FadeOut.duration(300)}
-          style={styles.modalOverlay}
-        >
-          <Animated.View
-            entering={FadeIn.duration(400).delay(100)}
-            style={styles.modalContainer}
-          >
-            <Text style={styles.modalTitle}>{t('selectExerciseForGoal')}</Text>
-
-            <ScrollView 
-              style={styles.modalContent} 
-              contentContainerStyle={{ flexGrow: 1 }}
-              showsVerticalScrollIndicator={true}
-            >
+      <Modal
+        visible={showExerciseSelector}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowExerciseSelector(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>{t('selectExerciseForGoal')}</Text>
+              <TouchableOpacity
+                style={styles.modalCloseButton}
+                onPress={() => setShowExerciseSelector(false)}
+              >
+                <X color={theme.colors.text.primary} size={24} />
+              </TouchableOpacity>
+            </View>
+            <ScrollView style={{ flex: 1 }}>
               <ExerciseList
                 selectedMuscle={selectedMuscleGroup as string}
                 setSelectedMuscle={(muscleGroup) => {
@@ -673,19 +683,9 @@ export default function NewGoalScreen() {
                 }}
               />
             </ScrollView>
-
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                setShowExerciseSelector(false);
-              }}
-            >
-              <Text style={styles.cancelButtonText}>{t('cancel')}</Text>
-            </TouchableOpacity>
-          </Animated.View>
-        </Animated.View>
-      )}
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }

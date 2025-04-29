@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, Modal } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import { router, useLocalSearchParams } from 'expo-router';
-import { BarChart, Calendar, Gauge, Layers, Plus, Weight, X } from 'lucide-react-native';
+import { BarChart, Calendar, Gauge, Layers, Plus, Weight, X, ChevronDown } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from '@/hooks/useTranslation';
 import Animated, { FadeIn } from 'react-native-reanimated';
@@ -42,6 +42,7 @@ export default function NewWorkoutScreen() {
   const params = useLocalSearchParams();
   const [selectedDate, setSelectedDate] = useState(params.selectedDate as string || new Date().toISOString().split('T')[0]);
   const [showCalendar, setShowCalendar] = useState(false);
+  const [showExerciseSelector, setShowExerciseSelector] = useState(false);
 
   // Function to calculate suggested weight based on previous workouts
   const calculateSuggestedWeight = useCallback(async (selectedExercise: string, inputReps: string, inputRpe: string) => {
@@ -317,43 +318,51 @@ export default function NewWorkoutScreen() {
           </View>
         </Modal>
 
-        <ExerciseList
-          selectedMuscle={selectedMuscle}
-          setSelectedMuscle={setSelectedMuscle}
-          exercise={exercise}
-          setExercise={setExercise}
-          setIsCustomExercise={setIsCustomExercise}
-          onExerciseSelect={(selectedExercise) => {
-            tryCalculateSuggestedWeight(selectedExercise);
-          }}
-        />
+        {/* Exercise Selector Modal */}
+        <Modal
+          visible={showExerciseSelector}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={() => setShowExerciseSelector(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={[styles.modalContent, { height: '80%' }]}>
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalTitle}>{t('selectExercise')}</Text>
+                <TouchableOpacity
+                  style={styles.modalCloseButton}
+                  onPress={() => setShowExerciseSelector(false)}
+                >
+                  <X color={theme.colors.text.primary} size={24} />
+                </TouchableOpacity>
+              </View>
+              <ScrollView style={{ flex: 1 }}>
+                <ExerciseList
+                  selectedMuscle={selectedMuscle}
+                  setSelectedMuscle={setSelectedMuscle}
+                  exercise={exercise}
+                  setExercise={(selectedExercise) => {
+                    setExercise(selectedExercise);
+                    setShowExerciseSelector(false);
+                    tryCalculateSuggestedWeight(selectedExercise);
+                  }}
+                  setIsCustomExercise={setIsCustomExercise}
+                />
+              </ScrollView>
+            </View>
+          </View>
+        </Modal>
 
-        {/* Custom Exercise Input */}
-        {isCustomExercise && selectedMuscle && (
-          <Animated.View
-            entering={FadeIn.duration(400)}
-            style={styles.customExerciseContainer}
-          >
-            <TextInput
-              style={styles.input}
-              value={exercise}
-              onChangeText={(value) => {
-                setExercise(value);
-                if (value) {
-                  tryCalculateSuggestedWeight(value);
-                }
-              }}
-              placeholder={t('enterExerciseName')}
-              placeholderTextColor={theme.colors.text.secondary}
-            />
-            <TouchableOpacity
-              style={styles.backButton}
-              onPress={() => setIsCustomExercise(false)}
-            >
-              <Text style={styles.backButtonText}>{t('backToPredefined')}</Text>
-            </TouchableOpacity>
-          </Animated.View>
-        )}
+        {/* Exercise Selection Button */}
+        <TouchableOpacity
+          style={styles.exerciseButton}
+          onPress={() => setShowExerciseSelector(true)}
+        >
+          <Text style={[styles.exerciseButtonText, !exercise && { color: theme.colors.text.secondary }]}>
+            {exercise || t('selectExercise')}
+          </Text>
+          <ChevronDown color={theme.colors.text.secondary} size={20} />
+        </TouchableOpacity>
 
         <Animated.View
           entering={FadeIn.duration(500).delay(300)}
@@ -1131,6 +1140,21 @@ const useStyles = () => {
       justifyContent: 'center',
       alignItems: 'center',
       ...theme.shadows.sm
+    },
+    exerciseButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: theme.colors.background.card,
+      padding: theme.spacing.base,
+      borderRadius: theme.borderRadius.lg,
+      marginBottom: theme.spacing.lg,
+      ...theme.shadows.sm
+    },
+    exerciseButtonText: {
+      color: theme.colors.text.primary,
+      fontFamily: theme.typography.fontFamily.semiBold,
+      fontSize: theme.typography.fontSize.base,
+      marginRight: theme.spacing.sm
     }
   });
 };

@@ -11,9 +11,9 @@ interface StatsMuscleRestStateProps {
 }
 
 export default function StatsMuscleRestState({
-  fadeAnim,
-  workouts
-}: StatsMuscleRestStateProps) {
+                                               fadeAnim,
+                                               workouts
+                                             }: StatsMuscleRestStateProps) {
   const { t } = useTranslation();
   const { theme } = useTheme();
 

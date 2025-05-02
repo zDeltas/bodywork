@@ -51,7 +51,7 @@ const GoalSection: React.FC<GoalSectionProps> = ({ fadeAnim, goals, setGoals }) 
     },
     goalItem: {
       marginBottom: theme.spacing.lg,
-      borderRadius: theme.borderRadius.base,
+      borderRadius: theme.borderRadius.base
     },
     goalHeader: {
       flexDirection: 'row',

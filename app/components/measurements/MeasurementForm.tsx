@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { colors } from '@/app/theme';
 import Text from '../ui/Text';
@@ -32,12 +32,12 @@ interface MeasurementFormProps {
 }
 
 export const MeasurementForm: React.FC<MeasurementFormProps> = ({
-  measurement,
-  onMeasurementChange,
-  onWeightChange,
-  onDateChange,
-  onSave,
-}) => {
+                                                                  measurement,
+                                                                  onMeasurementChange,
+                                                                  onWeightChange,
+                                                                  onDateChange,
+                                                                  onSave
+                                                                }) => {
   const { isDarkMode } = useTheme();
 
   const measurementPoints: { label: string; key: MeasurementKey }[] = [
@@ -49,7 +49,7 @@ export const MeasurementForm: React.FC<MeasurementFormProps> = ({
     { label: 'Shoulders', key: 'shoulders' },
     { label: 'Thighs', key: 'thighs' },
     { label: 'Calves', key: 'calves' },
-    { label: 'Neck', key: 'neck' },
+    { label: 'Neck', key: 'neck' }
   ];
 
   return (
@@ -62,8 +62,8 @@ export const MeasurementForm: React.FC<MeasurementFormProps> = ({
             {
               color: colors.text.primary,
               borderColor: colors.border.default,
-              backgroundColor: colors.background.input,
-            },
+              backgroundColor: colors.background.input
+            }
           ]}
           value={measurement.date}
           onChangeText={onDateChange}
@@ -80,8 +80,8 @@ export const MeasurementForm: React.FC<MeasurementFormProps> = ({
             {
               color: colors.text.primary,
               borderColor: colors.border.default,
-              backgroundColor: colors.background.input,
-            },
+              backgroundColor: colors.background.input
+            }
           ]}
           value={measurement.weight.toString()}
           onChangeText={onWeightChange}
@@ -100,8 +100,8 @@ export const MeasurementForm: React.FC<MeasurementFormProps> = ({
               {
                 color: colors.text.primary,
                 borderColor: colors.border.default,
-                backgroundColor: colors.background.input,
-              },
+                backgroundColor: colors.background.input
+              }
             ]}
             value={measurement.measurements[point.key].toString()}
             onChangeText={(value) => onMeasurementChange(point.key, value)}
@@ -125,10 +125,10 @@ export const MeasurementForm: React.FC<MeasurementFormProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    padding: 16
   },
   inputGroup: {
-    marginBottom: 16,
+    marginBottom: 16
   },
   input: {
     borderWidth: 1,
@@ -136,18 +136,18 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 8,
     marginBottom: 8,
-    color: colors.text.primary,
+    color: colors.text.primary
   },
   saveButton: {
     padding: 12,
     borderRadius: 8,
     alignItems: 'center',
-    marginTop: 16,
+    marginTop: 16
   },
   saveButtonText: {
     color: colors.text.primary,
-    fontWeight: 'bold',
-  },
+    fontWeight: 'bold'
+  }
 });
 
 export default MeasurementForm; 

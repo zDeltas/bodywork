@@ -15,13 +15,13 @@ interface KpiMotivationProps {
 }
 
 const KpiMotivation: React.FC<KpiMotivationProps> = ({
-  fadeAnim,
-  bestProgressExercise,
-  monthlyProgress,
-  trainingFrequency,
-  totalSets,
-  totalWorkouts
-}) => {
+                                                       fadeAnim,
+                                                       bestProgressExercise,
+                                                       monthlyProgress,
+                                                       trainingFrequency,
+                                                       totalSets,
+                                                       totalWorkouts
+                                                     }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
 
@@ -80,7 +80,7 @@ const KpiMotivation: React.FC<KpiMotivationProps> = ({
 
 const styles = StyleSheet.create({
   card: {
-    marginBottom: 20,
+    marginBottom: 20
   },
   statGradient: {
     padding: 20,

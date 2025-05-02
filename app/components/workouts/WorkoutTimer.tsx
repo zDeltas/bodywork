@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
 import Text from '../ui/Text';
 import { useTheme } from '@/hooks/useTheme';
 
@@ -16,10 +16,10 @@ const formatTime = (seconds: number): string => {
 };
 
 const WorkoutTimer: React.FC<WorkoutTimerProps> = ({
-  duration,
-  onComplete,
-  isActive = true,
-}) => {
+                                                     duration,
+                                                     onComplete,
+                                                     isActive = true
+                                                   }) => {
   const [timeLeft, setTimeLeft] = useState(duration);
   const { theme } = useTheme();
   const styles = useStyles(theme);
@@ -59,7 +59,7 @@ const WorkoutTimer: React.FC<WorkoutTimerProps> = ({
           <View
             style={[
               styles.progressFill,
-              { width: `${progress}%` },
+              { width: `${progress}%` }
             ]}
           />
         </View>
@@ -74,30 +74,30 @@ const WorkoutTimer: React.FC<WorkoutTimerProps> = ({
 const useStyles = (theme: any) => StyleSheet.create({
   container: {
     alignItems: 'center',
-    padding: 16,
+    padding: 16
   },
   timerContainer: {
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 8
   },
   timerText: {
     color: theme.colors.primary,
-    marginBottom: 16,
+    marginBottom: 16
   },
   progressBar: {
     width: '100%',
     height: 4,
     backgroundColor: theme.colors.background.card,
     borderRadius: 2,
-    overflow: 'hidden',
+    overflow: 'hidden'
   },
   progressFill: {
     height: '100%',
-    backgroundColor: theme.colors.primary,
+    backgroundColor: theme.colors.primary
   },
   label: {
-    marginTop: 8,
-  },
+    marginTop: 8
+  }
 });
 
 export default WorkoutTimer; 

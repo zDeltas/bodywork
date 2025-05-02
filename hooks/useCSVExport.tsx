@@ -17,7 +17,7 @@ export const useCSVExport = () => {
     // Add each workout as a row
     workouts.forEach(workout => {
       const date = new Date(workout.date).toISOString().split('T')[0];
-      
+
       // Add each series as a separate row
       workout.series.forEach(series => {
         const row = [
@@ -31,7 +31,7 @@ export const useCSVExport = () => {
           series.type,
           `"${series.note?.replace(/"/g, '""') || ''}"`  // Escape quotes in notes
         ].join(',');
-        
+
         csvContent += row + '\n';
       });
     });
@@ -43,7 +43,7 @@ export const useCSVExport = () => {
   const exportWorkoutsToCSV = async () => {
     try {
       setIsExporting(true);
-      
+
       // Get workouts from AsyncStorage
       const storedWorkouts = await AsyncStorage.getItem('workouts');
       if (!storedWorkouts) {
@@ -51,22 +51,22 @@ export const useCSVExport = () => {
         setIsExporting(false);
         return { success: false, message: t('noWorkoutsToExport') };
       }
-      
+
       const workouts: Workout[] = JSON.parse(storedWorkouts);
-      
+
       // Convert to CSV
       const csvContent = convertWorkoutsToCSV(workouts);
-      
+
       // Create a temporary file
       const fileDate = new Date().toISOString().split('T')[0];
       const fileName = `bodywork_workouts_${fileDate}.csv`;
       const filePath = `${FileSystem.documentDirectory}${fileName}`;
-      
+
       // Write CSV content to the file
       await FileSystem.writeAsStringAsync(filePath, csvContent, {
         encoding: FileSystem.EncodingType.UTF8
       });
-      
+
       // Share the file
       if (await Sharing.isAvailableAsync()) {
         await Sharing.shareAsync(filePath, {
@@ -74,7 +74,7 @@ export const useCSVExport = () => {
           dialogTitle: t('exportToCSV'),
           UTI: 'public.comma-separated-values-text'
         });
-        
+
         setIsExporting(false);
         return { success: true, message: t('exportSuccess') };
       } else {

@@ -280,7 +280,7 @@ const ExerciseDetails = () => {
     const now = new Date();
     const periodInMonths = parseInt(selectedPeriod);
     const cutoffDate = new Date(now.setMonth(now.getMonth() - periodInMonths));
-    
+
     return data.filter(item => {
       const itemDate = new Date(item.x);
       return itemDate >= cutoffDate;
@@ -472,8 +472,8 @@ const ExerciseDetails = () => {
                 tickCount={getTickCount()}
                 style={{
                   axis: { stroke: theme.colors.border.default },
-                  tickLabels: { 
-                    fill: theme.colors.text.primary, 
+                  tickLabels: {
+                    fill: theme.colors.text.primary,
                     fontSize: theme.typography.fontSize.sm,
                     angle: -45,
                     textAnchor: 'end'
@@ -491,9 +491,9 @@ const ExerciseDetails = () => {
                 tickCount={5}
                 style={{
                   axis: { stroke: theme.colors.border.default },
-                  tickLabels: { 
-                    fill: theme.colors.text.primary, 
-                    fontSize: theme.typography.fontSize.sm 
+                  tickLabels: {
+                    fill: theme.colors.text.primary,
+                    fontSize: theme.typography.fontSize.sm
                   },
                   axisLabel: {
                     fill: theme.colors.text.primary,
@@ -505,9 +505,9 @@ const ExerciseDetails = () => {
               <VictoryLine
                 data={filteredExerciseData}
                 style={{
-                  data: { 
-                    stroke: getChartColor(), 
-                    strokeWidth: 3 
+                  data: {
+                    stroke: getChartColor(),
+                    strokeWidth: 3
                   }
                 }}
               />
@@ -520,12 +520,12 @@ const ExerciseDetails = () => {
                 labels={formatTooltip}
                 labelComponent={
                   <VictoryTooltip
-                    style={{ 
+                    style={{
                       fill: theme.colors.text.primary,
                       fontSize: theme.typography.fontSize.sm
                     }}
-                    flyoutStyle={{ 
-                      fill: theme.colors.background.card, 
+                    flyoutStyle={{
+                      fill: theme.colors.background.card,
                       stroke: theme.colors.border.default,
                       strokeWidth: 1
                     }}
@@ -553,8 +553,8 @@ const ExerciseDetails = () => {
                 tickCount={getTickCount()}
                 style={{
                   axis: { stroke: theme.colors.border.default },
-                  tickLabels: { 
-                    fill: theme.colors.text.primary, 
+                  tickLabels: {
+                    fill: theme.colors.text.primary,
                     fontSize: theme.typography.fontSize.sm,
                     angle: -45,
                     textAnchor: 'end'
@@ -572,9 +572,9 @@ const ExerciseDetails = () => {
                 tickCount={5}
                 style={{
                   axis: { stroke: theme.colors.border.default },
-                  tickLabels: { 
-                    fill: theme.colors.text.primary, 
-                    fontSize: theme.typography.fontSize.sm 
+                  tickLabels: {
+                    fill: theme.colors.text.primary,
+                    fontSize: theme.typography.fontSize.sm
                   },
                   axisLabel: {
                     fill: theme.colors.text.primary,
@@ -586,9 +586,9 @@ const ExerciseDetails = () => {
               <VictoryLine
                 data={filteredVolumeData}
                 style={{
-                  data: { 
-                    stroke: getChartColor(), 
-                    strokeWidth: 3 
+                  data: {
+                    stroke: getChartColor(),
+                    strokeWidth: 3
                   }
                 }}
               />
@@ -601,12 +601,12 @@ const ExerciseDetails = () => {
                 labels={formatTooltip}
                 labelComponent={
                   <VictoryTooltip
-                    style={{ 
+                    style={{
                       fill: theme.colors.text.primary,
                       fontSize: theme.typography.fontSize.sm
                     }}
-                    flyoutStyle={{ 
-                      fill: theme.colors.background.card, 
+                    flyoutStyle={{
+                      fill: theme.colors.background.card,
                       stroke: theme.colors.border.default,
                       strokeWidth: 1
                     }}
@@ -634,8 +634,8 @@ const ExerciseDetails = () => {
                 tickCount={getTickCount()}
                 style={{
                   axis: { stroke: theme.colors.border.default },
-                  tickLabels: { 
-                    fill: theme.colors.text.primary, 
+                  tickLabels: {
+                    fill: theme.colors.text.primary,
                     fontSize: theme.typography.fontSize.sm,
                     angle: -45,
                     textAnchor: 'end'
@@ -653,9 +653,9 @@ const ExerciseDetails = () => {
                 tickCount={5}
                 style={{
                   axis: { stroke: theme.colors.border.default },
-                  tickLabels: { 
-                    fill: theme.colors.text.primary, 
-                    fontSize: theme.typography.fontSize.sm 
+                  tickLabels: {
+                    fill: theme.colors.text.primary,
+                    fontSize: theme.typography.fontSize.sm
                   },
                   axisLabel: {
                     fill: theme.colors.text.primary,
@@ -667,9 +667,9 @@ const ExerciseDetails = () => {
               <VictoryLine
                 data={filteredRepsData}
                 style={{
-                  data: { 
-                    stroke: getChartColor(), 
-                    strokeWidth: 3 
+                  data: {
+                    stroke: getChartColor(),
+                    strokeWidth: 3
                   }
                 }}
               />
@@ -682,12 +682,12 @@ const ExerciseDetails = () => {
                 labels={formatTooltip}
                 labelComponent={
                   <VictoryTooltip
-                    style={{ 
+                    style={{
                       fill: theme.colors.text.primary,
                       fontSize: theme.typography.fontSize.sm
                     }}
-                    flyoutStyle={{ 
-                      fill: theme.colors.background.card, 
+                    flyoutStyle={{
+                      fill: theme.colors.background.card,
                       stroke: theme.colors.border.default,
                       strokeWidth: 1
                     }}

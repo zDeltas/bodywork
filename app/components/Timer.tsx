@@ -10,7 +10,7 @@ import * as Haptics from 'expo-haptics';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useTheme } from '@/hooks/useTheme';
 import Text from './ui/Text';
-import Animated, { FadeIn, FadeOut, withSpring } from 'react-native-reanimated';
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 
 interface TimerProps {
   initialTime?: number;
@@ -23,14 +23,14 @@ interface TimerProps {
 }
 
 export default function Timer({
-  initialTime = 60,
-  mode = 'timer',
-  onComplete,
-  sets = 1,
-  restTime = 60,
-  exerciseName = 'Exercise',
-  onSetsChange
-}: TimerProps) {
+                                initialTime = 60,
+                                mode = 'timer',
+                                onComplete,
+                                sets = 1,
+                                restTime = 60,
+                                exerciseName = 'Exercise',
+                                onSetsChange
+                              }: TimerProps) {
   const { t } = useTranslation();
   const { theme } = useTheme();
   const styles = useStyles();
@@ -161,7 +161,7 @@ export default function Timer({
           <Text style={[styles.phaseText, { color: theme.colors.background.main }]}>
             {isResting ? 'REST' : 'WORK'}
           </Text>
-          
+
           <View style={styles.setsContainer}>
             <TouchableOpacity
               style={[styles.setButton, { opacity: currentSet <= 1 ? 0.5 : 1 }]}
@@ -170,11 +170,11 @@ export default function Timer({
             >
               <Minus size={16} color={theme.colors.background.main} />
             </TouchableOpacity>
-            
+
             <Text style={[styles.setInfo, { color: theme.colors.background.main }]}>
               {t('series')} {currentSet}/{sets}
             </Text>
-            
+
             <TouchableOpacity
               style={[styles.setButton, { opacity: currentSet >= sets ? 0.5 : 1 }]}
               onPress={() => setCurrentSet(prev => Math.min(sets, prev + 1))}
@@ -189,7 +189,7 @@ export default function Timer({
           </Text>
         </View>
       </Animated.View>
-      
+
       <View style={styles.controls}>
         <TouchableOpacity
           style={[

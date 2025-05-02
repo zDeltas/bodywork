@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import Text from '../ui/Text';
 import { useTheme } from '@/hooks/useTheme';
 
@@ -49,25 +49,25 @@ const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({ measurements })
 
 const useStyles = (theme: any) => StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 1
   },
   measurementItem: {
     padding: 16,
     backgroundColor: theme.colors.background.card,
     borderRadius: 8,
-    marginBottom: 16,
+    marginBottom: 16
   },
   measurementsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginTop: 8,
+    marginTop: 8
   },
   measurementDetail: {
     flexDirection: 'row',
     alignItems: 'center',
     marginRight: 16,
-    marginBottom: 8,
-  },
+    marginBottom: 8
+  }
 });
 
 export default MeasurementHistory; 

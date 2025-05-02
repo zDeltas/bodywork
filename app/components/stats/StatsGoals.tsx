@@ -1,9 +1,8 @@
-import React, { useCallback, useState, Dispatch, SetStateAction } from 'react';
-import { Animated, StyleSheet, TouchableOpacity, View } from 'react-native';
+import React, { Dispatch, SetStateAction, useCallback, useState } from 'react';
+import { Animated, StyleSheet, View } from 'react-native';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useTheme } from '@/hooks/useTheme';
 import GoalSection from '@/app/components/GoalSection';
-import Text from '../ui/Text';
 
 interface Goal {
   exercise: string;
@@ -21,12 +20,12 @@ interface StatsGoalsProps {
 }
 
 export default function StatsGoals({
-  fadeAnim,
-  goals,
-  setGoals,
-  workouts,
-  getCurrentWeight
-}: StatsGoalsProps) {
+                                     fadeAnim,
+                                     goals,
+                                     setGoals,
+                                     workouts,
+                                     getCurrentWeight
+                                   }: StatsGoalsProps) {
   const { t } = useTranslation();
   const { theme } = useTheme();
   const [showExerciseSelector, setShowExerciseSelector] = useState(false);

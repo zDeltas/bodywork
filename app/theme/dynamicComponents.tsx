@@ -6,7 +6,6 @@
 
 import { StyleSheet } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
-import { UIText } from './ui/Text';
 
 /**
  * Hook to get component styles based on the current theme

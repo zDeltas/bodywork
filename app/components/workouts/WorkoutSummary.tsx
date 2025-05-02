@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Text from '../ui/Text';
 import { useTheme } from '@/hooks/useTheme';
 
@@ -48,21 +48,21 @@ const useStyles = (theme: any) => StyleSheet.create({
     padding: 16,
     backgroundColor: theme.colors.background.card,
     borderRadius: 8,
-    marginBottom: 16,
+    marginBottom: 16
   },
   title: {
     color: theme.colors.primary,
-    marginBottom: 8,
+    marginBottom: 8
   },
   duration: {
-    marginBottom: 16,
+    marginBottom: 16
   },
   exercisesContainer: {
-    marginTop: 8,
+    marginTop: 8
   },
   exerciseItem: {
-    marginBottom: 12,
-  },
+    marginBottom: 12
+  }
 });
 
 export default WorkoutSummary;

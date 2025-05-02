@@ -283,7 +283,7 @@ const useStyles = () => {
     searchInput: {
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.regular,
-      fontSize: theme.typography.fontSize.base,
+      fontSize: theme.typography.fontSize.base
     },
     collapsibleSection: {
       marginBottom: theme.spacing.sm,

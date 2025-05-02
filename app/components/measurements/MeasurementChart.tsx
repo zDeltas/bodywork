@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { VictoryAxis, VictoryChart, VictoryLine } from 'victory-native';
 import { colors } from '../../theme/theme';
 
@@ -21,26 +21,26 @@ export const MeasurementChart: React.FC<MeasurementChartProps> = ({ data, title 
           axis: {
             style: {
               tickLabels: {
-                fill: colors.text.primary,
+                fill: colors.text.primary
               },
               grid: {
-                stroke: colors.border.default,
-              },
-            },
-          },
+                stroke: colors.border.default
+              }
+            }
+          }
         }}
       >
         <VictoryAxis
           dependentAxis
           style={{
             tickLabels: { fill: colors.text.primary },
-            grid: { stroke: colors.border.default },
+            grid: { stroke: colors.border.default }
           }}
         />
         <VictoryAxis
           style={{
             tickLabels: { fill: colors.text.primary },
-            grid: { stroke: colors.border.default },
+            grid: { stroke: colors.border.default }
           }}
         />
         <VictoryLine
@@ -48,7 +48,7 @@ export const MeasurementChart: React.FC<MeasurementChartProps> = ({ data, title 
           x="date"
           y="value"
           style={{
-            data: { stroke: colors.primary },
+            data: { stroke: colors.primary }
           }}
         />
       </VictoryChart>
@@ -59,8 +59,8 @@ export const MeasurementChart: React.FC<MeasurementChartProps> = ({ data, title 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
-  },
+    padding: 16
+  }
 });
 
 export default MeasurementChart; 

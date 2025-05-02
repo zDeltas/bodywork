@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, TouchableOpacity, View, Platform } from 'react-native';
+import { Platform, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import Timer from '../components/Timer';
-import { Minus, Plus, Timer as TimerIcon, Clock } from 'lucide-react-native';
+import { Clock, Minus, Plus, Timer as TimerIcon } from 'lucide-react-native';
 import { useTranslation } from '@/hooks/useTranslation';
 import { TimerPickerModal } from 'react-native-timer-picker';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -242,8 +242,8 @@ export default function TimerScreen() {
             style={[styles.modeButton, mode === 'timer' && styles.modeButtonActive]}
             onPress={() => setMode('timer')}
           >
-            <TimerIcon 
-              size={20} 
+            <TimerIcon
+              size={20}
               color={mode === 'timer' ? theme.colors.text.primary : theme.colors.text.secondary}
             />
           </TouchableOpacity>
@@ -251,8 +251,8 @@ export default function TimerScreen() {
             style={[styles.modeButton, mode === 'stopwatch' && styles.modeButtonActive]}
             onPress={() => setMode('stopwatch')}
           >
-            <Clock 
-              size={20} 
+            <Clock
+              size={20}
               color={mode === 'stopwatch' ? theme.colors.text.primary : theme.colors.text.secondary}
             />
           </TouchableOpacity>

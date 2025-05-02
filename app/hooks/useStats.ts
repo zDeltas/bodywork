@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Workout } from '@/app/types/workout';
 import { differenceInDays, subMonths } from 'date-fns';
@@ -175,13 +175,14 @@ const useStats = (selectedPeriod: Period) => {
         };
       })
       .sort((a, b) => b.value - a.value); // Trier par pourcentage décroissant
-  }, [selectedPeriod]);  useEffect(() => {
+  }, [selectedPeriod]);
+  useEffect(() => {
     const loadWorkouts = async () => {
       try {
         const storedWorkouts = await AsyncStorage.getItem('workouts');
         if (storedWorkouts) {
           const workouts = JSON.parse(storedWorkouts) as Workout[];
-          
+
           setStatsData({
             workouts,
             monthlyProgress: calculateMonthlyProgress(workouts),

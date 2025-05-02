@@ -11,7 +11,7 @@ export const useTranslation = () => {
   const t = (key: TranslationKey): string => {
     const keys = key.split('.');
     let value: any = translations[language];
-    
+
     for (const k of keys) {
       value = value[k];
       if (value === undefined) {
@@ -19,7 +19,7 @@ export const useTranslation = () => {
         return key;
       }
     }
-    
+
     return value as string;
   };
 

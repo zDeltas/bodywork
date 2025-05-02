@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import Text from '../ui/Text';
 import { useTheme } from '@/hooks/useTheme';
 
@@ -24,7 +24,7 @@ const WorkoutForm: React.FC<WorkoutFormProps> = ({ onSubmit }) => {
     name: '',
     sets: 0,
     reps: 0,
-    weight: 0,
+    weight: 0
   });
 
   const { theme } = useTheme();
@@ -37,7 +37,7 @@ const WorkoutForm: React.FC<WorkoutFormProps> = ({ onSubmit }) => {
         name: '',
         sets: 0,
         reps: 0,
-        weight: 0,
+        weight: 0
       });
     }
   };
@@ -46,7 +46,7 @@ const WorkoutForm: React.FC<WorkoutFormProps> = ({ onSubmit }) => {
     if (workoutName && exercises.length > 0) {
       onSubmit({
         name: workoutName,
-        exercises,
+        exercises
       });
     }
   };
@@ -142,10 +142,10 @@ const WorkoutForm: React.FC<WorkoutFormProps> = ({ onSubmit }) => {
 
 const useStyles = (theme: any) => StyleSheet.create({
   container: {
-    padding: 16,
+    padding: 16
   },
   section: {
-    marginBottom: 24,
+    marginBottom: 24
   },
   input: {
     borderWidth: 1,
@@ -154,35 +154,35 @@ const useStyles = (theme: any) => StyleSheet.create({
     padding: 12,
     marginVertical: 8,
     color: theme.colors.text.primary,
-    backgroundColor: theme.colors.background.input,
+    backgroundColor: theme.colors.background.input
   },
   row: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-between'
   },
   numberInput: {
     flex: 1,
-    marginHorizontal: 4,
+    marginHorizontal: 4
   },
   button: {
     backgroundColor: theme.colors.primary,
     padding: 12,
     borderRadius: 8,
     alignItems: 'center',
-    marginTop: 8,
+    marginTop: 8
   },
   submitButton: {
-    marginTop: 16,
+    marginTop: 16
   },
   buttonText: {
-    color: theme.colors.text.primary,
+    color: theme.colors.text.primary
   },
   exerciseItem: {
     backgroundColor: theme.colors.background.card,
     padding: 12,
     borderRadius: 8,
-    marginVertical: 4,
-  },
+    marginVertical: 4
+  }
 });
 
 export default WorkoutForm; 

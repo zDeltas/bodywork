@@ -21,12 +21,12 @@ interface StatsMuscleDistributionProps {
 }
 
 export default function StatsMuscleDistribution({
-  fadeAnim,
-  selectedPeriod,
-  setSelectedPeriod,
-  graphsSectionRef,
-  muscleGroups
-}: StatsMuscleDistributionProps) {
+                                                  fadeAnim,
+                                                  selectedPeriod,
+                                                  setSelectedPeriod,
+                                                  graphsSectionRef,
+                                                  muscleGroups
+                                                }: StatsMuscleDistributionProps) {
   const { t } = useTranslation();
   const { theme } = useTheme();
 

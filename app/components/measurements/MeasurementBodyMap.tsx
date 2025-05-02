@@ -1,7 +1,6 @@
 import React from 'react';
-import { View, StyleSheet, Dimensions } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Body, { ExtendedBodyPart, Slug } from 'react-native-body-highlighter';
-import { colors } from '../../theme/theme';
 
 const measurementSlugs: Record<string, Slug> = {
   CHEST: 'chest' as Slug,
@@ -12,7 +11,7 @@ const measurementSlugs: Record<string, Slug> = {
   SHOULDERS: 'deltoids' as Slug,
   THIGHS: 'quadriceps' as Slug,
   CALVES: 'calves' as Slug,
-  NECK: 'neck' as Slug,
+  NECK: 'neck' as Slug
 };
 
 interface MeasurementPoint {
@@ -43,7 +42,7 @@ export const MeasurementBodyMap: React.FC<MeasurementBodyMapProps> = ({ points, 
   const data: ExtendedBodyPart[] = points.map((point) => ({
     slug: measurementSlugs[point.key],
     intensity: 1,
-    color: point.color,
+    color: point.color
   }));
 
   return (
@@ -66,8 +65,8 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 16,
-  },
+    padding: 16
+  }
 });
 
 export default MeasurementBodyMap; 

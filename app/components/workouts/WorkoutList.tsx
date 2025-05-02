@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
 import Text from '../ui/Text';
 import { useTheme } from '@/hooks/useTheme';
 
@@ -61,24 +61,24 @@ const WorkoutList: React.FC<WorkoutListProps> = ({ workouts, onWorkoutPress }) =
 
 const useStyles = (theme: any) => StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 1
   },
   listContent: {
-    padding: 16,
+    padding: 16
   },
   workoutItem: {
     backgroundColor: theme.colors.background.card,
     borderRadius: 8,
     padding: 16,
-    marginBottom: 16,
+    marginBottom: 16
   },
   workoutName: {
-    color: theme.colors.primary,
+    color: theme.colors.primary
   },
   emptyText: {
     textAlign: 'center',
-    marginTop: 24,
-  },
+    marginTop: 24
+  }
 });
 
 export default WorkoutList; 

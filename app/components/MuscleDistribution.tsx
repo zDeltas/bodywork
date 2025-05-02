@@ -23,12 +23,12 @@ interface MuscleDistributionProps {
 }
 
 const MuscleDistribution: React.FC<MuscleDistributionProps> = ({
-  fadeAnim,
-  muscleGroups,
-  selectedPeriod,
-  setSelectedPeriod,
-  graphsSectionRef
-}) => {
+                                                                 fadeAnim,
+                                                                 muscleGroups,
+                                                                 selectedPeriod,
+                                                                 setSelectedPeriod,
+                                                                 graphsSectionRef
+                                                               }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
 
@@ -50,6 +50,12 @@ const MuscleDistribution: React.FC<MuscleDistributionProps> = ({
       fontFamily: theme.typography.fontFamily.bold,
       marginBottom: theme.spacing.xs,
       color: theme.colors.text.primary
+    },
+    chartSubtitle: {
+      fontSize: theme.typography.fontSize.sm,
+      fontFamily: theme.typography.fontFamily.regular,
+      color: theme.colors.text.secondary,
+      marginBottom: theme.spacing.sm
     },
     filterContainer: {
       flexDirection: 'row',
@@ -73,8 +79,42 @@ const MuscleDistribution: React.FC<MuscleDistributionProps> = ({
     filterTextActive: {
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.semiBold
+    },
+    legendContainer: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'center',
+      marginTop: theme.spacing.md,
+      gap: theme.spacing.sm
+    },
+    legendItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginRight: theme.spacing.sm
+    },
+    legendColor: {
+      width: 12,
+      height: 12,
+      borderRadius: 6,
+      marginRight: theme.spacing.xs
+    },
+    legendText: {
+      fontSize: theme.typography.fontSize.sm,
+      color: theme.colors.text.secondary
+    },
+    emptyStateContainer: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      height: 200
+    },
+    emptyStateText: {
+      color: theme.colors.text.secondary,
+      textAlign: 'center'
     }
   });
+
+  // Vérifier si des données sont disponibles
+  const hasData = muscleGroups && muscleGroups.length > 0;
 
   return (
     <Animated.View
@@ -86,6 +126,7 @@ const MuscleDistribution: React.FC<MuscleDistributionProps> = ({
     >
       <View style={styles.chartTitleContainer}>
         <Text style={styles.chartTitle}>{t('muscleDistribution')}</Text>
+        <Text style={styles.chartSubtitle}>Répartition du volume d'entraînement par groupe musculaire</Text>
         <View style={styles.filterContainer}>
           <TouchableOpacity
             style={[styles.filterButton, selectedPeriod === '1m' && styles.filterButtonActive]}
@@ -94,8 +135,9 @@ const MuscleDistribution: React.FC<MuscleDistributionProps> = ({
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             }}
           >
-            <Text
-              style={[styles.filterText, selectedPeriod === '1m' && styles.filterTextActive]}>{t('oneMonth')}</Text>
+            <Text style={[styles.filterText, selectedPeriod === '1m' && styles.filterTextActive]}>
+              {t('oneMonth')}
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.filterButton, selectedPeriod === '3m' && styles.filterButtonActive]}
@@ -104,8 +146,9 @@ const MuscleDistribution: React.FC<MuscleDistributionProps> = ({
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             }}
           >
-            <Text
-              style={[styles.filterText, selectedPeriod === '3m' && styles.filterTextActive]}>{t('threeMonths')}</Text>
+            <Text style={[styles.filterText, selectedPeriod === '3m' && styles.filterTextActive]}>
+              {t('threeMonths')}
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.filterButton, selectedPeriod === '6m' && styles.filterButtonActive]}
@@ -114,30 +157,62 @@ const MuscleDistribution: React.FC<MuscleDistributionProps> = ({
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             }}
           >
-            <Text
-              style={[styles.filterText, selectedPeriod === '6m' && styles.filterTextActive]}>{t('sixMonths')}</Text>
+            <Text style={[styles.filterText, selectedPeriod === '6m' && styles.filterTextActive]}>
+              {t('sixMonths')}
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
-      <VictoryPie
-        data={muscleGroups}
-        x="name"
-        y="value"
-        colorScale={muscleGroups.map(g => g.color)}
-        width={Dimensions.get('window').width - 40}
-        height={300}
-        innerRadius={70}
-        labelRadius={100}
-        style={{
-          labels: { fill: theme.colors.text.primary, fontSize: theme.typography.fontSize.sm }
-        }}
-        labelComponent={
-          <VictoryLabel
-            style={{ fill: theme.colors.text.primary, fontSize: theme.typography.fontSize.sm }}
-            text={({ datum }) => `${datum.name}\n${datum.value}kg`}
+
+      {hasData ? (
+        <>
+          <VictoryPie
+            data={muscleGroups}
+            x="name"
+            y="value"
+            colorScale={muscleGroups.map(g => g.color)}
+            width={Dimensions.get('window').width - 40}
+            height={300}
+            innerRadius={70}
+            labelRadius={100}
+            style={{
+              labels: {
+                fill: theme.colors.text.primary,
+                fontSize: theme.typography.fontSize.sm,
+                fontFamily: theme.typography.fontFamily.regular
+              },
+              data: {
+                fill: ({ datum }) => datum.color,
+                fillOpacity: 0.9,
+                stroke: theme.colors.background.main,
+                strokeWidth: 2
+              }
+            }}
+            labelComponent={
+              <VictoryLabel
+                style={{
+                  fill: theme.colors.text.primary,
+                  fontSize: theme.typography.fontSize.sm,
+                  fontFamily: theme.typography.fontFamily.regular
+                }}
+                text={({ datum }) => `${datum.name}\n${datum.value}%`}
+              />
+            }
           />
-        }
-      />
+          <View style={styles.legendContainer}>
+            {muscleGroups.map((group, index) => (
+              <View key={index} style={styles.legendItem}>
+                <View style={[styles.legendColor, { backgroundColor: group.color }]} />
+                <Text style={styles.legendText}>{group.name} ({group.value}%)</Text>
+              </View>
+            ))}
+          </View>
+        </>
+      ) : (
+        <View style={styles.emptyStateContainer}>
+          <Text style={styles.emptyStateText}>Aucune donnée disponible pour cette période</Text>
+        </View>
+      )}
     </Animated.View>
   );
 };

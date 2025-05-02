@@ -2,7 +2,7 @@ import { useState } from 'react';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Workout } from '@/types/workout';
+import { Workout } from '@/app/types/workout';
 import { useTranslation } from './useTranslation';
 
 export const useCSVExport = () => {

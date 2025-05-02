@@ -1,0 +1,204 @@
+import { useState, useEffect, useCallback } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Workout } from '@/app/types/workout';
+import { differenceInDays, subMonths } from 'date-fns';
+import calculations from '@/app/utils/calculations';
+
+type Period = '1m' | '3m' | '6m';
+
+interface StatsData {
+  workouts: Workout[];
+  monthlyProgress: number;
+  trainingFrequency: number;
+  bestProgressExercise: { progress: number; exercise: string } | null;
+  muscleDistribution: {
+    name: string;
+    value: number;
+    color: string;
+    originalName: string;
+  }[];
+}
+
+const useStats = (selectedPeriod: Period) => {
+  const [statsData, setStatsData] = useState<StatsData>({
+    workouts: [],
+    monthlyProgress: 0,
+    trainingFrequency: 0,
+    bestProgressExercise: null,
+    muscleDistribution: []
+  });
+
+  const calculateMonthlyProgress = useCallback((workouts: Workout[]): number => {
+    const lastMonthWorkouts = workouts.filter((workout: Workout) => {
+      const workoutDate = new Date(workout.date);
+      const oneMonthAgo = subMonths(new Date(), 1);
+      return workoutDate >= oneMonthAgo;
+    });
+
+    if (lastMonthWorkouts.length === 0) return 0;
+
+    const firstWorkout = lastMonthWorkouts.reduce((min: Workout, workout: Workout) =>
+      new Date(workout.date) < new Date(min.date) ? workout : min
+    );
+    const lastWorkout = lastMonthWorkouts.reduce((max: Workout, workout: Workout) =>
+      new Date(workout.date) > new Date(max.date) ? workout : max
+    );
+
+    const firstWorkingSet = firstWorkout.series.find(s => s.type === 'workingSet') || firstWorkout.series[0];
+    const lastWorkingSet = lastWorkout.series.find(s => s.type === 'workingSet') || lastWorkout.series[0];
+
+    const first1RM = calculations.calculateEstimated1RM(firstWorkingSet.weight, firstWorkingSet.reps);
+    const last1RM = calculations.calculateEstimated1RM(lastWorkingSet.weight, lastWorkingSet.reps);
+
+    return Math.round(((last1RM - first1RM) / first1RM) * 100);
+  }, []);
+
+  const calculateTrainingFrequency = useCallback((workouts: Workout[]): number => {
+    const filteredWorkouts = workouts.filter(workout => {
+      const workoutDate = new Date(workout.date);
+      const startDate = subMonths(new Date(), selectedPeriod === '1m' ? 1 : selectedPeriod === '3m' ? 3 : 6);
+      return workoutDate >= startDate;
+    });
+
+    if (!filteredWorkouts || !Array.isArray(filteredWorkouts)) {
+      return 0;
+    }
+
+    const uniqueDates = new Set(filteredWorkouts.map(w => w.date));
+    const daysInPeriod = differenceInDays(
+      new Date(),
+      subMonths(new Date(), selectedPeriod === '1m' ? 1 : selectedPeriod === '3m' ? 3 : 6)
+    );
+    return Math.round((uniqueDates.size / daysInPeriod) * 100);
+  }, [selectedPeriod]);
+
+  const getBestProgressExercise = useCallback((workouts: Workout[]): { progress: number; exercise: string } | null => {
+    if (!workouts || workouts.length === 0) return null;
+
+    const exerciseProgress = workouts.reduce((acc: { [key: string]: { first: number; last: number } }, workout) => {
+      const workingSet = workout.series.find(s => s.type === 'workingSet') || workout.series[0];
+      const estimated1RM = calculations.calculateEstimated1RM(workingSet.weight, workingSet.reps);
+
+      if (!acc[workout.exercise]) {
+        acc[workout.exercise] = { first: estimated1RM, last: estimated1RM };
+      } else {
+        acc[workout.exercise].last = estimated1RM;
+      }
+
+      return acc;
+    }, {});
+
+    const progressData = Object.entries(exerciseProgress)
+      .map(([exercise, data]) => ({
+        progress: Math.round(((data.last - data.first) / data.first) * 100),
+        exercise
+      }))
+      .filter(data => data.progress > 0);
+
+    if (progressData.length === 0) return null;
+
+    return progressData.reduce((max, current) =>
+      current.progress > max.progress ? current : max
+    );
+  }, []);
+
+// Dans app/hooks/useStats.ts - fonction calculateMuscleDistribution
+  const calculateMuscleDistribution = useCallback((workouts: Workout[]): StatsData['muscleDistribution'] => {
+    const filteredWorkouts = workouts.filter(workout => {
+      const workoutDate = new Date(workout.date);
+      const startDate = subMonths(new Date(), selectedPeriod === '1m' ? 1 : selectedPeriod === '3m' ? 3 : 6);
+      return workoutDate >= startDate;
+    });
+
+    if (filteredWorkouts.length === 0) {
+      return [];
+    }
+
+    // Agréger le volume d'entraînement par groupe musculaire
+    const muscleGroupVolumes: { [key: string]: number } = {};
+    let totalVolume = 0;
+
+    filteredWorkouts.forEach(workout => {
+      // Utiliser directement la propriété muscleGroup de l'objet workout
+      const muscleGroup = workout.muscleGroup;
+
+      // Calculer le volume pour cet entraînement (poids × répétitions × nombre de séries)
+      const volume = workout.series.reduce((total, set) => {
+        return total + (set.weight * set.reps);
+      }, 0);
+
+      // Agréger par groupe musculaire
+      if (!muscleGroupVolumes[muscleGroup]) {
+        muscleGroupVolumes[muscleGroup] = 0;
+      }
+      muscleGroupVolumes[muscleGroup] += volume;
+      totalVolume += volume;
+    });
+
+    // Transformation des données pour le graphique
+    const muscleTranslations: { [key: string]: string } = {
+      chest: 'Pectoraux',
+      back: 'Dos',
+      legs: 'Jambes',
+      shoulders: 'Épaules',
+      biceps: 'Biceps',
+      triceps: 'Triceps',
+      core: 'Abdominaux',
+      cardio: 'Cardio',
+      other: 'Autres'
+    };
+
+    const muscleColors: { [key: string]: string } = {
+      chest: '#FF6B6B',
+      back: '#4ECDC4',
+      legs: '#45B7D1',
+      shoulders: '#96CEB4',
+      biceps: '#FFEEAD',
+      triceps: '#D4A5A5',
+      core: '#9B59B6',
+      cardio: '#F39C12',
+      other: '#BDC3C7'
+    };
+
+    // Convertir en pourcentages et format pour le graphique
+    return Object.entries(muscleGroupVolumes)
+      .map(([muscleGroup, volume]) => {
+        const percentage = totalVolume > 0 ? Math.round((volume / totalVolume) * 100) : 0;
+
+        console.log(muscleGroup);
+
+        return {
+          name: muscleTranslations[muscleGroup.toLowerCase()] || muscleGroup,
+          value: percentage,
+          color: muscleColors[muscleGroup.toLowerCase()] || '#CCCCCC',
+          originalName: muscleGroup
+        };
+      })
+      .sort((a, b) => b.value - a.value); // Trier par pourcentage décroissant
+  }, [selectedPeriod]);  useEffect(() => {
+    const loadWorkouts = async () => {
+      try {
+        const storedWorkouts = await AsyncStorage.getItem('workouts');
+        if (storedWorkouts) {
+          const workouts = JSON.parse(storedWorkouts) as Workout[];
+          
+          setStatsData({
+            workouts,
+            monthlyProgress: calculateMonthlyProgress(workouts),
+            trainingFrequency: calculateTrainingFrequency(workouts),
+            bestProgressExercise: getBestProgressExercise(workouts),
+            muscleDistribution: calculateMuscleDistribution(workouts)
+          });
+        }
+      } catch (error) {
+        console.error('Error loading workouts:', error);
+      }
+    };
+
+    loadWorkouts();
+  }, [selectedPeriod, calculateMonthlyProgress, calculateTrainingFrequency, getBestProgressExercise, calculateMuscleDistribution]);
+
+  return statsData;
+};
+
+export default useStats; 

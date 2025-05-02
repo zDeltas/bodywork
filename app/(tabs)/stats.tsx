@@ -1,31 +1,21 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import {
-  Animated,
-  findNodeHandle,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View
-} from 'react-native';
+import { Animated, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold, useFonts } from '@expo-google-fonts/inter';
 import * as SplashScreen from 'expo-splash-screen';
-import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { differenceInDays, format, parseISO, subMonths } from 'date-fns';
-import { fr } from 'date-fns/locale';
 import { useTranslation } from '@/hooks/useTranslation';
 import { router } from 'expo-router';
-import { muscleGroupKeys, predefinedExercisesByKey } from '@/app/components/ExerciseList';
+import { muscleGroupKeys } from '@/app/components/ExerciseList';
 import { useTheme } from '@/hooks/useTheme';
 import KpiMotivation from '@/app/components/KpiMotivation';
-import { Workout } from '@/types/workout';
+import { Workout } from '@/app/types/workout';
 import StatsExerciseList from '@/app/components/stats/StatsExerciseList';
 import StatsGoals from '@/app/components/stats/StatsGoals';
 import StatsMuscleDistribution from '@/app/components/stats/StatsMuscleDistribution';
 import StatsMuscleRestState from '@/app/components/stats/StatsMuscleRestState';
 import Header from '@/app/components/Header';
+import useStats from '@/app/hooks/useStats';
+import useGoals from '@/app/hooks/useGoals';
 
 type MuscleGroupKey = typeof muscleGroupKeys[number];
 
@@ -35,168 +25,16 @@ type ExerciseName = string;
 
 type Period = '1m' | '3m' | '6m';
 
-// Define Goal interface
-interface Goal {
-  exercise: string;
-  current: number;
-  target: number;
-  progress: number;
-}
-
-interface ExerciseData {
-  x: string;
-  y: number;
-}
-
-interface ExerciseDataSet {
-  [key: string]: ExerciseData[];
-}
-
-interface MuscleGroupData {
-  name: string;
-  value: number;
-  color: string;
-}
-
-// Define Workout interface for MuscleRestState
-interface WorkoutForRestState {
-  id: string;
-  exercise: string;
-  muscleGroup: string;
-  weight: number;
-  reps: number;
-  sets: number;
-  date: string;
-  rpe?: number;
-}
-
-// Define BestProgressExercise interface for KpiMotivation
-interface BestProgressExercise {
-  progress: number;
-  exercise: string;
-}
-
-// Define ExerciseListProps interface
-interface ExerciseListProps {
-  selectedMuscle: string;
-  setSelectedMuscle: (muscleGroup: string) => void;
-  exercise: string;
-  setExercise: (exercise: string) => void;
-  setIsCustomExercise?: (isCustom: boolean) => void;
-  onExerciseSelect?: (exercise: string) => void;
-  onMuscleSelect?: (muscleGroup: string) => void;
-}
-
-// Fonction pour calculer le 1RM estimé avec la formule d'Epley (plus précise)
-const calculateEstimated1RM = (weight: number, reps: number): number => {
-  return Math.round(weight * (1 + (reps / 30)));
-};
-
-// Fonction pour calculer le volume total
-const calculateVolume = (weight: number, reps: number, sets: number): number => {
-  return weight * reps * sets;
-};
-
-// Fonction pour formater la date en français
-const formatDate = (date: string): string => {
-  return format(parseISO(date), 'dd MMM', { locale: fr });
-};
-
-// Fonction pour calculer la progression mensuelle
-const calculateMonthlyProgress = (workouts: Workout[]): number => {
-  const lastMonthWorkouts = workouts.filter((workout: Workout) => {
-    const workoutDate = new Date(workout.date);
-    const oneMonthAgo = subMonths(new Date(), 1);
-    return workoutDate >= oneMonthAgo;
-  });
-
-  if (lastMonthWorkouts.length === 0) return 0;
-
-  const firstWorkout = lastMonthWorkouts.reduce((min: Workout, workout: Workout) =>
-    new Date(workout.date) < new Date(min.date) ? workout : min
-  );
-  const lastWorkout = lastMonthWorkouts.reduce((max: Workout, workout: Workout) =>
-    new Date(workout.date) > new Date(max.date) ? workout : max
-  );
-
-  // Get the first working set or the first series if no working set
-  const firstWorkingSet = firstWorkout.series.find(s => s.type === 'workingSet') || firstWorkout.series[0];
-  const lastWorkingSet = lastWorkout.series.find(s => s.type === 'workingSet') || lastWorkout.series[0];
-
-  const first1RM = calculateEstimated1RM(firstWorkingSet.weight, firstWorkingSet.reps);
-  const last1RM = calculateEstimated1RM(lastWorkingSet.weight, lastWorkingSet.reps);
-
-  return Math.round(((last1RM - first1RM) / first1RM) * 100);
-};
-
-// Fonction pour calculer le nombre total de séries
-const calculateTotalSets = (workouts: Workout[]): number => {
-  return workouts.reduce((total, workout) => total + workout.series.length, 0);
-};
-
-// Fonction pour calculer la fréquence d'entraînement
-const calculateTrainingFrequency = (workouts: Workout[], selectedPeriod: Period): number => {
-  const filteredWorkouts = workouts.filter(workout => {
-    const workoutDate = new Date(workout.date);
-    const startDate = subMonths(new Date(), selectedPeriod === '1m' ? 1 : selectedPeriod === '3m' ? 3 : 6);
-    return workoutDate >= startDate;
-  });
-
-  if (!filteredWorkouts || !Array.isArray(filteredWorkouts)) {
-    return 0;
-  }
-
-  const uniqueDates = new Set(filteredWorkouts.map(w => w.date));
-  const daysInPeriod = differenceInDays(
-    new Date(),
-    subMonths(new Date(), selectedPeriod === '1m' ? 1 : selectedPeriod === '3m' ? 3 : 6)
-  );
-  return Math.round((uniqueDates.size / daysInPeriod) * 100);
-};
-
-// Fonction pour trouver l'exercice avec la meilleure progression
-const getBestProgressExercise = (workouts: Workout[]): { progress: number, exercise: string } | null => {
-  if (!workouts || workouts.length === 0) return null;
-
-  const exerciseProgress = workouts.reduce((acc: { [key: string]: { first: number, last: number } }, workout) => {
-    const workingSet = workout.series.find(s => s.type === 'workingSet') || workout.series[0];
-    const estimated1RM = calculateEstimated1RM(workingSet.weight, workingSet.reps);
-
-    if (!acc[workout.exercise]) {
-      acc[workout.exercise] = { first: estimated1RM, last: estimated1RM };
-    } else {
-      acc[workout.exercise].last = estimated1RM;
-    }
-
-    return acc;
-  }, {});
-
-  const progressData = Object.entries(exerciseProgress)
-    .map(([exercise, data]) => ({
-      progress: Math.round(((data.last - data.first) / data.first) * 100),
-      exercise
-    }))
-    .filter(data => data.progress > 0);
-
-  if (progressData.length === 0) return null;
-
-  return progressData.reduce((max, current) =>
-    current.progress > max.progress ? current : max
-  );
-};
-
 export default function StatsScreen() {
   const { t } = useTranslation();
   const { theme } = useTheme();
   const styles = useStyles();
 
-  const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [selectedPeriod, setSelectedPeriod] = useState<Period>('1m');
   const [searchQuery, setSearchQuery] = useState('');
   const [favoriteExercises, setFavoriteExercises] = useState<ExerciseName[]>([]);
   const [recentExercises, setRecentExercises] = useState<ExerciseName[]>([]);
   const [expandedMuscleGroup, setExpandedMuscleGroup] = useState<CategoryKey | null>(null);
-  const [goals, setGoals] = useState<Goal[]>([]);
   const [exerciseOptions, setExerciseOptions] = useState<ExerciseName[]>([]);
   const [showExerciseSelector, setShowExerciseSelector] = useState(false);
   const [newGoalExercise, setNewGoalExercise] = useState<ExerciseName>('exercise_chest_benchPress');
@@ -217,23 +55,13 @@ export default function StatsScreen() {
   const graphsSectionRef = useRef<View>(null);
   const scrollViewRef = useRef<ScrollView>(null);
 
+  const statsData = useStats(selectedPeriod);
+  const { goals, setGoals, getCurrentWeight, suggestTargetWeight } = useGoals(statsData.workouts);
+
   // Load initial data
   useEffect(() => {
     const loadInitialData = async () => {
       try {
-        // Load workouts
-        const storedWorkouts = await AsyncStorage.getItem('workouts');
-        if (storedWorkouts) {
-          const parsedWorkouts = JSON.parse(storedWorkouts) as Workout[];
-          if (Array.isArray(parsedWorkouts)) {
-            setWorkouts(parsedWorkouts);
-
-            // Extract unique exercise names
-            const uniqueExercises = Array.from(new Set(parsedWorkouts.map((w: Workout) => w.exercise)));
-            setExerciseOptions(uniqueExercises);
-          }
-        }
-
         // Load favorite exercises
         const storedFavorites = await AsyncStorage.getItem('favoriteExercises');
         if (storedFavorites) {
@@ -253,15 +81,6 @@ export default function StatsScreen() {
             }
           } catch (error) {
             console.error('Error parsing recent exercises:', error);
-          }
-        }
-
-        // Load goals
-        const storedGoals = await AsyncStorage.getItem('goals');
-        if (storedGoals) {
-          const parsedGoals = JSON.parse(storedGoals) as Goal[];
-          if (Array.isArray(parsedGoals)) {
-            setGoals(parsedGoals);
           }
         }
       } catch (error) {
@@ -291,7 +110,6 @@ export default function StatsScreen() {
     }
   }, [fontsLoaded]);
 
-  // Corriger la fonction getFilteredExercises
   const getFilteredExercises = useCallback((query: string, options: ExerciseName[]): ExerciseName[] => {
     if (!query || !options || !Array.isArray(options)) return [];
     return options.filter(exercise =>
@@ -311,15 +129,22 @@ export default function StatsScreen() {
     }
   }, [searchQuery, exerciseOptions, getFilteredExercises]);
 
-  // Function to handle exercise selection
   const handleSelectExercise = useCallback((exercise: ExerciseName) => {
     if (!exercise) return;
     setNewGoalExercise(exercise);
     setShowExerciseSelector(false);
     setSearchQuery('');
-  }, []);
 
-  // Function to toggle favorite status of an exercise
+    const currentWeight = getCurrentWeight(exercise);
+    if (currentWeight !== null) {
+      setNewGoalCurrent(currentWeight.toString());
+      const target = suggestTargetWeight(currentWeight);
+      if (target !== null) {
+        setSuggestedTarget(target);
+      }
+    }
+  }, [getCurrentWeight, suggestTargetWeight]);
+
   const toggleFavorite = useCallback((exercise: ExerciseName) => {
     if (!exercise) return;
     setFavoriteExercises(prev => {
@@ -329,7 +154,6 @@ export default function StatsScreen() {
         ? prev.filter(e => e !== exercise)
         : [...prev, exercise];
 
-      // Save to AsyncStorage
       try {
         AsyncStorage.setItem('favoriteExercises', JSON.stringify(newFavorites));
       } catch (error) {
@@ -340,106 +164,38 @@ export default function StatsScreen() {
     });
   }, [t]);
 
-  // Function to suggest a target weight based on incremental improvement
-  const suggestTargetWeight = useCallback((currentWeight: number) => {
-    if (!currentWeight) return null;
-
-    // Suggest a 5% improvement for weights under 50kg, 2.5% for heavier weights
-    const improvementFactor = currentWeight < 50 ? 0.05 : 0.025;
-    const suggestedImprovement = currentWeight * improvementFactor;
-
-    // Round to nearest 2.5kg for barbells (simplification)
-    const roundingFactor = 2.5;
-    const suggestedTarget = Math.ceil((currentWeight + suggestedImprovement) / roundingFactor) * roundingFactor;
-
-    return suggestedTarget;
-  }, []);
-
-  // Function to get the current weight from the most recent workout for the selected exercise
-  const getCurrentWeight = useCallback((exerciseName: ExerciseName) => {
-    if (!exerciseName || workouts.length === 0) return null;
-
-    // Filter workouts for the selected exercise
-    const exerciseWorkouts = workouts.filter(w => w.exercise === exerciseName);
-    if (exerciseWorkouts.length === 0) return null;
-
-    // Sort by date (most recent first)
-    exerciseWorkouts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-
-    // Return the weight from the most recent workout's first working set
-    const mostRecentWorkout = exerciseWorkouts[0];
-    const workingSet = mostRecentWorkout.series.find(s => s.type === 'workingSet');
-    return workingSet?.weight || null;
-  }, [workouts]);
-
-  // Update goals progress when workouts change
-  useEffect(() => {
-    if (workouts.length > 0 && goals.length > 0) {
-      // Recalculer les objectifs sans modifier l'état si rien n'a changé
-      const updatedGoals = goals.map(goal => {
-        const currentWeight = getCurrentWeight(goal.exercise);
-        if (currentWeight) {
-          const progress = Math.min(Math.round((currentWeight / goal.target) * 100), 100);
-          return { ...goal, current: currentWeight, progress };
-        }
-        return goal;
-      });
-
-      // Ne mettre à jour l'état que si quelque chose a réellement changé
-      if (JSON.stringify(updatedGoals) !== JSON.stringify(goals)) {
-        setGoals(updatedGoals);
-
-        // Sauvegarder les objectifs mis à jour dans AsyncStorage
-        try {
-          AsyncStorage.setItem('goals', JSON.stringify(updatedGoals));
-        } catch (error) {
-          console.error(t('errorSavingWorkouts'), error);
-        }
-      }
-    }
-  }, [workouts, goals, getCurrentWeight]);
-
-  const monthlyProgress = calculateMonthlyProgress(workouts);
-  const trainingFrequency = calculateTrainingFrequency(workouts, selectedPeriod);
-  const bestProgressExercise = getBestProgressExercise(workouts);
-  const totalSets = calculateTotalSets(workouts);
-
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded) {
       await SplashScreen.hideAsync();
     }
   }, [fontsLoaded]);
 
-  // Adapter les workouts pour MuscleRestState
-  const adaptedWorkouts = workouts.map(workout => {
-    const workingSet = workout.series.find(s => s.type === 'workingSet');
-    return {
-      id: workout.id,
-      exercise: workout.exercise,
-      muscleGroup: workout.muscleGroup,
-      weight: workingSet?.weight || 0,
-      reps: workingSet?.reps || 0,
-      sets: workout.series.length,
-      date: workout.date,
-      rpe: workingSet?.rpe
-    } as WorkoutForRestState;
-  });
+  const handleMuscleSelect = useCallback((muscleGroup: string) => {
+    setSelectedMuscle(muscleGroup);
+    if (scrollViewRef.current) {
+      scrollViewRef.current.scrollTo({ y: 400, animated: true });
+    }
+  }, []);
 
   if (!fontsLoaded) {
     return null;
   }
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} onLayout={onLayoutRootView}>
       <Header title={t('stats.title')} showBackButton={false} />
-      <ScrollView style={styles.content} ref={scrollViewRef}>
+      <ScrollView
+        style={styles.content}
+        ref={scrollViewRef}
+        contentContainerStyle={{ paddingBottom: 20 }}
+      >
         <KpiMotivation
           fadeAnim={fadeAnim}
-          bestProgressExercise={bestProgressExercise}
-          monthlyProgress={monthlyProgress}
-          trainingFrequency={trainingFrequency}
-          totalSets={totalSets}
-          totalWorkouts={workouts.length}
+          bestProgressExercise={statsData.bestProgressExercise}
+          monthlyProgress={statsData.monthlyProgress}
+          trainingFrequency={statsData.trainingFrequency}
+          totalSets={statsData.workouts.reduce((total: number, workout: Workout) => total + workout.series.length, 0)}
+          totalWorkouts={statsData.workouts.length}
         />
 
         <StatsExerciseList
@@ -447,8 +203,6 @@ export default function StatsScreen() {
           setSelectedMuscle={setSelectedMuscle}
           selectedExercise={selectedExercise}
           setSelectedExercise={setSelectedExercise}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
           exerciseOptions={exerciseOptions}
           onExerciseSelect={(exercise) => {
             handleSelectExercise(exercise as ExerciseName);
@@ -457,39 +211,31 @@ export default function StatsScreen() {
               params: { exercise }
             });
           }}
-          onMuscleSelect={(muscleGroup) => {
-            setSelectedMuscle(muscleGroup);
-            if (graphsSectionRef.current) {
-              graphsSectionRef.current.measureLayout(
-                findNodeHandle(scrollViewRef.current) as number,
-                (_, y) => {
-                  scrollViewRef.current?.scrollTo({ y, animated: true });
-                },
-                () => console.error('Failed to measure layout')
-              );
-            }
-          }}
+          onMuscleSelect={handleMuscleSelect}
         />
 
-        <StatsGoals
-          fadeAnim={fadeAnim}
-          goals={goals}
-          setGoals={setGoals}
-          workouts={workouts}
-          getCurrentWeight={getCurrentWeight}
-        />
+        <View ref={graphsSectionRef}>
+          <StatsGoals
+            fadeAnim={fadeAnim}
+            goals={goals}
+            setGoals={setGoals}
+            workouts={statsData.workouts}
+            getCurrentWeight={getCurrentWeight}
+          />
 
-        <StatsMuscleDistribution
-          fadeAnim={fadeAnim}
-          selectedPeriod={selectedPeriod}
-          setSelectedPeriod={setSelectedPeriod}
-          graphsSectionRef={graphsSectionRef}
-        />
+          <StatsMuscleDistribution
+            fadeAnim={fadeAnim}
+            selectedPeriod={selectedPeriod}
+            setSelectedPeriod={setSelectedPeriod}
+            graphsSectionRef={graphsSectionRef}
+            muscleGroups={statsData.muscleDistribution}
+          />
 
-        <StatsMuscleRestState
-          fadeAnim={fadeAnim}
-          workouts={adaptedWorkouts}
-        />
+          <StatsMuscleRestState
+            fadeAnim={fadeAnim}
+            workouts={statsData.workouts}
+          />
+        </View>
 
         {/* Exercise Selector Modal */}
         {showExerciseSelector && (
@@ -497,60 +243,18 @@ export default function StatsScreen() {
             <View style={styles.modalContainer}>
               <Text style={styles.modalTitle}>{t('selectExerciseForGoal')}</Text>
 
-              <View style={styles.searchContainer}>
-                <Ionicons name="search" size={20} color="#999" style={styles.searchIcon} />
-                <TextInput
-                  style={styles.searchInput}
-                  placeholder={t('searchExercise')}
-                  placeholderTextColor="#999"
-                  value={searchQuery}
-                  onChangeText={setSearchQuery}
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                />
-                {searchQuery.length > 0 && (
-                  <TouchableOpacity onPress={() => setSearchQuery('')}>
-                    <Ionicons name="close-circle" size={20} color="#999" />
-                  </TouchableOpacity>
-                )}
-              </View>
-
               <ScrollView style={styles.exerciseList}>
                 {exerciseOptions
-                  .filter(ex => {
-                    const exerciseKey = ex as ExerciseName;
-                    return exerciseKey in predefinedExercisesByKey && ex.toLowerCase().includes(searchQuery.toLowerCase());
-                  })
-                  .map((ex, index) => {
-                    const exerciseKey = ex as ExerciseName;
-                    if (!(exerciseKey in predefinedExercisesByKey)) {
-                      return null;
-                    }
-                    return (
-                      <TouchableOpacity
-                        key={index}
-                        style={styles.exerciseOption}
-                        onPress={() => {
-                          setNewGoalExercise(exerciseKey);
-                          setShowExerciseSelector(false);
-
-                          // Auto-populate current weight and suggest target
-                          const currentWeight = getCurrentWeight(exerciseKey);
-                          if (currentWeight !== null) {
-                            setNewGoalCurrent(currentWeight.toString());
-
-                            // Update suggested target
-                            const target = suggestTargetWeight(currentWeight);
-                            if (target !== null) {
-                              setSuggestedTarget(target);
-                            }
-                          }
-                        }}
-                      >
-                        <Text style={styles.exerciseOptionText}>{ex}</Text>
-                      </TouchableOpacity>
-                    );
-                  })}
+                  .filter(ex => ex.toLowerCase().includes(searchQuery.toLowerCase()))
+                  .map((ex, index) => (
+                    <TouchableOpacity
+                      key={index}
+                      style={styles.exerciseOption}
+                      onPress={() => handleSelectExercise(ex)}
+                    >
+                      <Text style={styles.exerciseOptionText}>{ex}</Text>
+                    </TouchableOpacity>
+                  ))}
               </ScrollView>
 
               <TouchableOpacity

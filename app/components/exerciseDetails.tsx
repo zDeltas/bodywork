@@ -1,17 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Animated, Dimensions, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { VictoryAxis, VictoryChart, VictoryLine, VictoryScatter, VictoryTheme, VictoryTooltip } from 'victory-native';
-import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { format, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { router, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useTheme } from '@/hooks/useTheme';
-import { Workout, Series } from '@/types/workout';
+import { Workout } from '@/app/types/workout';
+import Header from '@/app/components/Header';
+import Text from '@/app/components/ui/Text';
 
 interface ExerciseData {
-  x: string;
+  x: Date;
   y: number;
 }
 
@@ -128,45 +129,284 @@ const useStyles = () => {
       backgroundColor: theme.colors.background.button,
       justifyContent: 'center',
       alignItems: 'center'
+    },
+    statsContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginBottom: theme.spacing.lg
+    },
+    statCard: {
+      flex: 1,
+      backgroundColor: theme.colors.background.card,
+      borderRadius: theme.borderRadius.lg,
+      padding: theme.spacing.base,
+      marginHorizontal: theme.spacing.xs,
+      alignItems: 'center'
+    },
+    statLabel: {
+      fontSize: theme.typography.fontSize.sm,
+      color: theme.colors.text.secondary,
+      marginBottom: theme.spacing.xs
+    },
+    statValue: {
+      fontSize: theme.typography.fontSize.xl,
+      fontFamily: theme.typography.fontFamily.bold,
+      color: theme.colors.text.primary
+    },
+    chartTitle: {
+      fontSize: theme.typography.fontSize.lg,
+      fontFamily: theme.typography.fontFamily.bold,
+      color: theme.colors.text.primary,
+      textAlign: 'center',
+      marginBottom: theme.spacing.base
+    },
+    noDataContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: theme.spacing.lg
+    },
+    noDataText: {
+      fontSize: theme.typography.fontSize.md,
+      color: theme.colors.text.secondary,
+      textAlign: 'center'
     }
   });
 };
 
-const ExerciseDetails = ({ workout }: { workout: Workout }) => {
+const ExerciseDetails = () => {
+  const { t } = useTranslation();
+  const { theme } = useTheme();
+  const styles = useStyles();
+  const { exercise } = useLocalSearchParams<{ exercise: string }>();
+  const [workouts, setWorkouts] = useState<Workout[]>([]);
+  const [selectedPeriod, setSelectedPeriod] = useState<'1m' | '3m' | '6m'>('1m');
+  const [selectedChartType, setSelectedChartType] = useState<'1rm' | 'volume' | 'reps'>('1rm');
+  const [exerciseData, setExerciseData] = useState<ExerciseData[]>([]);
+  const [volumeData, setVolumeData] = useState<ExerciseData[]>([]);
+  const [repsData, setRepsData] = useState<ExerciseData[]>([]);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const loadWorkouts = async () => {
+      try {
+        const storedWorkouts = await AsyncStorage.getItem('workouts');
+        if (storedWorkouts) {
+          const parsedWorkouts = JSON.parse(storedWorkouts) as Workout[];
+          const filteredWorkouts = parsedWorkouts.filter(w => w.exercise === exercise);
+          setWorkouts(filteredWorkouts);
+
+          // Préparer les données pour les graphiques
+          const sortedWorkouts = [...filteredWorkouts].sort((a, b) =>
+            new Date(a.date).getTime() - new Date(b.date).getTime()
+          );
+
+          const newExerciseData: ExerciseData[] = [];
+          const newVolumeData: ExerciseData[] = [];
+          const newRepsData: ExerciseData[] = [];
+
+          sortedWorkouts.forEach(workout => {
+            if (workout.series && workout.series.length > 0) {
+              const workingSet = workout.series.find(s => s.type === 'workingSet') || workout.series[0];
+              if (workingSet) {
+                const date = new Date(workout.date);
+                const estimated1RM = calculateEstimated1RM(workingSet.weight, workingSet.reps);
+                const volume = calculateVolume(workingSet.weight, workingSet.reps, workout.series.length);
+
+                newExerciseData.push({ x: date, y: estimated1RM });
+                newVolumeData.push({ x: date, y: volume });
+                newRepsData.push({ x: date, y: workingSet.reps });
+              }
+            }
+          });
+
+          console.log('Exercise Data:', newExerciseData);
+          console.log('Volume Data:', newVolumeData);
+          console.log('Reps Data:', newRepsData);
+
+          setExerciseData(newExerciseData);
+          setVolumeData(newVolumeData);
+          setRepsData(newRepsData);
+        }
+      } catch (error) {
+        console.error('Error loading workouts:', error);
+      }
+    };
+
+    loadWorkouts();
+  }, [exercise]);
+
   // Get the first working set or the first series if no working set
-  const workingSet = workout.series.find(s => s.type === 'workingSet') || workout.series[0];
-  
-  const estimated1RM = calculateEstimated1RM(workingSet.weight, workingSet.reps);
-  const volume = calculateVolume(workingSet.weight, workingSet.reps, workout.series.length);
+  const latestWorkout = workouts[workouts.length - 1];
+  const workingSet = latestWorkout?.series?.find(s => s.type === 'workingSet') || latestWorkout?.series?.[0];
+
+  const estimated1RM = workingSet ? calculateEstimated1RM(workingSet.weight, workingSet.reps) : 0;
+  const volume = workingSet && latestWorkout ? calculateVolume(workingSet.weight, workingSet.reps, latestWorkout.series.length) : 0;
+
+  // Fonction pour obtenir le domaine Y approprié
+  const getDomainY = (data: ExerciseData[]) => {
+    if (data.length === 0) return { y: [0, 100] as [number, number] };
+
+    const values = data.map(item => item.y);
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    const padding = (max - min) * 0.1; // 10% padding
+
+    return {
+      y: [
+        Math.max(0, Math.floor(min - padding)),
+        Math.ceil(max + padding)
+      ] as [number, number]
+    };
+  };
+
+  // Fonction pour formater les tooltips
+  const formatTooltip = (datum: any) => {
+    switch (selectedChartType) {
+      case '1rm':
+        return `${datum.y}kg`;
+      case 'volume':
+        return `${datum.y}kg`;
+      case 'reps':
+        return `${datum.y} reps`;
+      default:
+        return `${datum.y}`;
+    }
+  };
+
+  // Fonction pour obtenir les données filtrées selon la période
+  const getFilteredData = (data: ExerciseData[]) => {
+    const now = new Date();
+    const periodInMonths = parseInt(selectedPeriod);
+    const cutoffDate = new Date(now.setMonth(now.getMonth() - periodInMonths));
+    
+    return data.filter(item => {
+      const itemDate = new Date(item.x);
+      return itemDate >= cutoffDate;
+    });
+  };
+
+  // Fonction pour obtenir le format de date approprié selon la période
+  const getDateFormat = () => {
+    switch (selectedPeriod) {
+      case '1m':
+        return 'dd MMM';
+      case '3m':
+        return 'dd MMM';
+      case '6m':
+        return 'MMM yyyy';
+      default:
+        return 'dd MMM';
+    }
+  };
+
+  // Fonction pour obtenir le nombre de ticks approprié selon la période
+  const getTickCount = () => {
+    switch (selectedPeriod) {
+      case '1m':
+        return 4;
+      case '3m':
+        return 6;
+      case '6m':
+        return 6;
+      default:
+        return 4;
+    }
+  };
+
+  // Fonction pour formater la date pour l'affichage
+  const formatDateForDisplay = (date: Date) => {
+    return format(date, getDateFormat(), { locale: fr });
+  };
+
+  // Obtenir les données filtrées
+  const filteredExerciseData = getFilteredData(exerciseData);
+  const filteredVolumeData = getFilteredData(volumeData);
+  const filteredRepsData = getFilteredData(repsData);
+
+  console.log('Filtered Exercise Data:', filteredExerciseData);
+  console.log('Filtered Volume Data:', filteredVolumeData);
+  console.log('Filtered Reps Data:', filteredRepsData);
+
+  // Obtenir les domaines Y
+  const domainY1RM = getDomainY(filteredExerciseData);
+  const domainYVolume = getDomainY(filteredVolumeData);
+  const domainYReps = getDomainY(filteredRepsData);
+
+  console.log('Domain Y 1RM:', domainY1RM);
+  console.log('Domain Y Volume:', domainYVolume);
+  console.log('Domain Y Reps:', domainYReps);
+
+  // Obtenir la couleur appropriée pour le graphique
+  const getChartColor = () => {
+    switch (selectedChartType) {
+      case '1rm':
+        return theme.colors.primary;
+      case 'volume':
+        return theme.colors.info;
+      case 'reps':
+        return theme.colors.success;
+      default:
+        return theme.colors.primary;
+    }
+  };
+
+  // Fonction pour obtenir le titre du graphique
+  const getChartTitle = () => {
+    switch (selectedChartType) {
+      case '1rm':
+        return t('oneRM');
+      case 'volume':
+        return t('volumePerWeek');
+      case 'reps':
+        return t('repsPerSession');
+      default:
+        return '';
+    }
+  };
+
+  // Fonction pour obtenir l'unité de l'axe Y
+  const getYAxisLabel = () => {
+    switch (selectedChartType) {
+      case '1rm':
+        return 'kg';
+      case 'volume':
+        return 'kg';
+      case 'reps':
+        return t('repetitions');
+      default:
+        return '';
+    }
+  };
 
   return (
-    <ScrollView style={styles.container}>
-      <Animated.View style={[styles.header, {
-        opacity: fadeAnim,
-        transform: [{ translateY: slideAnim.interpolate({ inputRange: [0, 1], outputRange: [-50, 0] }) }]
-      }]}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => router.back()}
-        >
-          <Ionicons name="arrow-back" size={24} color={theme.colors.text.primary} />
-        </TouchableOpacity>
-        <Text style={styles.title}>{workout.exercise}</Text>
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => router.push({
-            pathname: '/workout/new',
-            params: { exercise: workout.exercise }
-          })}
-        >
-          <Ionicons name="add-circle" size={24} color={theme.colors.primary} />
-        </TouchableOpacity>
-      </Animated.View>
+    <View style={styles.container}>
+      <Header
+        title={exercise}
+        showBackButton={true}
+      />
 
-      <View style={styles.content}>
+      <ScrollView style={styles.content}>
+        {/* Statistiques principales */}
+        <View style={styles.statsContainer}>
+          <View style={styles.statCard}>
+            <Text style={styles.statLabel}>{t('estimated_1rm')}</Text>
+            <Text style={styles.statValue}>{estimated1RM} kg</Text>
+          </View>
+          <View style={styles.statCard}>
+            <Text style={styles.statLabel}>{t('volume')}</Text>
+            <Text style={styles.statValue}>{volume} kg</Text>
+          </View>
+          <View style={styles.statCard}>
+            <Text style={styles.statLabel}>{t('repetitions')}</Text>
+            <Text style={styles.statValue}>{workingSet?.reps || 0}</Text>
+          </View>
+        </View>
+
         {/* Filtres de période */}
         <View style={styles.filterSection}>
-          <Text style={styles.filterLabel}>{t('period')}</Text>
+          <Text variant="subheading" style={styles.filterLabel}>{t('period')}</Text>
           <View style={styles.filterContainer}>
             <TouchableOpacity
               style={[styles.filterButton, selectedPeriod === '1m' && styles.filterButtonActive]}
@@ -214,155 +454,259 @@ const ExerciseDetails = ({ workout }: { workout: Workout }) => {
         </View>
 
         <View style={styles.chartContainer}>
-          {/* Graphique 1RM */}
-          {selectedChartType === '1rm' && (
+          <Text style={styles.chartTitle}>{getChartTitle()}</Text>
+
+          {selectedChartType === '1rm' && filteredExerciseData.length > 0 && (
             <VictoryChart
               theme={VictoryTheme.material}
               width={Dimensions.get('window').width - 40}
               height={300}
               padding={{ top: 20, bottom: 40, left: 50, right: 20 }}
               domainPadding={{ x: 20 }}
+              domain={domainY1RM}
+              scale={{ x: 'time' }}
             >
               <VictoryAxis
+                label={t('date')}
+                tickFormat={(date) => formatDateForDisplay(new Date(date))}
+                tickCount={getTickCount()}
                 style={{
                   axis: { stroke: theme.colors.border.default },
-                  tickLabels: { fill: theme.colors.text.primary, fontSize: theme.typography.fontSize.sm }
+                  tickLabels: { 
+                    fill: theme.colors.text.primary, 
+                    fontSize: theme.typography.fontSize.sm,
+                    angle: -45,
+                    textAnchor: 'end'
+                  },
+                  axisLabel: {
+                    fill: theme.colors.text.primary,
+                    fontSize: theme.typography.fontSize.sm,
+                    padding: 30
+                  }
                 }}
               />
               <VictoryAxis
                 dependentAxis
+                label={getYAxisLabel()}
+                tickCount={5}
                 style={{
                   axis: { stroke: theme.colors.border.default },
-                  tickLabels: { fill: theme.colors.text.primary, fontSize: theme.typography.fontSize.sm }
+                  tickLabels: { 
+                    fill: theme.colors.text.primary, 
+                    fontSize: theme.typography.fontSize.sm 
+                  },
+                  axisLabel: {
+                    fill: theme.colors.text.primary,
+                    fontSize: theme.typography.fontSize.sm,
+                    padding: 30
+                  }
                 }}
               />
-              {exerciseData.length > 0 && (
-                <>
-                  <VictoryLine
-                    data={exerciseData}
-                    style={{
-                      data: { stroke: theme.colors.primary, strokeWidth: 3 }
+              <VictoryLine
+                data={filteredExerciseData}
+                style={{
+                  data: { 
+                    stroke: getChartColor(), 
+                    strokeWidth: 3 
+                  }
+                }}
+              />
+              <VictoryScatter
+                data={filteredExerciseData}
+                size={5}
+                style={{
+                  data: { fill: getChartColor() }
+                }}
+                labels={formatTooltip}
+                labelComponent={
+                  <VictoryTooltip
+                    style={{ 
+                      fill: theme.colors.text.primary,
+                      fontSize: theme.typography.fontSize.sm
                     }}
-                  />
-                  <VictoryScatter
-                    data={exerciseData}
-                    size={5}
-                    style={{
-                      data: { fill: theme.colors.primary }
+                    flyoutStyle={{ 
+                      fill: theme.colors.background.card, 
+                      stroke: theme.colors.border.default,
+                      strokeWidth: 1
                     }}
-                    labels={({ datum }) => `${datum.y}kg`}
-                    labelComponent={
-                      <VictoryTooltip
-                        style={{ fill: theme.colors.text.primary }}
-                        flyoutStyle={{ fill: theme.colors.background.card, stroke: 'none' }}
-                      />
-                    }
+                    cornerRadius={theme.borderRadius.sm}
+                    pointerLength={5}
                   />
-                </>
-              )}
+                }
+              />
             </VictoryChart>
           )}
 
-          {/* Graphique Volume */}
-          {selectedChartType === 'volume' && (
+          {selectedChartType === 'volume' && filteredVolumeData.length > 0 && (
             <VictoryChart
               theme={VictoryTheme.material}
               width={Dimensions.get('window').width - 40}
               height={300}
               padding={{ top: 20, bottom: 40, left: 50, right: 20 }}
               domainPadding={{ x: 20 }}
+              domain={domainYVolume}
+              scale={{ x: 'time' }}
             >
               <VictoryAxis
+                label={t('date')}
+                tickFormat={(date) => formatDateForDisplay(new Date(date))}
+                tickCount={getTickCount()}
                 style={{
                   axis: { stroke: theme.colors.border.default },
-                  tickLabels: { fill: theme.colors.text.primary, fontSize: theme.typography.fontSize.sm }
+                  tickLabels: { 
+                    fill: theme.colors.text.primary, 
+                    fontSize: theme.typography.fontSize.sm,
+                    angle: -45,
+                    textAnchor: 'end'
+                  },
+                  axisLabel: {
+                    fill: theme.colors.text.primary,
+                    fontSize: theme.typography.fontSize.sm,
+                    padding: 30
+                  }
                 }}
               />
               <VictoryAxis
                 dependentAxis
+                label={getYAxisLabel()}
+                tickCount={5}
                 style={{
                   axis: { stroke: theme.colors.border.default },
-                  tickLabels: { fill: theme.colors.text.primary, fontSize: theme.typography.fontSize.sm }
+                  tickLabels: { 
+                    fill: theme.colors.text.primary, 
+                    fontSize: theme.typography.fontSize.sm 
+                  },
+                  axisLabel: {
+                    fill: theme.colors.text.primary,
+                    fontSize: theme.typography.fontSize.sm,
+                    padding: 30
+                  }
                 }}
               />
-              {volumeData.length > 0 && (
-                <>
-                  <VictoryLine
-                    data={volumeData}
-                    style={{
-                      data: { stroke: theme.colors.info, strokeWidth: 3 }
+              <VictoryLine
+                data={filteredVolumeData}
+                style={{
+                  data: { 
+                    stroke: getChartColor(), 
+                    strokeWidth: 3 
+                  }
+                }}
+              />
+              <VictoryScatter
+                data={filteredVolumeData}
+                size={5}
+                style={{
+                  data: { fill: getChartColor() }
+                }}
+                labels={formatTooltip}
+                labelComponent={
+                  <VictoryTooltip
+                    style={{ 
+                      fill: theme.colors.text.primary,
+                      fontSize: theme.typography.fontSize.sm
                     }}
-                  />
-                  <VictoryScatter
-                    data={volumeData}
-                    size={5}
-                    style={{
-                      data: { fill: theme.colors.info }
+                    flyoutStyle={{ 
+                      fill: theme.colors.background.card, 
+                      stroke: theme.colors.border.default,
+                      strokeWidth: 1
                     }}
-                    labels={({ datum }) => `${datum.y}kg`}
-                    labelComponent={
-                      <VictoryTooltip
-                        style={{ fill: theme.colors.text.primary }}
-                        flyoutStyle={{ fill: theme.colors.background.card, stroke: 'none' }}
-                      />
-                    }
+                    cornerRadius={theme.borderRadius.sm}
+                    pointerLength={5}
                   />
-                </>
-              )}
+                }
+              />
             </VictoryChart>
           )}
 
-          {/* Graphique Répétitions */}
-          {selectedChartType === 'reps' && (
+          {selectedChartType === 'reps' && filteredRepsData.length > 0 && (
             <VictoryChart
               theme={VictoryTheme.material}
               width={Dimensions.get('window').width - 40}
               height={300}
               padding={{ top: 20, bottom: 40, left: 50, right: 20 }}
               domainPadding={{ x: 20 }}
+              domain={domainYReps}
+              scale={{ x: 'time' }}
             >
               <VictoryAxis
+                label={t('date')}
+                tickFormat={(date) => formatDateForDisplay(new Date(date))}
+                tickCount={getTickCount()}
                 style={{
                   axis: { stroke: theme.colors.border.default },
-                  tickLabels: { fill: theme.colors.text.primary, fontSize: theme.typography.fontSize.sm }
+                  tickLabels: { 
+                    fill: theme.colors.text.primary, 
+                    fontSize: theme.typography.fontSize.sm,
+                    angle: -45,
+                    textAnchor: 'end'
+                  },
+                  axisLabel: {
+                    fill: theme.colors.text.primary,
+                    fontSize: theme.typography.fontSize.sm,
+                    padding: 30
+                  }
                 }}
               />
               <VictoryAxis
                 dependentAxis
+                label={getYAxisLabel()}
+                tickCount={5}
                 style={{
                   axis: { stroke: theme.colors.border.default },
-                  tickLabels: { fill: theme.colors.text.primary, fontSize: theme.typography.fontSize.sm }
+                  tickLabels: { 
+                    fill: theme.colors.text.primary, 
+                    fontSize: theme.typography.fontSize.sm 
+                  },
+                  axisLabel: {
+                    fill: theme.colors.text.primary,
+                    fontSize: theme.typography.fontSize.sm,
+                    padding: 30
+                  }
                 }}
               />
-              {repsData.length > 0 && (
-                <>
-                  <VictoryLine
-                    data={repsData}
-                    style={{
-                      data: { stroke: theme.colors.success, strokeWidth: 3 }
+              <VictoryLine
+                data={filteredRepsData}
+                style={{
+                  data: { 
+                    stroke: getChartColor(), 
+                    strokeWidth: 3 
+                  }
+                }}
+              />
+              <VictoryScatter
+                data={filteredRepsData}
+                size={5}
+                style={{
+                  data: { fill: getChartColor() }
+                }}
+                labels={formatTooltip}
+                labelComponent={
+                  <VictoryTooltip
+                    style={{ 
+                      fill: theme.colors.text.primary,
+                      fontSize: theme.typography.fontSize.sm
                     }}
-                  />
-                  <VictoryScatter
-                    data={repsData}
-                    size={5}
-                    style={{
-                      data: { fill: theme.colors.success }
+                    flyoutStyle={{ 
+                      fill: theme.colors.background.card, 
+                      stroke: theme.colors.border.default,
+                      strokeWidth: 1
                     }}
-                    labels={({ datum }) => `${datum.y} reps`}
-                    labelComponent={
-                      <VictoryTooltip
-                        style={{ fill: theme.colors.text.primary }}
-                        flyoutStyle={{ fill: theme.colors.background.card, stroke: 'none' }}
-                      />
-                    }
+                    cornerRadius={theme.borderRadius.sm}
+                    pointerLength={5}
                   />
-                </>
-              )}
+                }
+              />
             </VictoryChart>
+          )}
+
+          {(!filteredExerciseData.length && !filteredVolumeData.length && !filteredRepsData.length) && (
+            <View style={styles.noDataContainer}>
+              <Text style={styles.noDataText}>{t('noDataAvailable')}</Text>
+            </View>
           )}
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 };
 

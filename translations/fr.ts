@@ -6,6 +6,8 @@ export default {
   errorSavingWorkouts: 'Erreur lors de la sauvegarde des séances:',
   appTitle: 'Body Work',
   noWorkoutForDate: 'Aucune séance enregistrée pour cette date',
+  date: 'Date',
+  noDataAvailable: 'Aucune donnée disponible pour cette période',
 
   // Settings screen
   settings: 'Réglages',
@@ -236,5 +238,9 @@ export default {
   exercise_core_russianTwist: 'Twists russes',
   exercise_core_legRaises: 'Relevés de jambes',
   exercise_core_crunches: 'Crunchs',
-  exercise_core_hangingKneeRaises: 'Relevés de genoux suspendu'
+  exercise_core_hangingKneeRaises: 'Relevés de genoux suspendu',
+
+  // Exercise details screen
+  estimated_1rm: '1RM estimé',
+  last_session: 'Dernière séance',
 };

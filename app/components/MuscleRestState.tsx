@@ -3,7 +3,7 @@ import { Animated, StyleSheet, Text, View } from 'react-native';
 import MuscleMap from '@/app/components/MuscleMap';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useTheme } from '@/hooks/useTheme';
-import { Workout } from '@/types/workout';
+import { Workout } from '@/app/types/workout';
 
 interface MuscleRestStateProps {
   fadeAnim: Animated.Value;

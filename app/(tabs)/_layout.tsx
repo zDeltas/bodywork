@@ -8,7 +8,7 @@ import { useCallback } from 'react';
 
 SplashScreen.preventAutoHideAsync();
 
-export default function TabLayout() {
+function TabLayout() {
   const { theme } = useTheme();
   const styles = useStyles();
 
@@ -27,7 +27,7 @@ export default function TabLayout() {
   const handleAddButtonPress = () => {
     const today = new Date().toISOString().split('T')[0];
     router.push({
-      pathname: '/workout/new',
+      pathname: '/screens/workout/new',
       params: { selectedDate: today }
     });
   };
@@ -144,3 +144,5 @@ const useStyles = () => {
     }
   });
 };
+
+export default TabLayout;

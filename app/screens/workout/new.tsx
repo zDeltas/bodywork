@@ -5,14 +5,14 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { BarChart, Calendar, ChevronDown, Gauge, Layers, Plus, Weight, X } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Animated, { FadeIn } from 'react-native-reanimated';
-import ExerciseList from '../components/ExerciseList';
+import ExerciseList from '@/app/components/ExerciseList';
 import { Calendar as RNCalendar } from 'react-native-calendars';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import Text from '../components/ui/Text';
+import Text from '../../components/ui/Text';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useTheme } from '@/hooks/useTheme';
-import { Series, Workout } from '@/types/workout';
+import { Series, Workout } from '@/app/types/workout';
 import Header from '@/app/components/Header';
 import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold, useFonts } from '@expo-google-fonts/inter';
 

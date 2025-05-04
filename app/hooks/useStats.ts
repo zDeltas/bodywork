@@ -3,6 +3,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Workout } from '@/app/types/workout';
 import { differenceInDays, subMonths } from 'date-fns';
 import calculations from '@/app/utils/calculations';
+import { useTranslation } from '@/hooks/useTranslation';
+import { TranslationKey } from '@/translations';
 
 type Period = '1m' | '3m' | '6m';
 
@@ -20,6 +22,7 @@ interface StatsData {
 }
 
 const useStats = (selectedPeriod: Period) => {
+  const { t } = useTranslation();
   const [statsData, setStatsData] = useState<StatsData>({
     workouts: [],
     monthlyProgress: 0,
@@ -97,10 +100,16 @@ const useStats = (selectedPeriod: Period) => {
 
     if (progressData.length === 0) return null;
 
-    return progressData.reduce((max, current) =>
+    const bestExercise = progressData.reduce((max, current) =>
       current.progress > max.progress ? current : max
     );
-  }, []);
+
+    // Translate the exercise name using the key
+    return {
+      progress: bestExercise.progress,
+      exercise: t(bestExercise.exercise as TranslationKey) // Translate the exercise key
+    };
+  }, [t]);
 
 // Dans app/hooks/useStats.ts - fonction calculateMuscleDistribution
   const calculateMuscleDistribution = useCallback((workouts: Workout[]): StatsData['muscleDistribution'] => {

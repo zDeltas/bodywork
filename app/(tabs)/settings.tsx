@@ -9,6 +9,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { useTheme } from '@/hooks/useTheme';
 import { useCSVExport } from '@/hooks/useCSVExport';
 import Header from '@/app/components/Header';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function SettingsScreen() {
   const { settings, updateSettings, isLoading } = useSettings();
@@ -146,6 +147,83 @@ export default function SettingsScreen() {
               ) : (
                 <Ionicons name="chevron-forward" size={20} color={theme.colors.text.secondary} />
               )}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.settingItem}
+              onPress={() => {
+                Alert.alert(
+                  t('resetData'),
+                  t('resetDataConfirmation'),
+                  [
+                    {
+                      text: t('cancel'),
+                      style: 'cancel'
+                    },
+                    {
+                      text: t('reset'),
+                      style: 'destructive',
+                      onPress: async () => {
+                        try {
+                          // Afficher les données actuelles avant suppression
+                          const workouts = await AsyncStorage.getItem('workouts');
+                          const goals = await AsyncStorage.getItem('goals');
+                          const measurements = await AsyncStorage.getItem('bodyMeasurements');
+                          const favorites = await AsyncStorage.getItem('favoriteExercises');
+                          const recent = await AsyncStorage.getItem('recentExercises');
+                          const settings = await AsyncStorage.getItem('bodywork_settings');
+
+                          console.log('Données avant suppression:');
+                          console.log('Workouts:', workouts);
+                          console.log('Goals:', goals);
+                          console.log('Measurements:', measurements);
+                          console.log('Favorites:', favorites);
+                          console.log('Recent:', recent);
+                          console.log('Settings:', settings);
+
+                          // Supprimer TOUTES les données
+                          await AsyncStorage.clear();
+
+                          // Vérifier que les données ont bien été supprimées
+                          const workoutsAfter = await AsyncStorage.getItem('workouts');
+                          const goalsAfter = await AsyncStorage.getItem('goals');
+                          const measurementsAfter = await AsyncStorage.getItem('bodyMeasurements');
+                          const favoritesAfter = await AsyncStorage.getItem('favoriteExercises');
+                          const recentAfter = await AsyncStorage.getItem('recentExercises');
+                          const settingsAfter = await AsyncStorage.getItem('bodywork_settings');
+
+                          console.log('Données après suppression:');
+                          console.log('Workouts:', workoutsAfter);
+                          console.log('Goals:', goalsAfter);
+                          console.log('Measurements:', measurementsAfter);
+                          console.log('Favorites:', favoritesAfter);
+                          console.log('Recent:', recentAfter);
+                          console.log('Settings:', settingsAfter);
+
+                          // Forcer le rechargement des paramètres
+                          updateSettings({
+                            weightUnit: 'kg',
+                            gender: 'male',
+                            language: 'fr',
+                            theme: 'dark'
+                          });
+
+                          Alert.alert(t('success'), t('dataResetSuccess'));
+                        } catch (error) {
+                          console.error('Erreur lors de la réinitialisation:', error);
+                          Alert.alert(t('error'), t('errorResettingData'));
+                        }
+                      }
+                    }
+                  ]
+                );
+              }}
+            >
+              <View style={styles.settingInfo}>
+                <Ionicons name="trash-outline" size={24} color={theme.colors.error} />
+                <Text style={[styles.settingLabel, { color: theme.colors.error }]}>{t('resetData')}</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color={theme.colors.text.secondary} />
             </TouchableOpacity>
 
             <TouchableOpacity

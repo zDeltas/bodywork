@@ -37,6 +37,7 @@ export default function NewWorkoutScreen() {
   const styles = useStyles();
   const [selectedMuscle, setSelectedMuscle] = useState('');
   const [exercise, setExercise] = useState('');
+  const [exerciseKey, setExerciseKey] = useState('');
   const [rpe, setRpe] = useState('');
   const [series, setSeries] = useState<Array<{
     weight: string,
@@ -77,8 +78,9 @@ export default function NewWorkoutScreen() {
       const workouts = JSON.parse(existingWorkouts);
 
       // Filter workouts for the same exercise
+      // Use exerciseKey for comparison if we're looking at a saved workout
       const sameExerciseWorkouts = workouts.filter(
-        (w: Workout) => w.exercise === selectedExercise
+        (w: Workout) => w.exercise === (exerciseKey || selectedExercise)
       ).sort((a: Workout, b: Workout) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
       // If no previous workouts for this exercise, return null
@@ -125,7 +127,7 @@ export default function NewWorkoutScreen() {
       console.error('Error calculating suggested weight:', error);
       setSuggestedWeight(null);
     }
-  }, [setSuggestedWeight]);
+  }, [setSuggestedWeight, exerciseKey]);
 
   // Function to try to calculate suggested weight based on exercise, reps, and RPE
   const tryCalculateSuggestedWeight = useCallback(async (selectedExercise: string) => {
@@ -145,7 +147,7 @@ export default function NewWorkoutScreen() {
 
       const workouts = JSON.parse(existingWorkouts);
       const sameExerciseWorkouts = workouts
-        .filter((w: Workout) => w.exercise === selectedExercise)
+        .filter((w: Workout) => w.exercise === (exerciseKey || selectedExercise))
         .sort((a: Workout, b: Workout) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
       if (sameExerciseWorkouts.length === 0) return;
@@ -178,7 +180,7 @@ export default function NewWorkoutScreen() {
     } catch (error) {
       console.error('Error loading previous workouts:', error);
     }
-  }, [series, rpe, calculateSuggestedWeight]);
+  }, [series, rpe, calculateSuggestedWeight, exerciseKey]);
 
   const saveWorkout = async () => {
     try {
@@ -222,7 +224,7 @@ export default function NewWorkoutScreen() {
       const workout = {
         id: Date.now().toString(),
         muscleGroup: selectedMuscle,
-        exercise,
+        exercise: exerciseKey, // Save the exercise key instead of the translated name
         series: processedSeries,
         rpe: parseInt(rpe) || 0, // Keep global RPE for backward compatibility
         date: selectedDate ? `${selectedDate}T${new Date().toTimeString().split(' ')[0]}` : new Date().toISOString()
@@ -334,8 +336,9 @@ export default function NewWorkoutScreen() {
                   selectedMuscle={selectedMuscle}
                   setSelectedMuscle={setSelectedMuscle}
                   exercise={exercise}
-                  setExercise={(selectedExercise) => {
+                  setExercise={(selectedExercise, selectedExerciseKey) => {
                     setExercise(selectedExercise);
+                    setExerciseKey(selectedExerciseKey || selectedExercise); // Use the translated name as key if no key is provided (for custom exercises)
                     setShowExerciseSelector(false);
                     tryCalculateSuggestedWeight(selectedExercise);
                   }}

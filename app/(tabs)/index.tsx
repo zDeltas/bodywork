@@ -9,6 +9,7 @@ import { Activity, Dumbbell, Layers, Repeat } from 'lucide-react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Header from '@/app/components/Header';
 import { Workout } from '@/app/types/workout';
+import { TranslationKey } from '@/translations';
 
 LocaleConfig.locales['fr'] = {
   monthNames: [
@@ -173,7 +174,7 @@ export default function WorkoutScreen() {
           filteredWorkouts.map(workout => (
             <View key={workout.id} style={styles.workoutCard}>
               <View style={styles.workoutDetailsCard}>
-                <Text style={styles.workoutTitle}>{workout.exercise}</Text>
+                <Text style={styles.workoutTitle}>{t(workout.exercise as TranslationKey)}</Text>
                 <Text
                   style={styles.workoutDate}>{new Date(workout.date).toLocaleString(language === 'fr' ? 'fr-FR' : 'en-US', {
                   day: '2-digit',

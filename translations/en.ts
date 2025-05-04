@@ -8,6 +8,10 @@ export default {
   noWorkoutForDate: 'No workout recorded for this date',
   date: 'Date',
   noDataAvailable: 'No data available for this period',
+  error: 'Error',
+  success: 'Success',
+  cancel: 'Cancel',
+  reset: 'Reset',
 
   // Settings screen
   settings: 'Settings',
@@ -31,6 +35,10 @@ export default {
   theme: 'Theme',
   dark: 'Dark',
   light: 'Light',
+  resetData: 'Reset Data',
+  resetDataConfirmation: 'Are you sure you want to reset all data? This action cannot be undone.',
+  dataResetSuccess: 'All data has been successfully reset.',
+  errorResettingData: 'An error occurred while resetting the data.',
 
   // About section
   aboutTitle: 'BodyWork',
@@ -80,12 +88,23 @@ export default {
 
   // Stats screen
   stats: {
-    title: 'Analysis & Charts',
+    title: 'Statistics',
     overview: 'Overview',
     totalWorkouts: 'Total Workouts',
     totalExercises: 'Total Exercises',
     totalVolume: 'Total Volume',
-    avgWorkoutTime: 'Avg. Workout Time'
+    avgWorkoutTime: 'Avg. Workout Time',
+    progressionTextNone: 'No progression data available',
+    attendance: 'Attendance',
+    series: 'Series',
+    sessions: 'Sessions',
+    goals: 'Goals',
+    noGoalsYet: 'No goals set yet',
+    addGoal: 'Add Goal',
+    muscleDistribution: 'Muscle Distribution',
+    oneMonth: '1 Month',
+    threeMonths: '3 Months',
+    sixMonths: '6 Months'
   },
   period: 'Period:',
   muscleGroup: 'Muscle group:',
@@ -103,7 +122,6 @@ export default {
   allExercises: 'All exercises',
   volume: 'Volume',
   repetitions: 'Repetitions',
-  goals: 'Goals',
   goalRemaining: '{remaining}kg remaining',
   goalAchieved: 'Goal achieved!',
   addGoal: 'Add a goal',
@@ -111,7 +129,6 @@ export default {
   currentWeight: 'Current Weight',
   targetWeight: 'Target Weight',
   selectExerciseForGoal: 'Select Exercise',
-  noGoalsYet: 'No goals defined yet',
   deleteGoal: 'Delete Goal',
   deleteGoalConfirmation: 'Are you sure you want to delete the goal for {exercise}?',
   delete: 'Delete',
@@ -120,11 +137,9 @@ export default {
   exerciseNotFound: 'Exercise Not Found',
   exerciseNotFoundMessage: 'You need to have workout history for this exercise before setting a goal.',
   ok: 'OK',
-  error: 'Error',
   pleaseCompleteAllFields: 'Please complete all fields',
   invalidWeightValues: 'Invalid weight values',
   errorSavingGoal: 'Error saving goal',
-  muscleDistribution: 'Muscle group distribution',
   oneMonth: '1 month',
   threeMonths: '3 months',
   sixMonths: '6 months',

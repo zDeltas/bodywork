@@ -355,7 +355,10 @@ const useStyles = () => {
     calendarContainer: {
       borderRadius: theme.borderRadius.lg,
       overflow: 'hidden',
-      ...theme.shadows.md
+      marginLeft: theme.spacing.sm,
+      marginRight: theme.spacing.sm,
+      marginBottom: theme.spacing.sm,
+      ...theme.shadows.md,
     }
   });
 };

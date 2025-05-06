@@ -12,4 +12,10 @@ export interface Workout {
   muscleGroup: string;
   series: Series[];
   date: string;
-} 
+}
+
+// Create a dummy component as default export to satisfy the route requirements
+// This is needed because interfaces are type-only and cannot be used at runtime
+const WorkoutTypesComponent = () => null;
+
+export default WorkoutTypesComponent; 

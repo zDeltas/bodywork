@@ -94,3 +94,6 @@ export const useCSVExport = () => {
     exportWorkoutsToCSV
   };
 };
+
+// Add default export to fix the route warning
+export default useCSVExport;

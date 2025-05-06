@@ -16,3 +16,6 @@ export const useTheme = () => {
     isDarkMode: settings.theme === 'dark'
   };
 };
+
+// Add default export to fix the route warning
+export default useTheme;

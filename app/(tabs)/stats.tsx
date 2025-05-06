@@ -145,25 +145,6 @@ export default function StatsScreen() {
     }
   }, [getCurrentWeight, suggestTargetWeight]);
 
-  const toggleFavorite = useCallback((exercise: ExerciseName) => {
-    if (!exercise) return;
-    setFavoriteExercises(prev => {
-      if (!Array.isArray(prev)) return [exercise];
-      const isFavorite = prev.includes(exercise);
-      const newFavorites = isFavorite
-        ? prev.filter(e => e !== exercise)
-        : [...prev, exercise];
-
-      try {
-        AsyncStorage.setItem('favoriteExercises', JSON.stringify(newFavorites));
-      } catch (error) {
-        console.error(t('common.errorSavingWorkouts'), error);
-      }
-
-      return newFavorites;
-    });
-  }, [t]);
-
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded) {
       await SplashScreen.hideAsync();
@@ -207,7 +188,7 @@ export default function StatsScreen() {
           onExerciseSelect={(exercise) => {
             handleSelectExercise(exercise as ExerciseName);
             router.push({
-              pathname: '/components/exerciseDetails',
+              pathname: '/components/exercises/exerciseDetails',
               params: { exercise }
             });
           }}

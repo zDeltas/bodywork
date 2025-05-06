@@ -11,3 +11,6 @@ export function useFrameworkReady() {
     window.frameworkReady?.();
   });
 }
+
+// Add default export to fix the route warning
+export default useFrameworkReady;

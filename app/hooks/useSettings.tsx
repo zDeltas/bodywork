@@ -77,3 +77,6 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
 
 // Hook for using the settings context
 export const useSettings = () => useContext(SettingsContext);
+
+// Add default export to fix the route warning
+export default useSettings;

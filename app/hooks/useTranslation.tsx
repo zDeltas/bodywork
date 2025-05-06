@@ -39,3 +39,6 @@ export const useTranslation = () => {
   };
 };
 
+// Add default export to fix the route warning
+export default useTranslation;
+

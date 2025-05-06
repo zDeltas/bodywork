@@ -135,7 +135,7 @@ const GoalSection: React.FC<GoalSectionProps> = ({ fadeAnim, goals, setGoals }) 
         { opacity: fadeAnim, transform: [{ scale: fadeAnim }] }
       ]}
     >
-      <Text style={styles.chartTitle}>{t('goals')}</Text>
+      <Text style={styles.chartTitle}>{t('stats.goals')}</Text>
 
       {goals.length === 0 ? (
         <View style={styles.noGoalsContainer}>

@@ -24,14 +24,14 @@ export default function RootLayout() {
             >
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
               <Stack.Screen
-                name="workout/new"
+                name="screens/workout/new"
                 options={{
                   presentation: 'modal',
                   animation: Platform.OS === 'ios' ? 'slide_from_bottom' : 'fade'
                 }}
               />
               <Stack.Screen
-                name="goal/new"
+                name="screens/goal/new"
                 options={{
                   presentation: 'modal',
                   animation: Platform.OS === 'ios' ? 'slide_from_bottom' : 'fade'

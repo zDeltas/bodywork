@@ -92,7 +92,7 @@ export default {
     rpeDescription: '1 = Very easy, 10 = Maximum effort',
     addExercise: 'Add Exercise',
     searchExercises: 'Search Exercises...',
-    serieType: 'Series Type',
+    seriesType: 'Series Type',
     warmUp: 'Warm-up',
     workingSet: 'Working Set',
     warmUpDescription: 'Warm-up series (RPE not considered)',

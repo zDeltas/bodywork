@@ -12,7 +12,7 @@ import { fr } from 'date-fns/locale';
 import Text from '../../components/ui/Text';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useTheme } from '@/hooks/useTheme';
-import { Series, Workout } from '@/app/types/workout';
+import { Series, Workout } from '@/types/workout';
 import Header from '@/app/components/Header';
 import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold, useFonts } from '@expo-google-fonts/inter';
 
@@ -394,13 +394,13 @@ export default function NewWorkoutScreen() {
                 </View>
               </View>
 
-              <View style={styles.serieTypeContainer}>
-                <Text variant="body" style={styles.seriesInputLabel}>{t('workout.serieType')}</Text>
-                <View style={styles.serieTypeButtonsContainer}>
+              <View style={styles.seriesTypeContainer}>
+                <Text variant="body" style={styles.seriesInputLabel}>{t('workout.seriesType')}</Text>
+                <View style={styles.seriesTypeButtonsContainer}>
                   <TouchableOpacity
                     style={[
-                      styles.serieTypeButton,
-                      item.type === 'warmUp' && styles.serieTypeButtonSelected
+                      styles.seriesTypeButton,
+                      item.type === 'warmUp' && styles.seriesTypeButtonSelected
                     ]}
                     onPress={() => {
                       const newSeries = [...series];
@@ -410,21 +410,21 @@ export default function NewWorkoutScreen() {
                   >
                     <Text
                       style={[
-                        styles.serieTypeButtonText,
-                        item.type === 'warmUp' && styles.serieTypeButtonTextSelected
+                        styles.seriesTypeButtonText,
+                        item.type === 'warmUp' && styles.seriesTypeButtonTextSelected
                       ]}
                     >
                       {t('workout.warmUp')}
                     </Text>
-                    <Text variant="caption" style={styles.serieTypeDescription}>
+                    <Text variant="caption" style={styles.seriesTypeDescription}>
                       {t('workout.warmUpDescription')}
                     </Text>
                   </TouchableOpacity>
 
                   <TouchableOpacity
                     style={[
-                      styles.serieTypeButton,
-                      item.type === 'workingSet' && styles.serieTypeButtonSelected
+                      styles.seriesTypeButton,
+                      item.type === 'workingSet' && styles.seriesTypeButtonSelected
                     ]}
                     onPress={() => {
                       const newSeries = [...series];
@@ -434,13 +434,13 @@ export default function NewWorkoutScreen() {
                   >
                     <Text
                       style={[
-                        styles.serieTypeButtonText,
-                        item.type === 'workingSet' && styles.serieTypeButtonTextSelected
+                        styles.seriesTypeButtonText,
+                        item.type === 'workingSet' && styles.seriesTypeButtonTextSelected
                       ]}
                     >
                       {t('workout.workingSet')}
                     </Text>
-                    <Text variant="caption" style={styles.serieTypeDescription}>
+                    <Text variant="caption" style={styles.seriesTypeDescription}>
                       {t('workout.workingSetDescription')}
                     </Text>
                   </TouchableOpacity>
@@ -773,7 +773,7 @@ const useStyles = () => {
       alignItems: 'center',
       ...theme.shadows.sm
     },
-    serieTypeContainer: {
+    seriesTypeContainer: {
       marginBottom: theme.spacing.base
     },
     seriesInputLabel: {
@@ -782,12 +782,12 @@ const useStyles = () => {
       fontSize: theme.typography.fontSize.base,
       marginBottom: theme.spacing.sm
     },
-    serieTypeButtonsContainer: {
+    seriesTypeButtonsContainer: {
       flexDirection: 'row',
       gap: theme.spacing.md,
       marginBottom: theme.spacing.sm
     },
-    serieTypeButton: {
+    seriesTypeButton: {
       flex: 1,
       backgroundColor: theme.colors.background.card,
       borderRadius: theme.borderRadius.lg,
@@ -795,21 +795,21 @@ const useStyles = () => {
       borderWidth: 1,
       borderColor: theme.colors.border.default
     },
-    serieTypeButtonSelected: {
+    seriesTypeButtonSelected: {
       backgroundColor: theme.colors.primaryLight,
       borderColor: theme.colors.primaryBorder
     },
-    serieTypeButtonText: {
+    seriesTypeButtonText: {
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.semiBold,
       fontSize: theme.typography.fontSize.base,
       marginBottom: theme.spacing.xs,
       textAlign: 'center'
     },
-    serieTypeButtonTextSelected: {
+    seriesTypeButtonTextSelected: {
       color: theme.colors.primary
     },
-    serieTypeDescription: {
+    seriesTypeDescription: {
       color: theme.colors.text.secondary,
       fontFamily: theme.typography.fontFamily.regular,
       fontSize: theme.typography.fontSize.sm,

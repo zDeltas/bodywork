@@ -20,7 +20,7 @@ export const muscleGroupKeys: MuscleGroupKey[] = [
 ];
 
 export const getMuscleGroups = (t: (key: string) => string) => {
-  return muscleGroupKeys.map(key => t(key));
+  return muscleGroupKeys.map(key => t(`muscleGroups.${key}`));
 };
 
 export const predefinedExercisesByKey: Record<MuscleGroupKey, string[]> = {
@@ -44,7 +44,7 @@ export const getPredefinedExercises = (t: (key: string) => string) => {
 
   muscleGroupKeys.forEach(key => {
     // Translate both the muscle group key and each exercise name
-    result[t(key)] = predefinedExercisesByKey[key].map(exerciseKey => ({
+    result[t(`muscleGroups.${key}`)] = predefinedExercisesByKey[key].map(exerciseKey => ({
       translatedName: t(exerciseKey),
       key: exerciseKey
     }));

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Workout } from '@/app/types/workout';
+import { Workout } from '@/types/workout';
 import { differenceInDays, subMonths } from 'date-fns';
 import calculations from '@/app/utils/calculations';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -173,8 +173,6 @@ const useStats = (selectedPeriod: Period) => {
     return Object.entries(muscleGroupVolumes)
       .map(([muscleGroup, volume]) => {
         const percentage = totalVolume > 0 ? Math.round((volume / totalVolume) * 100) : 0;
-
-        console.log(muscleGroup);
 
         return {
           name: muscleTranslations[muscleGroup.toLowerCase()] || muscleGroup,

@@ -8,7 +8,7 @@ import { router } from 'expo-router';
 import { muscleGroupKeys } from '@/app/components/ExerciseList';
 import { useTheme } from '@/hooks/useTheme';
 import KpiMotivation from '@/app/components/KpiMotivation';
-import { Workout } from '@/app/types/workout';
+import { Workout } from '@/types/workout';
 import StatsExerciseList from '@/app/components/stats/StatsExerciseList';
 import StatsGoals from '@/app/components/stats/StatsGoals';
 import StatsMuscleDistribution from '@/app/components/stats/StatsMuscleDistribution';

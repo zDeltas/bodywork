@@ -1,5 +1,5 @@
 import React from 'react';
-import { Platform, Pressable, StyleSheet, TouchableOpacity as RNTouchableOpacity, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, TouchableOpacity as RNTouchableOpacity } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 
@@ -22,15 +22,15 @@ export default function TouchableOpacity({
   const { theme } = useTheme();
 
   const TouchableComponent = Platform.OS === 'ios' ? Pressable : RNTouchableOpacity;
-  
+
   // Create individual animated components instead of using a conditional
   const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
   const AnimatedTouchableOpacity = Animated.createAnimatedComponent(RNTouchableOpacity);
-  
+
   if (animated) {
     // Use the proper pre-created animated component
     const Component = Platform.OS === 'ios' ? AnimatedPressable : AnimatedTouchableOpacity;
-    
+
     return (
       <Component
         entering={FadeIn.duration(200)}
@@ -51,7 +51,7 @@ export default function TouchableOpacity({
       />
     );
   }
-  
+
   // Non-animated version
   return (
     <TouchableComponent

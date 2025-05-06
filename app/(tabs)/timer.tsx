@@ -6,7 +6,6 @@ import { Clock, Minus, Plus, Timer as TimerIcon } from 'lucide-react-native';
 import { useTranslation } from '@/hooks/useTranslation';
 import { TimerPickerModal } from 'react-native-timer-picker';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Audio } from 'expo-av';
 import * as Haptics from 'expo-haptics';
 import { TranslationKey } from '@/translations';
 import { useTheme } from '@/hooks/useTheme';
@@ -16,10 +15,10 @@ import Header from '@/app/components/Header';
 SplashScreen.preventAutoHideAsync();
 
 const WORKOUT_TIMES = {
-  'quick': 30,
-  'standard': 60,
-  'long': 90,
-  'veryLong': 120
+  'timer.quick': 30,
+  'timer.standard': 60,
+  'timer.long': 90,
+  'timer.veryLong': 120
 };
 
 // Define styles using the current theme
@@ -236,7 +235,7 @@ export default function TimerScreen() {
 
   return (
     <View style={styles.container}>
-      <Header title={t('timer')} showBackButton={false} rightComponent={
+      <Header title={String(t('timer.title'))} showBackButton={false} rightComponent={
         <View style={styles.modeSelector}>
           <TouchableOpacity
             style={[styles.modeButton, mode === 'timer' && styles.modeButtonActive]}
@@ -271,7 +270,7 @@ export default function TimerScreen() {
             {/*  placeholderTextColor="#666"*/}
             {/*/>*/}
 
-            <Text style={styles.sectionTitle}>{t('timer.workTime')}</Text>
+            <Text style={styles.sectionTitle}>{String(t('timer.workTime'))}</Text>
             <View style={styles.timeGrid}>
               {Object.entries(WORKOUT_TIMES).map(([key, time]) => (
                 <TouchableOpacity
@@ -291,7 +290,7 @@ export default function TimerScreen() {
                       selectedTime === time && !isCustomTime && styles.timeTextActive
                     ]}
                   >
-                    {t(key as TranslationKey)}
+                    {typeof t(key as TranslationKey) === 'string' ? String(t(key as TranslationKey)) : key}
                   </Text>
                   <Text
                     style={[
@@ -318,7 +317,7 @@ export default function TimerScreen() {
                     isCustomTime && styles.timeTextActive
                   ]}
                 >
-                  {t('common.custom')}
+                  {String(t('common.custom'))}
                 </Text>
                 <Text
                   style={[
@@ -333,7 +332,7 @@ export default function TimerScreen() {
               </TouchableOpacity>
             </View>
 
-            <Text style={styles.sectionTitle}>{t('timer.restTime')}</Text>
+            <Text style={styles.sectionTitle}>{String(t('timer.restTime'))}</Text>
             <View style={styles.timeGrid}>
               {Object.entries(WORKOUT_TIMES).map(([key, time]) => (
                 <TouchableOpacity
@@ -353,7 +352,7 @@ export default function TimerScreen() {
                       selectedRestTime === time && !isCustomRestTime && styles.timeTextActive
                     ]}
                   >
-                    {t(key as TranslationKey)}
+                    {typeof t(key as TranslationKey) === 'string' ? String(t(key as TranslationKey)) : key}
                   </Text>
                   <Text
                     style={[
@@ -380,7 +379,7 @@ export default function TimerScreen() {
                     isCustomRestTime && styles.timeTextActive
                   ]}
                 >
-                  {t('common.custom')}
+                  {String(t('common.custom'))}
                 </Text>
                 <Text
                   style={[
@@ -395,7 +394,7 @@ export default function TimerScreen() {
               </TouchableOpacity>
             </View>
 
-            <Text style={styles.sectionTitle}>{t('timer.series')}</Text>
+            <Text style={styles.sectionTitle}>{String(t('timer.series'))}</Text>
             <View style={styles.setsContainer}>
               <TouchableOpacity
                 style={[styles.setsButton, { opacity: sets <= 1 ? 0.5 : 1 }]}
@@ -423,7 +422,7 @@ export default function TimerScreen() {
             sets={sets}
             restTime={selectedRestTime}
             onSetsChange={setSets}
-            exerciseName={exerciseName || t('timer.exercise')}
+            exerciseName={exerciseName || String(t('timer.exercise'))}
           />
         </View>
       </ScrollView>
@@ -433,10 +432,10 @@ export default function TimerScreen() {
         setIsVisible={setShowCustomTimeModal}
         onCancel={() => setShowCustomTimeModal(false)}
         onConfirm={handleCustomTimeSave}
-        cancelButtonText={t('common.cancel')}
-        confirmButtonText={t('common.save')}
+        cancelButtonText={String(t('common.cancel'))}
+        confirmButtonText={String(t('common.save'))}
         closeOnOverlayPress={true}
-        modalTitle={t('timer.workTime')}
+        modalTitle={String(t('timer.workTime'))}
         styles={{
           backgroundColor: theme.colors.background.card,
           pickerContainer: {
@@ -469,7 +468,6 @@ export default function TimerScreen() {
         secondLabel="sec"
         LinearGradient={LinearGradient}
         Haptics={Haptics}
-        Audio={Audio}
       />
 
 
@@ -478,10 +476,10 @@ export default function TimerScreen() {
         setIsVisible={setShowCustomRestTimeModal}
         onCancel={() => setShowCustomRestTimeModal(false)}
         onConfirm={handleCustomRestTimeSave}
-        cancelButtonText={t('common.cancel')}
-        confirmButtonText={t('common.save')}
+        cancelButtonText={String(t('common.cancel'))}
+        confirmButtonText={String(t('common.save'))}
         closeOnOverlayPress={true}
-        modalTitle={t('timer.restTime')}
+        modalTitle={String(t('timer.restTime'))}
         styles={{
           backgroundColor: theme.colors.background.card,
           pickerContainer: {
@@ -514,7 +512,6 @@ export default function TimerScreen() {
         secondLabel="sec"
         LinearGradient={LinearGradient}
         Haptics={Haptics}
-        Audio={Audio}
       />
     </View>
   );

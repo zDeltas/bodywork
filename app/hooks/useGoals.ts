@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Workout } from '@/app/types/workout';
+import { Workout } from '@/types/workout';
 
 interface Goal {
   exercise: string;

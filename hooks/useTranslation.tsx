@@ -13,14 +13,24 @@ export const useTranslation = () => {
     let value: any = translations[language];
 
     for (const k of keys) {
+      if (!value || typeof value !== 'object') {
+        console.warn(`Translation path broken for key: ${key}`);
+        return String(key);
+      }
       value = value[k];
       if (value === undefined) {
         console.warn(`Translation key not found: ${key}`);
-        return key;
+        return String(key);
       }
     }
 
-    return value as string;
+    // Ensure we always return a string
+    if (typeof value === 'object') {
+      console.warn(`Translation value for key ${key} is an object, not a string`);
+      return String(key);
+    }
+
+    return String(value);
   };
 
   return {
@@ -28,3 +38,4 @@ export const useTranslation = () => {
     language
   };
 };
+

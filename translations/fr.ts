@@ -92,13 +92,13 @@ export default {
     rpeDescription: '1 = Très facile, 10 = Effort maximal',
     addExercise: 'Ajouter l\'exercice',
     searchExercises: 'Chercher des exercices...',
-    serieType: 'Type de série',
+    seriesType: 'Type de série',
     warmUp: 'Échauffement',
     workingSet: 'Série de travail',
     warmUpDescription: 'Série d\'échauffement (RPE non pris en compte)',
     workingSetDescription: 'Série de travail (RPE important)',
     addSeries: 'Ajouter une série',
-    serie: 'Série',
+    series: 'Series',
     optionalNote: 'Note optionnelle',
     usePreviousValues: 'Utiliser les valeurs précédentes',
     notApplicable: 'N/A',
@@ -115,12 +115,13 @@ export default {
     minutes: 'Minutes',
     seconds: 'Secondes',
     exerciseName: 'Nom de l\'exercice',
-    enterExerciseName: 'Entrer le nom de l\'exercice',
+    enterExerciseName: 'Entrez le nom de l\'exercice',
     exercise: 'Exercice',
     quick: 'Rapide',
     standard: 'Standard',
     long: 'Long',
-    veryLong: 'Très long'
+    veryLong: 'Très long',
+    series: 'Séries'
   },
 
   // Stats screen

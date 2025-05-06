@@ -92,7 +92,7 @@ export default function Timer({
   }, [initialTime, restTime, isRunning, mode]);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval>;
 
     if (isRunning) {
       interval = setInterval(() => {
@@ -172,7 +172,7 @@ export default function Timer({
             </TouchableOpacity>
 
             <Text style={[styles.setInfo, { color: theme.colors.background.main }]}>
-              {t('timer.series')} {currentSet}/{sets}
+              {typeof t('timer.series') === 'string' ? String(t('timer.series')) : 'Series'} {currentSet}/{sets}
             </Text>
 
             <TouchableOpacity

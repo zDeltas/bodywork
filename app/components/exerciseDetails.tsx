@@ -7,7 +7,7 @@ import { fr } from 'date-fns/locale';
 import { useLocalSearchParams } from 'expo-router';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useTheme } from '@/hooks/useTheme';
-import { Workout } from '@/app/types/workout';
+import { Workout } from '@/types/workout';
 import Header from '@/app/components/Header';
 import Text from '@/app/components/ui/Text';
 

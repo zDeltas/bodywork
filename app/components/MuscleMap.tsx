@@ -110,14 +110,14 @@ export default function MuscleMap({ workouts }: MuscleMapProps) {
         <Pressable
           style={[styles.toggleButton, selectedView === 'front' && styles.toggleButtonActive]}
           onPress={() => handleViewChange('front')}>
-          <Text style={[styles.toggleText]}>
+          <Text style={[styles.toggleText, selectedView === 'front' && styles.toggleButtonActive]}>
             {t('muscleMap.frontView')}
           </Text>
         </Pressable>
         <Pressable
           style={[styles.toggleButton, selectedView === 'back' && styles.toggleButtonActive]}
           onPress={() => handleViewChange('back')}>
-          <Text style={[styles.toggleText]}>
+          <Text style={[styles.toggleText, selectedView === 'back' && styles.toggleButtonActive]}>
             {t('muscleMap.backView')}
           </Text>
         </Pressable>
@@ -175,7 +175,8 @@ const useStyles = () => {
       borderRadius: theme.borderRadius.full
     },
     toggleButtonActive: {
-      backgroundColor: theme.colors.primary
+      backgroundColor: theme.colors.primary,
+      color: 'white'
     },
     toggleText: {
       color: theme.colors.text.primary,

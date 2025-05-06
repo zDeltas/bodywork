@@ -412,19 +412,22 @@ const ExerciseDetails = () => {
               style={[styles.filterButton, selectedPeriod === '1m' && styles.filterButtonActive]}
               onPress={() => setSelectedPeriod('1m')}
             >
-              <Text style={[styles.filterText, selectedPeriod === '1m' && styles.filterTextActive]}>1M</Text>
+              <Text
+                style={[styles.filterText, selectedPeriod === '1m' && styles.filterTextActive]}>{t('periods.oneMonth')}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.filterButton, selectedPeriod === '3m' && styles.filterButtonActive]}
               onPress={() => setSelectedPeriod('3m')}
             >
-              <Text style={[styles.filterText, selectedPeriod === '3m' && styles.filterTextActive]}>3M</Text>
+              <Text
+                style={[styles.filterText, selectedPeriod === '3m' && styles.filterTextActive]}>{t('periods.threeMonths')}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.filterButton, selectedPeriod === '6m' && styles.filterButtonActive]}
               onPress={() => setSelectedPeriod('6m')}
             >
-              <Text style={[styles.filterText, selectedPeriod === '6m' && styles.filterTextActive]}>6M</Text>
+              <Text
+                style={[styles.filterText, selectedPeriod === '6m' && styles.filterTextActive]}>{t('periods.sixMonths')}</Text>
             </TouchableOpacity>
           </View>
         </View>

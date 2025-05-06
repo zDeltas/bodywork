@@ -309,7 +309,7 @@ const useStyles = () => {
       paddingVertical: theme.spacing.md
     },
     collapsibleHeaderSelected: {
-      backgroundColor: theme.colors.primary
+      backgroundColor: theme.colors.primaryLight
     },
     muscleButtonContent: {
       flexDirection: 'row',
@@ -323,9 +323,6 @@ const useStyles = () => {
       fontFamily: theme.typography.fontFamily.semiBold,
       fontSize: theme.typography.fontSize.base,
       color: theme.colors.primary
-    },
-    muscleButtonTextSelected: {
-      color: theme.colors.text.primary
     },
     collapsibleContent: {
       paddingHorizontal: theme.spacing.md,
@@ -345,9 +342,6 @@ const useStyles = () => {
     },
     exerciseName: {
       marginBottom: theme.spacing.xs
-    },
-    exerciseMuscle: {
-      marginTop: theme.spacing.xs
     },
     customExerciseButton: {
       flexDirection: 'row',

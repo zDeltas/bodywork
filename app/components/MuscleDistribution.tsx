@@ -69,8 +69,8 @@ const MuscleDistribution: React.FC<MuscleDistributionProps> = ({
       borderRadius: theme.borderRadius.lg
     },
     filterButtonActive: {
-      backgroundColor: theme.colors.background.card,
-      ...theme.shadows.sm
+      backgroundColor: theme.colors.primary,
+      color: 'white'
     },
     filterText: {
       fontSize: theme.typography.fontSize.sm,
@@ -136,7 +136,7 @@ const MuscleDistribution: React.FC<MuscleDistributionProps> = ({
             }}
           >
             <Text style={[styles.filterText, selectedPeriod === '1m' && styles.filterTextActive]}>
-              {t('stats.oneMonth')}
+              {t('periods.oneMonth')}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -147,7 +147,7 @@ const MuscleDistribution: React.FC<MuscleDistributionProps> = ({
             }}
           >
             <Text style={[styles.filterText, selectedPeriod === '3m' && styles.filterTextActive]}>
-              {t('stats.threeMonths')}
+              {t('periods.threeMonths')}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -158,7 +158,7 @@ const MuscleDistribution: React.FC<MuscleDistributionProps> = ({
             }}
           >
             <Text style={[styles.filterText, selectedPeriod === '6m' && styles.filterTextActive]}>
-              {t('stats.sixMonths')}
+              {t('periods.sixMonths')}
             </Text>
           </TouchableOpacity>
         </View>

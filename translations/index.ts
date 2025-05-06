@@ -6,23 +6,14 @@ export const translations = {
   fr
 };
 
-// Create a type for the translation keys based on the English translations
-type NestedKeys<T> = {
-  [K in keyof T & string]: T[K] extends object ? `${K}.${keyof T[K] & string}` : K;
-}[keyof T & string];
+// Improved type for accessing nested translations
+type RecursiveKeyOf<TObj extends object> = {
+  [TKey in keyof TObj & (string | number)]: TObj[TKey] extends object
+    ? `${TKey}` | `${TKey}.${RecursiveKeyOf<TObj[TKey]>}`
+    : `${TKey}`
+}[keyof TObj & (string | number)];
 
-export type TranslationKey = NestedKeys<typeof en>;
+export type TranslationKey = RecursiveKeyOf<typeof en>;
 
 // Export the available languages
 export type Language = 'en' | 'fr';
-export const languages: Language[] = ['en', 'fr'];
-
-// Get the language name in the current language
-export const getLanguageName = (language: Language, currentLanguage: Language): string => {
-  if (language === 'en') {
-    return translations[currentLanguage].english as string;
-  } else if (language === 'fr') {
-    return translations[currentLanguage].french as string;
-  }
-  return language;
-};

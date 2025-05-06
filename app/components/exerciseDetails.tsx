@@ -356,11 +356,11 @@ const ExerciseDetails = () => {
   const getChartTitle = () => {
     switch (selectedChartType) {
       case '1rm':
-        return t('oneRM');
+        return t('stats.oneRM');
       case 'volume':
-        return t('volumePerWeek');
+        return t('stats.volumePerWeek');
       case 'reps':
-        return t('repsPerSession');
+        return t('stats.repsPerSession');
       default:
         return '';
     }
@@ -374,7 +374,7 @@ const ExerciseDetails = () => {
       case 'volume':
         return 'kg';
       case 'reps':
-        return t('repetitions');
+        return t('stats.repetitions');
       default:
         return '';
     }
@@ -391,22 +391,22 @@ const ExerciseDetails = () => {
         {/* Statistiques principales */}
         <View style={styles.statsContainer}>
           <View style={styles.statCard}>
-            <Text style={styles.statLabel}>{t('estimated_1rm')}</Text>
+            <Text style={styles.statLabel}>{t('exerciseDetails.estimated_1rm')}</Text>
             <Text style={styles.statValue}>{estimated1RM} kg</Text>
           </View>
           <View style={styles.statCard}>
-            <Text style={styles.statLabel}>{t('volume')}</Text>
+            <Text style={styles.statLabel}>{t('stats.volume')}</Text>
             <Text style={styles.statValue}>{volume} kg</Text>
           </View>
           <View style={styles.statCard}>
-            <Text style={styles.statLabel}>{t('repetitions')}</Text>
+            <Text style={styles.statLabel}>{t('stats.repetitions')}</Text>
             <Text style={styles.statValue}>{workingSet?.reps || 0}</Text>
           </View>
         </View>
 
         {/* Filtres de période */}
         <View style={styles.filterSection}>
-          <Text variant="subheading" style={styles.filterLabel}>{t('period')}</Text>
+          <Text variant="subheading" style={styles.filterLabel}>{t('stats.period')}</Text>
           <View style={styles.filterContainer}>
             <TouchableOpacity
               style={[styles.filterButton, selectedPeriod === '1m' && styles.filterButtonActive]}
@@ -442,14 +442,14 @@ const ExerciseDetails = () => {
             onPress={() => setSelectedChartType('volume')}
           >
             <Text
-              style={[styles.chartTypeText, selectedChartType === 'volume' && styles.chartTypeTextActive]}>{t('volume')}</Text>
+              style={[styles.chartTypeText, selectedChartType === 'volume' && styles.chartTypeTextActive]}>{t('stats.volume')}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.chartTypeButton, selectedChartType === 'reps' && styles.chartTypeButtonActive]}
             onPress={() => setSelectedChartType('reps')}
           >
             <Text
-              style={[styles.chartTypeText, selectedChartType === 'reps' && styles.chartTypeTextActive]}>{t('repetitions')}</Text>
+              style={[styles.chartTypeText, selectedChartType === 'reps' && styles.chartTypeTextActive]}>{t('stats.repetitions')}</Text>
           </TouchableOpacity>
         </View>
 
@@ -467,7 +467,7 @@ const ExerciseDetails = () => {
               scale={{ x: 'time' }}
             >
               <VictoryAxis
-                label={t('date')}
+                label={t('common.date')}
                 tickFormat={(date) => formatDateForDisplay(new Date(date))}
                 tickCount={getTickCount()}
                 style={{
@@ -548,7 +548,7 @@ const ExerciseDetails = () => {
               scale={{ x: 'time' }}
             >
               <VictoryAxis
-                label={t('date')}
+                label={t('common.date')}
                 tickFormat={(date) => formatDateForDisplay(new Date(date))}
                 tickCount={getTickCount()}
                 style={{
@@ -629,7 +629,7 @@ const ExerciseDetails = () => {
               scale={{ x: 'time' }}
             >
               <VictoryAxis
-                label={t('date')}
+                label={t('common.date')}
                 tickFormat={(date) => formatDateForDisplay(new Date(date))}
                 tickCount={getTickCount()}
                 style={{
@@ -701,7 +701,7 @@ const ExerciseDetails = () => {
 
           {(!filteredExerciseData.length && !filteredVolumeData.length && !filteredRepsData.length) && (
             <View style={styles.noDataContainer}>
-              <Text style={styles.noDataText}>{t('noDataAvailable')}</Text>
+              <Text style={styles.noDataText}>{t('common.noDataAvailable')}</Text>
             </View>
           )}
         </View>

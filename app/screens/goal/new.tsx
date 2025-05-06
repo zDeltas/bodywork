@@ -394,7 +394,7 @@ export default function NewGoalScreen() {
         setExerciseOptions(allExercises as string[]); // Assurer le type string[]
 
       } catch (error) {
-        console.error(t('errorLoadingWorkouts'), error);
+        console.error(t('common.errorLoadingWorkouts'), error);
       }
     };
 
@@ -438,18 +438,16 @@ export default function NewGoalScreen() {
 
     // Round to nearest 2.5kg for barbells (simplification)
     const roundingFactor = 2.5;
-    const suggestedTarget = Math.ceil((currentWeight + suggestedImprovement) / roundingFactor) * roundingFactor;
-
-    return suggestedTarget;
+    return Math.ceil((currentWeight + suggestedImprovement) / roundingFactor) * roundingFactor;
   }, []);
 
   const saveGoal = async () => {
     // Validate inputs
     if (!newGoalExercise.trim() || !newGoalCurrent || !newGoalTarget) {
       Alert.alert(
-        t('error'),
-        t('pleaseCompleteAllFields'),
-        [{ text: t('ok') }]
+        t('common.error'),
+        t('goals.pleaseCompleteAllFields'),
+        [{ text: t('common.ok') }]
       );
       return;
     }
@@ -459,9 +457,9 @@ export default function NewGoalScreen() {
 
     if (isNaN(current) || isNaN(target) || current <= 0 || target <= 0) {
       Alert.alert(
-        t('error'),
-        t('invalidWeightValues'),
-        [{ text: t('ok') }]
+        t('common.error'),
+        t('goals.invalidWeightValues'),
+        [{ text: t('common.ok') }]
       );
       return;
     }
@@ -494,11 +492,11 @@ export default function NewGoalScreen() {
         params: { refresh: 'true' }
       });
     } catch (error) {
-      console.error(t('errorSavingWorkouts'), error);
+      console.error(t('common.errorSavingWorkouts'), error);
       Alert.alert(
-        t('error'),
-        t('errorSavingGoal'),
-        [{ text: t('ok') }]
+        t('common.error'),
+        t('goals.errorSavingGoal'),
+        [{ text: t('common.ok') }]
       );
     }
   };
@@ -513,16 +511,16 @@ export default function NewGoalScreen() {
 
   return (
     <View style={styles.container} onLayout={onLayoutRootView}>
-      <Header title={t('addGoal')} showBackButton={true} />
+      <Header title={t('goals.addGoal')} showBackButton={true} />
       <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: 100 }}>
         <Animated.View
           entering={FadeIn.duration(400).delay(100)}
           style={styles.formCard}
         >
-          <Text variant="subheading" style={styles.sectionTitle}>{t('goalDetails')}</Text>
+          <Text variant="subheading" style={styles.sectionTitle}>{t('goals.goalDetails')}</Text>
 
           <View style={styles.formGroup}>
-            <Text variant="body" style={styles.formLabel}>{t('exercise')}</Text>
+            <Text variant="body" style={styles.formLabel}>{t('timer.exercise')}</Text>
             <TouchableOpacity
               style={styles.exerciseSelectorButton}
               onPress={() => {
@@ -538,15 +536,15 @@ export default function NewGoalScreen() {
                 numberOfLines={1}
                 ellipsizeMode="tail"
               >
-                {newGoalExercise || t('selectExerciseForGoal')}
+                {newGoalExercise || t('goals.selectExerciseForGoal')}
               </Text>
               <ChevronDown color={theme.colors.text.secondary} size={20} />
             </TouchableOpacity>
           </View>
 
           <View style={styles.formGroup}>
-            <Text variant="body" style={styles.formLabel}>{t('currentWeight')}</Text>
-            <Text variant="caption" style={styles.inputDescription}>{t('currentWeightDescription')}</Text>
+            <Text variant="body" style={styles.formLabel}>{t('goals.currentWeight')}</Text>
+            <Text variant="caption" style={styles.inputDescription}>{t('goals.currentWeightDescription')}</Text>
             <View style={styles.weightInputContainer}>
               <TextInput
                 style={styles.formInput}
@@ -578,7 +576,7 @@ export default function NewGoalScreen() {
                   {isLoadingLastWorkout ? (
                     <ActivityIndicator size="small" color={theme.colors.text.primary} style={styles.loadingIndicator} />
                   ) : (
-                    <Text style={styles.suggestedButtonText}>{t('useLastWorkout')}</Text>
+                    <Text style={styles.suggestedButtonText}>{t('goals.useLastWorkout')}</Text>
                   )}
                 </TouchableOpacity>
               )}
@@ -586,8 +584,8 @@ export default function NewGoalScreen() {
           </View>
 
           <View style={styles.formGroup}>
-            <Text variant="body" style={styles.formLabel}>{t('targetWeight')}</Text>
-            <Text variant="caption" style={styles.inputDescription}>{t('targetWeightDescription')}</Text>
+            <Text variant="body" style={styles.formLabel}>{t('goals.targetWeight')}</Text>
+            <Text variant="caption" style={styles.inputDescription}>{t('goals.targetWeightDescription')}</Text>
             <View style={styles.weightInputContainer}>
               <TextInput
                 style={styles.formInput}
@@ -605,7 +603,7 @@ export default function NewGoalScreen() {
                     setNewGoalTarget(suggestedTarget.toString());
                   }}
                 >
-                  <Text style={styles.suggestedButtonText}>{t('useSuggested')}</Text>
+                  <Text style={styles.suggestedButtonText}>{t('goals.useSuggested')}</Text>
                 </TouchableOpacity>
               )}
             </View>
@@ -619,7 +617,7 @@ export default function NewGoalScreen() {
             }}
             disabled={!newGoalExercise || !newGoalCurrent || !newGoalTarget}
           >
-            <Text style={styles.saveButtonText}>{t('save')}</Text>
+            <Text style={styles.saveButtonText}>{t('common.save')}</Text>
           </TouchableOpacity>
         </Animated.View>
       </ScrollView>
@@ -634,7 +632,7 @@ export default function NewGoalScreen() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>{t('selectExerciseForGoal')}</Text>
+              <Text style={styles.modalTitle}>{t('goals.selectExerciseForGoal')}</Text>
               <TouchableOpacity
                 style={styles.modalCloseButton}
                 onPress={() => setShowExerciseSelector(false)}

@@ -94,7 +94,7 @@ export default function WorkoutScreen() {
           setWorkouts(JSON.parse(storedWorkouts));
         }
       } catch (error) {
-        console.error(`${t('errorLoadingWorkouts')}`, error);
+        console.error(`${t('common.errorLoadingWorkouts')}`, error);
       }
     };
 
@@ -106,7 +106,7 @@ export default function WorkoutScreen() {
       try {
         await AsyncStorage.setItem('workouts', JSON.stringify(workouts));
       } catch (error) {
-        console.error(`${t('errorSavingWorkouts')}`, error);
+        console.error(`${t('common.errorSavingWorkouts')}`, error);
       }
     };
 
@@ -134,7 +134,7 @@ export default function WorkoutScreen() {
 
   return (
     <View style={styles.container}>
-      <Header title={t('appTitle')} rightComponent={
+      <Header title={t('common.appTitle')} rightComponent={
         <TouchableOpacity onPress={navigateToSettings}>
           <Ionicons name="settings-outline" size={24} color={theme.colors.primary} />
         </TouchableOpacity>
@@ -196,7 +196,7 @@ export default function WorkoutScreen() {
                           backgroundColor: isWarmUp ? theme.colors.text.disabled : theme.colors.primary,
                           color: theme.colors.background.main
                         }]}>
-                          {isWarmUp ? t('warmUpSeries') : t('workingSeries')}
+                          {isWarmUp ? t('workout.warmUpSeries') : t('workout.workingSeries')}
                         </Text>
                       </View>
                       <View style={styles.workoutInfoRow}>
@@ -232,7 +232,7 @@ export default function WorkoutScreen() {
           ))
         ) : (
           <View style={styles.noWorkoutContainer}>
-            <Text style={styles.noWorkoutText}>{t('noWorkoutForDate')}</Text>
+            <Text style={styles.noWorkoutText}>{t('common.noWorkoutForDate')}</Text>
           </View>
         )}
       </ScrollView>

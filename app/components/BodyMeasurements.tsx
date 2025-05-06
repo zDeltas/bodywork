@@ -1018,7 +1018,7 @@ export default function BodyMeasurements() {
             )}
             <TouchableOpacity style={[styles.modalButton, styles.modalCloseButton]}
                               onPress={() => setShowHistory(false)}>
-              <Text style={styles.modalButtonText}>{t('close')}</Text>
+              <Text style={styles.modalButtonText}>{t('common.close')}</Text>
             </TouchableOpacity>
           </Pressable>
         </Pressable>

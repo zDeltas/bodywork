@@ -38,7 +38,7 @@ const MuscleRestState: React.FC<MuscleRestStateProps> = ({ fadeAnim, workouts })
         { opacity: fadeAnim, transform: [{ scale: fadeAnim }] }
       ]}
     >
-      <Text style={styles.chartTitle}>{t('muscleRestState')}</Text>
+      <Text style={styles.chartTitle}>{t('muscleMap.muscleRestState')}</Text>
       <MuscleMap workouts={workouts} />
     </Animated.View>
   );

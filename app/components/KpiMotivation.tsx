@@ -48,29 +48,29 @@ const KpiMotivation: React.FC<KpiMotivationProps> = ({
           }]}
         >
           {bestProgressExercise && bestProgressExercise.progress && bestProgressExercise.exercise
-            ? t('progressionText').replace('{progress}', bestProgressExercise.progress.toString()).replace('{exercise}', bestProgressExercise.exercise)
+            ? t('stats.progressionText').replace('{progress}', bestProgressExercise.progress.toString()).replace('{exercise}', bestProgressExercise.exercise)
             : monthlyProgress > 0
-              ? t('progressionTextMonth').replace('{progress}', monthlyProgress.toString())
-              : t('progressionTextNone')}
+              ? t('stats.progressionTextMonth').replace('{progress}', monthlyProgress.toString())
+              : t('stats.progressionTextNone')}
         </Text>
         <View style={styles.kpiContainer}>
           <View style={styles.kpiItem}>
             <Text variant="heading" style={styles.kpiValue}>
               {trainingFrequency}%
             </Text>
-            <Text variant="caption">{t('attendance')}</Text>
+            <Text variant="caption">{t('stats.attendance')}</Text>
           </View>
           <View style={styles.kpiItem}>
             <Text variant="heading" style={styles.kpiValue}>
               {totalSets}
             </Text>
-            <Text variant="caption">{t('series')}</Text>
+            <Text variant="caption">{t('stats.series')}</Text>
           </View>
           <View style={styles.kpiItem}>
             <Text variant="heading" style={styles.kpiValue}>
               {totalWorkouts}
             </Text>
-            <Text variant="caption">{t('sessions')}</Text>
+            <Text variant="caption">{t('stats.sessions')}</Text>
           </View>
         </View>
       </LinearGradient>

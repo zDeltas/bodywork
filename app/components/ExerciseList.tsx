@@ -143,7 +143,7 @@ export const ExerciseList: React.FC<ExerciseListProps> = ({
             style={styles.searchInput}
             value={searchQuery}
             onChangeText={setSearchQuery}
-            placeholder={t('searchExercises')}
+            placeholder={t('workout.searchExercises')}
             placeholderTextColor={theme.colors.text.secondary}
           />
           {searchQuery.length > 0 && (
@@ -256,7 +256,7 @@ export const ExerciseList: React.FC<ExerciseListProps> = ({
                         }}
                       >
                         <Plus color={theme.colors.primary} size={20} />
-                        <Text variant="body" style={styles.customExerciseButtonText}>{t('customExercise')}</Text>
+                        <Text variant="body" style={styles.customExerciseButtonText}>{t('workout.customExercise')}</Text>
                       </TouchableOpacity>
                     </Animated.View>
                   )}

@@ -125,7 +125,7 @@ const MuscleDistribution: React.FC<MuscleDistributionProps> = ({
       ]}
     >
       <View style={styles.chartTitleContainer}>
-        <Text style={styles.chartTitle}>{t('muscleDistribution')}</Text>
+        <Text style={styles.chartTitle}>{t('stats.muscleDistribution')}</Text>
         <Text style={styles.chartSubtitle}>Répartition du volume d'entraînement par groupe musculaire</Text>
         <View style={styles.filterContainer}>
           <TouchableOpacity
@@ -136,7 +136,7 @@ const MuscleDistribution: React.FC<MuscleDistributionProps> = ({
             }}
           >
             <Text style={[styles.filterText, selectedPeriod === '1m' && styles.filterTextActive]}>
-              {t('oneMonth')}
+              {t('stats.oneMonth')}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -147,7 +147,7 @@ const MuscleDistribution: React.FC<MuscleDistributionProps> = ({
             }}
           >
             <Text style={[styles.filterText, selectedPeriod === '3m' && styles.filterTextActive]}>
-              {t('threeMonths')}
+              {t('stats.threeMonths')}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -158,7 +158,7 @@ const MuscleDistribution: React.FC<MuscleDistributionProps> = ({
             }}
           >
             <Text style={[styles.filterText, selectedPeriod === '6m' && styles.filterTextActive]}>
-              {t('sixMonths')}
+              {t('stats.sixMonths')}
             </Text>
           </TouchableOpacity>
         </View>

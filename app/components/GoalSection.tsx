@@ -139,7 +139,7 @@ const GoalSection: React.FC<GoalSectionProps> = ({ fadeAnim, goals, setGoals }) 
 
       {goals.length === 0 ? (
         <View style={styles.noGoalsContainer}>
-          <Text style={styles.noGoalsText}>{t('noGoalsYet')}</Text>
+          <Text style={styles.noGoalsText}>{t('stats.noGoalsYet')}</Text>
         </View>
       ) : (
         goals.map((goal, index) => (
@@ -157,15 +157,15 @@ const GoalSection: React.FC<GoalSectionProps> = ({ fadeAnim, goals, setGoals }) 
                   onPress={() => {
                     // Show confirmation dialog
                     Alert.alert(
-                      t('deleteGoal'),
-                      t('deleteGoalConfirmation').replace('{exercise}', goal.exercise),
+                      t('goals.deleteGoal'),
+                      t('goals.deleteGoalConfirmation').replace('{exercise}', goal.exercise),
                       [
                         {
-                          text: t('cancel'),
+                          text: t('common.cancel'),
                           style: 'cancel'
                         },
                         {
-                          text: t('delete'),
+                          text: t('common.delete'),
                           style: 'destructive',
                           onPress: () => {
                             // Remove goal
@@ -176,7 +176,7 @@ const GoalSection: React.FC<GoalSectionProps> = ({ fadeAnim, goals, setGoals }) 
                             try {
                               AsyncStorage.setItem('goals', JSON.stringify(updatedGoals));
                             } catch (error) {
-                              console.error(t('errorSavingWorkouts'), error);
+                              console.error(t('common.errorSavingWorkouts'), error);
                             }
 
                             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -205,8 +205,8 @@ const GoalSection: React.FC<GoalSectionProps> = ({ fadeAnim, goals, setGoals }) 
 
             <Text style={styles.goalProgressText}>
               {goal.progress < 100
-                ? t('goalRemaining').replace('{remaining}', (goal.target - goal.current).toString())
-                : t('goalAchieved')}
+                ? t('goals.goalRemaining').replace('{remaining}', (goal.target - goal.current).toString())
+                : t('goals.goalAchieved')}
             </Text>
           </View>
         ))
@@ -216,11 +216,11 @@ const GoalSection: React.FC<GoalSectionProps> = ({ fadeAnim, goals, setGoals }) 
         style={styles.addGoalButton}
         onPress={() => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-          router.push('/goal/new');
+          router.push('/screens/goal/new');
         }}
       >
         <Ionicons name="add-circle" size={20} color={theme.colors.primary} />
-        <Text style={styles.addGoalText}>{t('addGoal')}</Text>
+        <Text style={styles.addGoalText}>{t('goals.addGoal')}</Text>
       </TouchableOpacity>
     </Animated.View>
   );

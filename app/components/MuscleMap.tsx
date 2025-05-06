@@ -111,14 +111,14 @@ export default function MuscleMap({ workouts }: MuscleMapProps) {
           style={[styles.toggleButton, selectedView === 'front' && styles.toggleButtonActive]}
           onPress={() => handleViewChange('front')}>
           <Text style={[styles.toggleText]}>
-            {t('frontView')}
+            {t('muscleMap.frontView')}
           </Text>
         </Pressable>
         <Pressable
           style={[styles.toggleButton, selectedView === 'back' && styles.toggleButtonActive]}
           onPress={() => handleViewChange('back')}>
           <Text style={[styles.toggleText]}>
-            {t('backView')}
+            {t('muscleMap.backView')}
           </Text>
         </Pressable>
       </View>
@@ -131,19 +131,19 @@ export default function MuscleMap({ workouts }: MuscleMapProps) {
         />
       </Animated.View>
       <View style={styles.legend}>
-        <Text style={styles.legendTitle}>{t('muscleRestState')}</Text>
+        <Text style={styles.legendTitle}>{t('muscleMap.muscleRestState')}</Text>
         <View style={styles.legendItems}>
           <View style={styles.legendItem}>
             <View style={[styles.legendColor, { backgroundColor: intensityColorsArray[0] }]} />
-            <Text style={styles.legendText}>{t('restPeriod0to24')}</Text>
+            <Text style={styles.legendText}>{t('muscleMap.restPeriod0to24')}</Text>
           </View>
           <View style={styles.legendItem}>
             <View style={[styles.legendColor, { backgroundColor: intensityColorsArray[1] }]} />
-            <Text style={styles.legendText}>{t('restPeriod24to72')}</Text>
+            <Text style={styles.legendText}>{t('muscleMap.restPeriod24to72')}</Text>
           </View>
           <View style={styles.legendItem}>
             <View style={[styles.legendColor, { backgroundColor: intensityColorsArray[2] }]} />
-            <Text style={styles.legendText}>{t('restPeriod72plus')}</Text>
+            <Text style={styles.legendText}>{t('muscleMap.restPeriod72plus')}</Text>
           </View>
         </View>
       </View>

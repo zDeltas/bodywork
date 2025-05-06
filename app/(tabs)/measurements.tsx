@@ -39,7 +39,7 @@ export default function MeasurementsScreen() {
 
   return (
     <View style={styles.container}>
-      <Header title={t('measurements')} showBackButton={false} rightComponent={
+      <Header title={t('measurements.title')} showBackButton={false} rightComponent={
         <TouchableOpacity style={styles.saveButton}>
           <Check color={theme.colors.text.primary} size={24} />
         </TouchableOpacity>

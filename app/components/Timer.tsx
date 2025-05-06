@@ -172,7 +172,7 @@ export default function Timer({
             </TouchableOpacity>
 
             <Text style={[styles.setInfo, { color: theme.colors.background.main }]}>
-              {t('series')} {currentSet}/{sets}
+              {t('timer.series')} {currentSet}/{sets}
             </Text>
 
             <TouchableOpacity

@@ -84,7 +84,7 @@ export default function StatsScreen() {
           }
         }
       } catch (error) {
-        console.error(t('errorLoadingWorkouts'), error);
+        console.error(t('common.errorLoadingWorkouts'), error);
       }
     };
 
@@ -157,7 +157,7 @@ export default function StatsScreen() {
       try {
         AsyncStorage.setItem('favoriteExercises', JSON.stringify(newFavorites));
       } catch (error) {
-        console.error(t('errorSavingWorkouts'), error);
+        console.error(t('common.errorSavingWorkouts'), error);
       }
 
       return newFavorites;
@@ -241,7 +241,7 @@ export default function StatsScreen() {
         {showExerciseSelector && (
           <View style={styles.modalOverlay}>
             <View style={styles.modalContainer}>
-              <Text style={styles.modalTitle}>{t('selectExerciseForGoal')}</Text>
+              <Text style={styles.modalTitle}>{t('goals.selectExerciseForGoal')}</Text>
 
               <ScrollView style={styles.exerciseList}>
                 {exerciseOptions
@@ -261,7 +261,7 @@ export default function StatsScreen() {
                 style={styles.cancelButton}
                 onPress={() => setShowExerciseSelector(false)}
               >
-                <Text style={styles.cancelButtonText}>{t('cancel')}</Text>
+                <Text style={styles.cancelButtonText}>{t('common.cancel')}</Text>
               </TouchableOpacity>
             </View>
           </View>

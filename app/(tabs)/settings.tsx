@@ -50,28 +50,28 @@ export default function SettingsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header title={t('settings')} showBackButton={false} />
+      <Header title={t('settings.title')} showBackButton={false} />
       {isLoading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={theme.colors.primary} />
-          <Text style={styles.loadingText}>{t('loadingSettings')}</Text>
+          <Text style={styles.loadingText}>{t('settings.loadingSettings')}</Text>
         </View>
       ) : (
         <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: 100 }}>
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{t('preferences')}</Text>
+            <Text style={styles.sectionTitle}>{t('settings.preferences')}</Text>
 
             <View style={styles.settingItem}>
               <View style={styles.settingInfo}>
                 <Ionicons name="body-outline" size={24} color={theme.colors.primary} />
-                <Text style={styles.settingLabel}>{t('gender')}</Text>
+                <Text style={styles.settingLabel}>{t('settings.gender')}</Text>
               </View>
               <TouchableOpacity
                 style={styles.settingControl}
                 onPress={toggleGender}
               >
                 <Text style={styles.settingValue}>
-                  {settings.gender === 'male' ? t('male') : t('female')}
+                  {settings.gender === 'male' ? t('settings.male') : t('settings.female')}
                 </Text>
                 <Ionicons name="chevron-forward" size={20} color={theme.colors.text.secondary} />
               </TouchableOpacity>
@@ -80,7 +80,7 @@ export default function SettingsScreen() {
             <View style={styles.settingItem}>
               <View style={styles.settingInfo}>
                 <Ionicons name="scale-outline" size={24} color={theme.colors.primary} />
-                <Text style={styles.settingLabel}>{t('weightUnit')}</Text>
+                <Text style={styles.settingLabel}>{t('settings.weightUnit')}</Text>
               </View>
               <TouchableOpacity
                 style={styles.settingControl}
@@ -94,14 +94,14 @@ export default function SettingsScreen() {
             <View style={styles.settingItem}>
               <View style={styles.settingInfo}>
                 <Ionicons name="language-outline" size={24} color={theme.colors.primary} />
-                <Text style={styles.settingLabel}>{t('language')}</Text>
+                <Text style={styles.settingLabel}>{t('settings.language')}</Text>
               </View>
               <TouchableOpacity
                 style={styles.settingControl}
                 onPress={toggleLanguage}
               >
                 <Text style={styles.settingValue}>
-                  {settings.language === 'en' ? t('english') : t('french')}
+                  {settings.language === 'en' ? t('settings.english') : t('settings.french')}
                 </Text>
                 <Ionicons name="chevron-forward" size={20} color={theme.colors.text.secondary} />
               </TouchableOpacity>
@@ -110,14 +110,14 @@ export default function SettingsScreen() {
             <View style={styles.settingItem}>
               <View style={styles.settingInfo}>
                 <Ionicons name="contrast-outline" size={24} color={theme.colors.primary} />
-                <Text style={styles.settingLabel}>{t('theme')}</Text>
+                <Text style={styles.settingLabel}>{t('settings.theme')}</Text>
               </View>
               <TouchableOpacity
                 style={styles.settingControl}
                 onPress={toggleTheme}
               >
                 <Text style={styles.settingValue}>
-                  {settings.theme === 'dark' ? t('dark') : t('light')}
+                  {settings.theme === 'dark' ? t('settings.dark') : t('settings.light')}
                 </Text>
                 <Ionicons name="chevron-forward" size={20} color={theme.colors.text.secondary} />
               </TouchableOpacity>
@@ -125,7 +125,7 @@ export default function SettingsScreen() {
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{t('application')}</Text>
+            <Text style={styles.sectionTitle}>{t('settings.application')}</Text>
 
             <TouchableOpacity
               style={styles.settingItem}
@@ -133,14 +133,14 @@ export default function SettingsScreen() {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 const result = await exportWorkoutsToCSV();
                 if (!result.success) {
-                  Alert.alert(t('error'), result.message);
+                  Alert.alert(t('common.error'), result.message);
                 }
               }}
               disabled={isExporting}
             >
               <View style={styles.settingInfo}>
                 <Ionicons name="download-outline" size={24} color={theme.colors.primary} />
-                <Text style={styles.settingLabel}>{t('exportData')}</Text>
+                <Text style={styles.settingLabel}>{t('settings.exportData')}</Text>
               </View>
               {isExporting ? (
                 <ActivityIndicator size="small" color={theme.colors.primary} />
@@ -153,15 +153,15 @@ export default function SettingsScreen() {
               style={styles.settingItem}
               onPress={() => {
                 Alert.alert(
-                  t('resetData'),
-                  t('resetDataConfirmation'),
+                  t('settings.resetData'),
+                  t('settings.resetDataConfirmation'),
                   [
                     {
-                      text: t('cancel'),
+                      text: t('common.cancel'),
                       style: 'cancel'
                     },
                     {
-                      text: t('reset'),
+                      text: t('common.reset'),
                       style: 'destructive',
                       onPress: async () => {
                         try {
@@ -208,10 +208,10 @@ export default function SettingsScreen() {
                             theme: 'dark'
                           });
 
-                          Alert.alert(t('success'), t('dataResetSuccess'));
+                          Alert.alert(t('common.success'), t('settings.dataResetSuccess'));
                         } catch (error) {
                           console.error('Erreur lors de la réinitialisation:', error);
-                          Alert.alert(t('error'), t('errorResettingData'));
+                          Alert.alert(t('common.error'), t('settings.errorResettingData'));
                         }
                       }
                     }
@@ -221,7 +221,7 @@ export default function SettingsScreen() {
             >
               <View style={styles.settingInfo}>
                 <Ionicons name="trash-outline" size={24} color={theme.colors.error} />
-                <Text style={[styles.settingLabel, { color: theme.colors.error }]}>{t('resetData')}</Text>
+                <Text style={[styles.settingLabel, { color: theme.colors.error }]}>{t('settings.resetData')}</Text>
               </View>
               <Ionicons name="chevron-forward" size={20} color={theme.colors.text.secondary} />
             </TouchableOpacity>
@@ -232,7 +232,7 @@ export default function SettingsScreen() {
             >
               <View style={styles.settingInfo}>
                 <Ionicons name="information-circle-outline" size={24} color={theme.colors.primary} />
-                <Text style={styles.settingLabel}>{t('about')}</Text>
+                <Text style={styles.settingLabel}>{t('settings.about')}</Text>
               </View>
               <Ionicons name="chevron-forward" size={20} color={theme.colors.text.secondary} />
             </TouchableOpacity>
@@ -241,15 +241,15 @@ export default function SettingsScreen() {
           {showAbout && (
             <BlurView intensity={20} style={styles.aboutContainer}>
               <View style={styles.aboutContent}>
-                <Text style={styles.aboutTitle}>{t('aboutTitle')}</Text>
-                <Text style={styles.aboutVersion}>{t('aboutVersion')}</Text>
+                <Text style={styles.aboutTitle}>{t('about.title')}</Text>
+                <Text style={styles.aboutVersion}>{t('about.version')}</Text>
                 <Text style={styles.aboutDescription}>
-                  {t('aboutDescription')}
+                  {t('about.description')}
                 </Text>
 
                 <View style={styles.aboutDivider} />
 
-                <Text style={styles.aboutDeveloper}>{t('aboutDeveloper')}</Text>
+                <Text style={styles.aboutDeveloper}>{t('about.developer')}</Text>
 
                 <TouchableOpacity
                   style={styles.aboutLink}
@@ -263,7 +263,7 @@ export default function SettingsScreen() {
                   style={styles.closeButton}
                   onPress={toggleAbout}
                 >
-                  <Text style={styles.closeButtonText}>{t('close')}</Text>
+                  <Text style={styles.closeButtonText}>{t('common.close')}</Text>
                 </TouchableOpacity>
               </View>
             </BlurView>

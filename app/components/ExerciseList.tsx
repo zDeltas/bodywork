@@ -256,7 +256,8 @@ export const ExerciseList: React.FC<ExerciseListProps> = ({
                         }}
                       >
                         <Plus color={theme.colors.primary} size={20} />
-                        <Text variant="body" style={styles.customExerciseButtonText}>{t('workout.customExercise')}</Text>
+                        <Text variant="body"
+                              style={styles.customExerciseButtonText}>{t('workout.customExercise')}</Text>
                       </TouchableOpacity>
                     </Animated.View>
                   )}

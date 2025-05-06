@@ -121,7 +121,7 @@ export default {
     standard: 'Standard',
     long: 'Long',
     veryLong: 'Very Long',
-    series: 'Series',
+    series: 'Series'
   },
 
   // Stats screen
@@ -178,7 +178,7 @@ export default {
     errorSavingGoal: 'Error saving goal',
     goalDetails: 'Goal Details',
     currentWeightDescription: 'Current weight',
-    targetWeightDescription: 'Target weight',
+    targetWeightDescription: 'Target weight'
   },
 
   // Time periods

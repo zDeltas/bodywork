@@ -19,7 +19,7 @@ export default {
     use: 'Utiliser',
     select: 'Sélectionner',
     note: 'Note',
-    custom: 'Personnalisé',
+    custom: 'Personnalisé'
   },
 
   // Settings screen
@@ -48,7 +48,7 @@ export default {
     resetData: 'Réinitialiser les données',
     resetDataConfirmation: 'Êtes-vous sûr de vouloir réinitialiser toutes les données ? Cette action est irréversible.',
     dataResetSuccess: 'Toutes les données ont été réinitialisées avec succès.',
-    errorResettingData: 'Une erreur est survenue lors de la réinitialisation des données.',
+    errorResettingData: 'Une erreur est survenue lors de la réinitialisation des données.'
   },
 
   // About section
@@ -60,7 +60,7 @@ export default {
     contact: 'Contact',
     website: 'Site web',
     privacyPolicy: 'Politique de confidentialité',
-    termsOfService: 'Conditions d\'utilisation',
+    termsOfService: 'Conditions d\'utilisation'
   },
 
   // Muscle Map
@@ -70,7 +70,7 @@ export default {
     muscleRestState: 'État de repos des muscles',
     restPeriod0to24: '0-24h',
     restPeriod24to72: '24-72h',
-    restPeriod72plus: '72h+',
+    restPeriod72plus: '72h+'
   },
 
   // Workout screen
@@ -102,7 +102,7 @@ export default {
     optionalNote: 'Note optionnelle',
     usePreviousValues: 'Utiliser les valeurs précédentes',
     notApplicable: 'N/A',
-    selectDate: 'Sélectionner une date',
+    selectDate: 'Sélectionner une date'
   },
 
   // Timer screen
@@ -120,7 +120,7 @@ export default {
     quick: 'Rapide',
     standard: 'Standard',
     long: 'Long',
-    veryLong: 'Très long',
+    veryLong: 'Très long'
   },
 
   // Stats screen
@@ -154,7 +154,7 @@ export default {
     selectExercise: 'Sélectionner un exercice',
     allExercises: 'Tous les exercices',
     volume: 'Volume',
-    repetitions: 'Répétitions',
+    repetitions: 'Répétitions'
   },
 
   // Goals
@@ -177,14 +177,14 @@ export default {
     errorSavingGoal: 'Erreur lors de la sauvegarde de l\'objectif',
     goalDetails: 'Détails de l\'objectif',
     currentWeightDescription: 'Poids actuel',
-    targetWeightDescription: 'Poids cible',
+    targetWeightDescription: 'Poids cible'
   },
 
   // Time periods
   periods: {
     oneMonth: '1 mois',
     threeMonths: '3 mois',
-    sixMonths: '6 mois',
+    sixMonths: '6 mois'
   },
 
   // Exercise selector
@@ -195,7 +195,7 @@ export default {
     noFavorites: 'Pas encore d\'exercices favoris',
     noRecentExercises: 'Aucun exercice récent',
     searchResults: 'Résultats de recherche',
-    noExercisesInGroup: 'Aucun exercice disponible dans ce groupe musculaire',
+    noExercisesInGroup: 'Aucun exercice disponible dans ce groupe musculaire'
   },
 
   // Muscle groups
@@ -209,7 +209,7 @@ export default {
     triceps: 'Triceps',
     core: 'Abdominaux',
     cardio: 'Cardio',
-    other: 'Autre',
+    other: 'Autre'
   },
 
   // Measurements screen
@@ -224,13 +224,13 @@ export default {
     thighs: 'Cuisses',
     calves: 'Mollets',
     history: 'Historique',
-    historyOf: 'Historique {part}',
+    historyOf: 'Historique {part}'
   },
 
   // Exercise details screen
   exerciseDetails: {
     estimated_1rm: '1RM estimé',
-    last_session: 'Dernière séance',
+    last_session: 'Dernière séance'
   },
 
   // Exercise names - Chest
@@ -280,5 +280,5 @@ export default {
   exercise_core_russianTwist: 'Twists russes',
   exercise_core_legRaises: 'Relevés de jambes',
   exercise_core_crunches: 'Crunchs',
-  exercise_core_hangingKneeRaises: 'Relevés de genoux suspendu',
+  exercise_core_hangingKneeRaises: 'Relevés de genoux suspendu'
 };

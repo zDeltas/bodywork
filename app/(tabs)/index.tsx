@@ -358,7 +358,7 @@ const useStyles = () => {
       marginLeft: theme.spacing.sm,
       marginRight: theme.spacing.sm,
       marginBottom: theme.spacing.sm,
-      ...theme.shadows.md,
+      ...theme.shadows.md
     }
   });
 };

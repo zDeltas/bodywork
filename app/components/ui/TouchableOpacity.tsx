@@ -1,5 +1,5 @@
 import React from 'react';
-import { Platform, Pressable, StyleSheet, TouchableOpacity as RNTouchableOpacity } from 'react-native';
+import { Platform, Pressable, StyleSheet, TouchableOpacity as RNTouchableOpacity, View } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 
@@ -22,12 +22,39 @@ export default function TouchableOpacity({
   const { theme } = useTheme();
 
   const TouchableComponent = Platform.OS === 'ios' ? Pressable : RNTouchableOpacity;
-  const AnimatedTouchable = animated ? Animated.createAnimatedComponent(TouchableComponent) : TouchableComponent;
-
+  
+  // Create individual animated components instead of using a conditional
+  const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+  const AnimatedTouchableOpacity = Animated.createAnimatedComponent(RNTouchableOpacity);
+  
+  if (animated) {
+    // Use the proper pre-created animated component
+    const Component = Platform.OS === 'ios' ? AnimatedPressable : AnimatedTouchableOpacity;
+    
+    return (
+      <Component
+        entering={FadeIn.duration(200)}
+        exiting={FadeOut.duration(200)}
+        style={({ pressed }) => [
+          styles.base,
+          styles[variant],
+          styles[size],
+          pressFeedback && pressed && styles.pressed,
+          style
+        ]}
+        android_ripple={pressFeedback ? {
+          color: theme.colors.primary + '20',
+          borderless: variant === 'ghost',
+          radius: Platform.OS === 'android' ? 20 : undefined
+        } : undefined}
+        {...props}
+      />
+    );
+  }
+  
+  // Non-animated version
   return (
-    <AnimatedTouchable
-      entering={animated ? FadeIn.duration(200) : undefined}
-      exiting={animated ? FadeOut.duration(200) : undefined}
+    <TouchableComponent
       style={({ pressed }) => [
         styles.base,
         styles[variant],

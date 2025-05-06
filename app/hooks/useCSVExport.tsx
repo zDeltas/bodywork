@@ -2,7 +2,7 @@ import { useState } from 'react';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Workout } from '@/types/workout';
+import { Workout } from '@/app/types/workout';
 import { useTranslation } from './useTranslation';
 
 export const useCSVExport = () => {
@@ -49,7 +49,7 @@ export const useCSVExport = () => {
       if (!storedWorkouts) {
         console.log('No workouts found');
         setIsExporting(false);
-        return { success: false, message: t('noWorkoutsToExport') };
+        return { success: false, message: t('settings.noWorkoutsToExport') };
       }
 
       const workouts: Workout[] = JSON.parse(storedWorkouts);
@@ -71,21 +71,21 @@ export const useCSVExport = () => {
       if (await Sharing.isAvailableAsync()) {
         await Sharing.shareAsync(filePath, {
           mimeType: 'text/csv',
-          dialogTitle: t('exportToCSV'),
+          dialogTitle: t('settings.exportToCSV'),
           UTI: 'public.comma-separated-values-text'
         });
 
         setIsExporting(false);
-        return { success: true, message: t('exportSuccess') };
+        return { success: true, message: t('settings.exportSuccess') };
       } else {
         console.log('Sharing is not available');
         setIsExporting(false);
-        return { success: false, message: t('sharingNotAvailable') };
+        return { success: false, message: t('settings.sharingNotAvailable') };
       }
     } catch (error) {
       console.error('Error exporting workouts:', error);
       setIsExporting(false);
-      return { success: false, message: t('exportError') };
+      return { success: false, message: t('settings.exportError') };
     }
   };
 

@@ -14,13 +14,13 @@ import * as SplashScreen from 'expo-splash-screen';
 import { router } from 'expo-router';
 import { ChevronDown, X } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useTranslation } from '@/hooks/useTranslation';
-import ExerciseList, { getMuscleGroups, getPredefinedExercises } from '@/app/components/ExerciseList';
+import { useTranslation } from '@/app/hooks/useTranslation';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
-import { useTheme } from '@/hooks/useTheme';
+import { useTheme } from '@/app/hooks/useTheme';
 import Header from '@/app/components/Header';
 import Text from '@/app/components/ui/Text';
+import { ExerciseList, getMuscleGroups, getPredefinedExercises } from '@/app/components/exercises/ExerciseList';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -643,12 +643,12 @@ export default function NewGoalScreen() {
             <ScrollView style={{ flex: 1 }}>
               <ExerciseList
                 selectedMuscle={selectedMuscleGroup as string}
-                setSelectedMuscle={(muscleGroup) => {
+                setSelectedMuscle={(muscleGroup: string) => {
                   // Ne ferme pas la modale lors de la sélection d'un groupe musculaire
                   handleMuscleGroupSelect(muscleGroup);
                 }}
                 exercise={newGoalExercise}
-                setExercise={(exercise) => {
+                setExercise={(exercise: any) => {
                   setNewGoalExercise(exercise);
                   // Ferme la modale uniquement lors de la sélection d'un exercice
                   setShowExerciseSelector(false);

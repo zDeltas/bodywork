@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import Text from '../ui/Text';
-import { useTheme } from '@/hooks/useTheme';
+import Text from '@/app/components/ui/Text';
+import { useTheme } from '@/app/hooks/useTheme';
 
 interface WorkoutTimerProps {
   duration: number;

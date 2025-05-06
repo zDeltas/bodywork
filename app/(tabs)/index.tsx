@@ -3,12 +3,12 @@ import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-nati
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useTheme } from '@/hooks/useTheme';
+import { useTranslation } from '@/app/hooks/useTranslation';
+import { useTheme } from '@/app/hooks/useTheme';
 import { Activity, Dumbbell, Layers, Repeat } from 'lucide-react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Header from '@/app/components/Header';
-import { Workout } from '@/types/workout';
+import { Workout } from '@/app/types/workout';
 import { TranslationKey } from '@/translations';
 
 LocaleConfig.locales['fr'] = {

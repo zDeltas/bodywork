@@ -4,10 +4,10 @@ import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } fr
 import Body, { ExtendedBodyPart, Slug } from 'react-native-body-highlighter';
 import { differenceInHours } from 'date-fns';
 import { useSettings } from '@/hooks/useSettings';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useTheme } from '@/hooks/useTheme';
-import Text from './ui/Text';
-import { Workout } from '@/types/workout';
+import { useTranslation } from '@/app/hooks/useTranslation';
+import { useTheme } from '@/app/hooks/useTheme';
+import Text from '@/app/components/ui/Text';
+import { Workout } from '@/app/types/workout';
 
 interface MuscleMapProps {
   workouts: Workout[];

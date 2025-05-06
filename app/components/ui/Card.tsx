@@ -1,6 +1,6 @@
 import React from 'react';
 import { Platform, StyleSheet, View, ViewProps } from 'react-native';
-import { useTheme } from '@/hooks/useTheme';
+import { useTheme } from '@/app/hooks/useTheme';
 import Animated, { FadeIn } from 'react-native-reanimated';
 
 interface CardProps extends ViewProps {

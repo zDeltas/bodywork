@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useTheme } from '@/hooks/useTheme';
+import { useTranslation } from '@/app/hooks/useTranslation';
+import { useTheme } from '@/app/hooks/useTheme';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import Text from '@/app/components/ui/Text';
 import Card from '@/app/components/ui/Card';

@@ -1,11 +1,11 @@
 import 'react-native-reanimated';
 import React from 'react';
 import { Stack } from 'expo-router';
-import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Platform } from 'react-native';
-import { SettingsProvider } from '@/hooks/useSettings';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { SettingsProvider } from '@/app/hooks/useSettings';
+import { useFrameworkReady } from '@/app/hooks/useFrameworkReady';
 
 export default function RootLayout() {
   useFrameworkReady();

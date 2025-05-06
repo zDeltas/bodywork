@@ -1,6 +1,6 @@
 import React from 'react';
 import { Platform, Pressable, StyleSheet, TouchableOpacity as RNTouchableOpacity } from 'react-native';
-import { useTheme } from '@/hooks/useTheme';
+import { useTheme } from '@/app/hooks/useTheme';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 
 interface TouchableOpacityProps extends React.ComponentProps<typeof RNTouchableOpacity> {

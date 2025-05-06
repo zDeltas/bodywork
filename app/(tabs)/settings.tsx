@@ -4,10 +4,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
-import { useSettings } from '@/hooks/useSettings';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useTheme } from '@/hooks/useTheme';
-import { useCSVExport } from '@/hooks/useCSVExport';
+import { useSettings } from '@/app/hooks/useSettings';
+import { useTranslation } from '@/app/hooks/useTranslation';
+import { useTheme } from '@/app/hooks/useTheme';
+import { useCSVExport } from '@/app/hooks/useCSVExport';
 import Header from '@/app/components/Header';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 

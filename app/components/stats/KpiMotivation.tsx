@@ -1,9 +1,9 @@
 import React from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useTheme } from '@/hooks/useTheme';
-import Text from './ui/Text';
+import { useTranslation } from '@/app/hooks/useTranslation';
+import { useTheme } from '@/app/hooks/useTheme';
+import Text from '@/app/components/ui/Text';
 
 interface KpiMotivationProps {
   fadeAnim: Animated.Value;

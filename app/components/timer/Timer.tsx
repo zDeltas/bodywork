@@ -7,9 +7,9 @@ import {
 } from '@expo-google-fonts/inter';
 import { Minus, Pause, Play, Plus, RotateCcw } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useTheme } from '@/hooks/useTheme';
-import Text from './ui/Text';
+import { useTranslation } from '@/app/hooks/useTranslation';
+import { useTheme } from '@/app/hooks/useTheme';
+import Text from '@/app/components/ui/Text';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 
 interface TimerProps {

@@ -3,12 +3,12 @@ import { Animated, ScrollView, StyleSheet, Text, TouchableOpacity, View } from '
 import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold, useFonts } from '@expo-google-fonts/inter';
 import * as SplashScreen from 'expo-splash-screen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useTranslation } from '@/hooks/useTranslation';
+import { useTranslation } from '@/app/hooks/useTranslation';
 import { router } from 'expo-router';
-import { muscleGroupKeys } from '@/app/components/ExerciseList';
-import { useTheme } from '@/hooks/useTheme';
-import KpiMotivation from '@/app/components/KpiMotivation';
-import { Workout } from '@/types/workout';
+import { muscleGroupKeys } from '@/app/components/exercises/ExerciseList';
+import { useTheme } from '@/app/hooks/useTheme';
+import KpiMotivation from '@/app/components/stats/KpiMotivation';
+import { Workout } from '@/app/types/workout';
 import StatsExerciseList from '@/app/components/stats/StatsExerciseList';
 import StatsGoals from '@/app/components/stats/StatsGoals';
 import StatsMuscleDistribution from '@/app/components/stats/StatsMuscleDistribution';

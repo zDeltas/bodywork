@@ -1,9 +1,9 @@
 import React from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useTheme } from '@/hooks/useTheme';
-import MuscleRestState from '@/app/components/MuscleRestState';
-import { Workout } from '@/types/workout';
+import { useTranslation } from '@/app/hooks/useTranslation';
+import { useTheme } from '@/app/hooks/useTheme';
+import MuscleRestState from '@/app/components/muscles/MuscleRestState';
+import { Workout } from '@/app/types/workout';
 
 interface StatsMuscleRestStateProps {
   fadeAnim: Animated.Value;

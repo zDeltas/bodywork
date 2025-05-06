@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import { Platform, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
-import Timer from '../components/Timer';
 import { Clock, Minus, Plus, Timer as TimerIcon } from 'lucide-react-native';
-import { useTranslation } from '@/hooks/useTranslation';
+import { useTranslation } from '@/app/hooks/useTranslation';
 import { TimerPickerModal } from 'react-native-timer-picker';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { TranslationKey } from '@/translations';
-import { useTheme } from '@/hooks/useTheme';
+import { useTheme } from '@/app/hooks/useTheme';
 import Text from '../components/ui/Text';
 import Header from '@/app/components/Header';
+import Timer from '@/app/components/timer/Timer';
 
 SplashScreen.preventAutoHideAsync();
 

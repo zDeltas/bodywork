@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { colors } from '../../theme/theme';
-import { MeasurementForm } from '../../components/measurements/MeasurementForm';
-import { MeasurementChart } from '../../components/measurements/MeasurementChart';
-import { MeasurementBodyMap } from '../../components/measurements/MeasurementBodyMap';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Slug } from 'react-native-body-highlighter';
-import Text from '../../components/ui/Text';
-import { useTheme } from '@/hooks/useTheme';
+import { useTheme } from '@/app/hooks/useTheme';
 import MeasurementHistory from '@/app/components/measurements/MeasurementHistory';
+import { colors } from '@/app/theme/theme';
+import MeasurementBodyMap from '@/app/components/measurements/MeasurementBodyMap';
+import MeasurementChart from '@/app/components/measurements/MeasurementChart';
+import MeasurementForm from '@/app/components/measurements/MeasurementForm';
+import Text from '@/app/components/ui/Text';
 
 interface Measurement {
   date: string;

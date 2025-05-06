@@ -2,9 +2,9 @@ import React from 'react';
 import { Animated, Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { VictoryLabel, VictoryPie } from 'victory-native';
 import * as Haptics from 'expo-haptics';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useTheme } from '@/hooks/useTheme';
-import Text from './ui/Text';
+import { useTranslation } from '@/app/hooks/useTranslation';
+import { useTheme } from '@/app/hooks/useTheme';
+import Text from '@/app/components/ui/Text';
 
 interface MuscleGroupData {
   name: string;

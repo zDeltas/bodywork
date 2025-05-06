@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { useTheme } from '@/hooks/useTheme';
-import ExerciseList from '@/app/components/ExerciseList';
+import { useTheme } from '@/app/hooks/useTheme';
+import ExerciseList from '@/app/components/exercises/ExerciseList';
 
 interface StatsExerciseListProps {
   selectedMuscle: string;

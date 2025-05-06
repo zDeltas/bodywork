@@ -16,8 +16,8 @@ import Body from 'react-native-body-highlighter';
 import { VictoryAxis, VictoryChart, VictoryLine } from 'victory-native';
 import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 import { Calendar } from 'react-native-calendars';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useTheme } from '@/hooks/useTheme';
+import { useTranslation } from '@/app/hooks/useTranslation';
+import { useTheme } from '@/app/hooks/useTheme';
 
 interface Measurement {
   date: string;

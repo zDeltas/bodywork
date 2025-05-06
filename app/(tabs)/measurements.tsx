@@ -1,9 +1,9 @@
 import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
-import BodyMeasurements from '@/app/components/BodyMeasurements';
+import BodyMeasurements from '@/app/components/measurements/BodyMeasurements';
 import { Check } from 'lucide-react-native';
-import { useTheme } from '@/hooks/useTheme';
-import { useTranslation } from '@/hooks/useTranslation';
+import { useTheme } from '@/app/hooks/useTheme';
+import { useTranslation } from '@/app/hooks/useTranslation';
 import Header from '@/app/components/Header';
 
 SplashScreen.preventAutoHideAsync();

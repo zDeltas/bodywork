@@ -1,8 +1,8 @@
 import React from 'react';
 import { StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
-import { useTheme } from '@/hooks/useTheme';
+import { useTheme } from '@/app/hooks/useTheme';
 import { colors } from '@/app/theme';
-import Text from '../ui/Text';
+import Text from '@/app/components/ui/Text';
 
 
 interface Measurement {

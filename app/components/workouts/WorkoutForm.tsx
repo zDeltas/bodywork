@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
-import Text from '../ui/Text';
-import { useTheme } from '@/hooks/useTheme';
+import Text from '@/app/components/ui/Text';
+import { useTheme } from '@/app/hooks/useTheme';
 
 interface Exercise {
   name: string;

@@ -1,7 +1,7 @@
 import React, { Dispatch, SetStateAction, useCallback, useState } from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useTheme } from '@/hooks/useTheme';
+import { useTranslation } from '@/app/hooks/useTranslation';
+import { useTheme } from '@/app/hooks/useTheme';
 import GoalSection from '@/app/components/GoalSection';
 
 interface Goal {

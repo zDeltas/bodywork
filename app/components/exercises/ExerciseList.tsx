@@ -2,9 +2,9 @@ import React, { useCallback } from 'react';
 import { Image, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import { ChevronDown, ChevronUp, Plus, Search } from 'lucide-react-native';
 import Animated, { FadeIn, SlideInRight } from 'react-native-reanimated';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useTheme } from '@/hooks/useTheme';
-import Text from './ui/Text';
+import { useTranslation } from '@/app/hooks/useTranslation';
+import { useTheme } from '@/app/hooks/useTheme';
+import Text from '@/app/components/ui/Text';
 
 type MuscleGroupKey = 'chest' | 'back' | 'legs' | 'shoulders' | 'biceps' | 'triceps' | 'core';
 
@@ -54,13 +54,13 @@ export const getPredefinedExercises = (t: (key: string) => string) => {
 };
 
 const muscleImagesByKey: Record<MuscleGroupKey, any> = {
-  'chest': require('../../assets/images/muscles/chest.png'),
-  'back': require('../../assets/images/muscles/back.png'),
-  'legs': require('../../assets/images/muscles/legs.png'),
-  'shoulders': require('../../assets/images/muscles/shoulders.png'),
-  'biceps': require('../../assets/images/muscles/biceps.png'),
-  'triceps': require('../../assets/images/muscles/triceps.png'),
-  'core': require('../../assets/images/muscles/core.png')
+  'chest': require('../../../assets/images/muscles/chest.png'),
+  'back': require('../../../assets/images/muscles/back.png'),
+  'legs': require('../../../assets/images/muscles/legs.png'),
+  'shoulders': require('../../../assets/images/muscles/shoulders.png'),
+  'biceps': require('../../../assets/images/muscles/biceps.png'),
+  'triceps': require('../../../assets/images/muscles/triceps.png'),
+  'core': require('../../../assets/images/muscles/core.png')
 };
 
 interface ExerciseListProps {

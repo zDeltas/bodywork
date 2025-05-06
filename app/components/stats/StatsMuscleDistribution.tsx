@@ -1,7 +1,7 @@
 import React, { Dispatch, SetStateAction } from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useTheme } from '@/hooks/useTheme';
+import { useTranslation } from '@/app/hooks/useTranslation';
+import { useTheme } from '@/app/hooks/useTheme';
 import MuscleDistribution from '@/app/components/MuscleDistribution';
 
 type Period = '1m' | '3m' | '6m';

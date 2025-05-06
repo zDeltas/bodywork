@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Workout } from '@/types/workout';
+import { Workout } from '@/app/types/workout';
 import { differenceInDays, subMonths } from 'date-fns';
 import calculations from '@/app/utils/calculations';
-import { useTranslation } from '@/hooks/useTranslation';
+import { useTranslation } from '@/app/hooks/useTranslation';
 import { TranslationKey } from '@/translations';
 
 type Period = '1m' | '3m' | '6m';

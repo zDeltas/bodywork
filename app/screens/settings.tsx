@@ -10,6 +10,7 @@ import { useTheme } from '@/app/hooks/useTheme';
 import { useCSVExport } from '@/app/hooks/useCSVExport';
 import Header from '@/app/components/Header';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { router } from 'expo-router';
 
 export default function SettingsScreen() {
   const { settings, updateSettings, isLoading } = useSettings();
@@ -50,7 +51,11 @@ export default function SettingsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header title={t('settings.title')} showBackButton={false} />
+      <Header
+        title={t('settings.title')}
+        showBackButton={true}
+        onBack={() => router.back()}
+      />
       {isLoading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={theme.colors.primary} />
@@ -412,4 +417,4 @@ const useStyles = () => {
       color: theme.colors.text.primary
     }
   });
-};
+}; 

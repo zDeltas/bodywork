@@ -129,16 +129,19 @@ export default function WorkoutScreen() {
   });
 
   const navigateToSettings = () => {
-    router.push('/settings');
+    router.push('/screens/settings');
   };
 
   return (
     <View style={styles.container}>
-      <Header title={t('common.appTitle')} rightComponent={
-        <TouchableOpacity onPress={navigateToSettings}>
-          <Ionicons name="settings-outline" size={24} color={theme.colors.primary} />
-        </TouchableOpacity>
-      } />
+      <Header
+        title={t('common.appTitle')}
+        rightComponent={
+          <TouchableOpacity onPress={navigateToSettings}>
+            <Ionicons name="settings-outline" size={24} color={theme.colors.primary} />
+          </TouchableOpacity>
+        }
+      />
       <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: 100 }}>
         <View style={styles.calendarContainer}>
           <Calendar

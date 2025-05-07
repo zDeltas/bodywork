@@ -1,6 +1,6 @@
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { router, Tabs } from 'expo-router';
-import { Calendar, ChartLine as LineChart, Clock, Plus, Ruler, Settings } from 'lucide-react-native';
+import { Calendar, ChartLine as LineChart, Clock, Plus, Ruler } from 'lucide-react-native';
 import { useTheme } from '@/app/hooks/useTheme';
 import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold, useFonts } from '@expo-google-fonts/inter';
 import * as SplashScreen from 'expo-splash-screen';
@@ -90,15 +90,6 @@ function TabLayout() {
             title: 'Measures',
             tabBarIcon: ({ color, size }) => (
               <Ruler size={size} color={color} />
-            )
-          }}
-        />
-        <Tabs.Screen
-          name="settings"
-          options={{
-            title: 'Settings',
-            tabBarIcon: ({ color, size }) => (
-              <Settings size={size} color={color} />
             )
           }}
         />

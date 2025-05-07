@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Animated, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Animated, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold, useFonts } from '@expo-google-fonts/inter';
 import * as SplashScreen from 'expo-splash-screen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -16,6 +16,7 @@ import StatsMuscleRestState from '@/app/components/stats/StatsMuscleRestState';
 import Header from '@/app/components/Header';
 import useStats from '@/app/hooks/useStats';
 import useGoals from '@/app/hooks/useGoals';
+import Text from '@/app/components/ui/Text';
 
 type MuscleGroupKey = typeof muscleGroupKeys[number];
 
@@ -34,7 +35,6 @@ export default function StatsScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [favoriteExercises, setFavoriteExercises] = useState<ExerciseName[]>([]);
   const [recentExercises, setRecentExercises] = useState<ExerciseName[]>([]);
-  const [expandedMuscleGroup, setExpandedMuscleGroup] = useState<CategoryKey | null>(null);
   const [exerciseOptions, setExerciseOptions] = useState<ExerciseName[]>([]);
   const [showExerciseSelector, setShowExerciseSelector] = useState(false);
   const [newGoalExercise, setNewGoalExercise] = useState<ExerciseName>('exercise_chest_benchPress');

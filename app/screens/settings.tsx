@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ActivityIndicator, Alert, Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Linking, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
@@ -11,6 +11,7 @@ import { useCSVExport } from '@/app/hooks/useCSVExport';
 import Header from '@/app/components/Header';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
+import Text from '@/app/components/ui/Text';
 
 export default function SettingsScreen() {
   const { settings, updateSettings, isLoading } = useSettings();
@@ -231,19 +232,19 @@ export default function SettingsScreen() {
               <Ionicons name="chevron-forward" size={20} color={theme.colors.text.secondary} />
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.settingItem}
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                router.push('/screens/contact');
-              }}
-            >
-              <View style={styles.settingInfo}>
-                <Ionicons name="mail-outline" size={24} color={theme.colors.primary} />
-                <Text style={styles.settingLabel}>{t('contact.title')}</Text>
-              </View>
-              <Ionicons name="chevron-forward" size={20} color={theme.colors.text.secondary} />
-            </TouchableOpacity>
+            {/*<TouchableOpacity*/}
+            {/*  style={styles.settingItem}*/}
+            {/*  onPress={() => {*/}
+            {/*    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);*/}
+            {/*    router.push('/screens/contact');*/}
+            {/*  }}*/}
+            {/*>*/}
+            {/*  <View style={styles.settingInfo}>*/}
+            {/*    <Ionicons name="mail-outline" size={24} color={theme.colors.primary} />*/}
+            {/*    <Text style={styles.settingLabel}>{t('contact.title')}</Text>*/}
+            {/*  </View>*/}
+            {/*  <Ionicons name="chevron-forward" size={20} color={theme.colors.text.secondary} />*/}
+            {/*</TouchableOpacity>*/}
 
             <TouchableOpacity
               style={styles.settingItem}

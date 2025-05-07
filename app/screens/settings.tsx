@@ -233,6 +233,20 @@ export default function SettingsScreen() {
 
             <TouchableOpacity
               style={styles.settingItem}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                router.push('/screens/contact');
+              }}
+            >
+              <View style={styles.settingInfo}>
+                <Ionicons name="mail-outline" size={24} color={theme.colors.primary} />
+                <Text style={styles.settingLabel}>{t('contact.title')}</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color={theme.colors.text.secondary} />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.settingItem}
               onPress={toggleAbout}
             >
               <View style={styles.settingInfo}>

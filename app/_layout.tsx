@@ -60,6 +60,14 @@ export default function RootLayout() {
                 }}
               />
               <Stack.Screen
+                name="screens/contact"
+                options={{
+                  presentation: 'card',
+                  animation: getSlideAnimation,
+                  animationDuration: 300
+                }}
+              />
+              <Stack.Screen
                 name="+not-found"
                 options={{
                   animation: getDefaultAnimation,

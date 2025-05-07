@@ -281,5 +281,25 @@ export default {
   exercise_core_russianTwist: 'Twists russes',
   exercise_core_legRaises: 'Relevés de jambes',
   exercise_core_crunches: 'Crunchs',
-  exercise_core_hangingKneeRaises: 'Relevés de genoux suspendu'
+  exercise_core_hangingKneeRaises: 'Relevés de genoux suspendu',
+
+  // Contact section
+  contact: {
+    title: 'Me contacter',
+    name: 'Votre nom',
+    namePlaceholder: 'Entrez votre nom',
+    email: 'Votre email',
+    emailPlaceholder: 'Entrez votre adresse email',
+    message: 'Votre message',
+    messagePlaceholder: 'Entrez votre message',
+    send: 'Envoyer',
+    success: 'Message envoyé avec succès',
+    error: 'Erreur lors de l\'envoi du message',
+    errors: {
+      nameRequired: 'Le nom est requis',
+      emailRequired: 'L\'email est requis',
+      emailInvalid: 'L\'email n\'est pas valide',
+      messageRequired: 'Le message est requis'
+    }
+  }
 };

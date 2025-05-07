@@ -63,6 +63,26 @@ export default {
     termsOfService: 'Terms of Service'
   },
 
+  // Contact section
+  contact: {
+    title: 'Contact Me',
+    name: 'Your name',
+    namePlaceholder: 'Enter your name',
+    email: 'Your email',
+    emailPlaceholder: 'Enter your email address',
+    message: 'Your message',
+    messagePlaceholder: 'Enter your message',
+    send: 'Send',
+    success: 'Message sent successfully',
+    error: 'Error sending message',
+    errors: {
+      nameRequired: 'Name is required',
+      emailRequired: 'Email is required',
+      emailInvalid: 'Email is invalid',
+      messageRequired: 'Message is required'
+    }
+  },
+
   // Muscle Map
   muscleMap: {
     frontView: 'Front view',

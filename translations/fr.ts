@@ -219,13 +219,22 @@ export default {
     invalidDate: 'Date invalide',
     dateFormatError: 'Erreur de formatage de date:',
     neck: 'Cou',
+    shoulders: 'Épaules',
+    chest: 'Poitrine',
+    arms: 'Bras',
     forearms: 'Avant-bras',
     waist: 'Taille',
     hips: 'Hanches',
     thighs: 'Cuisses',
     calves: 'Mollets',
     history: 'Historique',
-    historyOf: 'Historique {part}'
+    historyOf: 'Historique {part}',
+    noData: 'Aucune donnée',
+    noHistoryData: 'Aucune donnée d\'historique disponible',
+    noDataForSelection: 'Aucune donnée pour cette sélection',
+    inputMode: 'Saisie',
+    historyMode: 'Historique',
+    lastUpdate: 'Dernière mise à jour'
   },
 
   // Exercise details screen

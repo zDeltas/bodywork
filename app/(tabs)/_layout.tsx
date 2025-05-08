@@ -122,15 +122,6 @@ const useStyles = () => {
       backgroundColor: theme.colors.primary,
       bottom: 70,
       right: theme.spacing.base,
-      ...theme.shadows.primary,
-      shadowColor: theme.colors.primary,
-      shadowOffset: {
-        width: 0,
-        height: 2
-      },
-      shadowOpacity: 0.3,
-      shadowRadius: 2,
-      elevation: 5,
       zIndex: 999
     }
   });

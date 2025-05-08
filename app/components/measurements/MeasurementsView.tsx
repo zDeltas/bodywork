@@ -1,0 +1,444 @@
+import React, { useState, useMemo, useEffect } from 'react';
+import { View, ScrollView, StyleSheet, TouchableOpacity, Text, TextInput, Modal } from 'react-native';
+import { useTheme } from '@/app/hooks/useTheme';
+import { useTranslation } from '@/app/hooks/useTranslation';
+import Header from '@/app/components/Header';
+import { BarChart, ListPlus, Calendar as CalendarIcon, Scale, ChevronDown } from 'lucide-react-native';
+import MeasurementBody, { MeasurementKey } from './MeasurementBodyMap';
+import MeasurementModal from './MeasurementModal';
+import MeasurementHistoryModal from './MeasurementHistoryModal';
+import MeasurementHistory from './MeasurementHistory';
+import WeightModal from './WeightModal';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Calendar } from 'react-native-calendars';
+import { MeasurementTranslationKey } from '@/translations';
+
+// Types de mesure
+const MEASUREMENT_KEYS: MeasurementKey[] = [
+  'neck', 'shoulders', 'chest', 'arms', 'forearms', 'waist', 'hips', 'thighs', 'calves'
+];
+
+// Mapping from measurement key to translation key
+const getMeasurementTranslationKey = (key: MeasurementKey): MeasurementTranslationKey => {
+  return `measurements.${key}` as MeasurementTranslationKey;
+};
+
+type Measurement = {
+  date: string;
+  weight: number;
+  measurements: Record<MeasurementKey, number>;
+};
+
+const initialMeasurements: Measurement = {
+  date: new Date().toISOString().split('T')[0],
+  weight: 0,
+  measurements: {
+    neck: 0, shoulders: 0, chest: 0, arms: 0, forearms: 0, waist: 0, hips: 0, thighs: 0, calves: 0
+  }
+};
+
+const STORAGE_KEY = 'bodyMeasurements';
+
+// Les modes de vue disponibles
+type ViewMode = 'history' | 'input';
+
+export default function MeasurementsView() {
+  const { theme } = useTheme();
+  const { t } = useTranslation();
+  // Mode de vue actif (historique ou saisie)
+  const [viewMode, setViewMode] = useState<ViewMode>('history');
+  const [measurements, setMeasurements] = useState<Measurement>(initialMeasurements);
+  const [allMeasurements, setAllMeasurements] = useState<Measurement[]>([]);
+  const [modal, setModal] = useState<{ key: MeasurementKey | null, open: boolean }>({ key: null, open: false });
+  const [historyModal, setHistoryModal] = useState<{ key: MeasurementKey | null, open: boolean }>({ key: null, open: false });
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [showWeightModal, setShowWeightModal] = useState(false);
+
+  // Chargement initial des mesures
+  useEffect(() => {
+    const load = async () => {
+      const stored = await AsyncStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        const arr: Measurement[] = JSON.parse(stored);
+        setAllMeasurements(arr);
+        // Charger la mesure du jour sélectionné
+        const found = arr.find(m => m.date === measurements.date);
+        if (found) setMeasurements(found);
+      }
+    };
+    load();
+    // eslint-disable-next-line
+  }, []);
+
+  // Sauvegarde à chaque modification
+  useEffect(() => {
+    const save = async () => {
+      if (!measurements.date) return;
+      
+      let arr = [...allMeasurements];
+      const idx = arr.findIndex(m => m.date === measurements.date);
+      
+      if (idx >= 0) arr[idx] = measurements;
+      else arr.push(measurements);
+      
+      arr = arr.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      setAllMeasurements(arr);
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+    };
+    save();
+    // eslint-disable-next-line
+  }, [measurements]);
+
+  // Ouvre la modale de saisie pour une mesure
+  const openMeasurementModal = (key: MeasurementKey) => setModal({ key, open: true });
+  const closeMeasurementModal = () => setModal({ key: null, open: false });
+
+  // Ouvre la modale d'historique
+  const openHistoryModal = (key: MeasurementKey) => setHistoryModal({ key, open: true });
+  const closeHistoryModal = () => setHistoryModal({ key: null, open: false });
+
+  // Ouvre la modale de saisie du poids
+  const openWeightModal = () => setShowWeightModal(true);
+  const closeWeightModal = () => setShowWeightModal(false);
+
+  // Mise à jour d'une mesure
+  const updateMeasurement = (key: MeasurementKey, value: number) => {
+    setMeasurements(prev => ({
+      ...prev,
+      measurements: { ...prev.measurements, [key]: value }
+    }));
+  };
+
+  // Mise à jour du poids
+  const updateWeight = (value: number) => {
+    setMeasurements(prev => ({
+      ...prev,
+      weight: value
+    }));
+  };
+
+  // Sélection de la date via Calendar
+  const onCalendarDayPress = (day: { dateString: string }) => {
+    setShowCalendar(false);
+    const found = allMeasurements.find(m => m.date === day.dateString);
+    if (found) setMeasurements(found);
+    else setMeasurements({ ...initialMeasurements, date: day.dateString });
+  };
+
+  // Historique réel pour la modale
+  const getHistory = (key: MeasurementKey) =>
+    allMeasurements
+      .filter(m => m.measurements[key] > 0)
+      .map(m => ({ date: m.date, value: m.measurements[key] }))
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+  // Historique du poids pour la modale
+  const getWeightHistory = () =>
+    allMeasurements
+      .filter(m => m.weight > 0)
+      .map(m => ({ date: m.date, value: m.weight }))
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+  // Ouvre la modale d'historique pour le poids
+  const openWeightHistoryModal = () => {
+    setHistoryModal({ key: null, open: true });
+  };
+
+  // Basculer entre les modes de vue
+  const toggleViewMode = () => {
+    setViewMode(prev => prev === 'input' ? 'history' : 'input');
+  };
+
+  // Styles
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background.main
+    },
+    content: {
+      flex: 1
+    },
+    measurementInputContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      padding: 16,
+      marginBottom: 8
+    },
+    inputCard: {
+      flex: 1,
+      backgroundColor: theme.colors.background.card,
+      borderRadius: theme.borderRadius.lg,
+      padding: 12,
+      marginHorizontal: 4,
+      ...theme.shadows.sm
+    },
+    inputHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 8
+    },
+    inputLabel: {
+      marginLeft: 6,
+      fontWeight: 'bold',
+      color: theme.colors.text.primary,
+      fontSize: 14
+    },
+    dateDisplay: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingVertical: 6
+    },
+    dateText: {
+      color: theme.colors.text.primary,
+      fontSize: 16
+    },
+    weightInputContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: 2
+    },
+    weightInput: {
+      flex: 1,
+      color: theme.colors.text.primary,
+      borderColor: theme.colors.border.default,
+      borderWidth: 1,
+      borderRadius: theme.borderRadius.md,
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      textAlign: 'center',
+      fontSize: 16
+    },
+    unitBadge: {
+      backgroundColor: theme.colors.primary,
+      borderRadius: theme.borderRadius.md,
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      marginLeft: 8,
+      alignItems: 'center',
+      justifyContent: 'center'
+    },
+    unitText: {
+      color: theme.colors.text.primary,
+      fontWeight: 'bold',
+      fontSize: 12
+    },
+    calendarOverlay: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'rgba(0,0,0,0.7)'
+    },
+    calendarModal: {
+      backgroundColor: theme.colors.background.card,
+      borderRadius: theme.borderRadius.lg,
+      padding: 24,
+      width: 340,
+      maxWidth: '90%'
+    },
+    calendarCloseButton: {
+      backgroundColor: theme.colors.primary, 
+      borderRadius: theme.borderRadius.md,
+      paddingVertical: 10,
+      marginTop: 16,
+      alignItems: 'center'
+    },
+    calendarCloseText: {
+      color: theme.colors.text.primary,
+      fontWeight: 'bold'
+    },
+    viewToggle: {
+      flexDirection: 'row',
+      borderRadius: theme.borderRadius.full,
+      backgroundColor: theme.colors.background.card,
+      padding: 4,
+      margin: 16,
+      ...theme.shadows.sm
+    },
+    toggleButton: {
+      flex: 1,
+      paddingVertical: 8,
+      paddingHorizontal: 12,
+      borderRadius: theme.borderRadius.full,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center'
+    },
+    activeToggle: {
+      backgroundColor: theme.colors.primary
+    },
+    toggleText: {
+      color: theme.colors.text.secondary,
+      marginLeft: 6
+    },
+    activeToggleText: {
+      color: theme.colors.text.primary,
+      fontWeight: 'bold'
+    }
+  }), [theme]);
+
+  // Bloc date/poids pour la vue de saisie
+  const renderDateWeight = () => (
+    <View style={styles.measurementInputContainer}>
+      {/* Date selection */}
+      <TouchableOpacity 
+        style={styles.inputCard} 
+        onPress={() => setShowCalendar(true)}
+      >
+        <View style={styles.inputHeader}>
+          <CalendarIcon size={18} color={theme.colors.primary} />
+          <Text style={styles.inputLabel}>Date</Text>
+        </View>
+        <View style={styles.dateDisplay}>
+          <Text style={styles.dateText}>
+            {format(new Date(measurements.date), 'dd MMMM yyyy', { locale: fr })}
+          </Text>
+          <ChevronDown size={18} color={theme.colors.text.secondary} />
+        </View>
+      </TouchableOpacity>
+
+      {/* Weight input */}
+      <TouchableOpacity 
+        style={styles.inputCard}
+        onPress={openWeightModal}
+      >
+        <View style={styles.inputHeader}>
+          <Scale size={18} color={theme.colors.primary} />
+          <Text style={styles.inputLabel}>{t('workout.weight')}</Text>
+        </View>
+        <View style={styles.dateDisplay}>
+          <Text style={styles.dateText}>
+            {measurements.weight > 0 ? `${measurements.weight} kg` : '-'}
+          </Text>
+          <ChevronDown size={18} color={theme.colors.text.secondary} />
+        </View>
+      </TouchableOpacity>
+
+      {/* Calendar modal */}
+      <Modal
+        visible={showCalendar}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowCalendar(false)}
+      >
+        <View style={styles.calendarOverlay}>
+          <View style={styles.calendarModal}>
+            <Calendar
+              current={measurements.date}
+              onDayPress={onCalendarDayPress}
+              markedDates={{ [measurements.date]: { selected: true, selectedColor: theme.colors.primary } }}
+              theme={{
+                backgroundColor: theme.colors.background.card,
+                calendarBackground: theme.colors.background.card,
+                textSectionTitleColor: theme.colors.text.primary,
+                selectedDayBackgroundColor: theme.colors.primary,
+                selectedDayTextColor: theme.colors.text.primary,
+                todayTextColor: theme.colors.primary,
+                dayTextColor: theme.colors.text.primary,
+                textDisabledColor: theme.colors.text.disabled,
+                dotColor: theme.colors.primary,
+                selectedDotColor: theme.colors.text.primary,
+                arrowColor: theme.colors.primary,
+                monthTextColor: theme.colors.text.primary,
+                indicatorColor: theme.colors.primary
+              }}
+            />
+            <TouchableOpacity 
+              style={styles.calendarCloseButton} 
+              onPress={() => setShowCalendar(false)}
+            >
+              <Text style={styles.calendarCloseText}>{t('common.close')}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    </View>
+  );
+
+  // Rendu du sélecteur de vue (historique/saisie)
+  const renderViewToggle = () => (
+    <View style={styles.viewToggle}>
+      <TouchableOpacity
+        style={[styles.toggleButton, viewMode === 'history' && styles.activeToggle]}
+        onPress={() => setViewMode('history')}
+      >
+        <BarChart size={18} color={viewMode === 'history' ? theme.colors.text.primary : theme.colors.text.secondary} />
+        <Text style={[styles.toggleText, viewMode === 'history' && styles.activeToggleText]}>
+          {t('measurements.historyMode')}
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={[styles.toggleButton, viewMode === 'input' && styles.activeToggle]}
+        onPress={() => setViewMode('input')}
+      >
+        <ListPlus size={18} color={viewMode === 'input' ? theme.colors.text.primary : theme.colors.text.secondary} />
+        <Text style={[styles.toggleText, viewMode === 'input' && styles.activeToggleText]}>
+          {t('measurements.inputMode')}
+        </Text>
+      </TouchableOpacity>
+    </View>
+  );
+
+  // Contenu pour le mode de saisie
+  const renderInputMode = () => (
+    <>
+      {renderDateWeight()}
+      <MeasurementBody
+        points={MEASUREMENT_KEYS.map(key => ({
+          key,
+          label: t(getMeasurementTranslationKey(key)),
+          color: theme.colors.measurement[key],
+        }))}
+        values={measurements.measurements}
+        onPointPress={openMeasurementModal}
+      />
+    </>
+  );
+
+  // Contenu pour le mode d'historique
+  const renderHistoryMode = () => (
+    <MeasurementHistory
+      measurements={allMeasurements}
+    />
+  );
+
+  return (
+    <View style={styles.container}>
+      <Header
+        title={t('measurements.title')}
+        showBackButton={false}
+      />
+      {renderViewToggle()}
+      <ScrollView style={styles.content}>
+        {viewMode === 'input' ? renderInputMode() : renderHistoryMode()}
+      </ScrollView>
+      {/* Modale de saisie des mesures */}
+      <MeasurementModal
+        open={modal.open}
+        keyName={modal.key}
+        value={modal.key ? measurements.measurements[modal.key] : 0}
+        onClose={closeMeasurementModal}
+        onSave={updateMeasurement}
+        onShowHistory={openHistoryModal}
+      />
+      {/* Modale de saisie du poids */}
+      <WeightModal
+        open={showWeightModal}
+        value={measurements.weight}
+        onClose={closeWeightModal}
+        onSave={updateWeight}
+        onShowHistory={openWeightHistoryModal}
+      />
+      {/* Modale d'historique */}
+      <MeasurementHistoryModal
+        open={historyModal.open}
+        keyName={historyModal.key}
+        onClose={closeHistoryModal}
+        history={historyModal.key ? getHistory(historyModal.key) : getWeightHistory()}
+      />
+    </View>
+  );
+} 

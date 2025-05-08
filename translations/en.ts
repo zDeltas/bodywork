@@ -239,13 +239,22 @@ export default {
     invalidDate: 'Invalid date',
     dateFormatError: 'Date formatting error:',
     neck: 'Neck',
+    shoulders: 'Shoulders',
+    chest: 'Chest',
+    arms: 'Arms',
     forearms: 'Forearms',
     waist: 'Waist',
     hips: 'Hips',
     thighs: 'Thighs',
     calves: 'Calves',
     history: 'History',
-    historyOf: 'History of {part}'
+    historyOf: 'History of {part}',
+    noData: 'No data',
+    noHistoryData: 'No history data available',
+    noDataForSelection: 'No data for this selection',
+    inputMode: 'Input',
+    historyMode: 'History',
+    lastUpdate: 'Last update'
   },
 
   // Exercise details screen

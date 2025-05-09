@@ -7,6 +7,7 @@ import { useTheme } from '@/app/hooks/useTheme';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { MeasurementKey } from './MeasurementBodyMap';
 import { BarChart3, Clock } from 'lucide-react-native';
+import { WorkoutDateUtils } from '@/app/types/workout';
 
 type Measurement = {
   date: string;
@@ -35,7 +36,7 @@ const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({
   const getLastMeasurementValue = (key: MeasurementKey | 'weight') => {
     if (sortedMeasurements.length === 0) return { value: 0, date: '' };
 
-    const today = new Date().toISOString().split('T')[0];
+    const today = WorkoutDateUtils.getDatePart(new Date().toISOString());
 
     const measurementsSortedByDateProximity = [...sortedMeasurements].sort((a, b) => {
       const diffA = Math.abs(new Date(a.date).getTime() - new Date(today).getTime());

@@ -8,7 +8,7 @@ import { useTheme } from '@/app/hooks/useTheme';
 import { Activity, Dumbbell, Layers, Repeat } from 'lucide-react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Header from '@/app/components/Header';
-import { Workout } from '@/app/types/workout';
+import { Workout, WorkoutDateUtils } from '@/app/types/workout';
 import { TranslationKey } from '@/translations';
 
 LocaleConfig.locales['fr'] = {
@@ -53,15 +53,36 @@ LocaleConfig.locales['en'] = {
   today: 'Today'
 };
 
+/**
+ * Interface pour les informations d'une série de travail
+ */
+interface WorkingSetInfo {
+  weight: number;
+  reps: number;
+  sets: number;
+  rpe: number;
+}
+
+/**
+ * Interface pour les dates marquées dans le calendrier
+ */
+interface MarkedDate {
+  marked?: boolean;
+  dotColor?: string;
+  selected?: boolean;
+}
 
 export default function WorkoutScreen() {
   const [workouts, setWorkouts] = useState<Workout[]>([]);
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [selectedDate, setSelectedDate] = useState<string>(WorkoutDateUtils.getDatePart(new Date().toISOString()));
   const { t, language } = useTranslation();
   const { theme } = useTheme();
   const styles = useStyles();
 
-  const getWorkingSetInfo = (workout: Workout) => {
+  /**
+   * Récupère les informations de la série de travail d'un entraînement
+   */
+  const getWorkingSetInfo = (workout: Workout): WorkingSetInfo => {
     if (workout.series && workout.series.length > 0) {
       const workingSet = workout.series.find(s => s.type === 'workingSet') || workout.series[0];
       const workingSetsCount = workout.series.filter(s => s.type === 'workingSet').length;
@@ -82,8 +103,11 @@ export default function WorkoutScreen() {
     };
   };
 
+  /**
+   * Charge les entraînements depuis le stockage local
+   */
   useEffect(() => {
-    const loadWorkouts = async () => {
+    const loadWorkouts = async (): Promise<void> => {
       try {
         const storedWorkouts = await AsyncStorage.getItem('workouts');
         if (storedWorkouts) {
@@ -97,8 +121,11 @@ export default function WorkoutScreen() {
     loadWorkouts();
   }, []);
 
+  /**
+   * Sauvegarde les entraînements dans le stockage local
+   */
   useEffect(() => {
-    const saveWorkouts = async () => {
+    const saveWorkouts = async (): Promise<void> => {
       try {
         await AsyncStorage.setItem('workouts', JSON.stringify(workouts));
       } catch (error) {
@@ -109,21 +136,30 @@ export default function WorkoutScreen() {
     saveWorkouts();
   }, [workouts]);
 
-  const markedDates = workouts.reduce((acc, workout) => {
-    const date = new Date(workout.date).toISOString().split('T')[0];
+  /**
+   * Prépare les dates marquées pour le calendrier
+   */
+  const markedDates = workouts.reduce<Record<string, MarkedDate>>((acc, workout) => {
+    const date = WorkoutDateUtils.getDatePart(workout.date);
     acc[date] = { marked: true, dotColor: theme.colors.primary };
     if (date === selectedDate) {
       acc[date].selected = true;
     }
     return acc;
-  }, {} as { [key: string]: { marked?: boolean; dotColor?: string; selected?: boolean } });
+  }, {});
 
+  /**
+   * Filtre les entraînements pour la date sélectionnée
+   */
   const filteredWorkouts = workouts.filter(workout => {
-    const workoutDate = new Date(workout.date).toISOString().split('T')[0];
+    const workoutDate = WorkoutDateUtils.getDatePart(workout.date);
     return workoutDate === selectedDate;
   });
 
-  const navigateToSettings = () => {
+  /**
+   * Navigation vers les paramètres
+   */
+  const navigateToSettings = (): void => {
     router.push('/screens/settings');
   };
 
@@ -173,14 +209,9 @@ export default function WorkoutScreen() {
             <View key={workout.id} style={styles.workoutCard}>
               <View style={styles.workoutDetailsCard}>
                 <Text style={styles.workoutTitle}>{t(workout.exercise as TranslationKey)}</Text>
-                <Text
-                  style={styles.workoutDate}>{new Date(workout.date).toLocaleString(language === 'fr' ? 'fr-FR' : 'en-US', {
-                  day: '2-digit',
-                  month: '2-digit',
-                  year: '2-digit',
-                  hour: '2-digit',
-                  minute: '2-digit'
-                })}</Text>
+                <Text style={styles.workoutDate}>
+                  {WorkoutDateUtils.formatForDisplay(workout.date, language)}
+                </Text>
                 {(() => {
                   const info = getWorkingSetInfo(workout);
                   const isWarmUp = workout.series && workout.series.length > 0 && workout.series[0].type === 'warmUp';

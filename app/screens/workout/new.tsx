@@ -11,12 +11,24 @@ import { fr } from 'date-fns/locale';
 import Text from '../../components/ui/Text';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
-import { Series, Workout } from '@/app/types/workout';
+import { Series, SeriesType, Workout, WorkoutDateUtils } from '@/app/types/workout';
 import Header from '@/app/components/Header';
 import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold, useFonts } from '@expo-google-fonts/inter';
 import ExerciseList from '@/app/components/exercises/ExerciseList';
 
 SplashScreen.preventAutoHideAsync();
+
+/**
+ * Interface pour une série en cours d'édition
+ */
+interface EditableSeries {
+  weight: string;
+  reps: string;
+  note: string;
+  rpe: string;
+  showRpeDropdown?: boolean;
+  type: SeriesType;
+}
 
 export default function NewWorkoutScreen() {
 
@@ -35,18 +47,11 @@ export default function NewWorkoutScreen() {
   const { t } = useTranslation();
   const { theme } = useTheme();
   const styles = useStyles();
-  const [selectedMuscle, setSelectedMuscle] = useState('');
-  const [exercise, setExercise] = useState('');
-  const [exerciseKey, setExerciseKey] = useState('');
-  const [rpe, setRpe] = useState('');
-  const [series, setSeries] = useState<Array<{
-    weight: string,
-    reps: string,
-    note: string,
-    rpe: string,
-    showRpeDropdown?: boolean,
-    type: 'warmUp' | 'workingSet'
-  }>>([{
+  const [selectedMuscle, setSelectedMuscle] = useState<string>('');
+  const [exercise, setExercise] = useState<string>('');
+  const [exerciseKey, setExerciseKey] = useState<string>('');
+  const [rpe, setRpe] = useState<string>('');
+  const [series, setSeries] = useState<EditableSeries[]>([{
     weight: '',
     reps: '',
     note: '',
@@ -55,11 +60,11 @@ export default function NewWorkoutScreen() {
     type: 'workingSet'
   }]);
   const [suggestedWeight, setSuggestedWeight] = useState<number | null>(null);
-  const [isCustomExercise, setIsCustomExercise] = useState(false);
+  const [isCustomExercise, setIsCustomExercise] = useState<boolean>(false);
   const params = useLocalSearchParams();
-  const [selectedDate, setSelectedDate] = useState(params.selectedDate as string || new Date().toISOString().split('workout.T')[0]);
-  const [showCalendar, setShowCalendar] = useState(false);
-  const [showExerciseSelector, setShowExerciseSelector] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<string>(params.selectedDate as string || WorkoutDateUtils.getDatePart(new Date().toISOString()));
+  const [showCalendar, setShowCalendar] = useState<boolean>(false);
+  const [showExerciseSelector, setShowExerciseSelector] = useState<boolean>(false);
 
   // Function to calculate suggested weight based on previous workouts
   const calculateSuggestedWeight = useCallback(async (selectedExercise: string, inputReps: string, inputRpe: string) => {
@@ -182,7 +187,7 @@ export default function NewWorkoutScreen() {
     }
   }, [series, rpe, calculateSuggestedWeight, exerciseKey]);
 
-  const saveWorkout = async () => {
+  const saveWorkout = async (): Promise<void> => {
     try {
       // Filter out empty series
       const validSeries = series.filter(s => {
@@ -206,7 +211,7 @@ export default function NewWorkoutScreen() {
       }
 
       // Process series
-      const processedSeries = validSeries.map(s => {
+      const processedSeries: Series[] = validSeries.map(s => {
         // For warm-up sets, RPE is not applicable
         const rpeValue = s.type === 'warmUp'
           ? 0  // Use 0 to indicate N/A for warm-up sets
@@ -221,13 +226,12 @@ export default function NewWorkoutScreen() {
         };
       });
 
-      const workout = {
+      const workout: Workout = {
         id: Date.now().toString(),
         muscleGroup: selectedMuscle,
         exercise: exerciseKey, // Save the exercise key instead of the translated name
         series: processedSeries,
-        rpe: parseInt(rpe) || 0, // Keep global RPE for backward compatibility
-        date: selectedDate ? `${selectedDate}T${new Date().toTimeString().split('workout. ')[0]}` : new Date().toISOString()
+        date: selectedDate ? WorkoutDateUtils.createISOString(selectedDate) : new Date().toISOString()
       };
 
       const existingWorkouts = await AsyncStorage.getItem('workouts');

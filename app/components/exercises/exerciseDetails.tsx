@@ -7,7 +7,7 @@ import { fr } from 'date-fns/locale';
 import { useLocalSearchParams } from 'expo-router';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
-import { Workout } from '@/app/types/workout';
+import { Workout, WorkoutDateUtils } from '@/app/types/workout';
 import Header from '@/app/components/Header';
 import Text from '@/app/components/ui/Text';
 
@@ -197,14 +197,15 @@ const ExerciseDetails = () => {
           const filteredWorkouts = parsedWorkouts.filter(w => w.exercise === exercise);
           setWorkouts(filteredWorkouts);
 
-          // Préparer les données pour les graphiques
-          const sortedWorkouts = [...filteredWorkouts].sort((a, b) =>
-            new Date(a.date).getTime() - new Date(b.date).getTime()
-          );
+          // Prepare chart data
+          const oneRMData: ExerciseData[] = [];
+          const volumeData: ExerciseData[] = [];
+          const repsData: ExerciseData[] = [];
 
-          const newExerciseData: ExerciseData[] = [];
-          const newVolumeData: ExerciseData[] = [];
-          const newRepsData: ExerciseData[] = [];
+          // Sort workouts by date
+          const sortedWorkouts = [...filteredWorkouts].sort(
+            (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+          );
 
           sortedWorkouts.forEach(workout => {
             if (workout.series && workout.series.length > 0) {
@@ -214,20 +215,20 @@ const ExerciseDetails = () => {
                 const estimated1RM = calculateEstimated1RM(workingSet.weight, workingSet.reps);
                 const volume = calculateVolume(workingSet.weight, workingSet.reps, workout.series.length);
 
-                newExerciseData.push({ x: date, y: estimated1RM });
-                newVolumeData.push({ x: date, y: volume });
-                newRepsData.push({ x: date, y: workingSet.reps });
+                oneRMData.push({ x: date, y: estimated1RM });
+                volumeData.push({ x: date, y: volume });
+                repsData.push({ x: date, y: workingSet.reps });
               }
             }
           });
 
-          console.log('Exercise Data:', newExerciseData);
-          console.log('Volume Data:', newVolumeData);
-          console.log('Reps Data:', newRepsData);
+          console.log('Exercise Data:', oneRMData);
+          console.log('Volume Data:', volumeData);
+          console.log('Reps Data:', repsData);
 
-          setExerciseData(newExerciseData);
-          setVolumeData(newVolumeData);
-          setRepsData(newRepsData);
+          setExerciseData(oneRMData);
+          setVolumeData(volumeData);
+          setRepsData(repsData);
         }
       } catch (error) {
         console.error('Error loading workouts:', error);
@@ -261,18 +262,11 @@ const ExerciseDetails = () => {
     };
   };
 
-  // Fonction pour formater les tooltips
+  // Format date for display in chart tooltip
   const formatTooltip = (datum: any) => {
-    switch (selectedChartType) {
-      case '1rm':
-        return `${datum.y}kg`;
-      case 'volume':
-        return `${datum.y}kg`;
-      case 'reps':
-        return `${datum.y} reps`;
-      default:
-        return `${datum.y}`;
-    }
+    const date = new Date(datum.x);
+    const formattedDate = format(date, 'dd/MM/yy', { locale: fr });
+    return `${formattedDate}: ${datum.y}`;
   };
 
   // Fonction pour obtenir les données filtrées selon la période
@@ -315,7 +309,7 @@ const ExerciseDetails = () => {
     }
   };
 
-  // Fonction pour formater la date pour l'affichage
+  // Format date for display on X axis
   const formatDateForDisplay = (date: Date) => {
     return format(date, getDateFormat(), { locale: fr });
   };
@@ -471,7 +465,7 @@ const ExerciseDetails = () => {
             >
               <VictoryAxis
                 label={t('common.date')}
-                tickFormat={(date) => formatDateForDisplay(new Date(date))}
+                tickFormat={(date: number | Date) => formatDateForDisplay(new Date(date))}
                 tickCount={getTickCount()}
                 style={{
                   axis: { stroke: theme.colors.border.default },
@@ -552,7 +546,7 @@ const ExerciseDetails = () => {
             >
               <VictoryAxis
                 label={t('common.date')}
-                tickFormat={(date) => formatDateForDisplay(new Date(date))}
+                tickFormat={(date: number | Date) => formatDateForDisplay(new Date(date))}
                 tickCount={getTickCount()}
                 style={{
                   axis: { stroke: theme.colors.border.default },
@@ -633,7 +627,7 @@ const ExerciseDetails = () => {
             >
               <VictoryAxis
                 label={t('common.date')}
-                tickFormat={(date) => formatDateForDisplay(new Date(date))}
+                tickFormat={(date: number | Date) => formatDateForDisplay(new Date(date))}
                 tickCount={getTickCount()}
                 style={{
                   axis: { stroke: theme.colors.border.default },

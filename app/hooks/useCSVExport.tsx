@@ -2,7 +2,7 @@ import { useState } from 'react';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Workout } from '@/app/types/workout';
+import { Workout, WorkoutDateUtils } from '@/app/types/workout';
 import { useTranslation } from './useTranslation';
 
 export const useCSVExport = () => {
@@ -15,7 +15,7 @@ export const useCSVExport = () => {
 
     // Add each workout as a row
     workouts.forEach(workout => {
-      const date = new Date(workout.date).toISOString().split('T')[0];
+      const date = WorkoutDateUtils.getDatePart(workout.date);
 
       // Add each series as a separate row
       workout.series.forEach(series => {

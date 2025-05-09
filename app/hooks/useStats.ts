@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Workout } from '@/app/types/workout';
+import { Workout, WorkoutDateUtils } from '@/app/types/workout';
 import { differenceInDays, subMonths } from 'date-fns';
 import calculations from '@/app/utils/calculations';
 import { useTranslation } from '@/app/hooks/useTranslation';
@@ -67,7 +67,7 @@ const useStats = (selectedPeriod: Period) => {
       return 0;
     }
 
-    const uniqueDates = new Set(filteredWorkouts.map(w => w.date));
+    const uniqueDates = new Set(filteredWorkouts.map(w => WorkoutDateUtils.getDatePart(w.date)));
     const daysInPeriod = differenceInDays(
       new Date(),
       subMonths(new Date(), selectedPeriod === '1m' ? 1 : selectedPeriod === '3m' ? 3 : 6)
@@ -111,7 +111,6 @@ const useStats = (selectedPeriod: Period) => {
     };
   }, [t]);
 
-// Dans app/hooks/useStats.ts - fonction calculateMuscleDistribution
   const calculateMuscleDistribution = useCallback((workouts: Workout[]): StatsData['muscleDistribution'] => {
     const filteredWorkouts = workouts.filter(workout => {
       const workoutDate = new Date(workout.date);
@@ -183,6 +182,7 @@ const useStats = (selectedPeriod: Period) => {
       })
       .sort((a, b) => b.value - a.value); // Trier par pourcentage décroissant
   }, [selectedPeriod]);
+
   useEffect(() => {
     const loadWorkouts = async () => {
       try {

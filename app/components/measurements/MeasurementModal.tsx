@@ -25,8 +25,7 @@ const MeasurementModal: React.FC<Props> = ({ open, keyName, value, onClose, onSa
   }, [value, keyName]);
 
   if (!keyName) return null;
-  
-  // Create the measurement key in the format used in the translations file
+
   const measurementKey = `measurements.${keyName}` as MeasurementTranslationKey;
 
   const handleInputChange = (text: string) => {
@@ -84,7 +83,7 @@ const MeasurementModal: React.FC<Props> = ({ open, keyName, value, onClose, onSa
               <Text style={[styles.unit, { color: theme.colors.text.secondary }]}>cm</Text>
             </View>
           </View>
-          
+
           <View style={styles.buttonContainer}>
             <TouchableOpacity 
               style={[styles.historyButton, { backgroundColor: theme.colors.background.button }]} 
@@ -95,7 +94,7 @@ const MeasurementModal: React.FC<Props> = ({ open, keyName, value, onClose, onSa
                 {t('measurements.history')}
               </Text>
             </TouchableOpacity>
-            
+
             <TouchableOpacity 
               style={[styles.saveButton, { backgroundColor: theme.colors.primary }]} 
               onPress={handleSave}

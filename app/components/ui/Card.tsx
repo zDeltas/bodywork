@@ -55,7 +55,6 @@ const useStyles = () => {
       })
     },
     default: {
-      // Default card style is already defined in the base card style
     },
     highlighted: {
       borderWidth: Platform.OS === 'ios' ? 1 : 1.5,

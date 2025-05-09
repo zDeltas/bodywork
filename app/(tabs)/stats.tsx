@@ -58,11 +58,9 @@ export default function StatsScreen() {
   const statsData = useStats(selectedPeriod);
   const { goals, setGoals, getCurrentWeight, suggestTargetWeight } = useGoals(statsData.workouts);
 
-  // Load initial data
   useEffect(() => {
     const loadInitialData = async () => {
       try {
-        // Load favorite exercises
         const storedFavorites = await AsyncStorage.getItem('favoriteExercises');
         if (storedFavorites) {
           const parsedFavorites = JSON.parse(storedFavorites) as ExerciseName[];
@@ -71,7 +69,6 @@ export default function StatsScreen() {
           }
         }
 
-        // Load recent exercises
         const storedRecent = await AsyncStorage.getItem('recentExercises');
         if (storedRecent) {
           try {
@@ -91,7 +88,6 @@ export default function StatsScreen() {
     loadInitialData();
   }, [t]);
 
-  // Animation effect
   useEffect(() => {
     if (fontsLoaded) {
       Animated.parallel([
@@ -117,7 +113,6 @@ export default function StatsScreen() {
     );
   }, []);
 
-  // Update filtered exercises when search query changes
   useEffect(() => {
     if (!searchQuery) {
       setFilteredExercises([]);
@@ -218,7 +213,6 @@ export default function StatsScreen() {
           />
         </View>
 
-        {/* Exercise Selector Modal */}
         {showExerciseSelector && (
           <View style={styles.modalOverlay}>
             <View style={styles.modalContainer}>

@@ -4,10 +4,8 @@ import { Language, TranslationKey, translations } from '@/translations';
 export const useTranslation = () => {
   const { settings } = useSettings();
 
-  // Use the language from settings, or default to 'fr' if not set
   const language = (settings.language || 'fr') as Language;
 
-  // Function to get a translation by key
   const t = (key: TranslationKey): string => {
     const keys = key.split('.');
     let value: any = translations[language];
@@ -24,7 +22,6 @@ export const useTranslation = () => {
       }
     }
 
-    // Ensure we always return a string
     if (typeof value === 'object') {
       console.warn(`Translation value for key ${key} is an object, not a string`);
       return String(key);
@@ -39,6 +36,5 @@ export const useTranslation = () => {
   };
 };
 
-// Add default export to fix the route warning
 export default useTranslation;
 

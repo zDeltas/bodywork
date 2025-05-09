@@ -107,7 +107,6 @@ function TabLayout() {
   );
 }
 
-// Define styles using the current theme
 const useStyles = () => {
   const { theme } = useTheme();
 

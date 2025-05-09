@@ -8,7 +8,6 @@ import { useTranslation } from '@/app/hooks/useTranslation';
 import { MeasurementKey } from './MeasurementBodyMap';
 import { BarChart3, Clock } from 'lucide-react-native';
 
-// Obtenir les dimensions de l'écran
 type Measurement = {
   date: string;
   weight: number;
@@ -27,28 +26,23 @@ const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({
   const [selectedMeasurement, setSelectedMeasurement] = useState<MeasurementKey | 'weight' | null>(null);
   const [historyModalVisible, setHistoryModalVisible] = useState(false);
 
-  // Tri des mesures par date (du plus récent au plus ancien)
   const sortedMeasurements = useMemo(() => {
     return [...measurements].sort((a, b) =>
       new Date(b.date).getTime() - new Date(a.date).getTime()
     );
   }, [measurements]);
 
-  // Obtenir la dernière mesure pour chaque partie
   const getLastMeasurementValue = (key: MeasurementKey | 'weight') => {
     if (sortedMeasurements.length === 0) return { value: 0, date: '' };
 
-    // Date d'aujourd'hui en format ISO
     const today = new Date().toISOString().split('T')[0];
-    
-    // Trier les mesures par proximité avec aujourd'hui
+
     const measurementsSortedByDateProximity = [...sortedMeasurements].sort((a, b) => {
-      // Calculer la différence en jours avec aujourd'hui
       const diffA = Math.abs(new Date(a.date).getTime() - new Date(today).getTime());
       const diffB = Math.abs(new Date(b.date).getTime() - new Date(today).getTime());
-      return diffA - diffB; // Trier du plus proche au plus éloigné d'aujourd'hui
+      return diffA - diffB;
     });
-    
+
     if (key === 'weight') {
       const withValue = measurementsSortedByDateProximity.find(m => m.weight > 0);
       return withValue
@@ -62,7 +56,6 @@ const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({
       : { value: 0, date: '' };
   };
 
-  // Données pour le graphique de l'historique
   const getHistoryData = (key: MeasurementKey | 'weight') => {
     let data;
     if (key === 'weight') {
@@ -82,15 +75,12 @@ const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({
           date: m.date
         }));
     }
-    
-    // Trier par date, du plus ancien au plus récent
+
     return data.sort((a, b) => a.x.getTime() - b.x.getTime());
   };
 
-  // Type pour le statut de progression
   type ProgressStatus = 'positive' | 'negative' | 'neutral';
-  
-  // Fonction pour obtenir les caractéristiques visuelles en fonction du statut de progression
+
   const getProgressVisuals = (status: ProgressStatus) => {
     switch (status) {
       case 'positive':
@@ -121,7 +111,6 @@ const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({
       { key: 'weight', label: t('workout.weightKg') }
     ];
 
-    // Ajout des différentes mesures corporelles
     ['neck', 'shoulders', 'chest', 'arms', 'forearms', 'waist', 'hips', 'thighs', 'calves'].forEach(key => {
       options.push({
         key: key as MeasurementKey,
@@ -153,9 +142,7 @@ const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({
     return t(`measurements.${key}`);
   };
 
-  // Formatage des valeurs pour éviter les valeurs extravagantes
   const formatValue = (value: number, key: MeasurementKey | 'weight') => {
-    // Arrondir à une décimale pour le poids, zéro pour les mesures corporelles
     const decimal = key === 'weight' ? 1 : 0;
     return value.toFixed(decimal);
   };
@@ -169,28 +156,22 @@ const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({
     setHistoryModalVisible(true);
   };
 
-  // Calculer les bornes min/max raisonnables pour les graphiques
   const getChartDomain = (key: MeasurementKey | 'weight', data: Array<{ x: Date, y: number }>) => {
     if (data.length === 0) return { min: 0, max: 100 };
-    
-    // Trouver min et max des données
+
     const values = data.map(d => d.y);
     const min = Math.min(...values);
     const max = Math.max(...values);
-    
-    // Calculer un padding approprié (environ 10% de l'étendue des données)
+
     const range = max - min;
     const padding = Math.max(range * 0.1, 1);
-    
-    // Limites raisonnables selon le type de mesure
+
     if (key === 'weight') {
-      // Poids en kg (éviter des valeurs négatives ou trop grandes)
       return { 
         min: Math.max(min - padding, 0),
         max: Math.min(max + padding, 200)
       };
     } else {
-      // Mesures en cm (ajuster selon la partie du corps)
       return { 
         min: Math.max(min - padding, 0),
         max: Math.min(max + padding, 200)
@@ -198,25 +179,22 @@ const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({
     }
   };
 
-  // Calculer la progression entre la mesure actuelle et la précédente
   const getProgressData = (key: MeasurementKey | 'weight') => {
     const data = getHistoryData(key);
     if (data.length < 2) return { value: 0, status: 'neutral' as const };
 
-    // Nous utilisons les deux mesures les plus récentes
     const lastIndex = data.length - 1;
     const currentValue = data[lastIndex].y;
     const previousValue = data[lastIndex - 1].y;
-    
+
     const diff = currentValue - previousValue;
-    
-    // Seuil minimal pour considérer un changement comme significatif
+
     const threshold = key === 'weight' ? 0.1 : 1; // 0.1kg pour le poids, 1cm pour les mesures
-    
+
     if (Math.abs(diff) < threshold) {
       return { value: 0, status: 'neutral' as const };
     }
-    
+
     // Pour le poids, une diminution est positive, pour les mesures, une augmentation est positive
     const isPositive = key === 'weight' ? diff < 0 : diff > 0;
 
@@ -486,18 +464,15 @@ const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({
     );
   }
 
-  // Rendu d'une carte de mesure
   const renderMeasurementCard = (option: { key: MeasurementKey | 'weight', label: string }) => {
     const key = option.key;
     const lastData = getLastMeasurementValue(key);
     const progress = getProgressData(key);
     const historyData = getHistoryData(key);
     const unit = getUnit(key);
-    
-    // Obtenir les caractéristiques visuelles pour la progression
+
     const progressVisuals = getProgressVisuals(progress.status);
-    
-    // Obtenir les limites du graphique
+
     const domain = getChartDomain(key, historyData);
 
     return (
@@ -508,21 +483,18 @@ const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({
             <BarChart3 size={14} color={theme.colors.primary} />
           </TouchableOpacity>
         </View>
-        
+
         <View style={styles.cardDivider} />
-        
+
         <View style={styles.cardContent}>
-          {/* Nouvelle disposition horizontale */}
           <View style={styles.dataRow}>
-            {/* Colonne gauche: dernière valeur */}
             <View style={styles.leftColumn}>
               <View style={styles.valueRow}>
                 <Text style={styles.value}>{formatValue(lastData.value, key)}</Text>
                 <Text style={styles.unit}>{unit}</Text>
               </View>
             </View>
-            
-            {/* Colonne droite: date de mise à jour et progression */}
+
             <View style={styles.rightColumn}>
               {lastData.date ? (
                 <View style={styles.dateRow}>
@@ -530,7 +502,7 @@ const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({
                   <Text style={styles.dateLabel}>{formatDateLabel(lastData.date)}</Text>
                 </View>
               ) : null}
-              
+
               {/* Affichage de la progression UNIQUEMENT pour les mensurations (pas pour le poids) */}
               {historyData.length >= 2 && key !== 'weight' && (
                 <View style={[
@@ -549,9 +521,8 @@ const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({
               )}
             </View>
           </View>
-          
-          {/* Graphique sous les données */}
-          {historyData.length > 1 && (
+
+          {historyData.length > 1 ? (
             <View style={styles.chartWrapper}>
               <VictoryChart
                 padding={{ top: 5, bottom: 20, left: 25, right: 5 }}
@@ -607,7 +578,7 @@ const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({
                   tickCount={3}
                 />
               </VictoryChart>
-              
+
               {/* Indicateur de tendance uniquement pour les mensurations */}
               {key !== 'weight' && (
                 <View style={[
@@ -623,13 +594,16 @@ const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({
                 </View>
               )}
             </View>
+          ) : (
+            <View style={styles.emptyCard}>
+              <Text style={styles.emptyStateText}>{t('measurements.noData')}</Text>
+            </View>
           )}
         </View>
       </View>
     );
   };
 
-  // Rendu du modal d'historique détaillé
   const renderHistoryModal = () => {
     if (!selectedMeasurement) return null;
 
@@ -638,8 +612,7 @@ const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({
     const progressColor = progressData.status === 'positive'
       ? theme.colors.primary
       : theme.colors.text.warning;
-      
-    // Obtenez les dates des deux dernières mesures pour l'affichage
+
     let dateRangeText = '';
     if (chartData.length >= 2) {
       const lastIndex = chartData.length - 1;

@@ -9,7 +9,6 @@ interface Settings {
   theme: 'dark' | 'light';
 }
 
-// Default settings
 const defaultSettings: Settings = {
   weightUnit: 'kg',
   gender: 'male',
@@ -17,7 +16,6 @@ const defaultSettings: Settings = {
   theme: 'dark'
 };
 
-// Create context with default values
 interface SettingsContextType {
   settings: Settings;
   updateSettings: (newSettings: Partial<Settings>) => Promise<void>;
@@ -31,15 +29,12 @@ const SettingsContext = createContext<SettingsContextType>({
   isLoading: true
 });
 
-// Storage keys
 const SETTINGS_STORAGE_KEY = 'bodywork_settings';
 
-// Provider component
 export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [settings, setSettings] = useState<Settings>(defaultSettings);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load settings from storage on mount
   useEffect(() => {
     const loadSettings = async () => {
       try {
@@ -57,7 +52,6 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
     loadSettings();
   }, []);
 
-  // Update settings and persist to storage
   const updateSettings = async (newSettings: Partial<Settings>) => {
     try {
       const updatedSettings = { ...settings, ...newSettings };
@@ -75,8 +69,6 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
   );
 };
 
-// Hook for using the settings context
 export const useSettings = () => useContext(SettingsContext);
 
-// Add default export to fix the route warning
 export default useSettings;

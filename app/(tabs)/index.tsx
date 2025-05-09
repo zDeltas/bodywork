@@ -61,12 +61,9 @@ export default function WorkoutScreen() {
   const { theme } = useTheme();
   const styles = useStyles();
 
-  // Helper function to find the first working set in a series
   const getWorkingSetInfo = (workout: Workout) => {
     if (workout.series && workout.series.length > 0) {
-      // Find the first working set or default to the first series
       const workingSet = workout.series.find(s => s.type === 'workingSet') || workout.series[0];
-      // Count working sets
       const workingSetsCount = workout.series.filter(s => s.type === 'workingSet').length;
 
       return {
@@ -77,7 +74,6 @@ export default function WorkoutScreen() {
       };
     }
 
-    // Fallback to empty values if no series
     return {
       weight: 0,
       reps: 0,
@@ -122,7 +118,6 @@ export default function WorkoutScreen() {
     return acc;
   }, {} as { [key: string]: { marked?: boolean; dotColor?: string; selected?: boolean } });
 
-  // Filter workouts for the selected date
   const filteredWorkouts = workouts.filter(workout => {
     const workoutDate = new Date(workout.date).toISOString().split('T')[0];
     return workoutDate === selectedDate;

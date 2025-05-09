@@ -73,9 +73,9 @@ const BODY_POINTS: Record<MeasurementKey, {
 };
 
 const BUTTON_OFFSET = {
-  left: 50,   // Distance à gauche
-  right: 50,  // Distance à droite
-  y: 0        // Ajustement vertical
+  left: 50,
+  right: 50,
+  y: 0
 };
 
 const MeasurementBody: React.FC<Props> = ({ points, values, onPointPress }) => {
@@ -174,7 +174,6 @@ const MeasurementBody: React.FC<Props> = ({ points, values, onPointPress }) => {
             })}
           </Svg>
 
-          {/* Boutons positionnés dynamiquement */}
           {points.map((pt) => {
             const btnPt = btnPositions[pt.key];
             if (!btnPt) return null;

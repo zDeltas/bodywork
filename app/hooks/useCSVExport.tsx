@@ -9,7 +9,6 @@ export const useCSVExport = () => {
   const [isExporting, setIsExporting] = useState(false);
   const { t } = useTranslation();
 
-  // Convert workouts data to CSV format
   const convertWorkoutsToCSV = (workouts: Workout[]) => {
     // CSV header
     let csvContent = 'ID,Date,Exercise,Weight (kg),Reps,Sets,RPE,Type,Note\n';

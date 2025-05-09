@@ -23,12 +23,10 @@ export default function TouchableOpacity({
 
   const TouchableComponent = Platform.OS === 'ios' ? Pressable : RNTouchableOpacity;
 
-  // Create individual animated components instead of using a conditional
   const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
   const AnimatedTouchableOpacity = Animated.createAnimatedComponent(RNTouchableOpacity);
 
   if (animated) {
-    // Use the proper pre-created animated component
     const Component = Platform.OS === 'ios' ? AnimatedPressable : AnimatedTouchableOpacity;
 
     return (
@@ -52,7 +50,6 @@ export default function TouchableOpacity({
     );
   }
 
-  // Non-animated version
   return (
     <TouchableComponent
       style={({ pressed }) => [

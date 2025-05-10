@@ -180,11 +180,11 @@ export default function StatsScreen() {
           selectedExercise={selectedExercise}
           setSelectedExercise={setSelectedExercise}
           exerciseOptions={exerciseOptions}
-          onExerciseSelect={(exercise) => {
+          onExerciseSelect={(exercise, exerciseKey) => {
             handleSelectExercise(exercise as ExerciseName);
             router.push({
               pathname: '/components/exercises/exerciseDetails',
-              params: { exercise }
+              params: { exercise: exerciseKey }
             });
           }}
           onMuscleSelect={handleMuscleSelect}

@@ -3,6 +3,7 @@ import { FlatList, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react
 import { useTheme } from '@/app/hooks/useTheme';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { MeasurementKey } from './MeasurementBodyMap';
+import { TranslationKey, MeasurementTranslationKey } from '@/translations';
 
 interface Props {
   open: boolean;
@@ -16,24 +17,21 @@ const MeasurementHistoryModal: React.FC<Props> = ({ open, keyName, onClose, hist
   const { t } = useTranslation();
 
   // Détermine l'unité à afficher
-  const getUnit = () => {
-    if (!keyName) return 'kg'; // Pour le poids (cas où keyName est null)
-    return 'cm'; // Pour les mesures corporelles
+  const getUnit = (keyName: string | null): string => {
+    if (!keyName) return 'kg';
+    return 'cm';
   };
 
   // Récupère le titre approprié
-  const getTitle = () => {
-    if (!keyName) {
-      return `${t('workout.weight')} - ${t('measurements.history')}`;
-    }
-    return `${t(`measurements.${keyName}`)} - ${t('measurements.history')}`;
+  const getTitle = (keyName: string | null): string => {
+    if (!keyName) return t('workout.weight');
+    return t(`measurements.${keyName}` as MeasurementTranslationKey);
   };
 
   // Formatage des valeurs pour éviter les valeurs extravagantes
-  const formatValue = (value: number) => {
-    // Arrondir à une décimale pour le poids, zéro pour les mesures
-    const decimal = !keyName ? 1 : 0;
-    return value.toFixed(decimal);
+  const formatValue = (value: number, keyName: string | null): number => {
+    const decimals = keyName ? 0 : 1;
+    return Number(value.toFixed(decimals));
   };
 
   return (
@@ -50,7 +48,7 @@ const MeasurementHistoryModal: React.FC<Props> = ({ open, keyName, onClose, hist
           borderRadius: theme.borderRadius.lg
         }]}>
           <Text style={[styles.title, { color: theme.colors.text.primary }]}>
-            {getTitle()}
+            {getTitle(keyName)} - {t('measurements.history')}
           </Text>
           <FlatList
             data={history}
@@ -59,7 +57,7 @@ const MeasurementHistoryModal: React.FC<Props> = ({ open, keyName, onClose, hist
               <View style={styles.row}>
                 <Text style={{ color: theme.colors.text.primary }}>{item.date}</Text>
                 <Text style={{ color: theme.colors.text.primary }}>
-                  {formatValue(item.value)} {getUnit()}
+                  {formatValue(item.value, keyName)} {getUnit(keyName)}
                 </Text>
               </View>
             )}

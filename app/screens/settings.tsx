@@ -12,6 +12,7 @@ import Header from '@/app/components/Header';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import Text from '@/app/components/ui/Text';
+import { TranslationKey } from '@/translations';
 
 export default function SettingsScreen() {
   const { settings, updateSettings, isLoading } = useSettings();
@@ -48,6 +49,36 @@ export default function SettingsScreen() {
   const toggleAbout = () => {
     setShowAbout(!showAbout);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  };
+
+  const handleResetData = async () => {
+    try {
+      const workouts = await AsyncStorage.getItem('workouts');
+      const goals = await AsyncStorage.getItem('goals');
+      const measurements = await AsyncStorage.getItem('measurements');
+
+      await AsyncStorage.multiRemove(['workouts', 'goals', 'measurements']);
+      
+      const workoutsAfter = await AsyncStorage.getItem('workouts');
+      const goalsAfter = await AsyncStorage.getItem('goals');
+      const measurementsAfter = await AsyncStorage.getItem('measurements');
+
+      if (workoutsAfter === null && goalsAfter === null && measurementsAfter === null) {
+        Alert.alert(
+          t('settings.resetDataSuccess' as TranslationKey),
+          '',
+          [{ text: 'OK' }]
+        );
+        await updateSettings(settings);
+      } else {
+        throw new Error('Data not properly cleared');
+      }
+    } catch (error) {
+      Alert.alert(
+        t('settings.errorResettingData'),
+        error instanceof Error ? error.message : String(error)
+      );
+    }
   };
 
   return (
@@ -157,73 +188,7 @@ export default function SettingsScreen() {
 
             <TouchableOpacity
               style={styles.settingItem}
-              onPress={() => {
-                Alert.alert(
-                  t('settings.resetData'),
-                  t('settings.resetDataConfirmation'),
-                  [
-                    {
-                      text: t('common.cancel'),
-                      style: 'cancel'
-                    },
-                    {
-                      text: t('common.reset'),
-                      style: 'destructive',
-                      onPress: async () => {
-                        try {
-                          // Afficher les données actuelles avant suppression
-                          const workouts = await AsyncStorage.getItem('workouts');
-                          const goals = await AsyncStorage.getItem('goals');
-                          const measurements = await AsyncStorage.getItem('bodyMeasurements');
-                          const favorites = await AsyncStorage.getItem('favoriteExercises');
-                          const recent = await AsyncStorage.getItem('recentExercises');
-                          const settings = await AsyncStorage.getItem('bodywork_settings');
-
-                          console.log('Données avant suppression:');
-                          console.log('Workouts:', workouts);
-                          console.log('Goals:', goals);
-                          console.log('Measurements:', measurements);
-                          console.log('Favorites:', favorites);
-                          console.log('Recent:', recent);
-                          console.log('Settings:', settings);
-
-                          // Supprimer TOUTES les données
-                          await AsyncStorage.clear();
-
-                          // Vérifier que les données ont bien été supprimées
-                          const workoutsAfter = await AsyncStorage.getItem('workouts');
-                          const goalsAfter = await AsyncStorage.getItem('goals');
-                          const measurementsAfter = await AsyncStorage.getItem('bodyMeasurements');
-                          const favoritesAfter = await AsyncStorage.getItem('favoriteExercises');
-                          const recentAfter = await AsyncStorage.getItem('recentExercises');
-                          const settingsAfter = await AsyncStorage.getItem('bodywork_settings');
-
-                          console.log('Données après suppression:');
-                          console.log('Workouts:', workoutsAfter);
-                          console.log('Goals:', goalsAfter);
-                          console.log('Measurements:', measurementsAfter);
-                          console.log('Favorites:', favoritesAfter);
-                          console.log('Recent:', recentAfter);
-                          console.log('Settings:', settingsAfter);
-
-                          // Forcer le rechargement des paramètres
-                          updateSettings({
-                            weightUnit: 'kg',
-                            gender: 'male',
-                            language: 'fr',
-                            theme: 'dark'
-                          });
-
-                          Alert.alert(t('common.success'), t('settings.dataResetSuccess'));
-                        } catch (error) {
-                          console.error('Erreur lors de la réinitialisation:', error);
-                          Alert.alert(t('common.error'), t('settings.errorResettingData'));
-                        }
-                      }
-                    }
-                  ]
-                );
-              }}
+              onPress={handleResetData}
             >
               <View style={styles.settingInfo}>
                 <Ionicons name="trash-outline" size={24} color={theme.colors.error} />

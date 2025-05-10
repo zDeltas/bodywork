@@ -22,7 +22,6 @@ config.resolver = {
   extraNodeModules: {
     '@': path.resolve(__dirname, 'app')
   },
-  // Désactive le support du package.json:exports pour éviter les erreurs avec ws, supabase, etc.
   unstable_enablePackageExports: false
 };
 

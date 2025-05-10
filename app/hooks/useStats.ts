@@ -7,6 +7,26 @@ import calculations from '@/app/utils/calculations';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { TranslationKey } from '@/translations';
 
+interface MuscleDistributionData {
+  name: string;
+  value: number;
+  color: string;
+  originalName: string;
+}
+
+const getMuscleGroupColor = (muscleGroup: string): string => {
+  const colors: Record<string, string> = {
+    chest: '#FF6B6B',
+    back: '#4ECDC4',
+    legs: '#45B7D1',
+    shoulders: '#96CEB4',
+    arms: '#FFEEAD',
+    core: '#D4A5A5',
+    other: '#9B9B9B'
+  };
+  return colors[muscleGroup.toLowerCase()] || colors.other;
+};
+
 const useStats = (selectedPeriod: Period) => {
   const { t } = useTranslation();
   const [statsData, setStatsData] = useState<StatsData>({
@@ -97,77 +117,31 @@ const useStats = (selectedPeriod: Period) => {
     };
   }, [t]);
 
-  const calculateMuscleDistribution = useCallback((workouts: Workout[]): StatsData['muscleDistribution'] => {
-    const filteredWorkouts = workouts.filter(workout => {
-      const workoutDate = new Date(workout.date);
-      const startDate = subMonths(new Date(), selectedPeriod === '1m' ? 1 : selectedPeriod === '3m' ? 3 : 6);
-      return workoutDate >= startDate;
-    });
+  const getMuscleDistribution = (workouts: Workout[]): MuscleDistributionData[] => {
+    const muscleGroups: Record<string, number> = {};
 
-    if (filteredWorkouts.length === 0) {
-      return [];
-    }
-
-    // Agréger le volume d'entraînement par groupe musculaire
-    const muscleGroupVolumes: { [key: string]: number } = {};
-    let totalVolume = 0;
-
-    filteredWorkouts.forEach(workout => {
-      // Utiliser directement la propriété muscleGroup de l'objet workout
-      const muscleGroup = workout.muscleGroup;
-
-      // Calculer le volume pour cet entraînement (poids × répétitions × nombre de séries)
-      const volume = workout.series.reduce((total, set) => {
-        return total + (set.weight * set.reps);
+    workouts.forEach(workout => {
+      const volume = workout.series.reduce((total, series) => {
+        return total + (series.weight * series.reps);
       }, 0);
 
-      // Agréger par groupe musculaire
-      if (!muscleGroupVolumes[muscleGroup]) {
-        muscleGroupVolumes[muscleGroup] = 0;
+      if (!muscleGroups[workout.muscleGroup]) {
+        muscleGroups[workout.muscleGroup] = 0;
       }
-      muscleGroupVolumes[muscleGroup] += volume;
-      totalVolume += volume;
+      muscleGroups[workout.muscleGroup] += volume;
     });
 
-    // Transformation des données pour le graphique
-    const muscleTranslations: { [key: string]: string } = {
-      chest: 'Pectoraux',
-      back: 'Dos',
-      legs: 'Jambes',
-      shoulders: 'Épaules',
-      biceps: 'Biceps',
-      triceps: 'Triceps',
-      core: 'Abdominaux',
-      cardio: 'Cardio',
-      other: 'Autres'
-    };
+    const totalVolume = Object.values(muscleGroups).reduce((sum, volume) => sum + volume, 0);
 
-    const muscleColors: { [key: string]: string } = {
-      chest: '#FF6B6B',
-      back: '#4ECDC4',
-      legs: '#45B7D1',
-      shoulders: '#96CEB4',
-      biceps: '#FFEEAD',
-      triceps: '#D4A5A5',
-      core: '#9B59B6',
-      cardio: '#F39C12',
-      other: '#BDC3C7'
-    };
-
-    // Convertir en pourcentages et format pour le graphique
-    return Object.entries(muscleGroupVolumes)
-      .map(([muscleGroup, volume]) => {
-        const percentage = totalVolume > 0 ? Math.round((volume / totalVolume) * 100) : 0;
-
-        return {
-          name: muscleTranslations[muscleGroup.toLowerCase()] || muscleGroup,
-          value: percentage,
-          color: muscleColors[muscleGroup.toLowerCase()] || '#CCCCCC',
-          originalName: muscleGroup
-        };
-      })
-      .sort((a, b) => b.value - a.value); // Trier par pourcentage décroissant
-  }, [selectedPeriod]);
+    return Object.entries(muscleGroups)
+      .map(([name, volume]) => ({
+        name: t(`muscleGroups.${name.toLowerCase()}` as TranslationKey),
+        value: Math.round((volume / totalVolume) * 100),
+        color: getMuscleGroupColor(name),
+        originalName: name
+      }))
+      .sort((a, b) => b.value - a.value);
+  };
 
   useEffect(() => {
     const loadWorkouts = async () => {
@@ -181,7 +155,7 @@ const useStats = (selectedPeriod: Period) => {
             monthlyProgress: calculateMonthlyProgress(workouts),
             trainingFrequency: calculateTrainingFrequency(workouts),
             bestProgressExercise: getBestProgressExercise(workouts),
-            muscleDistribution: calculateMuscleDistribution(workouts)
+            muscleDistribution: getMuscleDistribution(workouts)
           });
         }
       } catch (error) {
@@ -190,7 +164,7 @@ const useStats = (selectedPeriod: Period) => {
     };
 
     loadWorkouts();
-  }, [selectedPeriod, calculateMonthlyProgress, calculateTrainingFrequency, getBestProgressExercise, calculateMuscleDistribution]);
+  }, [selectedPeriod, calculateMonthlyProgress, calculateTrainingFrequency, getBestProgressExercise, getMuscleDistribution]);
 
   return statsData;
 };

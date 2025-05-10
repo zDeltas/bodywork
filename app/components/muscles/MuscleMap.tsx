@@ -6,7 +6,7 @@ import { differenceInHours } from 'date-fns';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
 import Text from '@/app/components/ui/Text';
-import { Workout } from '@/app/types/workout';
+import { Workout } from '@/app/types/common';
 import { useSettings } from '@/app/hooks/useSettings';
 
 interface MuscleMapProps {
@@ -71,37 +71,31 @@ export default function MuscleMap({ workouts }: MuscleMapProps) {
     transform: [{ rotateY: `${rotationValue.value}deg` }]
   }));
 
-  // Calculer l'état de repos des muscles
-  const calculateMuscleRestState = (muscleGroup: string): number => {
-    const now = new Date();
-    const muscleWorkouts = workouts.filter(w => w.muscleGroup === muscleGroup);
-
-    if (muscleWorkouts.length === 0) return 3; // Plus de 72h (gris)
-
-    const lastWorkout = muscleWorkouts.reduce((latest, current) => {
-      const currentDate = new Date(current.date);
-      const latestDate = new Date(latest.date);
-      return currentDate > latestDate ? current : latest;
-    });
-
-    const hoursSinceLastWorkout = differenceInHours(now, new Date(lastWorkout.date));
-
-    if (hoursSinceLastWorkout < 24) return 1; // 0-24h (rouge)
-    if (hoursSinceLastWorkout < 72) return 2; // 24-72h (bordeaux)
-    return 3; // Plus de 72h (gris)
+  const getMuscleRestState = (muscleWorkouts: Workout[]) => {
+    if (muscleWorkouts.length === 0) return 3;
+    
+    const lastWorkout = muscleWorkouts[muscleWorkouts.length - 1];
+    const lastWorkoutDate = new Date(lastWorkout.date);
+    const hoursSinceLastWorkout = (Date.now() - lastWorkoutDate.getTime()) / (1000 * 60 * 60);
+    
+    if (hoursSinceLastWorkout < 24) return 1;
+    if (hoursSinceLastWorkout < 72) return 2;
+    return 3;
   };
 
-  // Convertir en format ExtendedBodyPart avec les états de repos
-  const bodyData: ExtendedBodyPart[] = Object.entries(muscleGroupToSlug).map(([group, slug]) => ({
-    slug: slug as Slug,
-    intensity: calculateMuscleRestState(group)
-  }));
+  const getExtendedBodyParts = (workouts: Workout[]): ExtendedBodyPart[] => {
+    return Object.entries(muscleGroupToSlug).map(([group, slug]) => ({
+      slug: slug as Slug,
+      restState: getMuscleRestState(workouts.filter(w => w.muscleGroup === group))
+    }));
+  };
 
-  // Définir les couleurs pour l'intensité sous forme de tableau
-  const intensityColorsArray: string[] = [
-    theme.colors.error,          // 0-24h (rouge)
-    theme.colors.text.warning,   // 24-72h (remplacé bordeaux par warning)
-    theme.colors.text.disabled   // 72h+ (gris)
+  const bodyData = getExtendedBodyParts(workouts);
+
+  const intensityColors = [
+    theme.colors.error,
+    theme.colors.text.warning,
+    theme.colors.text.disabled
   ];
 
   return (
@@ -127,22 +121,22 @@ export default function MuscleMap({ workouts }: MuscleMapProps) {
           data={bodyData}
           side={selectedView}
           gender={settings.gender}
-          colors={intensityColorsArray}
+          colors={intensityColors}
         />
       </Animated.View>
       <View style={styles.legend}>
         <Text style={styles.legendTitle}>{t('muscleMap.muscleRestState')}</Text>
         <View style={styles.legendItems}>
           <View style={styles.legendItem}>
-            <View style={[styles.legendColor, { backgroundColor: intensityColorsArray[0] }]} />
+            <View style={[styles.legendColor, { backgroundColor: intensityColors[0] }]} />
             <Text style={styles.legendText}>{t('muscleMap.restPeriod0to24')}</Text>
           </View>
           <View style={styles.legendItem}>
-            <View style={[styles.legendColor, { backgroundColor: intensityColorsArray[1] }]} />
+            <View style={[styles.legendColor, { backgroundColor: intensityColors[1] }]} />
             <Text style={styles.legendText}>{t('muscleMap.restPeriod24to72')}</Text>
           </View>
           <View style={styles.legendItem}>
-            <View style={[styles.legendColor, { backgroundColor: intensityColorsArray[2] }]} />
+            <View style={[styles.legendColor, { backgroundColor: intensityColors[2] }]} />
             <Text style={styles.legendText}>{t('muscleMap.restPeriod72plus')}</Text>
           </View>
         </View>

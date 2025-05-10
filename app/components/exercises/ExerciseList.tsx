@@ -6,7 +6,7 @@ import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
 import Text from '@/app/components/ui/Text';
 
-type MuscleGroupKey = 'chest' | 'back' | 'legs' | 'shoulders' | 'biceps' | 'triceps' | 'core';
+export type MuscleGroupKey = 'chest' | 'back' | 'legs' | 'shoulders' | 'biceps' | 'triceps' | 'core';
 
 // Define muscle groups using translation keys
 export const muscleGroupKeys: MuscleGroupKey[] = [
@@ -65,7 +65,7 @@ const muscleImagesByKey: Record<MuscleGroupKey, any> = {
 
 interface ExerciseListProps {
   selectedMuscle: string;
-  setSelectedMuscle: (muscleGroup: string) => void;
+  setSelectedMuscle: (muscleGroup: string, muscleKey?: string) => void;
   exercise: string;
   setExercise: (exercise: string, exerciseKey?: string) => void;
   setIsCustomExercise?: (isCustom: boolean) => void;
@@ -184,7 +184,8 @@ export const ExerciseList: React.FC<ExerciseListProps> = ({
                 onPress={() => {
                   toggleMuscleGroupExpanded(muscleGroup);
                   if (selectedMuscle !== muscleGroup) {
-                    setSelectedMuscle(muscleGroup);
+                    const muscleKey = muscleGroupKeys[index];
+                    setSelectedMuscle(muscleGroup, muscleKey);
                     if (setIsCustomExercise) {
                       setIsCustomExercise(false);
                     }
@@ -251,7 +252,7 @@ export const ExerciseList: React.FC<ExerciseListProps> = ({
                       <TouchableOpacity
                         style={styles.customExerciseButton}
                         onPress={() => {
-                          setSelectedMuscle(muscleGroup);
+                          setSelectedMuscle(muscleGroup, muscleGroupKeys[index]);
                           setIsCustomExercise(true);
                         }}
                       >

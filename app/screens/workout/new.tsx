@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { Modal, Pressable, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -15,7 +15,9 @@ import Header from '@/app/components/Header';
 import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold, useFonts } from '@expo-google-fonts/inter';
 import ExerciseList from '@/app/components/exercises/ExerciseList';
 import { Series, SeriesType, Workout } from '@/app/types/common';
-import { WorkoutDateUtils } from '@/app/types/workout';
+import { WorkoutDateUtils } from '../../types/workout';
+import { MuscleGroupKey, muscleGroupKeys } from '@/app/components/exercises/ExerciseList';
+import { TranslationKey } from '@/translations';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -49,6 +51,7 @@ export default function NewWorkoutScreen() {
   const { theme } = useTheme();
   const styles = useStyles();
   const [selectedMuscle, setSelectedMuscle] = useState<string>('');
+  const [selectedMuscleKey, setSelectedMuscleKey] = useState<MuscleGroupKey | string>('');
   const [exercise, setExercise] = useState<string>('');
   const [exerciseKey, setExerciseKey] = useState<string>('');
   const [rpe, setRpe] = useState<string>('');
@@ -65,74 +68,58 @@ export default function NewWorkoutScreen() {
   const [selectedDate, setSelectedDate] = useState<string>(params.selectedDate as string || WorkoutDateUtils.getDatePart(new Date().toISOString()));
   const [showCalendar, setShowCalendar] = useState<boolean>(false);
   const [showExerciseSelector, setShowExerciseSelector] = useState<boolean>(false);
+  const [workouts, setWorkouts] = useState<Workout[]>([]);
 
-  // Function to calculate suggested weight based on previous workouts
-  const calculateSuggestedWeight = useCallback(async (selectedExercise: string, inputReps: string, inputRpe: string) => {
-    if (!selectedExercise || !inputReps || !inputRpe) {
-      setSuggestedWeight(null);
-      return;
-    }
-
-    try {
-      const existingWorkouts = await AsyncStorage.getItem('workouts');
-      if (!existingWorkouts) {
-        setSuggestedWeight(null);
-        return;
+  useEffect(() => {
+    const loadWorkouts = async () => {
+      try {
+        const storedWorkouts = await AsyncStorage.getItem('workouts');
+        if (storedWorkouts) {
+          setWorkouts(JSON.parse(storedWorkouts));
+        }
+      } catch (error) {
+        console.error('Error loading workouts:', error);
       }
+    };
+    loadWorkouts();
+  }, []);
 
-      const workouts = JSON.parse(existingWorkouts);
+  const calculateSuggestedWeight = (exercise: string, reps: number, rpe: number): number | null => {
+    const exerciseWorkouts = workouts.filter((w: Workout) => w.exercise === exercise);
+    if (exerciseWorkouts.length === 0) return null;
 
-      // Filter workouts for the same exercise
-      // Use exerciseKey for comparison if we're looking at a saved workout
-      const sameExerciseWorkouts = workouts.filter(
-        (w: Workout) => w.exercise === (exerciseKey || selectedExercise)
-      ).sort((a: Workout, b: Workout) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    const lastWorkout = exerciseWorkouts[exerciseWorkouts.length - 1];
+    if (!lastWorkout.series || lastWorkout.series.length === 0) return null;
 
-      // If no previous workouts for this exercise, return null
-      if (sameExerciseWorkouts.length === 0) {
-        setSuggestedWeight(null);
-        return;
-      }
+    const workingSet = lastWorkout.series.find((s: Series) => s.type === 'workingSet');
+    if (!workingSet) return null;
 
-      // Get the most recent workout for this exercise
-      const lastWorkout = sameExerciseWorkouts[0];
+    const oneRepMax = workingSet.weight * (1 + 0.033 * workingSet.reps);
+    const rpeAdjustment = (10 - rpe) * 0.025;
+    const suggestedWeight = oneRepMax * (1 - rpeAdjustment) / (1 + 0.033 * reps);
 
-      // If the last workout doesn't have series, we can't calculate
-      if (!lastWorkout.series || lastWorkout.series.length === 0) {
-        setSuggestedWeight(null);
-        return;
-      }
+    return Math.round(suggestedWeight / 2.5) * 2.5;
+  };
 
-      // Find the first working set in the series
-      const workingSet = lastWorkout.series.find((s: Series) => s.type === 'workingSet') || lastWorkout.series[0];
-      const lastWeight = workingSet.weight;
-      const lastReps = workingSet.reps;
-      const lastRpe = workingSet.rpe;
+  const validateSeries = (series: Series[]): boolean => {
+    const validSeries = series.filter(s => s.weight > 0 || s.reps > 0);
+    if (validSeries.length === 0) return false;
 
-      const currentReps = parseInt(inputReps);
-      const currentRpe = parseInt(inputRpe);
+    return validSeries.every(s => {
+      if (s.type === 'warmUp') return true;
+      return s.rpe >= 1 && s.rpe <= 10;
+    });
+  };
 
-      // Calculate one-rep max (Epley formula)
-      const lastOneRepMax = lastWeight * (1 + lastReps / 30);
-
-      // Adjust based on RPE difference
-      // RPE 10 is maximum effort, so we adjust based on how far from max
-      const rpeAdjustment = (currentRpe - lastRpe) * 0.03;
-
-      // Calculate suggested weight based on one-rep max, desired reps, and RPE
-      let calculatedWeight = lastOneRepMax * (1 - currentReps / 30) * (1 + rpeAdjustment);
-
-      // Round to nearest 2.5kg for barbells or 1kg for dumbbells
-      // This is a simplification - in reality, you'd want to adjust based on the equipment type
-      const roundingFactor = selectedExercise.toLowerCase().includes('haltères') ? 1 : 2.5;
-      calculatedWeight = Math.round(calculatedWeight / roundingFactor) * roundingFactor;
-
-      setSuggestedWeight(calculatedWeight > 0 ? calculatedWeight : lastWeight);
-    } catch (error) {
-      console.error('Error calculating suggested weight:', error);
-      setSuggestedWeight(null);
-    }
-  }, [setSuggestedWeight, exerciseKey]);
+  const processSeries = (series: EditableSeries[], rpe: string): Series[] => {
+    return series.map(s => ({
+      ...s,
+      weight: parseFloat(s.weight) || 0,
+      reps: parseInt(s.reps) || 0,
+      rpe: s.type === 'warmUp' ? 0 : (parseInt(s.rpe) || parseInt(rpe) || 7),
+      type: s.type || 'workingSet'
+    }));
+  };
 
   // Function to try to calculate suggested weight based on exercise, reps, and RPE
   const tryCalculateSuggestedWeight = useCallback(async (selectedExercise: string) => {
@@ -141,7 +128,7 @@ export default function NewWorkoutScreen() {
 
     // Try to calculate suggested weight if reps and RPE are already set
     if (selectedExercise && currentReps && currentRpe) {
-      calculateSuggestedWeight(selectedExercise, currentReps, currentRpe);
+      calculateSuggestedWeight(selectedExercise, parseInt(currentReps), parseInt(currentRpe));
       return;
     }
 
@@ -162,11 +149,11 @@ export default function NewWorkoutScreen() {
 
       // If we have reps but no RPE, use the last workout's RPE
       if (currentReps && !currentRpe) {
-        calculateSuggestedWeight(selectedExercise, currentReps, lastWorkingSet.rpe.toString());
+        calculateSuggestedWeight(selectedExercise, parseInt(currentReps), lastWorkingSet.rpe);
       }
       // If we have RPE but no reps, use the last workout's reps
       else if (!currentReps && currentRpe) {
-        calculateSuggestedWeight(selectedExercise, lastWorkingSet.reps.toString(), currentRpe);
+        calculateSuggestedWeight(selectedExercise, lastWorkingSet.reps, parseInt(currentRpe));
       }
       // If we have neither, use both from the last workout
       else if (!currentReps && !currentRpe) {
@@ -180,7 +167,7 @@ export default function NewWorkoutScreen() {
           setSeries(newSeries);
         }
         setRpe(lastWorkingSet.rpe.toString());
-        calculateSuggestedWeight(selectedExercise, lastWorkingSet.reps.toString(), lastWorkingSet.rpe.toString());
+        calculateSuggestedWeight(selectedExercise, parseInt(lastWorkingSet.reps), parseInt(lastWorkingSet.rpe));
       }
     } catch (error) {
       console.error('Error loading previous workouts:', error);
@@ -205,31 +192,17 @@ export default function NewWorkoutScreen() {
 
       // If no valid series, don't save
       if (validSeries.length === 0) {
-        // Show an alert or message to the user
         console.error('No valid series to save');
         return;
       }
 
       // Process series
-      const processedSeries: Series[] = validSeries.map(s => {
-        // For warm-up sets, RPE is not applicable
-        const rpeValue = s.type === 'warmUp'
-          ? 0  // Use 0 to indicate N/A for warm-up sets
-          : (parseInt(s.rpe) || parseInt(rpe) || 7); // Default to 7 for working sets if not specified
-
-        return {
-          weight: parseFloat(s.weight) || 0,
-          reps: parseInt(s.reps) || 0,
-          note: s.note || '',
-          rpe: rpeValue,
-          type: s.type || 'workingSet' // Include the series type
-        };
-      });
+      const processedSeries: Series[] = processSeries(validSeries, rpe);
 
       const workout: Workout = {
         id: Date.now().toString(),
-        muscleGroup: selectedMuscle,
-        exercise: exerciseKey, // Save the exercise key instead of the translated name
+        muscleGroup: selectedMuscleKey, // On utilise déjà la clé du groupe musculaire
+        exercise: exerciseKey, // On utilise déjà la clé de l'exercice
         series: processedSeries,
         date: selectedDate ? WorkoutDateUtils.createISOString(selectedDate) : new Date().toISOString()
       };
@@ -338,16 +311,18 @@ export default function NewWorkoutScreen() {
               <ScrollView style={{ flex: 1 }}>
                 <ExerciseList
                   selectedMuscle={selectedMuscle}
-                  setSelectedMuscle={setSelectedMuscle}
+                  setSelectedMuscle={(muscleGroup: string, muscleKey?: string) => {
+                    setSelectedMuscle(muscleGroup);
+                    setSelectedMuscleKey(muscleKey || muscleGroup);
+                  }}
                   exercise={exercise}
                   setExercise={(selectedExercise, selectedExerciseKey) => {
                     setExercise(selectedExercise);
-                    setExerciseKey(selectedExerciseKey || selectedExercise); // Use the translated name as key if no key is provided (for custom exercises)
+                    setExerciseKey(selectedExerciseKey || selectedExercise);
                     setShowExerciseSelector(false);
                     tryCalculateSuggestedWeight(selectedExercise);
                   }}
-                  setIsCustomExercise={() => {
-                  }}
+                  setIsCustomExercise={() => {}}
                 />
               </ScrollView>
             </View>
@@ -360,7 +335,7 @@ export default function NewWorkoutScreen() {
           onPress={() => setShowExerciseSelector(true)}
         >
           <Text variant="body" style={[styles.exerciseButtonText, !exercise && { color: theme.colors.text.secondary }]}>
-            {exercise || t('stats.selectExercise')}
+            {exercise ? t(exerciseKey as TranslationKey) : t('stats.selectExercise')}
           </Text>
           <ChevronDown color={theme.colors.text.secondary} size={20} />
         </TouchableOpacity>
@@ -505,7 +480,7 @@ export default function NewWorkoutScreen() {
                       setSeries(newSeries);
 
                       if (index === 0 && exercise && value && (item.rpe || rpe)) {
-                        calculateSuggestedWeight(exercise, value, item.rpe || rpe);
+                        calculateSuggestedWeight(exercise, parseInt(value), parseInt(item.rpe || rpe));
                       }
                     }}
                     placeholder="0"
@@ -550,7 +525,7 @@ export default function NewWorkoutScreen() {
                             };
                             setSeries(newSeries);
                             if (index === 0 && exercise && item.reps && rpeValue) {
-                              calculateSuggestedWeight(exercise, item.reps, rpeValue);
+                              calculateSuggestedWeight(exercise, parseInt(item.reps), parseInt(rpeValue));
                             }
                           }}
                         >
@@ -573,7 +548,7 @@ export default function NewWorkoutScreen() {
                             };
                             setSeries(newSeries);
                             if (index === 0 && exercise && item.reps && rpeValue) {
-                              calculateSuggestedWeight(exercise, item.reps, rpeValue);
+                              calculateSuggestedWeight(exercise, parseInt(item.reps), parseInt(rpeValue));
                             }
                           }}
                         >

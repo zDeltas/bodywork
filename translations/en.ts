@@ -122,7 +122,8 @@ export default {
     optionalNote: 'Optional note',
     usePreviousValues: 'Use previous values',
     notApplicable: 'N/A',
-    selectDate: 'Select a date'
+    selectDate: 'Select a date',
+    duplicateLastSeries: 'Duplicate last series'
   },
 
   // Timer screen

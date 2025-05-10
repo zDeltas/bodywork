@@ -1,3 +1,7 @@
+import { Series, Workout } from './common';
+
+export { Workout, Series };
+
 export const WorkoutDateUtils = {
   getDatePart: (isoString: string): string => {
     return isoString.split('T')[0];

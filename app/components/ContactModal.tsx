@@ -3,6 +3,7 @@ import { ActivityIndicator, Alert, StyleSheet, Text, TextInput, TouchableOpacity
 import { BlurView } from 'expo-blur';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
+import { StatsCardSkeleton } from '@/app/components/ui/SkeletonComponents';
 
 interface ContactModalProps {
   isVisible: boolean;
@@ -20,11 +21,12 @@ export default function ContactModal({ isVisible, onClose }: ContactModalProps) 
   });
   const [isSending, setIsSending] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [isLoading, setIsLoading] = useState(false);
 
   const validateForm = () => {
     const errors: Record<string, string> = {};
     if (!contactForm.name.trim()) {
-      errors.name = t('contact.nameRequired');
+      errors.name = t('contact.errors.nameRequired');
     }
     if (!contactForm.email.trim()) {
       errors.email = t('contact.errors.emailRequired');
@@ -72,6 +74,12 @@ export default function ContactModal({ isVisible, onClose }: ContactModalProps) 
 
   return (
     <BlurView intensity={20} style={styles.modalContainer}>
+      {isLoading ? (
+        <View style={styles.modalContent}>
+          <StatsCardSkeleton />
+          <StatsCardSkeleton />
+        </View>
+      ) : (
       <View style={styles.modalContent}>
         <Text style={styles.modalTitle}>{t('contact.title')}</Text>
 
@@ -143,6 +151,7 @@ export default function ContactModal({ isVisible, onClose }: ContactModalProps) 
           </TouchableOpacity>
         </View>
       </View>
+      )}
     </BlurView>
   );
 }

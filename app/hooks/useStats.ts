@@ -148,7 +148,14 @@ const useStats = (selectedPeriod: Period) => {
       try {
         const storedWorkouts = await AsyncStorage.getItem('workouts');
         if (storedWorkouts) {
-          const workouts = JSON.parse(storedWorkouts) as Workout[];
+          const parsedWorkouts = JSON.parse(storedWorkouts) as Workout[];
+          const workouts = parsedWorkouts.map(workout => ({
+            ...workout,
+            series: workout.series.map(series => ({
+              ...series,
+              type: series.type || 'workingSet'
+            }))
+          }));
 
           setStatsData({
             workouts,

@@ -102,7 +102,8 @@ export default {
     optionalNote: 'Note optionnelle',
     usePreviousValues: 'Utiliser les valeurs précédentes',
     notApplicable: 'N/A',
-    selectDate: 'Sélectionner une date'
+    selectDate: 'Sélectionner une date',
+    duplicateLastSeries: 'Dupliquer la dernière série'
   },
 
   // Timer screen

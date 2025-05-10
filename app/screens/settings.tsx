@@ -13,6 +13,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import Text from '@/app/components/ui/Text';
 import { TranslationKey } from '@/translations';
+import { StatsCardSkeleton } from '@/app/components/ui/SkeletonComponents';
 
 export default function SettingsScreen() {
   const { settings, updateSettings, isLoading } = useSettings();
@@ -89,9 +90,12 @@ export default function SettingsScreen() {
         onBack={() => router.back()}
       />
       {isLoading ? (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={theme.colors.primary} />
-          <Text style={styles.loadingText}>{t('settings.loadingSettings')}</Text>
+        <View style={styles.content}>
+          <View style={styles.section}>
+            <StatsCardSkeleton />
+            <StatsCardSkeleton />
+            <StatsCardSkeleton />
+          </View>
         </View>
       ) : (
         <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: 100 }}>

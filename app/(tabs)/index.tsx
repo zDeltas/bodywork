@@ -10,6 +10,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Header from '@/app/components/Header';
 import { Workout, WorkoutDateUtils } from '@/app/types/workout';
 import { TranslationKey } from '@/translations';
+import { Workout as CommonWorkout } from '@/app/types/common';
 
 LocaleConfig.locales['fr'] = {
   monthNames: [

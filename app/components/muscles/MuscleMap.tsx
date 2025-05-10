@@ -73,11 +73,11 @@ export default function MuscleMap({ workouts }: MuscleMapProps) {
 
   const getMuscleRestState = (muscleWorkouts: Workout[]) => {
     if (muscleWorkouts.length === 0) return 3;
-    
+
     const lastWorkout = muscleWorkouts[muscleWorkouts.length - 1];
     const lastWorkoutDate = new Date(lastWorkout.date);
     const hoursSinceLastWorkout = (Date.now() - lastWorkoutDate.getTime()) / (1000 * 60 * 60);
-    
+
     if (hoursSinceLastWorkout < 24) return 1;
     if (hoursSinceLastWorkout < 72) return 2;
     return 3;
@@ -85,7 +85,7 @@ export default function MuscleMap({ workouts }: MuscleMapProps) {
 
   const getExtendedBodyParts = (workouts: Workout[]): ExtendedBodyPart[] => {
     return Object.entries(muscleGroupToSlug).map(([group, slug]) => ({
-      slug: slug as Slug,
+    slug: slug as Slug,
       restState: getMuscleRestState(workouts.filter(w => w.muscleGroup === group))
     }));
   };

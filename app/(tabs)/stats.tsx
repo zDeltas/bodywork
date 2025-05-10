@@ -8,7 +8,7 @@ import { router } from 'expo-router';
 import { muscleGroupKeys } from '@/app/components/exercises/ExerciseList';
 import { useTheme } from '@/app/hooks/useTheme';
 import KpiMotivation from '@/app/components/stats/KpiMotivation';
-import { Workout } from '@/app/types/workout';
+import { Workout } from '@/app/types/common';
 import StatsExerciseList from '@/app/components/stats/StatsExerciseList';
 import StatsGoals from '@/app/components/stats/StatsGoals';
 import StatsMuscleDistribution from '@/app/components/stats/StatsMuscleDistribution';
@@ -17,6 +17,7 @@ import Header from '@/app/components/Header';
 import useStats from '@/app/hooks/useStats';
 import useGoals from '@/app/hooks/useGoals';
 import Text from '@/app/components/ui/Text';
+import { StatsCardSkeleton, ChartSkeleton } from '@/app/components/ui/SkeletonComponents';
 
 type MuscleGroupKey = typeof muscleGroupKeys[number];
 
@@ -154,7 +155,18 @@ export default function StatsScreen() {
   }, []);
 
   if (!fontsLoaded) {
-    return null;
+    return (
+      <View style={styles.container}>
+        <View style={styles.section}>
+          <StatsCardSkeleton />
+          <StatsCardSkeleton />
+          <StatsCardSkeleton />
+        </View>
+        <View style={styles.section}>
+          <ChartSkeleton />
+        </View>
+      </View>
+    );
   }
 
   return (
@@ -203,7 +215,7 @@ export default function StatsScreen() {
             fadeAnim={fadeAnim}
             selectedPeriod={selectedPeriod}
             setSelectedPeriod={setSelectedPeriod}
-            graphsSectionRef={graphsSectionRef}
+            graphsSectionRef={graphsSectionRef as React.RefObject<View>}
             muscleGroups={statsData.muscleDistribution}
           />
 
@@ -257,6 +269,10 @@ const useStyles = () => {
     content: {
       flex: 1
     },
+    section: {
+      marginBottom: theme.spacing.xl,
+      paddingHorizontal: theme.spacing.lg
+    },
     header: {
       flexDirection: 'row',
       justifyContent: 'space-between',
@@ -307,10 +323,6 @@ const useStyles = () => {
     },
     periodButtonActive: {
       backgroundColor: theme.colors.primary
-    },
-    sectionContainer: {
-      marginBottom: theme.spacing.xl,
-      paddingHorizontal: theme.spacing.lg
     },
     sectionTitle: {
       fontSize: theme.typography.fontSize.xl,

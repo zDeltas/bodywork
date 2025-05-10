@@ -5,6 +5,7 @@ import Animated, { FadeIn, SlideInRight } from 'react-native-reanimated';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
 import Text from '@/app/components/ui/Text';
+import { ExerciseCardSkeleton } from '@/app/components/ui/SkeletonComponents';
 
 export type MuscleGroupKey = 'chest' | 'back' | 'legs' | 'shoulders' | 'biceps' | 'triceps' | 'core';
 
@@ -71,6 +72,7 @@ interface ExerciseListProps {
   setIsCustomExercise?: (isCustom: boolean) => void;
   onExerciseSelect?: (exercise: string, exerciseKey?: string) => void;
   onMuscleSelect?: (muscleGroup: string) => void;
+  isLoading?: boolean;
 }
 
 export const ExerciseList: React.FC<ExerciseListProps> = ({
@@ -80,7 +82,8 @@ export const ExerciseList: React.FC<ExerciseListProps> = ({
                                                             setExercise,
                                                             setIsCustomExercise,
                                                             onExerciseSelect,
-                                                            onMuscleSelect
+                                                            onMuscleSelect,
+                                                            isLoading
                                                           }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
@@ -154,6 +157,13 @@ export const ExerciseList: React.FC<ExerciseListProps> = ({
         </View>
       </Animated.View>
 
+      {isLoading ? (
+        <View style={styles.container}>
+          <ExerciseCardSkeleton />
+          <ExerciseCardSkeleton />
+          <ExerciseCardSkeleton />
+        </View>
+      ) : (
       <Animated.View entering={FadeIn.duration(500).delay(100)}>
         {muscleGroups.map((muscleGroup, index) => {
           // If searching, only show muscle groups with matching exercises
@@ -184,8 +194,8 @@ export const ExerciseList: React.FC<ExerciseListProps> = ({
                 onPress={() => {
                   toggleMuscleGroupExpanded(muscleGroup);
                   if (selectedMuscle !== muscleGroup) {
-                    const muscleKey = muscleGroupKeys[index];
-                    setSelectedMuscle(muscleGroup, muscleKey);
+                      const muscleKey = muscleGroupKeys[index];
+                      setSelectedMuscle(muscleGroup, muscleKey);
                     if (setIsCustomExercise) {
                       setIsCustomExercise(false);
                     }
@@ -252,7 +262,7 @@ export const ExerciseList: React.FC<ExerciseListProps> = ({
                       <TouchableOpacity
                         style={styles.customExerciseButton}
                         onPress={() => {
-                          setSelectedMuscle(muscleGroup, muscleGroupKeys[index]);
+                            setSelectedMuscle(muscleGroup, muscleGroupKeys[index]);
                           setIsCustomExercise(true);
                         }}
                       >
@@ -268,6 +278,7 @@ export const ExerciseList: React.FC<ExerciseListProps> = ({
           );
         })}
       </Animated.View>
+      )}
     </>
   );
 };
@@ -354,6 +365,12 @@ const useStyles = () => {
     },
     customExerciseButtonText: {
       textAlign: 'center'
+    },
+    container: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      padding: theme.spacing.md
     }
   });
 };

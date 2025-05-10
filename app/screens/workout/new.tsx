@@ -4,7 +4,6 @@ import * as SplashScreen from 'expo-splash-screen';
 import { router, useLocalSearchParams } from 'expo-router';
 import { BarChart, Calendar, ChevronDown, Gauge, Layers, Plus, Weight, X } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Animated, { FadeIn } from 'react-native-reanimated';
 import { Calendar as RNCalendar } from 'react-native-calendars';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -15,15 +14,12 @@ import Header from '@/app/components/Header';
 import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold, useFonts } from '@expo-google-fonts/inter';
 import ExerciseList from '@/app/components/exercises/ExerciseList';
 import { Series, SeriesType, Workout } from '@/app/types/common';
-import { WorkoutDateUtils } from '../../types/workout';
+import { WorkoutDateUtils } from '@/app/types/workout';
 import { MuscleGroupKey, muscleGroupKeys } from '@/app/components/exercises/ExerciseList';
 import { TranslationKey } from '@/translations';
 
 SplashScreen.preventAutoHideAsync();
 
-/**
- * Interface pour une série en cours d'édition
- */
 interface EditableSeries {
   weight: string;
   reps: string;
@@ -34,7 +30,6 @@ interface EditableSeries {
 }
 
 export default function NewWorkoutScreen() {
-
   const [fontsLoaded] = useFonts({
     'Inter-Regular': Inter_400Regular,
     'Inter-SemiBold': Inter_600SemiBold,
@@ -121,18 +116,15 @@ export default function NewWorkoutScreen() {
     }));
   };
 
-  // Function to try to calculate suggested weight based on exercise, reps, and RPE
   const tryCalculateSuggestedWeight = useCallback(async (selectedExercise: string) => {
     const currentReps = series[0]?.reps || '';
     const currentRpe = series[0]?.rpe || rpe;
 
-    // Try to calculate suggested weight if reps and RPE are already set
     if (selectedExercise && currentReps && currentRpe) {
       calculateSuggestedWeight(selectedExercise, parseInt(currentReps), parseInt(currentRpe));
       return;
     }
 
-    // Otherwise, try to find previous workouts for this exercise
     try {
       const existingWorkouts = await AsyncStorage.getItem('workouts');
       if (!existingWorkouts) return;
@@ -147,17 +139,13 @@ export default function NewWorkoutScreen() {
       const lastWorkout = sameExerciseWorkouts[0];
       const lastWorkingSet = lastWorkout.series.find((s: Series) => s.type === 'workingSet') || lastWorkout.series[0];
 
-      // If we have reps but no RPE, use the last workout's RPE
       if (currentReps && !currentRpe) {
         calculateSuggestedWeight(selectedExercise, parseInt(currentReps), lastWorkingSet.rpe);
       }
-      // If we have RPE but no reps, use the last workout's reps
       else if (!currentReps && currentRpe) {
         calculateSuggestedWeight(selectedExercise, lastWorkingSet.reps, parseInt(currentRpe));
       }
-      // If we have neither, use both from the last workout
       else if (!currentReps && !currentRpe) {
-        // Update the first series with the reps from the last workout
         const newSeries = [...series];
         if (newSeries.length > 0) {
           newSeries[0] = {
@@ -176,33 +164,24 @@ export default function NewWorkoutScreen() {
 
   const saveWorkout = async (): Promise<void> => {
     try {
-      // Filter out empty series
       const validSeries = series.filter(s => {
-        // Basic validation: must have weight or reps
         const hasWeightOrReps = parseFloat(s.weight) > 0 || parseInt(s.reps) > 0;
-
         if (!hasWeightOrReps) return false;
-
-        // For warm-up sets, RPE is not required
         if (s.type === 'warmUp') return true;
-
-        // For working sets, ensure RPE is between 1 and 10
         return (parseInt(s.rpe) >= 1 && parseInt(s.rpe) <= 10) || (parseInt(rpe) >= 1 && parseInt(rpe) <= 10);
       });
 
-      // If no valid series, don't save
       if (validSeries.length === 0) {
         console.error('No valid series to save');
         return;
       }
 
-      // Process series
       const processedSeries: Series[] = processSeries(validSeries, rpe);
 
       const workout: Workout = {
         id: Date.now().toString(),
-        muscleGroup: selectedMuscleKey, // On utilise déjà la clé du groupe musculaire
-        exercise: exerciseKey, // On utilise déjà la clé de l'exercice
+        muscleGroup: selectedMuscleKey,
+        exercise: exerciseKey,
         series: processedSeries,
         date: selectedDate ? WorkoutDateUtils.createISOString(selectedDate) : new Date().toISOString()
       };
@@ -290,7 +269,6 @@ export default function NewWorkoutScreen() {
           </View>
         </Modal>
 
-        {/* Exercise Selector Modal */}
         <Modal
           visible={showExerciseSelector}
           transparent={true}
@@ -329,7 +307,6 @@ export default function NewWorkoutScreen() {
           </View>
         </Modal>
 
-        {/* Exercise Selection Button */}
         <TouchableOpacity
           style={styles.exerciseButton}
           onPress={() => setShowExerciseSelector(true)}
@@ -340,302 +317,304 @@ export default function NewWorkoutScreen() {
           <ChevronDown color={theme.colors.text.secondary} size={20} />
         </TouchableOpacity>
 
-        <Animated.View
-          entering={FadeIn.duration(500).delay(300)}
-        >
-          <View style={styles.sectionTitleContainer}>
-            <Layers color={theme.colors.primary} size={24} style={styles.sectionTitleIcon} />
-            <Text variant="heading" style={styles.sectionTitle}>
-              {t('workout.series')}
-            </Text>
-          </View>
+        <View style={styles.sectionTitleContainer}>
+          <Layers color={theme.colors.primary} size={24} style={styles.sectionTitleIcon} />
+          <Text variant="heading" style={styles.sectionTitle}>
+            {t('workout.series')}
+          </Text>
+        </View>
 
-          {series.map((item, index) => (
-            <Animated.View
-              key={index}
-              entering={FadeIn.duration(400).delay(100 + index * 50)}
-              style={styles.seriesContainer}
-            >
-              <View style={styles.seriesHeader}>
-                <Text variant="subheading" style={styles.seriesTitle}>{t('workout.series')} {index + 1}</Text>
-                <View style={styles.seriesActions}>
-                  {index > 0 && (
-                    <TouchableOpacity
-                      style={styles.seriesActionButton}
-                      onPress={() => {
-                        const newSeries = [...series];
-                        newSeries.splice(index, 1);
-                        setSeries(newSeries);
-                      }}
-                    >
-                      <X color={theme.colors.text.primary} size={18} />
-                    </TouchableOpacity>
-                  )}
-                </View>
-              </View>
-
-              <View style={styles.seriesTypeContainer}>
-                <Text variant="body" style={styles.seriesInputLabel}>{t('workout.seriesType')}</Text>
-                <View style={styles.seriesTypeButtonsContainer}>
+        {series.map((item, index) => (
+          <View
+            key={index}
+            style={styles.seriesContainer}
+          >
+            <View style={styles.seriesHeader}>
+              <Text variant="subheading" style={styles.seriesTitle}>{t('workout.series')} {index + 1}</Text>
+              <View style={styles.seriesActions}>
+                {index > 0 && (
                   <TouchableOpacity
-                    style={[
-                      styles.seriesTypeButton,
-                      item.type === 'warmUp' && styles.seriesTypeButtonSelected
-                    ]}
+                    style={styles.seriesActionButton}
                     onPress={() => {
                       const newSeries = [...series];
-                      newSeries[index] = { ...newSeries[index], type: 'warmUp' };
+                      newSeries.splice(index, 1);
                       setSeries(newSeries);
                     }}
                   >
-                    <Text
-                      style={[
-                        styles.seriesTypeButtonText,
-                        item.type === 'warmUp' && styles.seriesTypeButtonTextSelected
-                      ]}
-                    >
-                      {t('workout.warmUp')}
-                    </Text>
-                    <Text variant="caption" style={styles.seriesTypeDescription}>
-                      {t('workout.warmUpDescription')}
-                    </Text>
+                    <X color={theme.colors.text.primary} size={18} />
                   </TouchableOpacity>
-
-                  <TouchableOpacity
-                    style={[
-                      styles.seriesTypeButton,
-                      item.type === 'workingSet' && styles.seriesTypeButtonSelected
-                    ]}
-                    onPress={() => {
-                      const newSeries = [...series];
-                      newSeries[index] = { ...newSeries[index], type: 'workingSet' };
-                      setSeries(newSeries);
-                    }}
-                  >
-                    <Text
-                      style={[
-                        styles.seriesTypeButtonText,
-                        item.type === 'workingSet' && styles.seriesTypeButtonTextSelected
-                      ]}
-                    >
-                      {t('workout.workingSet')}
-                    </Text>
-                    <Text variant="caption" style={styles.seriesTypeDescription}>
-                      {t('workout.workingSetDescription')}
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-
-              <View style={[styles.row]}>
-                <View style={styles.column}>
-                  <View style={styles.sectionTitleContainer}>
-                    <Weight color={theme.colors.primary} size={20} style={styles.sectionTitleIcon} />
-                    <Text variant="body" style={styles.seriesInputLabel}>{t('workout.weightKg')}</Text>
-                  </View>
-                  {index === 0 && suggestedWeight !== null && (
-                    <Animated.View
-                      entering={FadeIn.duration(400).delay(100)}
-                      style={styles.suggestedWeightContainer}
-                    >
-                      <Text variant="caption" style={styles.suggestedWeightText}>
-                        {t('workout.suggested')}: {suggestedWeight} kg
-                      </Text>
-                      <TouchableOpacity
-                        onPress={() => {
-                          const newSeries = [...series];
-                          newSeries[index] = { ...newSeries[index], weight: suggestedWeight.toString() };
-                          setSeries(newSeries);
-                        }}
-                        style={styles.useSuggestedButton}
-                      >
-                        <Text variant="body" style={styles.useSuggestedButtonText}>{t('common.use')}</Text>
-                      </TouchableOpacity>
-                    </Animated.View>
-                  )}
-                  <TextInput
-                    style={styles.compactInput}
-                    value={item.weight}
-                    onChangeText={(value) => {
-                      const newSeries = [...series];
-                      newSeries[index] = { ...newSeries[index], weight: value };
-                      setSeries(newSeries);
-                    }}
-                    placeholder="0"
-                    placeholderTextColor={theme.colors.text.secondary}
-                    keyboardType="numeric"
-                  />
-                </View>
-                <View style={styles.column}>
-                  <View style={styles.sectionTitleContainer}>
-                    <BarChart color={theme.colors.primary} size={20} style={styles.sectionTitleIcon} />
-                    <Text variant="body" style={styles.seriesInputLabel}>{t('workout.reps')}</Text>
-                  </View>
-                  <TextInput
-                    style={styles.compactInput}
-                    value={item.reps}
-                    onChangeText={(value) => {
-                      const newSeries = [...series];
-                      newSeries[index] = { ...newSeries[index], reps: value };
-                      setSeries(newSeries);
-
-                      if (index === 0 && exercise && value && (item.rpe || rpe)) {
-                        calculateSuggestedWeight(exercise, parseInt(value), parseInt(item.rpe || rpe));
-                      }
-                    }}
-                    placeholder="0"
-                    placeholderTextColor={theme.colors.text.secondary}
-                    keyboardType="numeric"
-                  />
-                </View>
-              </View>
-              {/* Grille RPE sous weight et reps */}
-              <View style={styles.rpeSectionContainer}>
-                <View style={styles.sectionTitleContainer}>
-                  <Gauge color={theme.colors.primary} size={20} style={styles.sectionTitleIcon} />
-                  <Text
-                    style={[
-                      styles.seriesInputLabel,
-                      item.type === 'warmUp' && styles.disabledLabel
-                    ]}
-                  >
-                    {t('workout.rpe')}
-                    {item.type === 'warmUp' && (
-                      <Text variant="caption" style={styles.disabledLabelNote}> ({t('workout.notApplicable')})</Text>
-                    )}
-                  </Text>
-                </View>
-                {item.type === 'warmUp' ? (
-                  <View style={[styles.rpeButtonGrid, styles.disabledDropdown]}>
-                    <Text variant="body" style={styles.disabledDropdownButtonText}>{t('workout.notApplicable')}</Text>
-                  </View>
-                ) : (
-                  <>
-                    <View style={styles.rpeButtonRow}>
-                      {[1, 2, 3, 4, 5].map((value) => (
-                        <Pressable
-                          key={value}
-                          style={[styles.rpeButtonModern, item.rpe === value.toString() && styles.rpeButtonModernSelected]}
-                          onPress={() => {
-                            const rpeValue = value.toString();
-                            const newSeries = [...series];
-                            newSeries[index] = {
-                              ...newSeries[index],
-                              rpe: rpeValue
-                            };
-                            setSeries(newSeries);
-                            if (index === 0 && exercise && item.reps && rpeValue) {
-                              calculateSuggestedWeight(exercise, parseInt(item.reps), parseInt(rpeValue));
-                            }
-                          }}
-                        >
-                          <Text variant="body"
-                                style={[styles.rpeButtonModernText, item.rpe === value.toString() && styles.rpeButtonModernTextSelected]}>{value}</Text>
-                        </Pressable>
-                      ))}
-                    </View>
-                    <View style={styles.rpeButtonRow}>
-                      {[6, 7, 8, 9, 10].map((value) => (
-                        <Pressable
-                          key={value}
-                          style={[styles.rpeButtonModern, item.rpe === value.toString() && styles.rpeButtonModernSelected]}
-                          onPress={() => {
-                            const rpeValue = value.toString();
-                            const newSeries = [...series];
-                            newSeries[index] = {
-                              ...newSeries[index],
-                              rpe: rpeValue
-                            };
-                            setSeries(newSeries);
-                            if (index === 0 && exercise && item.reps && rpeValue) {
-                              calculateSuggestedWeight(exercise, parseInt(item.reps), parseInt(rpeValue));
-                            }
-                          }}
-                        >
-                          <Text variant="body"
-                                style={[styles.rpeButtonModernText, item.rpe === value.toString() && styles.rpeButtonModernTextSelected]}>{value}</Text>
-                        </Pressable>
-                      ))}
-                    </View>
-                  </>
                 )}
               </View>
+            </View>
 
-              <View style={styles.noteContainer}>
-                <Text variant="body" style={styles.seriesInputLabel}>{t('common.note')}</Text>
-                <TextInput
-                  style={styles.noteInput}
-                  value={item.note}
-                  onChangeText={(value) => {
+            <View style={styles.seriesTypeContainer}>
+              <Text variant="body" style={styles.seriesInputLabel}>{t('workout.seriesType')}</Text>
+              <View style={styles.seriesTypeButtonsContainer}>
+                <TouchableOpacity
+                  style={[
+                    styles.seriesTypeButton,
+                    item.type === 'warmUp' && styles.seriesTypeButtonSelected
+                  ]}
+                  onPress={() => {
                     const newSeries = [...series];
-                    newSeries[index] = { ...newSeries[index], note: value };
+                    newSeries[index] = { ...newSeries[index], type: 'warmUp' };
                     setSeries(newSeries);
                   }}
-                  placeholder={t('workout.optionalNote')}
+                >
+                  <Text
+                    style={[
+                      styles.seriesTypeButtonText,
+                      item.type === 'warmUp' && styles.seriesTypeButtonTextSelected
+                    ]}
+                  >
+                    {t('workout.warmUp')}
+                  </Text>
+                  <Text variant="caption" style={styles.seriesTypeDescription}>
+                    {t('workout.warmUpDescription')}
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[
+                    styles.seriesTypeButton,
+                    item.type === 'workingSet' && styles.seriesTypeButtonSelected
+                  ]}
+                  onPress={() => {
+                    const newSeries = [...series];
+                    newSeries[index] = { ...newSeries[index], type: 'workingSet' };
+                    setSeries(newSeries);
+                  }}
+                >
+                  <Text
+                    style={[
+                      styles.seriesTypeButtonText,
+                      item.type === 'workingSet' && styles.seriesTypeButtonTextSelected
+                    ]}
+                  >
+                    {t('workout.workingSet')}
+                  </Text>
+                  <Text variant="caption" style={styles.seriesTypeDescription}>
+                    {t('workout.workingSetDescription')}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <View style={[styles.row]}>
+              <View style={styles.column}>
+                <View style={styles.sectionTitleContainer}>
+                  <Weight color={theme.colors.primary} size={20} style={styles.sectionTitleIcon} />
+                  <Text variant="body" style={styles.seriesInputLabel}>{t('workout.weightKg')}</Text>
+                </View>
+                {index === 0 && suggestedWeight !== null && (
+                  <View style={styles.suggestedWeightContainer}>
+                    <Text variant="caption" style={styles.suggestedWeightText}>
+                      {t('workout.suggested')}: {suggestedWeight} kg
+                    </Text>
+                    <TouchableOpacity
+                      onPress={() => {
+                        const newSeries = [...series];
+                        newSeries[index] = { ...newSeries[index], weight: suggestedWeight.toString() };
+                        setSeries(newSeries);
+                      }}
+                      style={styles.useSuggestedButton}
+                    >
+                      <Text variant="body" style={styles.useSuggestedButtonText}>{t('common.use')}</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+                <TextInput
+                  style={styles.compactInput}
+                  value={item.weight}
+                  onChangeText={(value) => {
+                    const newSeries = [...series];
+                    newSeries[index] = { ...newSeries[index], weight: value };
+                    setSeries(newSeries);
+                  }}
+                  placeholder="0"
                   placeholderTextColor={theme.colors.text.secondary}
-                  multiline
+                  keyboardType="numeric"
                 />
               </View>
-
-              {index > 0 && (
-                <View style={styles.quickFillContainer}>
-                  <TouchableOpacity
-                    style={styles.quickFillButton}
-                    onPress={() => {
-                      // Copy values from previous series
-                      const newSeries = [...series];
-                      const prevSeries = newSeries[index - 1];
-                      newSeries[index] = {
-                        ...newSeries[index],
-                        weight: prevSeries.weight,
-                        reps: prevSeries.reps,
-                        rpe: prevSeries.rpe,
-                        type: prevSeries.type, // Copy the series type as well
-                        showRpeDropdown: false
-                      };
-                      setSeries(newSeries);
-                    }}
-                  >
-                    <Text variant="body" style={styles.quickFillButtonText}>{t('workout.usePreviousValues')}</Text>
-                  </TouchableOpacity>
+              <View style={styles.column}>
+                <View style={styles.sectionTitleContainer}>
+                  <BarChart color={theme.colors.primary} size={20} style={styles.sectionTitleIcon} />
+                  <Text variant="body" style={styles.seriesInputLabel}>{t('workout.reps')}</Text>
                 </View>
+                <TextInput
+                  style={styles.compactInput}
+                  value={item.reps}
+                  onChangeText={(value) => {
+                    const newSeries = [...series];
+                    newSeries[index] = { ...newSeries[index], reps: value };
+                    setSeries(newSeries);
+
+                    if (index === 0 && exercise && value && (item.rpe || rpe)) {
+                      calculateSuggestedWeight(exercise, parseInt(value), parseInt(item.rpe || rpe));
+                    }
+                  }}
+                  placeholder="0"
+                  placeholderTextColor={theme.colors.text.secondary}
+                  keyboardType="numeric"
+                />
+              </View>
+            </View>
+
+            <View style={styles.rpeSectionContainer}>
+              <View style={styles.sectionTitleContainer}>
+                <Gauge color={theme.colors.primary} size={20} style={styles.sectionTitleIcon} />
+                <Text
+                  style={[
+                    styles.seriesInputLabel,
+                    item.type === 'warmUp' && styles.disabledLabel
+                  ]}
+                >
+                  {t('workout.rpe')}
+                  {item.type === 'warmUp' && (
+                    <Text variant="caption" style={styles.disabledLabelNote}> ({t('workout.notApplicable')})</Text>
+                  )}
+                </Text>
+              </View>
+              {item.type === 'warmUp' ? (
+                <View style={[styles.rpeButtonGrid, styles.disabledDropdown]}>
+                  <Text variant="body" style={styles.disabledDropdownButtonText}>{t('workout.notApplicable')}</Text>
+                </View>
+              ) : (
+                <>
+                  <View style={styles.rpeButtonRow}>
+                    {[1, 2, 3, 4, 5].map((value) => (
+                      <Pressable
+                        key={value}
+                        style={[styles.rpeButtonModern, item.rpe === value.toString() && styles.rpeButtonModernSelected]}
+                        onPress={() => {
+                          const rpeValue = value.toString();
+                          const newSeries = [...series];
+                          newSeries[index] = {
+                            ...newSeries[index],
+                            rpe: rpeValue
+                          };
+                          setSeries(newSeries);
+                          if (index === 0 && exercise && item.reps && rpeValue) {
+                            calculateSuggestedWeight(exercise, parseInt(item.reps), parseInt(rpeValue));
+                          }
+                        }}
+                      >
+                        <Text variant="body"
+                              style={[styles.rpeButtonModernText, item.rpe === value.toString() && styles.rpeButtonModernTextSelected]}>{value}</Text>
+                      </Pressable>
+                    ))}
+                  </View>
+                  <View style={styles.rpeButtonRow}>
+                    {[6, 7, 8, 9, 10].map((value) => (
+                      <Pressable
+                        key={value}
+                        style={[styles.rpeButtonModern, item.rpe === value.toString() && styles.rpeButtonModernSelected]}
+                        onPress={() => {
+                          const rpeValue = value.toString();
+                          const newSeries = [...series];
+                          newSeries[index] = {
+                            ...newSeries[index],
+                            rpe: rpeValue
+                          };
+                          setSeries(newSeries);
+                          if (index === 0 && exercise && item.reps && rpeValue) {
+                            calculateSuggestedWeight(exercise, parseInt(item.reps), parseInt(rpeValue));
+                          }
+                        }}
+                      >
+                        <Text variant="body"
+                              style={[styles.rpeButtonModernText, item.rpe === value.toString() && styles.rpeButtonModernTextSelected]}>{value}</Text>
+                      </Pressable>
+                    ))}
+                  </View>
+                </>
               )}
-            </Animated.View>
-          ))}
+            </View>
 
-          {!isAnyRpeDropdownOpen && (
-            <TouchableOpacity
-              style={styles.addSeriesButton}
-              onPress={() => {
-                setSeries([...series, {
-                  weight: '',
-                  reps: '',
-                  note: '',
-                  rpe: '',
-                  showRpeDropdown: false,
-                  type: 'workingSet' // Default to working set for new series
-                }]);
-              }}
-            >
-              <Plus color={theme.colors.text.primary} size={20} style={{ marginRight: theme.spacing.sm }} />
-              <Text variant="body" style={styles.addSeriesButtonText}>{t('workout.addSeries')}</Text>
-            </TouchableOpacity>
-          )}
-        </Animated.View>
+            <View style={styles.noteContainer}>
+              <Text variant="body" style={styles.seriesInputLabel}>{t('common.note')}</Text>
+              <TextInput
+                style={styles.noteInput}
+                value={item.note}
+                onChangeText={(value) => {
+                  const newSeries = [...series];
+                  newSeries[index] = { ...newSeries[index], note: value };
+                  setSeries(newSeries);
+                }}
+                placeholder={t('workout.optionalNote')}
+                placeholderTextColor={theme.colors.text.secondary}
+                multiline
+              />
+            </View>
 
-        <Animated.View
-          entering={FadeIn.duration(500).delay(500)}
-        >
-          {!isAnyRpeDropdownOpen && (
-            <TouchableOpacity
-              style={[styles.addButton, (!exercise || !selectedMuscle) && styles.addButtonDisabled]}
-              onPress={saveWorkout}
-              disabled={!exercise || !selectedMuscle}
-            >
-              <Text variant="body" style={styles.addButtonText}>{t('workout.addExercise')}</Text>
-            </TouchableOpacity>
-          )}
-        </Animated.View>
+            {index > 0 && (
+              <View style={styles.quickFillContainer}>
+                <TouchableOpacity
+                  style={styles.quickFillButton}
+                  onPress={() => {
+                    const newSeries = [...series];
+                    const prevSeries = newSeries[index - 1];
+                    newSeries[index] = {
+                      ...newSeries[index],
+                      weight: prevSeries.weight,
+                      reps: prevSeries.reps,
+                      rpe: prevSeries.rpe,
+                      type: prevSeries.type,
+                      showRpeDropdown: false
+                    };
+                    setSeries(newSeries);
+                  }}
+                >
+                  <Text variant="body" style={styles.quickFillButtonText}>{t('workout.usePreviousValues')}</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
+        ))}
+
+        {!isAnyRpeDropdownOpen && series.length > 0 && (
+          <TouchableOpacity
+            style={styles.duplicateButton}
+            onPress={() => {
+              const lastSeries = series[series.length - 1];
+              setSeries([...series, {
+                ...lastSeries,
+                showRpeDropdown: false
+              }]);
+            }}
+          >
+            <Text variant="body" style={styles.duplicateButtonText}>{t('workout.duplicateLastSeries')}</Text>
+          </TouchableOpacity>
+        )}
+
+        {!isAnyRpeDropdownOpen && (
+          <TouchableOpacity
+            style={styles.addSeriesButton}
+            onPress={() => {
+              setSeries([...series, {
+                weight: '',
+                reps: '',
+                note: '',
+                rpe: '',
+                showRpeDropdown: false,
+                type: 'workingSet'
+              }]);
+            }}
+          >
+            <Plus color={theme.colors.text.primary} size={20} style={{ marginRight: theme.spacing.sm }} />
+            <Text variant="body" style={styles.addSeriesButtonText}>{t('workout.addSeries')}</Text>
+          </TouchableOpacity>
+        )}
+
+        {!isAnyRpeDropdownOpen && (
+          <TouchableOpacity
+            style={[styles.addButton, (!exercise || !selectedMuscle) && styles.addButtonDisabled]}
+            onPress={saveWorkout}
+            disabled={!exercise || !selectedMuscle}
+          >
+            <Text variant="body" style={styles.addButtonText}>{t('workout.addExercise')}</Text>
+          </TouchableOpacity>
+        )}
       </ScrollView>
     </View>
   );
@@ -957,18 +936,19 @@ const useStyles = () => {
     },
     addSeriesButton: {
       flexDirection: 'row',
-      backgroundColor: theme.colors.background.button,
+      backgroundColor: theme.colors.background.card,
       paddingVertical: theme.spacing.base,
       paddingHorizontal: theme.spacing.lg,
       borderRadius: theme.borderRadius.base,
       alignItems: 'center',
       justifyContent: 'center',
       marginBottom: theme.spacing.xl,
-      ...theme.shadows.sm
+      borderWidth: 1,
+      borderColor: theme.colors.border.default
     },
     addSeriesButtonText: {
       color: theme.colors.text.primary,
-      fontFamily: theme.typography.fontFamily.semiBold,
+      fontFamily: theme.typography.fontFamily.regular,
       fontSize: theme.typography.fontSize.base
     },
     addButton: {
@@ -976,16 +956,15 @@ const useStyles = () => {
       paddingVertical: theme.spacing.lg,
       borderRadius: theme.borderRadius.base,
       alignItems: 'center',
-      ...theme.shadows.lg,
       marginTop: theme.spacing.sm
     },
     addButtonDisabled: {
       backgroundColor: theme.colors.background.button,
-      ...theme.shadows.sm
+      opacity: 0.5
     },
     addButtonText: {
       color: theme.colors.text.primary,
-      fontFamily: theme.typography.fontFamily.bold,
+      fontFamily: theme.typography.fontFamily.semiBold,
       fontSize: theme.typography.fontSize.lg
     },
     rpeButtonGrid: {
@@ -1129,6 +1108,22 @@ const useStyles = () => {
       fontFamily: theme.typography.fontFamily.semiBold,
       fontSize: theme.typography.fontSize.base,
       marginRight: theme.spacing.sm
+    },
+    duplicateButton: {
+      backgroundColor: theme.colors.background.card,
+      paddingVertical: theme.spacing.base,
+      paddingHorizontal: theme.spacing.lg,
+      borderRadius: theme.borderRadius.base,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: theme.spacing.md,
+      borderWidth: 1,
+      borderColor: theme.colors.border.default
+    },
+    duplicateButtonText: {
+      color: theme.colors.text.primary,
+      fontFamily: theme.typography.fontFamily.regular,
+      fontSize: theme.typography.fontSize.base
     }
   });
 };

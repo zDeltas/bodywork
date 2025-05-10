@@ -9,6 +9,7 @@ import { MeasurementKey } from './MeasurementBodyMap';
 import { MeasurementTranslationKey } from '@/translations';
 import { BarChart3, Clock } from 'lucide-react-native';
 import { WorkoutDateUtils } from '@/app/types/workout';
+import { StatsCardSkeleton, ChartSkeleton } from '@/app/components/ui/SkeletonComponents';
 
 type Measurement = {
   date: string;
@@ -18,10 +19,12 @@ type Measurement = {
 
 interface MeasurementHistoryProps {
   measurements: Measurement[];
+  isLoading: boolean;
 }
 
 const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({
-                                                                 measurements
+                                                                 measurements,
+                                                                 isLoading
                                                                }) => {
   const { theme } = useTheme();
   const { t } = useTranslation();
@@ -217,6 +220,10 @@ const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({
     container: {
       flex: 1,
       paddingTop: 8
+    },
+    section: {
+      marginBottom: theme.spacing.xl,
+      paddingHorizontal: theme.spacing.lg
     },
     cardGrid: {
       flexDirection: 'row',
@@ -462,6 +469,20 @@ const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({
       color: theme.colors.text.primary
     }
   });
+
+  if (isLoading) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.section}>
+          <StatsCardSkeleton />
+          <StatsCardSkeleton />
+        </View>
+        <View style={styles.section}>
+          <ChartSkeleton />
+        </View>
+      </View>
+    );
+  }
 
   if (measurements.length === 0) {
     return (

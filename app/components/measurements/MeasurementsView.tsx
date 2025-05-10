@@ -1,9 +1,9 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { View, ScrollView, StyleSheet, TouchableOpacity, Text, TextInput, Modal } from 'react-native';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useTheme } from '@/app/hooks/useTheme';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import Header from '@/app/components/Header';
-import { BarChart, ListPlus, Calendar as CalendarIcon, Scale, ChevronDown } from 'lucide-react-native';
+import { BarChart, Calendar as CalendarIcon, ChevronDown, ListPlus, Scale } from 'lucide-react-native';
 import MeasurementBody, { MeasurementKey } from './MeasurementBodyMap';
 import MeasurementModal from './MeasurementModal';
 import MeasurementHistoryModal from './MeasurementHistoryModal';
@@ -49,7 +49,10 @@ export default function MeasurementsView() {
   const [measurements, setMeasurements] = useState<Measurement>(initialMeasurements);
   const [allMeasurements, setAllMeasurements] = useState<Measurement[]>([]);
   const [modal, setModal] = useState<{ key: MeasurementKey | null, open: boolean }>({ key: null, open: false });
-  const [historyModal, setHistoryModal] = useState<{ key: MeasurementKey | null, open: boolean }>({ key: null, open: false });
+  const [historyModal, setHistoryModal] = useState<{ key: MeasurementKey | null, open: boolean }>({
+    key: null,
+    open: false
+  });
   const [showCalendar, setShowCalendar] = useState(false);
   const [showWeightModal, setShowWeightModal] = useState(false);
 
@@ -217,7 +220,7 @@ export default function MeasurementsView() {
       maxWidth: '90%'
     },
     calendarCloseButton: {
-      backgroundColor: theme.colors.primary, 
+      backgroundColor: theme.colors.primary,
       borderRadius: theme.borderRadius.md,
       paddingVertical: 10,
       marginTop: 16,
@@ -260,8 +263,8 @@ export default function MeasurementsView() {
   const renderDateWeight = () => (
     <View style={styles.measurementInputContainer}>
       {/* Date selection */}
-      <TouchableOpacity 
-        style={styles.inputCard} 
+      <TouchableOpacity
+        style={styles.inputCard}
         onPress={() => setShowCalendar(true)}
       >
         <View style={styles.inputHeader}>
@@ -277,7 +280,7 @@ export default function MeasurementsView() {
       </TouchableOpacity>
 
       {/* Weight input */}
-      <TouchableOpacity 
+      <TouchableOpacity
         style={styles.inputCard}
         onPress={openWeightModal}
       >
@@ -322,8 +325,8 @@ export default function MeasurementsView() {
                 indicatorColor: theme.colors.primary
               }}
             />
-            <TouchableOpacity 
-              style={styles.calendarCloseButton} 
+            <TouchableOpacity
+              style={styles.calendarCloseButton}
               onPress={() => setShowCalendar(false)}
             >
               <Text style={styles.calendarCloseText}>{t('common.close')}</Text>
@@ -365,7 +368,7 @@ export default function MeasurementsView() {
         points={MEASUREMENT_KEYS.map(key => ({
           key,
           label: t(getMeasurementTranslationKey(key)),
-          color: theme.colors.measurement[key],
+          color: theme.colors.measurement[key]
         }))}
         values={measurements.measurements}
         onPointPress={openMeasurementModal}

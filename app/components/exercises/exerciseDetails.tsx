@@ -7,24 +7,15 @@ import { fr } from 'date-fns/locale';
 import { useLocalSearchParams } from 'expo-router';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
-import { Workout, WorkoutDateUtils } from '@/app/types/workout';
+import { Workout } from '@/app/types/common';
 import Header from '@/app/components/Header';
 import Text from '@/app/components/ui/Text';
+import calculations from '@/app/utils/calculations';
 
 interface ExerciseData {
   x: Date;
   y: number;
 }
-
-// Fonction pour calculer le 1RM estimé avec la formule d'Epley
-const calculateEstimated1RM = (weight: number, reps: number): number => {
-  return Math.round(weight * (1 + (reps / 30)));
-};
-
-// Fonction pour calculer le volume total
-const calculateVolume = (weight: number, reps: number, sets: number): number => {
-  return weight * reps * sets;
-};
 
 // Fonction pour formater la date en français
 const formatDate = (date: string): string => {
@@ -212,8 +203,8 @@ const ExerciseDetails = () => {
               const workingSet = workout.series.find(s => s.type === 'workingSet') || workout.series[0];
               if (workingSet) {
                 const date = new Date(workout.date);
-                const estimated1RM = calculateEstimated1RM(workingSet.weight, workingSet.reps);
-                const volume = calculateVolume(workingSet.weight, workingSet.reps, workout.series.length);
+                const estimated1RM = calculations.calculateEstimated1RM(workingSet.weight, workingSet.reps);
+                const volume = calculations.calculateVolume(workingSet.weight, workingSet.reps, workout.series.length);
 
                 oneRMData.push({ x: date, y: estimated1RM });
                 volumeData.push({ x: date, y: volume });
@@ -242,8 +233,8 @@ const ExerciseDetails = () => {
   const latestWorkout = workouts[workouts.length - 1];
   const workingSet = latestWorkout?.series?.find(s => s.type === 'workingSet') || latestWorkout?.series?.[0];
 
-  const estimated1RM = workingSet ? calculateEstimated1RM(workingSet.weight, workingSet.reps) : 0;
-  const volume = workingSet && latestWorkout ? calculateVolume(workingSet.weight, workingSet.reps, latestWorkout.series.length) : 0;
+  const estimated1RM = workingSet ? calculations.calculateEstimated1RM(workingSet.weight, workingSet.reps) : 0;
+  const volume = workingSet && latestWorkout ? calculations.calculateVolume(workingSet.weight, workingSet.reps, latestWorkout.series.length) : 0;
 
   // Fonction pour obtenir le domaine Y approprié
   const getDomainY = (data: ExerciseData[]) => {

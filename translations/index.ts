@@ -19,7 +19,7 @@ export type TranslationKey = RecursiveKeyOf<typeof en>;
 export type Language = 'en' | 'fr';
 
 // Helper type for measurement keys from the translations
-export type MeasurementTranslationKey = 
+export type MeasurementTranslationKey =
   | 'measurements.neck'
   | 'measurements.shoulders'
   | 'measurements.chest'

@@ -2,14 +2,10 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import Text from '@/app/components/ui/Text';
 import { useTheme } from '@/app/hooks/useTheme';
+import { WorkoutStats as WorkoutStatsType } from '@/app/types/common';
 
 interface WorkoutStatsProps {
-  stats: {
-    totalWorkouts: number;
-    totalExercises: number;
-    totalTime: number;
-    averageWorkoutTime: number;
-  };
+  stats: WorkoutStatsType;
 }
 
 const WorkoutStats: React.FC<WorkoutStatsProps> = ({ stats }) => {

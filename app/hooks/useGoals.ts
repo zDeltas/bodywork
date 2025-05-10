@@ -1,13 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Workout } from '@/app/types/workout';
-
-interface Goal {
-  exercise: string;
-  current: number;
-  target: number;
-  progress: number;
-}
+import { Goal, Workout } from '@/app/types/common';
 
 const useGoals = (workouts: Workout[]) => {
   const [goals, setGoals] = useState<Goal[]>([]);

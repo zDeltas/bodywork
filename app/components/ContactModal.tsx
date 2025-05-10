@@ -46,12 +46,12 @@ export default function ContactModal({ isVisible, onClose }: ContactModalProps) 
       const response = await fetch('/api/send-email', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           ...contactForm,
           to: 'mon-adresse@example.com'
-        }),
+        })
       });
 
       if (!response.ok) {
@@ -74,7 +74,7 @@ export default function ContactModal({ isVisible, onClose }: ContactModalProps) 
     <BlurView intensity={20} style={styles.modalContainer}>
       <View style={styles.modalContent}>
         <Text style={styles.modalTitle}>{t('contact.title')}</Text>
-        
+
         <View style={styles.formGroup}>
           <Text style={styles.label}>{t('contact.name')}</Text>
           <TextInput

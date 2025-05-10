@@ -2,19 +2,10 @@ import React, { useState } from 'react';
 import { StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import Text from '@/app/components/ui/Text';
 import { useTheme } from '@/app/hooks/useTheme';
-
-interface Exercise {
-  name: string;
-  sets: number;
-  reps: number;
-  weight: number;
-}
+import { Exercise, WorkoutSummary } from '@/app/types/common';
 
 interface WorkoutFormProps {
-  onSubmit: (workout: {
-    name: string;
-    exercises: Exercise[];
-  }) => void;
+  onSubmit: (workout: WorkoutSummary) => void;
 }
 
 const WorkoutForm: React.FC<WorkoutFormProps> = ({ onSubmit }) => {
@@ -45,8 +36,10 @@ const WorkoutForm: React.FC<WorkoutFormProps> = ({ onSubmit }) => {
   const handleSubmit = () => {
     if (workoutName && exercises.length > 0) {
       onSubmit({
+        id: Date.now().toString(),
         name: workoutName,
-        exercises
+        exercises: exercises,
+        duration: 0
       });
     }
   };

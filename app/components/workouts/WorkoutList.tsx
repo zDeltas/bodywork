@@ -2,29 +2,18 @@ import React from 'react';
 import { FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
 import Text from '@/app/components/ui/Text';
 import { useTheme } from '@/app/hooks/useTheme';
-
-interface Workout {
-  id: string;
-  name: string;
-  duration: number;
-  exercises: Array<{
-    name: string;
-    sets: number;
-    reps: number;
-    weight: number;
-  }>;
-}
+import { WorkoutSummary } from '@/app/types/common';
 
 interface WorkoutListProps {
-  workouts: Workout[];
-  onWorkoutPress: (workout: Workout) => void;
+  workouts: WorkoutSummary[];
+  onWorkoutPress: (workout: WorkoutSummary) => void;
 }
 
 const WorkoutList: React.FC<WorkoutListProps> = ({ workouts, onWorkoutPress }) => {
   const { theme } = useTheme();
   const styles = useStyles(theme);
 
-  const renderWorkoutItem = ({ item }: { item: Workout }) => (
+  const renderWorkoutItem = ({ item }: { item: WorkoutSummary }) => (
     <TouchableOpacity
       style={styles.workoutItem}
       onPress={() => onWorkoutPress(item)}

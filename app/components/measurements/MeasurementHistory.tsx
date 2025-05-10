@@ -168,12 +168,12 @@ const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({
     const padding = Math.max(range * 0.1, 1);
 
     if (key === 'weight') {
-      return { 
+      return {
         min: Math.max(min - padding, 0),
         max: Math.min(max + padding, 200)
       };
     } else {
-      return { 
+      return {
         min: Math.max(min - padding, 0),
         max: Math.min(max + padding, 200)
       };
@@ -507,16 +507,16 @@ const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({
               {/* Affichage de la progression UNIQUEMENT pour les mensurations (pas pour le poids) */}
               {historyData.length >= 2 && key !== 'weight' && (
                 <View style={[
-                  styles.progressBadge, 
+                  styles.progressBadge,
                   { backgroundColor: progressVisuals.bgColor }
                 ]}>
                   <Text style={[
-                    styles.progressText, 
+                    styles.progressText,
                     { color: progressVisuals.color }
                   ]}>
-                    {progressVisuals.symbol} {progress.value > 0 
-                      ? `${formatValue(progress.value, key)} ${unit}` 
-                      : "Stable"}
+                    {progressVisuals.symbol} {progress.value > 0
+                    ? `${formatValue(progress.value, key)} ${unit}`
+                    : 'Stable'}
                   </Text>
                 </View>
               )}
@@ -535,21 +535,21 @@ const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({
                 <VictoryLine
                   data={historyData}
                   style={{
-                    data: { 
-                      stroke: theme.colors.primary, 
-                      strokeWidth: 2 
+                    data: {
+                      stroke: theme.colors.primary,
+                      strokeWidth: 2
                     }
                   }}
-                  animate={{ duration: 300, easing: "exp" }}
+                  animate={{ duration: 300, easing: 'exp' }}
                   interpolation="monotoneX"
                 />
                 <VictoryScatter
                   data={historyData}
                   size={3}
                   style={{
-                    data: { 
-                      fill: theme.colors.background.card, 
-                      stroke: theme.colors.primary, 
+                    data: {
+                      fill: theme.colors.background.card,
+                      stroke: theme.colors.primary,
                       strokeWidth: 1.5
                     }
                   }}
@@ -568,8 +568,8 @@ const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({
                   tickFormat={() => ''}
                   style={{
                     axis: { stroke: 'transparent' },
-                    grid: { 
-                      stroke: theme.colors.border.default, 
+                    grid: {
+                      stroke: theme.colors.border.default,
                       strokeDasharray: '2,2',
                       strokeOpacity: 0.5
                     },
@@ -587,7 +587,7 @@ const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({
                   { backgroundColor: progressVisuals.bgColor }
                 ]}>
                   <Text style={[
-                    styles.trendText, 
+                    styles.trendText,
                     { color: progressVisuals.color }
                   ]}>
                     {progress.status === 'positive' ? '↗' : progress.status === 'negative' ? '↘' : '↔'}

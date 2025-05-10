@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, View, Text, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
+import { FlatList, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useTheme } from '@/app/hooks/useTheme';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { MeasurementKey } from './MeasurementBodyMap';
@@ -14,13 +14,13 @@ interface Props {
 const MeasurementHistoryModal: React.FC<Props> = ({ open, keyName, onClose, history }) => {
   const { theme } = useTheme();
   const { t } = useTranslation();
-  
+
   // Détermine l'unité à afficher
   const getUnit = () => {
     if (!keyName) return 'kg'; // Pour le poids (cas où keyName est null)
     return 'cm'; // Pour les mesures corporelles
   };
-  
+
   // Récupère le titre approprié
   const getTitle = () => {
     if (!keyName) {
@@ -44,8 +44,11 @@ const MeasurementHistoryModal: React.FC<Props> = ({ open, keyName, onClose, hist
       onRequestClose={onClose}
       statusBarTranslucent
     >
-      <View style={[styles.overlay, { backgroundColor: 'rgba(0,0,0,0.7)' }]}> 
-        <View style={[styles.content, { backgroundColor: theme.colors.background.card, borderRadius: theme.borderRadius.lg }]}> 
+      <View style={[styles.overlay, { backgroundColor: 'rgba(0,0,0,0.7)' }]}>
+        <View style={[styles.content, {
+          backgroundColor: theme.colors.background.card,
+          borderRadius: theme.borderRadius.lg
+        }]}>
           <Text style={[styles.title, { color: theme.colors.text.primary }]}>
             {getTitle()}
           </Text>

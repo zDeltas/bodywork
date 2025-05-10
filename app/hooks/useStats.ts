@@ -1,25 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Workout, WorkoutDateUtils } from '@/app/types/workout';
+import { WorkoutDateUtils } from '@/app/types/workout';
+import { Period, StatsData, Workout } from '@/app/types/common';
 import { differenceInDays, subMonths } from 'date-fns';
 import calculations from '@/app/utils/calculations';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { TranslationKey } from '@/translations';
-
-type Period = '1m' | '3m' | '6m';
-
-interface StatsData {
-  workouts: Workout[];
-  monthlyProgress: number;
-  trainingFrequency: number;
-  bestProgressExercise: { progress: number; exercise: string } | null;
-  muscleDistribution: {
-    name: string;
-    value: number;
-    color: string;
-    originalName: string;
-  }[];
-}
 
 const useStats = (selectedPeriod: Period) => {
   const { t } = useTranslation();

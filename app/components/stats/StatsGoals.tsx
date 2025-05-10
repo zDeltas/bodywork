@@ -3,19 +3,13 @@ import { Animated, StyleSheet, View } from 'react-native';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
 import GoalSection from '@/app/components/goal/GoalSection';
-
-interface Goal {
-  exercise: string;
-  current: number;
-  target: number;
-  progress: number;
-}
+import { Goal, Workout } from '@/app/types/common';
 
 interface StatsGoalsProps {
   fadeAnim: Animated.Value;
   goals: Goal[];
   setGoals: Dispatch<SetStateAction<Goal[]>>;
-  workouts: any[];
+  workouts: Workout[];
   getCurrentWeight: (exercise: string) => number | null;
 }
 

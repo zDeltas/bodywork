@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Modal, View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useTheme } from '@/app/hooks/useTheme';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { BarChart3, Scale, X } from 'lucide-react-native';
@@ -38,19 +38,19 @@ const WeightModal: React.FC<Props> = ({ open, value, onClose, onSave, onShowHist
       onRequestClose={onClose}
       statusBarTranslucent
     >
-      <View style={[styles.overlay, { backgroundColor: 'rgba(0,0,0,0.7)' }]}> 
-        <View style={[styles.content, { 
-          backgroundColor: theme.colors.background.card, 
+      <View style={[styles.overlay, { backgroundColor: 'rgba(0,0,0,0.7)' }]}>
+        <View style={[styles.content, {
+          backgroundColor: theme.colors.background.card,
           borderRadius: theme.borderRadius.lg,
           ...theme.shadows.lg
-        }]}> 
+        }]}>
           <View style={styles.header}>
             <Scale size={22} color={theme.colors.primary} />
             <Text style={[styles.title, { color: theme.colors.text.primary }]}>
               {t('workout.weight')}
             </Text>
-            <TouchableOpacity 
-              style={styles.closeButton} 
+            <TouchableOpacity
+              style={styles.closeButton}
               onPress={onClose}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
@@ -61,8 +61,8 @@ const WeightModal: React.FC<Props> = ({ open, value, onClose, onSave, onShowHist
           <View style={styles.inputSection}>
             <View style={styles.inputContainer}>
               <TextInput
-                style={[styles.input, { 
-                  color: theme.colors.text.primary, 
+                style={[styles.input, {
+                  color: theme.colors.text.primary,
                   borderColor: theme.colors.border.default,
                   backgroundColor: theme.colors.background.input
                 }]}
@@ -76,20 +76,23 @@ const WeightModal: React.FC<Props> = ({ open, value, onClose, onSave, onShowHist
               <Text style={[styles.unit, { color: theme.colors.text.secondary }]}>kg</Text>
             </View>
           </View>
-          
+
           <View style={styles.buttonContainer}>
-            <TouchableOpacity 
-              style={[styles.historyButton, { backgroundColor: theme.colors.background.button }]} 
-              onPress={() => { onShowHistory(); onClose(); }}
+            <TouchableOpacity
+              style={[styles.historyButton, { backgroundColor: theme.colors.background.button }]}
+              onPress={() => {
+                onShowHistory();
+                onClose();
+              }}
             >
               <BarChart3 size={18} color={theme.colors.text.primary} />
               <Text style={{ color: theme.colors.text.primary, marginLeft: 8 }}>
                 {t('measurements.history')}
               </Text>
             </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={[styles.saveButton, { backgroundColor: theme.colors.primary }]} 
+
+            <TouchableOpacity
+              style={[styles.saveButton, { backgroundColor: theme.colors.primary }]}
               onPress={handleSave}
             >
               <Text style={{ color: theme.colors.text.primary, fontWeight: 'bold' }}>
@@ -134,7 +137,7 @@ const styles = StyleSheet.create({
     padding: 4
   },
   inputSection: {
-    padding: 24,
+    padding: 24
   },
   inputContainer: {
     flexDirection: 'row',

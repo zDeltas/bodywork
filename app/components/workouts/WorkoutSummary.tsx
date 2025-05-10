@@ -2,18 +2,10 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import Text from '@/app/components/ui/Text';
 import { useTheme } from '@/app/hooks/useTheme';
+import { WorkoutSummary as WorkoutSummaryType } from '@/app/types/common';
 
 interface WorkoutSummaryProps {
-  workout: {
-    name: string;
-    duration: number;
-    exercises: Array<{
-      name: string;
-      sets: number;
-      reps: number;
-      weight: number;
-    }>;
-  };
+  workout: WorkoutSummaryType;
 }
 
 const WorkoutSummary: React.FC<WorkoutSummaryProps> = ({ workout }) => {

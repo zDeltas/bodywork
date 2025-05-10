@@ -54,8 +54,7 @@ const useStyles = () => {
         }
       })
     },
-    default: {
-    },
+    default: {},
     highlighted: {
       borderWidth: Platform.OS === 'ios' ? 1 : 1.5,
       borderColor: theme.colors.primary,

@@ -11,10 +11,11 @@ import { fr } from 'date-fns/locale';
 import Text from '../../components/ui/Text';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
-import { Series, SeriesType, Workout, WorkoutDateUtils } from '@/app/types/workout';
 import Header from '@/app/components/Header';
 import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold, useFonts } from '@expo-google-fonts/inter';
 import ExerciseList from '@/app/components/exercises/ExerciseList';
+import { Series, SeriesType, Workout } from '@/app/types/common';
+import { WorkoutDateUtils } from '@/app/types/workout';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -60,7 +61,6 @@ export default function NewWorkoutScreen() {
     type: 'workingSet'
   }]);
   const [suggestedWeight, setSuggestedWeight] = useState<number | null>(null);
-  const [isCustomExercise, setIsCustomExercise] = useState<boolean>(false);
   const params = useLocalSearchParams();
   const [selectedDate, setSelectedDate] = useState<string>(params.selectedDate as string || WorkoutDateUtils.getDatePart(new Date().toISOString()));
   const [showCalendar, setShowCalendar] = useState<boolean>(false);
@@ -346,7 +346,8 @@ export default function NewWorkoutScreen() {
                     setShowExerciseSelector(false);
                     tryCalculateSuggestedWeight(selectedExercise);
                   }}
-                  setIsCustomExercise={setIsCustomExercise}
+                  setIsCustomExercise={() => {
+                  }}
                 />
               </ScrollView>
             </View>

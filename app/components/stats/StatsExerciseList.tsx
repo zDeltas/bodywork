@@ -9,7 +9,7 @@ interface StatsExerciseListProps {
   selectedExercise: string;
   setSelectedExercise: (exercise: string) => void;
   exerciseOptions: string[];
-  onExerciseSelect: (exercise: string) => void;
+  onExerciseSelect: (exercise: string, exerciseKey?: string) => void;
   onMuscleSelect: (muscleGroup: string) => void;
 }
 

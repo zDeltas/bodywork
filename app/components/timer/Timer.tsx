@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Platform, StyleSheet, TouchableOpacity, Vibration, View } from 'react-native';
+import { Platform, StyleSheet, Vibration, View, ViewStyle } from 'react-native';
 import {
   Inter_400Regular as InterRegular,
   Inter_600SemiBold as InterSemiBold,
@@ -11,6 +11,7 @@ import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
 import Text from '@/app/components/ui/Text';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import { Button } from '@/app/components/Button';
 
 interface TimerProps {
   initialTime?: number;
@@ -163,25 +164,25 @@ export default function Timer({
           </Text>
 
           <View style={styles.setsContainer}>
-            <TouchableOpacity
-              style={[styles.setButton, { opacity: currentSet <= 1 ? 0.5 : 1 }]}
+            <Button
+              variant="icon"
+              icon={<Minus size={16} color={theme.colors.background.main} />}
               onPress={() => setCurrentSet(prev => Math.max(1, prev - 1))}
               disabled={currentSet <= 1}
-            >
-              <Minus size={16} color={theme.colors.background.main} />
-            </TouchableOpacity>
+              style={{ ...styles.setButton, opacity: currentSet <= 1 ? 0.5 : 1 }}
+            />
 
             <Text style={[styles.setInfo, { color: theme.colors.background.main }]}>
               {typeof t('timer.series') === 'string' ? String(t('timer.series')) : 'Series'} {currentSet}/{sets}
             </Text>
 
-            <TouchableOpacity
-              style={[styles.setButton, { opacity: currentSet >= sets ? 0.5 : 1 }]}
+            <Button
+              variant="icon"
+              icon={<Plus size={16} color={theme.colors.background.main} />}
               onPress={() => setCurrentSet(prev => Math.min(sets, prev + 1))}
               disabled={currentSet >= sets}
-            >
-              <Plus size={16} color={theme.colors.background.main} />
-            </TouchableOpacity>
+              style={{ ...styles.setButton, opacity: currentSet >= sets ? 0.5 : 1 }}
+            />
           </View>
 
           <Text style={[styles.time, { color: theme.colors.background.main }]}>
@@ -191,27 +192,19 @@ export default function Timer({
       </Animated.View>
 
       <View style={styles.controls}>
-        <TouchableOpacity
-          style={[
-            styles.button,
-            { backgroundColor: isRunning ? theme.colors.error : theme.colors.success }
-          ]}
+        <Button
+          variant="primary"
+          icon={isRunning ? <Pause size={24} color={theme.colors.background.main} /> : <Play size={24} color={theme.colors.background.main} />}
           onPress={toggleTimer}
-          activeOpacity={0.7}
-        >
-          {isRunning ? (
-            <Pause size={24} color={theme.colors.background.main} strokeWidth={2.5} />
-          ) : (
-            <Play size={24} color={theme.colors.background.main} strokeWidth={2.5} />
-          )}
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.button, { backgroundColor: theme.colors.background.card }]}
+          style={{ ...styles.button, backgroundColor: isRunning ? theme.colors.error : theme.colors.success }}
+        />
+
+        <Button
+          variant="primary"
+          icon={<RotateCcw size={24} color={theme.colors.background.main} />}
           onPress={resetTimer}
-          activeOpacity={0.7}
-        >
-          <RotateCcw size={22} color={theme.colors.text.primary} strokeWidth={2} />
-        </TouchableOpacity>
+          style={{ ...styles.button, backgroundColor: theme.colors.background.button }}
+        />
       </View>
     </View>
   );

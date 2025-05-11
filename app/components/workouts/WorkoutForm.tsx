@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TextInput, View, ViewStyle } from 'react-native';
 import Text from '@/app/components/ui/Text';
 import { useTheme } from '@/app/hooks/useTheme';
 import { Exercise, WorkoutSummary } from '@/app/types/common';
+import { Button } from '@/app/components/Button';
 
 interface WorkoutFormProps {
   onSubmit: (workout: WorkoutSummary) => void;
@@ -100,12 +101,12 @@ const WorkoutForm: React.FC<WorkoutFormProps> = ({ onSubmit }) => {
             placeholderTextColor={theme.colors.text.secondary}
           />
         </View>
-        <TouchableOpacity
-          style={styles.button}
+        <Button
+          variant="primary"
+          title="Add Exercise"
           onPress={handleAddExercise}
-        >
-          <Text variant="body" style={styles.buttonText}>Add Exercise</Text>
-        </TouchableOpacity>
+          style={styles.button}
+        />
       </View>
 
       {exercises.length > 0 && (
@@ -123,12 +124,12 @@ const WorkoutForm: React.FC<WorkoutFormProps> = ({ onSubmit }) => {
         </View>
       )}
 
-      <TouchableOpacity
-        style={[styles.button, styles.submitButton]}
+      <Button
+        variant="primary"
+        title="Create Workout"
         onPress={handleSubmit}
-      >
-        <Text variant="body" style={styles.buttonText}>Create Workout</Text>
-      </TouchableOpacity>
+        style={{ ...styles.button, ...styles.submitButton }}
+      />
     </View>
   );
 };
@@ -158,17 +159,10 @@ const useStyles = (theme: any) => StyleSheet.create({
     marginHorizontal: 4
   },
   button: {
-    backgroundColor: theme.colors.primary,
-    padding: 12,
-    borderRadius: 8,
-    alignItems: 'center',
     marginTop: 8
   },
   submitButton: {
     marginTop: 16
-  },
-  buttonText: {
-    color: theme.colors.text.primary
   },
   exerciseItem: {
     backgroundColor: theme.colors.background.card,

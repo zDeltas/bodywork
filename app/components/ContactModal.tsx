@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { ActivityIndicator, Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, StyleSheet, Text, TextInput, View } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
 import { StatsCardSkeleton } from '@/app/components/ui/SkeletonComponents';
+import { Button } from '@/app/components/Button';
 
 interface ContactModalProps {
   isVisible: boolean;
@@ -131,24 +132,21 @@ export default function ContactModal({ isVisible, onClose }: ContactModalProps) 
         </View>
 
         <View style={styles.modalButtons}>
-          <TouchableOpacity
-            style={[styles.modalButton, styles.cancelButton]}
+          <Button
+            variant="secondary"
+            title={t('common.cancel')}
             onPress={onClose}
             disabled={isSending}
-          >
-            <Text style={styles.cancelButtonText}>{t('common.cancel')}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.modalButton, styles.submitButton]}
+            style={styles.modalButton}
+          />
+          <Button
+            variant="primary"
+            title={isSending ? undefined : t('contact.send')}
             onPress={handleSubmit}
             disabled={isSending}
-          >
-            {isSending ? (
-              <ActivityIndicator size="small" color={theme.colors.text.primary} />
-            ) : (
-              <Text style={styles.submitButtonText}>{t('contact.send')}</Text>
-            )}
-          </TouchableOpacity>
+            style={styles.modalButton}
+            icon={isSending ? <ActivityIndicator size="small" color={theme.colors.text.primary} /> : undefined}
+          />
         </View>
       </View>
       )}
@@ -237,26 +235,6 @@ const useStyles = () => {
       borderRadius: theme.borderRadius.md,
       alignItems: 'center',
       justifyContent: 'center'
-    },
-    cancelButton: {
-      marginRight: theme.spacing.sm,
-      backgroundColor: theme.colors.background.main,
-      borderWidth: 1,
-      borderColor: theme.colors.border.default
-    },
-    submitButton: {
-      marginLeft: theme.spacing.sm,
-      backgroundColor: theme.colors.primary
-    },
-    cancelButtonText: {
-      color: theme.colors.text.primary,
-      fontSize: theme.typography.fontSize.base,
-      fontFamily: theme.typography.fontFamily.semiBold
-    },
-    submitButtonText: {
-      color: theme.colors.text.primary,
-      fontSize: theme.typography.fontSize.base,
-      fontFamily: theme.typography.fontFamily.bold
     }
   });
 }; 

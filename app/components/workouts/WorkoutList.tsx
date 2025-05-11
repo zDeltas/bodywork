@@ -1,8 +1,9 @@
 import React from 'react';
-import { FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { FlatList, StyleSheet, View } from 'react-native';
 import Text from '@/app/components/ui/Text';
 import { useTheme } from '@/app/hooks/useTheme';
 import { WorkoutSummary } from '@/app/types/common';
+import { Button } from '@/app/components/Button';
 
 interface WorkoutListProps {
   workouts: WorkoutSummary[];
@@ -14,9 +15,10 @@ const WorkoutList: React.FC<WorkoutListProps> = ({ workouts, onWorkoutPress }) =
   const styles = useStyles(theme);
 
   const renderWorkoutItem = ({ item }: { item: WorkoutSummary }) => (
-    <TouchableOpacity
-      style={styles.workoutItem}
+    <Button
+      variant="secondary"
       onPress={() => onWorkoutPress(item)}
+      style={styles.workoutItem}
     >
       <Text variant="subheading" style={styles.workoutName}>
         {item.name}
@@ -27,7 +29,7 @@ const WorkoutList: React.FC<WorkoutListProps> = ({ workouts, onWorkoutPress }) =
       <Text variant="caption">
         Exercises: {item.exercises.length}
       </Text>
-    </TouchableOpacity>
+    </Button>
   );
 
   return (

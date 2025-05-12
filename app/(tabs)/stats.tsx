@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold, useFonts } from '@expo-google-fonts/inter';
 import * as SplashScreen from 'expo-splash-screen';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { router } from 'expo-router';
 import { muscleGroupKeys } from '@/app/components/exercises/ExerciseList';
@@ -16,6 +15,7 @@ import StatsMuscleRestState from '@/app/components/stats/StatsMuscleRestState';
 import Header from '@/app/components/Header';
 import useStats from '@/app/hooks/useStats';
 import useGoals from '@/app/hooks/useGoals';
+import useExercises from '@/app/hooks/useExercises';
 import Text from '@/app/components/ui/Text';
 import { StatsCardSkeleton, ChartSkeleton } from '@/app/components/ui/SkeletonComponents';
 
@@ -34,8 +34,6 @@ export default function StatsScreen() {
 
   const [selectedPeriod, setSelectedPeriod] = useState<Period>('1m');
   const [searchQuery, setSearchQuery] = useState('');
-  const [favoriteExercises, setFavoriteExercises] = useState<ExerciseName[]>([]);
-  const [recentExercises, setRecentExercises] = useState<ExerciseName[]>([]);
   const [exerciseOptions, setExerciseOptions] = useState<ExerciseName[]>([]);
   const [showExerciseSelector, setShowExerciseSelector] = useState(false);
   const [newGoalExercise, setNewGoalExercise] = useState<ExerciseName>('exercise_chest_benchPress');
@@ -58,36 +56,7 @@ export default function StatsScreen() {
 
   const statsData = useStats(selectedPeriod);
   const { goals, setGoals, getCurrentWeight, suggestTargetWeight } = useGoals(statsData.workouts);
-
-  useEffect(() => {
-    const loadInitialData = async () => {
-      try {
-        const storedFavorites = await AsyncStorage.getItem('favoriteExercises');
-        if (storedFavorites) {
-          const parsedFavorites = JSON.parse(storedFavorites) as ExerciseName[];
-          if (Array.isArray(parsedFavorites)) {
-            setFavoriteExercises(parsedFavorites);
-          }
-        }
-
-        const storedRecent = await AsyncStorage.getItem('recentExercises');
-        if (storedRecent) {
-          try {
-            const parsed = JSON.parse(storedRecent);
-            if (Array.isArray(parsed)) {
-              setRecentExercises(parsed as ExerciseName[]);
-            }
-          } catch (error) {
-            console.error('Error parsing recent exercises:', error);
-          }
-        }
-      } catch (error) {
-        console.error(t('common.errorLoadingWorkouts'), error);
-      }
-    };
-
-    loadInitialData();
-  }, [t]);
+  const { favoriteExercises, recentExercises, loading: exercisesLoading } = useExercises();
 
   useEffect(() => {
     if (fontsLoaded) {
@@ -154,7 +123,7 @@ export default function StatsScreen() {
     }
   }, []);
 
-  if (!fontsLoaded) {
+  if (!fontsLoaded || exercisesLoading) {
     return (
       <View style={styles.container}>
         <View style={styles.section}>

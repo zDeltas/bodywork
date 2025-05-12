@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { router } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { router, useLocalSearchParams } from 'expo-router';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
@@ -10,7 +9,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Header from '@/app/components/Header';
 import { Workout, WorkoutDateUtils } from '@/app/types/workout';
 import { TranslationKey } from '@/translations';
-import { Workout as CommonWorkout } from '@/app/types/common';
+import { useWorkouts } from '@/app/hooks/useWorkouts';
 
 LocaleConfig.locales['fr'] = {
   monthNames: [
@@ -74,11 +73,19 @@ interface MarkedDate {
 }
 
 export default function WorkoutScreen() {
-  const [workouts, setWorkouts] = useState<Workout[]>([]);
+  const params = useLocalSearchParams();
   const [selectedDate, setSelectedDate] = useState<string>(WorkoutDateUtils.getDatePart(new Date().toISOString()));
   const { t, language } = useTranslation();
   const { theme } = useTheme();
   const styles = useStyles();
+  const { workouts, loading, error, refreshWorkouts } = useWorkouts();
+
+  // Vérifier si un rafraîchissement est demandé via les paramètres de route
+  useEffect(() => {
+    if (params.refresh === 'true') {
+      refreshWorkouts();
+    }
+  }, [params.refresh, refreshWorkouts]);
 
   /**
    * Récupère les informations de la série de travail d'un entraînement
@@ -103,39 +110,6 @@ export default function WorkoutScreen() {
       rpe: 0
     };
   };
-
-  /**
-   * Charge les entraînements depuis le stockage local
-   */
-  useEffect(() => {
-    const loadWorkouts = async (): Promise<void> => {
-      try {
-        const storedWorkouts = await AsyncStorage.getItem('workouts');
-        if (storedWorkouts) {
-          setWorkouts(JSON.parse(storedWorkouts));
-        }
-      } catch (error) {
-        console.error(`${t('common.errorLoadingWorkouts')}`, error);
-      }
-    };
-
-    loadWorkouts();
-  }, []);
-
-  /**
-   * Sauvegarde les entraînements dans le stockage local
-   */
-  useEffect(() => {
-    const saveWorkouts = async (): Promise<void> => {
-      try {
-        await AsyncStorage.setItem('workouts', JSON.stringify(workouts));
-      } catch (error) {
-        console.error(`${t('common.errorSavingWorkouts')}`, error);
-      }
-    };
-
-    saveWorkouts();
-  }, [workouts]);
 
   /**
    * Prépare les dates marquées pour le calendrier
@@ -205,7 +179,15 @@ export default function WorkoutScreen() {
             enableSwipeMonths={true}
           />
         </View>
-        {filteredWorkouts.length > 0 ? (
+        {loading ? (
+          <View style={styles.noWorkoutContainer}>
+            <Text style={styles.noWorkoutText}>{t('common.loading')}</Text>
+          </View>
+        ) : error ? (
+          <View style={styles.noWorkoutContainer}>
+            <Text style={styles.noWorkoutText}>{t('common.errorLoadingWorkouts')}</Text>
+          </View>
+        ) : filteredWorkouts.length > 0 ? (
           filteredWorkouts.map(workout => (
             <View key={workout.id} style={styles.workoutCard}>
               <View style={styles.workoutDetailsCard}>

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useTheme } from '@/app/hooks/useTheme';
 import { useTranslation } from '@/app/hooks/useTranslation';
@@ -11,9 +11,9 @@ import MeasurementHistory from './MeasurementHistory';
 import WeightModal from './WeightModal';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Calendar } from 'react-native-calendars';
 import { MeasurementTranslationKey } from '@/translations';
+import useMeasurements from '@/app/hooks/useMeasurements';
 
 const MEASUREMENT_KEYS: MeasurementKey[] = [
   'neck', 'shoulders', 'chest', 'arms', 'forearms', 'waist', 'hips', 'thighs', 'calves'
@@ -23,22 +23,6 @@ const getMeasurementTranslationKey = (key: MeasurementKey): MeasurementTranslati
   return `measurements.${key}` as MeasurementTranslationKey;
 };
 
-type Measurement = {
-  date: string;
-  weight: number;
-  measurements: Record<MeasurementKey, number>;
-};
-
-const initialMeasurements: Measurement = {
-  date: new Date().toISOString().split('T')[0],
-  weight: 0,
-  measurements: {
-    neck: 0, shoulders: 0, chest: 0, arms: 0, forearms: 0, waist: 0, hips: 0, thighs: 0, calves: 0
-  }
-};
-
-const STORAGE_KEY = 'bodyMeasurements';
-
 // Les modes de vue disponibles
 type ViewMode = 'history' | 'input';
 
@@ -46,8 +30,6 @@ export default function MeasurementsView() {
   const { theme } = useTheme();
   const { t } = useTranslation();
   const [viewMode, setViewMode] = useState<ViewMode>('history');
-  const [measurements, setMeasurements] = useState<Measurement>(initialMeasurements);
-  const [allMeasurements, setAllMeasurements] = useState<Measurement[]>([]);
   const [modal, setModal] = useState<{ key: MeasurementKey | null, open: boolean }>({ key: null, open: false });
   const [historyModal, setHistoryModal] = useState<{ key: MeasurementKey | null, open: boolean }>({
     key: null,
@@ -56,37 +38,16 @@ export default function MeasurementsView() {
   const [showCalendar, setShowCalendar] = useState(false);
   const [showWeightModal, setShowWeightModal] = useState(false);
 
-  useEffect(() => {
-    const load = async () => {
-      const stored = await AsyncStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const arr: Measurement[] = JSON.parse(stored);
-        setAllMeasurements(arr);
-        const found = arr.find(m => m.date === measurements.date);
-        if (found) setMeasurements(found);
-      }
-    };
-    load();
-    // eslint-disable-next-line
-  }, []);
-
-  useEffect(() => {
-    const save = async () => {
-      if (!measurements.date) return;
-
-      let arr = [...allMeasurements];
-      const idx = arr.findIndex(m => m.date === measurements.date);
-
-      if (idx >= 0) arr[idx] = measurements;
-      else arr.push(measurements);
-
-      arr = arr.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-      setAllMeasurements(arr);
-      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
-    };
-    save();
-    // eslint-disable-next-line
-  }, [measurements]);
+  // Utiliser le hook centralisé
+  const {
+    measurements,
+    allMeasurements,
+    loading,
+    error,
+    updateMeasurement,
+    updateWeight,
+    setSelectedDate
+  } = useMeasurements();
 
   const openMeasurementModal = (key: MeasurementKey) => setModal({ key, open: true });
   const closeMeasurementModal = () => setModal({ key: null, open: false });
@@ -97,24 +58,13 @@ export default function MeasurementsView() {
   const openWeightModal = () => setShowWeightModal(true);
   const closeWeightModal = () => setShowWeightModal(false);
 
-  const updateMeasurement = (key: MeasurementKey, value: number) => {
-    setMeasurements(prev => ({
-      ...prev,
-      measurements: { ...prev.measurements, [key]: value }
-    }));
+  const openWeightHistoryModal = () => {
+    setHistoryModal({ key: null, open: true });
   };
 
-  const updateWeight = (value: number) => {
-    setMeasurements(prev => ({
-      ...prev,
-      weight: value
-    }));
-  };
   const onCalendarDayPress = (day: { dateString: string }) => {
     setShowCalendar(false);
-    const found = allMeasurements.find(m => m.date === day.dateString);
-    if (found) setMeasurements(found);
-    else setMeasurements({ ...initialMeasurements, date: day.dateString });
+    setSelectedDate(day.dateString);
   };
 
   const getHistory = (key: MeasurementKey) =>
@@ -128,9 +78,6 @@ export default function MeasurementsView() {
       .filter(m => m.weight > 0)
       .map(m => ({ date: m.date, value: m.weight }))
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-  const openWeightHistoryModal = () => {
-    setHistoryModal({ key: null, open: true });
-  };
 
   // Styles
   const styles = useMemo(() => StyleSheet.create({
@@ -379,6 +326,7 @@ export default function MeasurementsView() {
   const renderHistoryMode = () => (
     <MeasurementHistory
       measurements={allMeasurements}
+      isLoading={loading}
     />
   );
 

@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { WorkoutDateUtils } from '@/app/types/workout';
 import { Workout } from '@/app/types/common';
 import { useTranslation } from './useTranslation';
+import { storageService } from '@/app/services';
 
 export const useCSVExport = () => {
   const [isExporting, setIsExporting] = useState(false);
@@ -44,15 +44,14 @@ export const useCSVExport = () => {
     try {
       setIsExporting(true);
 
-      // Get workouts from AsyncStorage
-      const storedWorkouts = await AsyncStorage.getItem('workouts');
-      if (!storedWorkouts) {
+      // Get workouts from storage service
+      const workouts = await storageService.getWorkouts();
+      
+      if (!workouts || workouts.length === 0) {
         console.log('No workouts found');
         setIsExporting(false);
         return { success: false, message: t('settings.noWorkoutsToExport') };
       }
-
-      const workouts: Workout[] = JSON.parse(storedWorkouts);
 
       // Convert to CSV
       const csvContent = convertWorkoutsToCSV(workouts);

@@ -1,9 +1,18 @@
-import { useCallback, useEffect, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Goal, Workout } from '@/app/types/common';
+import { useCallback, useEffect, useState, useMemo } from 'react';
+import { Workout } from '@/app/types/common';
+import storageService, { StorageKeys } from '../services/storage';
 
-const useGoals = (workouts: Workout[]) => {
+export interface Goal {
+  exercise: string;
+  current: number;
+  target: number;
+  progress: number;
+}
+
+export function useGoals(workouts: Workout[]) {
   const [goals, setGoals] = useState<Goal[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
 
   const getCurrentWeight = useCallback((exerciseName: string): number | null => {
     if (!exerciseName || workouts.length === 0) return null;
@@ -27,24 +36,32 @@ const useGoals = (workouts: Workout[]) => {
     return Math.ceil((currentWeight + suggestedImprovement) / roundingFactor) * roundingFactor;
   }, []);
 
+  // Charger les goals au montage du composant
   useEffect(() => {
+    let mounted = true;
     const loadGoals = async () => {
+      setLoading(true);
       try {
-        const storedGoals = await AsyncStorage.getItem('goals');
-        if (storedGoals) {
-          const parsedGoals = JSON.parse(storedGoals) as Goal[];
-          if (Array.isArray(parsedGoals)) {
-            setGoals(parsedGoals);
-          }
+        const storedGoals = await storageService.getGoals();
+        if (mounted) {
+          setGoals(storedGoals || []);
+          setError(null);
         }
-      } catch (error) {
-        console.error('Error loading goals:', error);
+      } catch (err) {
+        if (mounted) {
+          setError(err instanceof Error ? err : new Error('Une erreur est survenue lors du chargement des goals'));
+          setGoals([]);
+        }
+      } finally {
+        if (mounted) setLoading(false);
       }
     };
 
     loadGoals();
+    return () => { mounted = false; };
   }, []);
 
+  // Mettre à jour les goals quand les workouts changent
   useEffect(() => {
     if (workouts.length > 0 && goals.length > 0) {
       const updatedGoals = goals.map(goal => {
@@ -58,55 +75,60 @@ const useGoals = (workouts: Workout[]) => {
 
       if (JSON.stringify(updatedGoals) !== JSON.stringify(goals)) {
         setGoals(updatedGoals);
-        try {
-          AsyncStorage.setItem('goals', JSON.stringify(updatedGoals));
-        } catch (error) {
-          console.error('Error saving goals:', error);
-        }
+        // Utiliser le service de stockage pour sauvegarder les goals mis à jour
+        storageService.setItem(StorageKeys.GOALS, updatedGoals).catch(err => {
+          console.error('Erreur lors de la sauvegarde des goals:', err);
+        });
       }
     }
   }, [workouts, goals, getCurrentWeight]);
 
-  const addGoal = useCallback(async (exercise: string, target: number) => {
-    const currentWeight = getCurrentWeight(exercise) || 0;
-    const newGoal: Goal = {
-      exercise,
-      current: currentWeight,
-      target,
-      progress: Math.min(Math.round((currentWeight / target) * 100), 100)
-    };
-
+  const addGoal = useCallback(async (goal: Goal) => {
     setGoals(prev => {
-      const updatedGoals = [...prev, newGoal];
-      try {
-        AsyncStorage.setItem('goals', JSON.stringify(updatedGoals));
-      } catch (error) {
-        console.error('Error saving goals:', error);
-      }
-      return updatedGoals;
-    });
-  }, [getCurrentWeight]);
-
-  const removeGoal = useCallback(async (exercise: string) => {
-    setGoals(prev => {
-      const updatedGoals = prev.filter(goal => goal.exercise !== exercise);
-      try {
-        AsyncStorage.setItem('goals', JSON.stringify(updatedGoals));
-      } catch (error) {
-        console.error('Error saving goals:', error);
-      }
-      return updatedGoals;
+      const updated = [...prev, goal];
+      storageService.saveGoal(goal).then(async () => {
+        const stored = await storageService.getGoals();
+        setGoals(stored || []);
+      });
+      return updated;
     });
   }, []);
 
-  return {
+  const deleteGoal = useCallback(async (exercise: string) => {
+    setGoals(prev => {
+      const updated = prev.filter(g => g.exercise !== exercise);
+      storageService.deleteGoal(exercise).then(async () => {
+        const stored = await storageService.getGoals();
+        setGoals(stored || []);
+      });
+      return updated;
+    });
+  }, []);
+
+  const updateGoal = useCallback(async (goal: Goal) => {
+    setGoals(prev => {
+      const updated = prev.map(g => g.exercise === goal.exercise ? goal : g);
+      storageService.saveGoal(goal).then(async () => {
+        const stored = await storageService.getGoals();
+        setGoals(stored || []);
+      });
+      return updated;
+    });
+  }, []);
+
+  const contextValue = useMemo(() => ({
     goals,
-    setGoals,
+    loading,
+    error,
     addGoal,
-    removeGoal,
+    deleteGoal,
+    updateGoal,
+    setGoals,
     getCurrentWeight,
     suggestTargetWeight
-  };
-};
+  }), [goals, loading, error, addGoal, deleteGoal, updateGoal]);
+
+  return contextValue;
+}
 
 export default useGoals; 

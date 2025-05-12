@@ -14,7 +14,6 @@ import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold, useFonts } from '@e
 import * as SplashScreen from 'expo-splash-screen';
 import { router } from 'expo-router';
 import { ChevronDown, X } from 'lucide-react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
@@ -23,6 +22,8 @@ import Header from '@/app/components/Header';
 import Text from '@/app/components/ui/Text';
 import { ExerciseList, getMuscleGroups, getPredefinedExercises } from '@/app/components/exercises/ExerciseList';
 import { Button } from '@/app/components/Button';
+import useGoals from '@/app/hooks/useGoals';
+import useWorkouts from '@/app/hooks/useWorkouts';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -337,8 +338,8 @@ const useStyles = () => {
 
 export default function NewGoalScreen() {
   const { t } = useTranslation();
-  const { theme } = useTheme(); // Get the theme object
-  const styles = useStyles(); // Generate styles based on the theme
+  const { theme } = useTheme();
+  const styles = useStyles();
   const [newGoalExercise, setNewGoalExercise] = useState('');
   const [newGoalCurrent, setNewGoalCurrent] = useState('');
   const [newGoalTarget, setNewGoalTarget] = useState('');
@@ -364,175 +365,37 @@ export default function NewGoalScreen() {
     }
   }, [fontsLoaded]);
 
-  // Load workouts to get exercise options
+  // Utiliser les hooks optimisés
+  const { workouts } = useWorkouts();
+  const { addGoal, getCurrentWeight, suggestTargetWeight } = useGoals(workouts);
+
+  // Charger les options d'exercice à partir des workouts et des exercices prédéfinis
   useEffect(() => {
-    const loadExerciseOptions = async () => {
-      try {
-        // Load workouts
-        const storedWorkouts = await AsyncStorage.getItem('workouts');
-        let parsedWorkouts: any[] = []; // Initialiser comme tableau vide
-        if (storedWorkouts) {
-          try {
-            const parsed = JSON.parse(storedWorkouts);
-            if (Array.isArray(parsed)) {
-              parsedWorkouts = parsed; // Assigner si c'est un tableau
-            } else {
-              console.warn('Stored workouts were not an array:', parsed);
-            }
-          } catch (parseError) {
-            console.error('Error parsing workouts:', parseError);
-          }
-        }
+    const uniqueExercises = Array.from(new Set([
+      ...workouts.map(w => w.exercise),
+      ...Object.values(getPredefinedExercises(t as (key: string) => string)).flat()
+    ]));
+    setExerciseOptions(uniqueExercises as string[]);
+  }, [workouts, t]);
 
-        // Extract unique exercise names for the exercise selector
-        const uniqueExercises = Array.from(new Set(parsedWorkouts.map((w: any) => w.exercise)));
-
-        // Combine with predefined exercises
-        const muscleGroups = getMuscleGroups(t as (key: string) => string);
-        const predefinedExercises = getPredefinedExercises(t as (key: string) => string);
-        const predefinedExercisesList = Object.values(predefinedExercises).flat();
-        const allExercises = Array.from(new Set([
-          ...uniqueExercises,
-          ...predefinedExercisesList
-        ]));
-
-        setExerciseOptions(allExercises as string[]); // Assurer le type string[]
-
-      } catch (error) {
-        console.error(t('common.errorLoadingWorkouts'), error);
-      }
-    };
-
-    loadExerciseOptions();
-  }, [t]);
-
-  // Function to check if there are previous workouts for an exercise
-  const checkPreviousWorkouts = useCallback(async (exerciseName: string) => {
-    if (!exerciseName) return false;
-
-    try {
-      const storedWorkouts = await AsyncStorage.getItem('workouts');
-      if (!storedWorkouts) return false;
-
-      const workouts = JSON.parse(storedWorkouts);
-      const exerciseWorkouts = workouts.filter((w: any) => w.exercise === exerciseName);
-      return exerciseWorkouts.length > 0;
-    } catch (error) {
-      console.error('Error checking previous workouts:', error);
-      return false;
-    }
-  }, []);
-
-  // Update hasPreviousWorkouts when exercise changes
+  // Vérifier s'il y a des workouts précédents pour l'exercice sélectionné
   useEffect(() => {
     if (newGoalExercise) {
-      checkPreviousWorkouts(newGoalExercise).then(setHasPreviousWorkouts);
-    } else {
-      setHasPreviousWorkouts(false);
-    }
-  }, [newGoalExercise, checkPreviousWorkouts]);
-
-  // Function to get the current weight from the most recent workout for the selected exercise
-  const getCurrentWeight = useCallback(async (exerciseName: string) => {
-    if (!exerciseName) return null;
-
-    try {
-      const storedWorkouts = await AsyncStorage.getItem('workouts');
-      if (!storedWorkouts) return null;
-
-      const workouts = JSON.parse(storedWorkouts);
-      const exerciseWorkouts = workouts.filter((w: any) => w.exercise === exerciseName);
-      
-      if (exerciseWorkouts.length === 0) return null;
-
-      // Sort by date (most recent first)
-      exerciseWorkouts.sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
-
-      // Return the weight from the most recent workout
-      return exerciseWorkouts[0].weight;
-    } catch (error) {
-      console.error('Error getting current weight:', error);
-      return null;
-    }
-  }, []);
-
-  // Function to suggest a target weight based on incremental improvement
-  const suggestTargetWeight = useCallback((currentWeight: number) => {
-    if (!currentWeight) return null;
-
-    // Suggest a 5% improvement for weights under 50kg, 2.5% for heavier weights
-    const improvementFactor = currentWeight < 50 ? 0.05 : 0.025;
-    const suggestedImprovement = currentWeight * improvementFactor;
-
-    // Round to nearest 2.5kg for barbells (simplification)
-    const roundingFactor = 2.5;
-    return Math.ceil((currentWeight + suggestedImprovement) / roundingFactor) * roundingFactor;
-  }, []);
-
-  // Function to find the highest weight for an exercise
-  const findHighestWeight = useCallback(async (exerciseName: string) => {
-    if (!exerciseName) return null;
-
-    try {
-      const storedWorkouts = await AsyncStorage.getItem('workouts');
-      console.log('Stored workouts:', storedWorkouts);
-      
-      if (!storedWorkouts) {
-        console.log('No stored workouts found');
-        return null;
-      }
-
-      const workouts = JSON.parse(storedWorkouts);
-      console.log('Parsed workouts:', workouts);
-      
-      if (!Array.isArray(workouts)) {
-        console.log('Workouts is not an array:', workouts);
-        return null;
-      }
-
-      const exerciseWorkouts = workouts.filter((w: any) => {
-        console.log('Comparing:', w.exercise, exerciseName);
-        return w.exercise === exerciseName;
-      });
-      console.log('Exercise workouts:', exerciseWorkouts);
-      
-      if (exerciseWorkouts.length === 0) {
-        console.log('No workouts found for exercise:', exerciseName);
-        return null;
-      }
-
-      // Find the highest weight
-      const weights = exerciseWorkouts.map((w: any) => w.weight);
-      console.log('All weights:', weights);
-      const highest = Math.max(...weights);
-      console.log('Highest weight found:', highest);
-      return highest;
-    } catch (error) {
-      console.error('Error finding highest weight:', error);
-      return null;
-    }
-  }, []);
-
-  // Update highest weight when exercise changes
-  useEffect(() => {
-    const updateWeight = async () => {
-      if (newGoalExercise) {
-        console.log('Exercise changed to:', newGoalExercise);
-        const weight = await findHighestWeight(newGoalExercise);
-        console.log('Weight found:', weight);
-        setHighestWeight(weight);
-        setHasPreviousWorkouts(weight !== null);
+      const hasWorkouts = workouts.some(w => w.exercise === newGoalExercise);
+      setHasPreviousWorkouts(hasWorkouts);
+      if (hasWorkouts) {
+        const weight = getCurrentWeight(newGoalExercise);
+        setHighestWeight(weight || null);
       } else {
         setHighestWeight(null);
-        setHasPreviousWorkouts(false);
       }
-    };
-
-    updateWeight();
-  }, [newGoalExercise, findHighestWeight]);
+    } else {
+      setHasPreviousWorkouts(false);
+      setHighestWeight(null);
+    }
+  }, [newGoalExercise, workouts, getCurrentWeight]);
 
   const saveGoal = async () => {
-    // Validate inputs
     if (!newGoalExercise.trim() || !newGoalCurrent || !newGoalTarget) {
       Alert.alert(
         t('common.error'),
@@ -555,34 +418,19 @@ export default function NewGoalScreen() {
     }
 
     try {
-      // Calculate progress
       const progress = Math.min(Math.round((current / target) * 100), 100);
-
-      // Add new goal
       const newGoal = {
         exercise: newGoalExercise,
         current,
         target,
         progress
       };
-
-      // Get existing goals
-      const storedGoals = await AsyncStorage.getItem('goals');
-      const goals = storedGoals ? JSON.parse(storedGoals) : [];
-
-      // Add new goal
-      const updatedGoals = [...goals, newGoal];
-
-      // Save goals to AsyncStorage
-      await AsyncStorage.setItem('goals', JSON.stringify(updatedGoals));
-
-      // Navigate back to stats screen
+      await addGoal(newGoal);
       router.push({
         pathname: '/(tabs)',
         params: { refresh: 'true' }
       });
     } catch (error) {
-      console.error(t('common.errorSavingWorkouts'), error);
       Alert.alert(
         t('common.error'),
         t('goals.errorSavingGoal'),
@@ -644,30 +492,21 @@ export default function NewGoalScreen() {
                 onChangeText={setNewGoalCurrent}
                 keyboardType="numeric"
               />
-              {(() => {
-                console.log('Button conditions:', { 
-                  hasExercise: !!newGoalExercise, 
-                  hasWorkouts: hasPreviousWorkouts, 
-                  hasWeight: !!highestWeight 
-                });
-                return newGoalExercise && hasPreviousWorkouts && highestWeight && (
-                  <Button
-                    variant="secondary"
-                    title={`${t('goals.useLastWorkout')} (${highestWeight}kg)`}
-                    onPress={() => {
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                      setNewGoalCurrent(highestWeight.toString());
-                      
-                      // Update suggested target when current weight changes
-                      const target = suggestTargetWeight(highestWeight);
-                      if (target) {
-                        setSuggestedTarget(target);
-                      }
-                    }}
-                    style={styles.suggestedButton}
-                  />
-                );
-              })()}
+              {newGoalExercise && hasPreviousWorkouts && highestWeight && (
+                <Button
+                  variant="secondary"
+                  title={`${t('goals.useLastWorkout')} (${highestWeight}kg)`}
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    setNewGoalCurrent(highestWeight.toString());
+                    const target = suggestTargetWeight(highestWeight);
+                    if (target) {
+                      setSuggestedTarget(target);
+                    }
+                  }}
+                  style={styles.suggestedButton}
+                />
+              )}
             </View>
           </View>
 
@@ -733,13 +572,9 @@ export default function NewGoalScreen() {
               setExercise={(exercise) => {
                 setIsExerciseModalVisible(false);
                 setNewGoalExercise(exercise);
-                const currentWeight = getCurrentWeight(exercise);
-                if (currentWeight) {
-                  currentWeight.then(weight => {
-                    if (weight) {
-                      setNewGoalCurrent(weight.toString());
-                    }
-                  });
+                const weight = getCurrentWeight(exercise);
+                if (weight) {
+                  setNewGoalCurrent(weight.toString());
                 }
               }}
               selectedMuscle={selectedMuscleGroup}

@@ -3,7 +3,6 @@ import { Modal, Pressable, ScrollView, StyleSheet, TextInput, TouchableOpacity, 
 import * as SplashScreen from 'expo-splash-screen';
 import { router, useLocalSearchParams } from 'expo-router';
 import { BarChart, Calendar, ChevronDown, Gauge, Layers, Plus, Weight, X } from 'lucide-react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Calendar as RNCalendar } from 'react-native-calendars';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -17,6 +16,7 @@ import { Series, SeriesType, Workout } from '@/app/types/common';
 import { WorkoutDateUtils } from '@/app/types/workout';
 import { MuscleGroupKey, muscleGroupKeys } from '@/app/components/exercises/ExerciseList';
 import { TranslationKey } from '@/translations';
+import { useWorkouts } from '@/app/hooks/useWorkouts';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -45,6 +45,7 @@ export default function NewWorkoutScreen() {
   const { t } = useTranslation();
   const { theme } = useTheme();
   const styles = useStyles();
+  const { workouts, saveWorkout: saveWorkoutToStorage } = useWorkouts();
   const [selectedMuscle, setSelectedMuscle] = useState<string>('');
   const [selectedMuscleKey, setSelectedMuscleKey] = useState<MuscleGroupKey | string>('');
   const [exercise, setExercise] = useState<string>('');
@@ -63,21 +64,6 @@ export default function NewWorkoutScreen() {
   const [selectedDate, setSelectedDate] = useState<string>(params.selectedDate as string || WorkoutDateUtils.getDatePart(new Date().toISOString()));
   const [showCalendar, setShowCalendar] = useState<boolean>(false);
   const [showExerciseSelector, setShowExerciseSelector] = useState<boolean>(false);
-  const [workouts, setWorkouts] = useState<Workout[]>([]);
-
-  useEffect(() => {
-    const loadWorkouts = async () => {
-      try {
-        const storedWorkouts = await AsyncStorage.getItem('workouts');
-        if (storedWorkouts) {
-          setWorkouts(JSON.parse(storedWorkouts));
-        }
-      } catch (error) {
-        console.error('Error loading workouts:', error);
-      }
-    };
-    loadWorkouts();
-  }, []);
 
   const calculateSuggestedWeight = (exercise: string, reps: number, rpe: number): number | null => {
     const exerciseWorkouts = workouts.filter((w: Workout) => w.exercise === exercise);
@@ -121,46 +107,42 @@ export default function NewWorkoutScreen() {
     const currentRpe = series[0]?.rpe || rpe;
 
     if (selectedExercise && currentReps && currentRpe) {
-      calculateSuggestedWeight(selectedExercise, parseInt(currentReps), parseInt(currentRpe));
+      const weight = calculateSuggestedWeight(selectedExercise, parseInt(currentReps), parseInt(currentRpe));
+      setSuggestedWeight(weight);
       return;
     }
 
-    try {
-      const existingWorkouts = await AsyncStorage.getItem('workouts');
-      if (!existingWorkouts) return;
+    const sameExerciseWorkouts = workouts
+      .filter((w: Workout) => w.exercise === (exerciseKey || selectedExercise))
+      .sort((a: Workout, b: Workout) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-      const workouts = JSON.parse(existingWorkouts);
-      const sameExerciseWorkouts = workouts
-        .filter((w: Workout) => w.exercise === (exerciseKey || selectedExercise))
-        .sort((a: Workout, b: Workout) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    if (sameExerciseWorkouts.length === 0) return;
 
-      if (sameExerciseWorkouts.length === 0) return;
+    const lastWorkout = sameExerciseWorkouts[0];
+    const lastWorkingSet = lastWorkout.series.find((s: Series) => s.type === 'workingSet') || lastWorkout.series[0];
 
-      const lastWorkout = sameExerciseWorkouts[0];
-      const lastWorkingSet = lastWorkout.series.find((s: Series) => s.type === 'workingSet') || lastWorkout.series[0];
-
-      if (currentReps && !currentRpe) {
-        calculateSuggestedWeight(selectedExercise, parseInt(currentReps), lastWorkingSet.rpe);
-      }
-      else if (!currentReps && currentRpe) {
-        calculateSuggestedWeight(selectedExercise, lastWorkingSet.reps, parseInt(currentRpe));
-      }
-      else if (!currentReps && !currentRpe) {
-        const newSeries = [...series];
-        if (newSeries.length > 0) {
-          newSeries[0] = {
-            ...newSeries[0],
-            reps: lastWorkingSet.reps.toString()
-          };
-          setSeries(newSeries);
-        }
-        setRpe(lastWorkingSet.rpe.toString());
-        calculateSuggestedWeight(selectedExercise, parseInt(lastWorkingSet.reps), parseInt(lastWorkingSet.rpe));
-      }
-    } catch (error) {
-      console.error('Error loading previous workouts:', error);
+    if (currentReps && !currentRpe) {
+      const weight = calculateSuggestedWeight(selectedExercise, parseInt(currentReps), lastWorkingSet.rpe);
+      setSuggestedWeight(weight);
     }
-  }, [series, rpe, calculateSuggestedWeight, exerciseKey]);
+    else if (!currentReps && currentRpe) {
+      const weight = calculateSuggestedWeight(selectedExercise, lastWorkingSet.reps, parseInt(currentRpe));
+      setSuggestedWeight(weight);
+    }
+    else if (!currentReps && !currentRpe) {
+      const newSeries = [...series];
+      if (newSeries.length > 0) {
+        newSeries[0] = {
+          ...newSeries[0],
+          reps: lastWorkingSet.reps.toString()
+        };
+        setSeries(newSeries);
+      }
+      setRpe(lastWorkingSet.rpe.toString());
+      const weight = calculateSuggestedWeight(selectedExercise, lastWorkingSet.reps, lastWorkingSet.rpe);
+      setSuggestedWeight(weight);
+    }
+  }, [series, rpe, workouts, exerciseKey, calculateSuggestedWeight]);
 
   const saveWorkout = async (): Promise<void> => {
     try {
@@ -186,15 +168,16 @@ export default function NewWorkoutScreen() {
         date: selectedDate ? WorkoutDateUtils.createISOString(selectedDate) : new Date().toISOString()
       };
 
-      const existingWorkouts = await AsyncStorage.getItem('workouts');
-      const workouts = existingWorkouts ? JSON.parse(existingWorkouts) : [];
-      workouts.push(workout);
-      await AsyncStorage.setItem('workouts', JSON.stringify(workouts));
-
-      router.push({
-        pathname: '/(tabs)',
-        params: { refresh: 'true' }
-      });
+      const success = await saveWorkoutToStorage(workout);
+      
+      if (success) {
+        router.push({
+          pathname: '/(tabs)',
+          params: { refresh: 'true' }
+        });
+      } else {
+        console.error('Erreur lors de la sauvegarde de l\'entraînement');
+      }
     } catch (error) {
       console.error('Erreur lors de la sauvegarde:', error);
     }
@@ -450,7 +433,7 @@ export default function NewWorkoutScreen() {
                     setSeries(newSeries);
 
                     if (index === 0 && exercise && value && (item.rpe || rpe)) {
-                      calculateSuggestedWeight(exercise, parseInt(value), parseInt(item.rpe || rpe));
+                      tryCalculateSuggestedWeight(exercise);
                     }
                   }}
                   placeholder="0"
@@ -495,7 +478,7 @@ export default function NewWorkoutScreen() {
                           };
                           setSeries(newSeries);
                           if (index === 0 && exercise && item.reps && rpeValue) {
-                            calculateSuggestedWeight(exercise, parseInt(item.reps), parseInt(rpeValue));
+                            tryCalculateSuggestedWeight(exercise);
                           }
                         }}
                       >
@@ -518,7 +501,7 @@ export default function NewWorkoutScreen() {
                           };
                           setSeries(newSeries);
                           if (index === 0 && exercise && item.reps && rpeValue) {
-                            calculateSuggestedWeight(exercise, parseInt(item.reps), parseInt(rpeValue));
+                            tryCalculateSuggestedWeight(exercise);
                           }
                         }}
                       >

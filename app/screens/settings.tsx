@@ -9,11 +9,11 @@ import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
 import { useCSVExport } from '@/app/hooks/useCSVExport';
 import Header from '@/app/components/Header';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import Text from '@/app/components/ui/Text';
 import { TranslationKey } from '@/translations';
 import { StatsCardSkeleton } from '@/app/components/ui/SkeletonComponents';
+import { storageService } from '@/app/services';
 
 export default function SettingsScreen() {
   const { settings, updateSettings, isLoading } = useSettings();
@@ -54,26 +54,17 @@ export default function SettingsScreen() {
 
   const handleResetData = async () => {
     try {
-      const workouts = await AsyncStorage.getItem('workouts');
-      const goals = await AsyncStorage.getItem('goals');
-      const measurements = await AsyncStorage.getItem('measurements');
-
-      await AsyncStorage.multiRemove(['workouts', 'goals', 'measurements']);
+      // Utiliser le service de stockage pour réinitialiser les données
+      await storageService.resetAllData();
       
-      const workoutsAfter = await AsyncStorage.getItem('workouts');
-      const goalsAfter = await AsyncStorage.getItem('goals');
-      const measurementsAfter = await AsyncStorage.getItem('measurements');
-
-      if (workoutsAfter === null && goalsAfter === null && measurementsAfter === null) {
-        Alert.alert(
-          t('settings.resetDataSuccess' as TranslationKey),
-          '',
-          [{ text: 'OK' }]
-        );
-        await updateSettings(settings);
-      } else {
-        throw new Error('Data not properly cleared');
-      }
+      Alert.alert(
+        t('settings.resetDataSuccess' as TranslationKey),
+        '',
+        [{ text: 'OK' }]
+      );
+      
+      // Mettre à jour les paramètres pour les préserver
+      await updateSettings(settings);
     } catch (error) {
       Alert.alert(
         t('settings.errorResettingData'),

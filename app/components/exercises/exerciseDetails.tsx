@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Dimensions, ScrollView, StyleSheet, TouchableOpacity, View, ActivityIndicator } from 'react-native';
 import { VictoryAxis, VictoryChart, VictoryLine, VictoryScatter, VictoryTheme, VictoryTooltip } from 'victory-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { format, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useLocalSearchParams } from 'expo-router';
@@ -13,6 +12,7 @@ import Text from '@/app/components/ui/Text';
 import calculations from '@/app/utils/calculations';
 import { TranslationKey } from '@/translations';
 import { StatsCardSkeleton, ChartSkeleton } from '@/app/components/ui/SkeletonComponents';
+import useWorkouts from '@/app/hooks/useWorkouts';
 
 interface ExerciseData {
   x: Date;
@@ -191,7 +191,7 @@ const ExerciseDetails = () => {
   const { theme } = useTheme();
   const styles = useStyles();
   const { exercise } = useLocalSearchParams<{ exercise: string }>();
-  const [workouts, setWorkouts] = useState<Workout[]>([]);
+  const { workouts, loading } = useWorkouts();
   const [selectedPeriod, setSelectedPeriod] = useState<'1m' | '3m' | '6m'>('1m');
   const [selectedChartType, setSelectedChartType] = useState<'1rm' | 'volume' | 'reps'>('1rm');
   const [exerciseData, setExerciseData] = useState<ExerciseData[]>([]);
@@ -202,57 +202,33 @@ const ExerciseDetails = () => {
   const slideAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    const loadWorkouts = async () => {
-      setIsLoading(true);
-      try {
-        const storedWorkouts = await AsyncStorage.getItem('workouts');
-        if (storedWorkouts) {
-          const parsedWorkouts = JSON.parse(storedWorkouts) as Workout[];
-          const filteredWorkouts = parsedWorkouts.filter(w => w.exercise === exercise);
-          setWorkouts(filteredWorkouts);
-
-          // Prepare chart data
-          const oneRMData: ExerciseData[] = [];
-          const volumeData: ExerciseData[] = [];
-          const repsData: ExerciseData[] = [];
-
-          // Sort workouts by date
-          const sortedWorkouts = [...filteredWorkouts].sort(
-            (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-          );
-
-          sortedWorkouts.forEach(workout => {
-            if (workout.series && workout.series.length > 0) {
-              const workingSet = workout.series.find(s => s.type === 'workingSet') || workout.series[0];
-              if (workingSet) {
-                const date = new Date(workout.date);
-                const estimated1RM = calculations.calculateEstimated1RM(workingSet.weight, workingSet.reps);
-                const volume = calculations.calculateVolume(workingSet.weight, workingSet.reps, workout.series.length);
-
-                oneRMData.push({ x: date, y: estimated1RM });
-                volumeData.push({ x: date, y: volume });
-                repsData.push({ x: date, y: workingSet.reps });
-              }
-            }
-          });
-
-          console.log('Exercise Data:', oneRMData);
-          console.log('Volume Data:', volumeData);
-          console.log('Reps Data:', repsData);
-
-          setExerciseData(oneRMData);
-          setVolumeData(volumeData);
-          setRepsData(repsData);
+    if (!exercise) return;
+    const filteredWorkouts = workouts.filter(w => w.exercise === exercise);
+    // Prepare chart data
+    const oneRMData: ExerciseData[] = [];
+    const volumeDataArr: ExerciseData[] = [];
+    const repsDataArr: ExerciseData[] = [];
+    // Sort workouts by date
+    const sortedWorkouts = [...filteredWorkouts].sort(
+      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+    );
+    sortedWorkouts.forEach(workout => {
+      if (workout.series && workout.series.length > 0) {
+        const workingSet = workout.series.find(s => s.type === 'workingSet') || workout.series[0];
+        if (workingSet) {
+          const date = new Date(workout.date);
+          const estimated1RM = calculations.calculateEstimated1RM(workingSet.weight, workingSet.reps);
+          const volume = calculations.calculateVolume(workingSet.weight, workingSet.reps, workout.series.length);
+          oneRMData.push({ x: date, y: estimated1RM });
+          volumeDataArr.push({ x: date, y: volume });
+          repsDataArr.push({ x: date, y: workingSet.reps });
         }
-      } catch (error) {
-        console.error('Error loading workouts:', error);
-      } finally {
-        setIsLoading(false);
       }
-    };
-
-    loadWorkouts();
-  }, [exercise]);
+    });
+    setExerciseData(oneRMData);
+    setVolumeData(volumeDataArr);
+    setRepsData(repsDataArr);
+  }, [workouts, exercise]);
 
   // Get the first working set or the first series if no working set
   const latestWorkout = workouts[workouts.length - 1];

@@ -1,28 +1,22 @@
 import React from 'react';
 import { Alert, Animated, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
 import { router } from 'expo-router';
-
-interface Goal {
-  exercise: string;
-  current: number;
-  target: number;
-  progress: number;
-}
+import useGoals from '@/app/hooks/useGoals';
+import useWorkouts from '@/app/hooks/useWorkouts';
 
 interface GoalSectionProps {
   fadeAnim: Animated.Value;
-  goals: Goal[];
-  setGoals: React.Dispatch<React.SetStateAction<Goal[]>>;
 }
 
-const GoalSection: React.FC<GoalSectionProps> = ({ fadeAnim, goals, setGoals }) => {
+const GoalSection: React.FC<GoalSectionProps> = ({ fadeAnim }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
+  const { workouts } = useWorkouts();
+  const { goals, deleteGoal } = useGoals(workouts);
 
   const styles = StyleSheet.create({
     chartContainer: {
@@ -155,7 +149,6 @@ const GoalSection: React.FC<GoalSectionProps> = ({ fadeAnim, goals, setGoals }) 
                 <TouchableOpacity
                   style={styles.deleteGoalButton}
                   onPress={() => {
-                    // Show confirmation dialog
                     Alert.alert(
                       t('goals.deleteGoal'),
                       t('goals.deleteGoalConfirmation').replace('{exercise}', goal.exercise),
@@ -168,17 +161,7 @@ const GoalSection: React.FC<GoalSectionProps> = ({ fadeAnim, goals, setGoals }) 
                           text: t('common.delete'),
                           style: 'destructive',
                           onPress: () => {
-                            // Remove goal
-                            const updatedGoals = goals.filter((_, i) => i !== index);
-                            setGoals(updatedGoals);
-
-                            // Save updated goals to AsyncStorage
-                            try {
-                              AsyncStorage.setItem('goals', JSON.stringify(updatedGoals));
-                            } catch (error) {
-                              console.error(t('common.errorSavingWorkouts'), error);
-                            }
-
+                            deleteGoal(goal.exercise);
                             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                           }
                         }

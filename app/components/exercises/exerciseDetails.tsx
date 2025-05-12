@@ -197,21 +197,21 @@ const ExerciseDetails = () => {
   const [exerciseData, setExerciseData] = useState<ExerciseData[]>([]);
   const [volumeData, setVolumeData] = useState<ExerciseData[]>([]);
   const [repsData, setRepsData] = useState<ExerciseData[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    if (!exercise) return;
+    if (!exercise || !workouts) return;
+    
     const filteredWorkouts = workouts.filter(w => w.exercise === exercise);
-    // Prepare chart data
     const oneRMData: ExerciseData[] = [];
     const volumeDataArr: ExerciseData[] = [];
     const repsDataArr: ExerciseData[] = [];
-    // Sort workouts by date
+
     const sortedWorkouts = [...filteredWorkouts].sort(
       (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
     );
+
     sortedWorkouts.forEach(workout => {
       if (workout.series && workout.series.length > 0) {
         const workingSet = workout.series.find(s => s.type === 'workingSet') || workout.series[0];
@@ -225,6 +225,7 @@ const ExerciseDetails = () => {
         }
       }
     });
+
     setExerciseData(oneRMData);
     setVolumeData(volumeDataArr);
     setRepsData(repsDataArr);
@@ -367,18 +368,10 @@ const ExerciseDetails = () => {
   const filteredVolumeData = getFilteredData(volumeData);
   const filteredRepsData = getFilteredData(repsData);
 
-  console.log('Filtered Exercise Data:', filteredExerciseData);
-  console.log('Filtered Volume Data:', filteredVolumeData);
-  console.log('Filtered Reps Data:', filteredRepsData);
-
   // Obtenir les domaines Y
   const domainY1RM = getDomainY(filteredExerciseData, '1rm');
   const domainYVolume = getDomainY(filteredVolumeData, 'volume');
   const domainYReps = getDomainY(filteredRepsData, 'reps');
-
-  console.log('Domain Y 1RM:', domainY1RM);
-  console.log('Domain Y Volume:', domainYVolume);
-  console.log('Domain Y Reps:', domainYReps);
 
   // Obtenir la couleur appropriée pour le graphique
   const getChartColor = () => {
@@ -432,7 +425,7 @@ const ExerciseDetails = () => {
       <ScrollView style={styles.content}>
         {/* Statistiques principales */}
         <View style={styles.statsContainer}>
-          {isLoading ? (
+          {loading ? (
             <>
               <StatsCardSkeleton />
               <StatsCardSkeleton />
@@ -440,18 +433,18 @@ const ExerciseDetails = () => {
             </>
           ) : (
             <>
-          <View style={styles.statCard}>
-            <Text style={styles.statLabel}>{t('exerciseDetails.estimated_1rm')}</Text>
+              <View style={styles.statCard}>
+                <Text style={styles.statLabel}>{t('exerciseDetails.estimated_1rm')}</Text>
                 <Text style={styles.statValue}>{Math.round(estimated1RM)} kg</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Text style={styles.statLabel}>{t('stats.volume')}</Text>
+              </View>
+              <View style={styles.statCard}>
+                <Text style={styles.statLabel}>{t('stats.volume')}</Text>
                 <Text style={styles.statValue}>{Math.round(volume)} kg</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Text style={styles.statLabel}>{t('stats.repetitions')}</Text>
+              </View>
+              <View style={styles.statCard}>
+                <Text style={styles.statLabel}>{t('stats.repetitions')}</Text>
                 <Text style={styles.statValue}>{Math.round(workingSet?.reps || 0)}</Text>
-          </View>
+              </View>
             </>
           )}
         </View>
@@ -464,22 +457,25 @@ const ExerciseDetails = () => {
               style={[styles.filterButton, selectedPeriod === '1m' && styles.filterButtonActive]}
               onPress={() => setSelectedPeriod('1m')}
             >
-              <Text
-                style={[styles.filterText, selectedPeriod === '1m' && styles.filterTextActive]}>{t('periods.oneMonth')}</Text>
+              <Text style={[styles.filterText, selectedPeriod === '1m' && styles.filterTextActive]}>
+                {t('periods.oneMonth')}
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.filterButton, selectedPeriod === '3m' && styles.filterButtonActive]}
               onPress={() => setSelectedPeriod('3m')}
             >
-              <Text
-                style={[styles.filterText, selectedPeriod === '3m' && styles.filterTextActive]}>{t('periods.threeMonths')}</Text>
+              <Text style={[styles.filterText, selectedPeriod === '3m' && styles.filterTextActive]}>
+                {t('periods.threeMonths')}
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.filterButton, selectedPeriod === '6m' && styles.filterButtonActive]}
               onPress={() => setSelectedPeriod('6m')}
             >
-              <Text
-                style={[styles.filterText, selectedPeriod === '6m' && styles.filterTextActive]}>{t('periods.sixMonths')}</Text>
+              <Text style={[styles.filterText, selectedPeriod === '6m' && styles.filterTextActive]}>
+                {t('periods.sixMonths')}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -490,266 +486,270 @@ const ExerciseDetails = () => {
             style={[styles.chartTypeButton, selectedChartType === '1rm' && styles.chartTypeButtonActive]}
             onPress={() => setSelectedChartType('1rm')}
           >
-            <Text style={[styles.chartTypeText, selectedChartType === '1rm' && styles.chartTypeTextActive]}>1RM</Text>
+            <Text style={[styles.chartTypeText, selectedChartType === '1rm' && styles.chartTypeTextActive]}>
+              1RM
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.chartTypeButton, selectedChartType === 'volume' && styles.chartTypeButtonActive]}
             onPress={() => setSelectedChartType('volume')}
           >
-            <Text
-              style={[styles.chartTypeText, selectedChartType === 'volume' && styles.chartTypeTextActive]}>{t('stats.volume')}</Text>
+            <Text style={[styles.chartTypeText, selectedChartType === 'volume' && styles.chartTypeTextActive]}>
+              {t('stats.volume')}
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.chartTypeButton, selectedChartType === 'reps' && styles.chartTypeButtonActive]}
             onPress={() => setSelectedChartType('reps')}
           >
-            <Text
-              style={[styles.chartTypeText, selectedChartType === 'reps' && styles.chartTypeTextActive]}>{t('stats.repetitions')}</Text>
+            <Text style={[styles.chartTypeText, selectedChartType === 'reps' && styles.chartTypeTextActive]}>
+              {t('stats.repetitions')}
+            </Text>
           </TouchableOpacity>
         </View>
 
         <View style={styles.chartContainer}>
           <Text style={styles.chartTitle}>{getChartTitle()}</Text>
 
-          {isLoading ? (
+          {loading ? (
             <ChartSkeleton />
           ) : (
             <>
-          {selectedChartType === '1rm' && filteredExerciseData.length > 0 && (
+              {selectedChartType === '1rm' && filteredExerciseData.length > 0 && (
                 <View style={styles.chartWrapper}>
-            <VictoryChart
-              theme={VictoryTheme.material}
+                  <VictoryChart
+                    theme={VictoryTheme.material}
                     width={Dimensions.get('window').width - 60}
-              height={300}
+                    height={300}
                     padding={{ top: 20, bottom: 50, left: 60, right: 30 }}
-              domainPadding={{ x: 20 }}
-              domain={domainY1RM}
-              scale={{ x: 'time' }}
-            >
-              <VictoryAxis
-                tickFormat={(date: number | Date) => formatDateForDisplay(new Date(date))}
-                tickCount={getTickCount()}
-                style={{
-                  axis: { stroke: theme.colors.border.default },
-                  tickLabels: {
-                    fill: theme.colors.text.primary,
-                    fontSize: theme.typography.fontSize.sm,
-                    angle: -45,
+                    domainPadding={{ x: 20 }}
+                    domain={domainY1RM}
+                    scale={{ x: 'time' }}
+                  >
+                    <VictoryAxis
+                      tickFormat={(date: number | Date) => formatDateForDisplay(new Date(date))}
+                      tickCount={getTickCount()}
+                      style={{
+                        axis: { stroke: theme.colors.border.default },
+                        tickLabels: {
+                          fill: theme.colors.text.primary,
+                          fontSize: theme.typography.fontSize.sm,
+                          angle: -45,
                           textAnchor: 'end',
                           padding: 5
-                  }
-                }}
-              />
-              <VictoryAxis
-                dependentAxis
+                        }
+                      }}
+                    />
+                    <VictoryAxis
+                      dependentAxis
                       tickCount={getTickCount()}
                       tickFormat={getYTickFormat}
-                style={{
-                  axis: { stroke: theme.colors.border.default },
-                  tickLabels: {
-                    fill: theme.colors.text.primary,
-                    fontSize: theme.typography.fontSize.sm,
+                      style={{
+                        axis: { stroke: theme.colors.border.default },
+                        tickLabels: {
+                          fill: theme.colors.text.primary,
+                          fontSize: theme.typography.fontSize.sm,
                           padding: 5
-                  }
-                }}
-              />
-              <VictoryLine
-                data={filteredExerciseData}
-                style={{
-                  data: {
-                    stroke: getChartColor(),
-                    strokeWidth: 3
-                  }
-                }}
-              />
-              <VictoryScatter
-                data={filteredExerciseData}
-                size={5}
-                style={{
-                  data: { fill: getChartColor() }
-                }}
-                labels={formatTooltip}
-                labelComponent={
-                  <VictoryTooltip
-                    style={{
-                      fill: theme.colors.text.primary,
+                        }
+                      }}
+                    />
+                    <VictoryLine
+                      data={filteredExerciseData}
+                      style={{
+                        data: {
+                          stroke: getChartColor(),
+                          strokeWidth: 3
+                        }
+                      }}
+                    />
+                    <VictoryScatter
+                      data={filteredExerciseData}
+                      size={5}
+                      style={{
+                        data: { fill: getChartColor() }
+                      }}
+                      labels={formatTooltip}
+                      labelComponent={
+                        <VictoryTooltip
+                          style={{
+                            fill: theme.colors.text.primary,
                             fontSize: theme.typography.fontSize.sm,
                             fontFamily: theme.typography.fontFamily.regular
-                    }}
-                    flyoutStyle={{
-                      fill: theme.colors.background.card,
-                      stroke: theme.colors.border.default,
+                          }}
+                          flyoutStyle={{
+                            fill: theme.colors.background.card,
+                            stroke: theme.colors.border.default,
                             strokeWidth: 1,
                             padding: 8
-                    }}
-                    cornerRadius={theme.borderRadius.sm}
-                    pointerLength={5}
+                          }}
+                          cornerRadius={theme.borderRadius.sm}
+                          pointerLength={5}
                           dy={-10}
-                  />
-                }
-              />
-            </VictoryChart>
+                        />
+                      }
+                    />
+                  </VictoryChart>
                 </View>
-          )}
+              )}
 
-          {selectedChartType === 'volume' && filteredVolumeData.length > 0 && (
+              {selectedChartType === 'volume' && filteredVolumeData.length > 0 && (
                 <View style={styles.chartWrapper}>
-            <VictoryChart
-              theme={VictoryTheme.material}
+                  <VictoryChart
+                    theme={VictoryTheme.material}
                     width={Dimensions.get('window').width - 60}
-              height={300}
+                    height={300}
                     padding={{ top: 20, bottom: 50, left: 60, right: 30 }}
-              domainPadding={{ x: 20 }}
-              domain={domainYVolume}
-              scale={{ x: 'time' }}
-            >
-              <VictoryAxis
-                tickFormat={(date: number | Date) => formatDateForDisplay(new Date(date))}
-                tickCount={getTickCount()}
-                style={{
-                  axis: { stroke: theme.colors.border.default },
-                  tickLabels: {
-                    fill: theme.colors.text.primary,
-                    fontSize: theme.typography.fontSize.sm,
-                    angle: -45,
+                    domainPadding={{ x: 20 }}
+                    domain={domainYVolume}
+                    scale={{ x: 'time' }}
+                  >
+                    <VictoryAxis
+                      tickFormat={(date: number | Date) => formatDateForDisplay(new Date(date))}
+                      tickCount={getTickCount()}
+                      style={{
+                        axis: { stroke: theme.colors.border.default },
+                        tickLabels: {
+                          fill: theme.colors.text.primary,
+                          fontSize: theme.typography.fontSize.sm,
+                          angle: -45,
                           textAnchor: 'end',
                           padding: 5
-                  }
-                }}
-              />
-              <VictoryAxis
-                dependentAxis
+                        }
+                      }}
+                    />
+                    <VictoryAxis
+                      dependentAxis
                       tickCount={getTickCount()}
                       tickFormat={getYTickFormat}
-                style={{
-                  axis: { stroke: theme.colors.border.default },
-                  tickLabels: {
-                    fill: theme.colors.text.primary,
-                    fontSize: theme.typography.fontSize.sm,
+                      style={{
+                        axis: { stroke: theme.colors.border.default },
+                        tickLabels: {
+                          fill: theme.colors.text.primary,
+                          fontSize: theme.typography.fontSize.sm,
                           padding: 5
-                  }
-                }}
-              />
-              <VictoryLine
-                data={filteredVolumeData}
-                style={{
-                  data: {
-                    stroke: getChartColor(),
-                    strokeWidth: 3
-                  }
-                }}
-              />
-              <VictoryScatter
-                data={filteredVolumeData}
-                size={5}
-                style={{
-                  data: { fill: getChartColor() }
-                }}
-                labels={formatTooltip}
-                labelComponent={
-                  <VictoryTooltip
-                    style={{
-                      fill: theme.colors.text.primary,
+                        }
+                      }}
+                    />
+                    <VictoryLine
+                      data={filteredVolumeData}
+                      style={{
+                        data: {
+                          stroke: getChartColor(),
+                          strokeWidth: 3
+                        }
+                      }}
+                    />
+                    <VictoryScatter
+                      data={filteredVolumeData}
+                      size={5}
+                      style={{
+                        data: { fill: getChartColor() }
+                      }}
+                      labels={formatTooltip}
+                      labelComponent={
+                        <VictoryTooltip
+                          style={{
+                            fill: theme.colors.text.primary,
                             fontSize: theme.typography.fontSize.sm,
                             fontFamily: theme.typography.fontFamily.regular
-                    }}
-                    flyoutStyle={{
-                      fill: theme.colors.background.card,
-                      stroke: theme.colors.border.default,
+                          }}
+                          flyoutStyle={{
+                            fill: theme.colors.background.card,
+                            stroke: theme.colors.border.default,
                             strokeWidth: 1,
                             padding: 8
-                    }}
-                    cornerRadius={theme.borderRadius.sm}
-                    pointerLength={5}
+                          }}
+                          cornerRadius={theme.borderRadius.sm}
+                          pointerLength={5}
                           dy={-10}
-                  />
-                }
-              />
-            </VictoryChart>
+                        />
+                      }
+                    />
+                  </VictoryChart>
                 </View>
-          )}
+              )}
 
-          {selectedChartType === 'reps' && filteredRepsData.length > 0 && (
+              {selectedChartType === 'reps' && filteredRepsData.length > 0 && (
                 <View style={styles.chartWrapper}>
-            <VictoryChart
-              theme={VictoryTheme.material}
+                  <VictoryChart
+                    theme={VictoryTheme.material}
                     width={Dimensions.get('window').width - 60}
-              height={300}
+                    height={300}
                     padding={{ top: 20, bottom: 50, left: 60, right: 30 }}
-              domainPadding={{ x: 20 }}
-              domain={domainYReps}
-              scale={{ x: 'time' }}
-            >
-              <VictoryAxis
-                tickFormat={(date: number | Date) => formatDateForDisplay(new Date(date))}
-                tickCount={getTickCount()}
-                style={{
-                  axis: { stroke: theme.colors.border.default },
-                  tickLabels: {
-                    fill: theme.colors.text.primary,
-                    fontSize: theme.typography.fontSize.sm,
-                    angle: -45,
+                    domainPadding={{ x: 20 }}
+                    domain={domainYReps}
+                    scale={{ x: 'time' }}
+                  >
+                    <VictoryAxis
+                      tickFormat={(date: number | Date) => formatDateForDisplay(new Date(date))}
+                      tickCount={getTickCount()}
+                      style={{
+                        axis: { stroke: theme.colors.border.default },
+                        tickLabels: {
+                          fill: theme.colors.text.primary,
+                          fontSize: theme.typography.fontSize.sm,
+                          angle: -45,
                           textAnchor: 'end',
                           padding: 5
-                  }
-                }}
-              />
-              <VictoryAxis
-                dependentAxis
+                        }
+                      }}
+                    />
+                    <VictoryAxis
+                      dependentAxis
                       tickCount={getTickCount()}
                       tickFormat={getYTickFormat}
-                style={{
-                  axis: { stroke: theme.colors.border.default },
-                  tickLabels: {
-                    fill: theme.colors.text.primary,
-                    fontSize: theme.typography.fontSize.sm,
+                      style={{
+                        axis: { stroke: theme.colors.border.default },
+                        tickLabels: {
+                          fill: theme.colors.text.primary,
+                          fontSize: theme.typography.fontSize.sm,
                           padding: 5
-                  }
-                }}
-              />
-              <VictoryLine
-                data={filteredRepsData}
-                style={{
-                  data: {
-                    stroke: getChartColor(),
-                    strokeWidth: 3
-                  }
-                }}
-              />
-              <VictoryScatter
-                data={filteredRepsData}
-                size={5}
-                style={{
-                  data: { fill: getChartColor() }
-                }}
-                labels={formatTooltip}
-                labelComponent={
-                  <VictoryTooltip
-                    style={{
-                      fill: theme.colors.text.primary,
+                        }
+                      }}
+                    />
+                    <VictoryLine
+                      data={filteredRepsData}
+                      style={{
+                        data: {
+                          stroke: getChartColor(),
+                          strokeWidth: 3
+                        }
+                      }}
+                    />
+                    <VictoryScatter
+                      data={filteredRepsData}
+                      size={5}
+                      style={{
+                        data: { fill: getChartColor() }
+                      }}
+                      labels={formatTooltip}
+                      labelComponent={
+                        <VictoryTooltip
+                          style={{
+                            fill: theme.colors.text.primary,
                             fontSize: theme.typography.fontSize.sm,
                             fontFamily: theme.typography.fontFamily.regular
-                    }}
-                    flyoutStyle={{
-                      fill: theme.colors.background.card,
-                      stroke: theme.colors.border.default,
+                          }}
+                          flyoutStyle={{
+                            fill: theme.colors.background.card,
+                            stroke: theme.colors.border.default,
                             strokeWidth: 1,
                             padding: 8
-                    }}
-                    cornerRadius={theme.borderRadius.sm}
-                    pointerLength={5}
+                          }}
+                          cornerRadius={theme.borderRadius.sm}
+                          pointerLength={5}
                           dy={-10}
-                  />
-                }
-              />
-            </VictoryChart>
+                        />
+                      }
+                    />
+                  </VictoryChart>
                 </View>
-          )}
+              )}
 
-          {(!filteredExerciseData.length && !filteredVolumeData.length && !filteredRepsData.length) && (
-            <View style={styles.noDataContainer}>
-              <Text style={styles.noDataText}>{t('common.noDataAvailable')}</Text>
-            </View>
+              {(!filteredExerciseData.length && !filteredVolumeData.length && !filteredRepsData.length) && (
+                <View style={styles.noDataContainer}>
+                  <Text style={styles.noDataText}>{t('common.noDataAvailable')}</Text>
+                </View>
               )}
             </>
           )}

@@ -92,7 +92,8 @@ const useStyles = () => {
       borderWidth: 1,
       borderColor: theme.colors.border.default,
       flex: 1,
-      height: 48
+      height: 48,
+      width: '50%'
     },
     weightInputContainer: {
       flexDirection: 'row',
@@ -101,13 +102,13 @@ const useStyles = () => {
     },
     suggestedButton: {
       backgroundColor: theme.colors.background.button,
-      paddingHorizontal: theme.spacing.base,
+      paddingHorizontal: theme.spacing.sm,
       paddingVertical: theme.spacing.sm,
       borderRadius: theme.borderRadius.md,
       height: 48,
       justifyContent: 'center',
       alignItems: 'center',
-      minWidth: 80
+      width: '50%'
     },
     suggestedButtonText: {
       color: theme.colors.text.primary,
@@ -341,6 +342,7 @@ export default function NewGoalScreen() {
   const { theme } = useTheme();
   const styles = useStyles();
   const [newGoalExercise, setNewGoalExercise] = useState('');
+  const [newGoalExerciseKey, setNewGoalExerciseKey] = useState('');
   const [newGoalCurrent, setNewGoalCurrent] = useState('');
   const [newGoalTarget, setNewGoalTarget] = useState('');
   const [exerciseOptions, setExerciseOptions] = useState<string[]>([]);
@@ -371,29 +373,82 @@ export default function NewGoalScreen() {
 
   // Charger les options d'exercice à partir des workouts et des exercices prédéfinis
   useEffect(() => {
-    const uniqueExercises = Array.from(new Set([
-      ...workouts.map(w => w.exercise),
-      ...Object.values(getPredefinedExercises(t as (key: string) => string)).flat()
-    ]));
-    setExerciseOptions(uniqueExercises as string[]);
-  }, [workouts, t]);
+    const predefinedExercises = Object.values(getPredefinedExercises(t as (key: string) => string)).flat();
+    const workoutExercises = workouts.map(w => w.exercise);
+    const uniqueExercises = Array.from(new Set([...workoutExercises, ...predefinedExercises]));
+    
+    // Ne mettre à jour que si les exercices ont changé
+    if (JSON.stringify(uniqueExercises) !== JSON.stringify(exerciseOptions)) {
+      setExerciseOptions(uniqueExercises as string[]);
+    }
+  }, [workouts, t, exerciseOptions]);
 
   // Vérifier s'il y a des workouts précédents pour l'exercice sélectionné
   useEffect(() => {
-    if (newGoalExercise) {
-      const hasWorkouts = workouts.some(w => w.exercise === newGoalExercise);
-      setHasPreviousWorkouts(hasWorkouts);
-      if (hasWorkouts) {
-        const weight = getCurrentWeight(newGoalExercise);
-        setHighestWeight(weight || null);
-      } else {
-        setHighestWeight(null);
-      }
-    } else {
+    if (!newGoalExerciseKey) {
       setHasPreviousWorkouts(false);
       setHighestWeight(null);
+      return;
     }
-  }, [newGoalExercise, workouts, getCurrentWeight]);
+
+    const hasWorkouts = workouts.some(w => w.exercise === newGoalExerciseKey);
+
+    if (hasWorkouts) {
+      const weight = getCurrentWeight(newGoalExerciseKey);
+      setHighestWeight(weight || null);
+    } else {
+      setHighestWeight(null);
+    }
+    setHasPreviousWorkouts(hasWorkouts);
+  }, [newGoalExerciseKey, workouts, getCurrentWeight]);
+
+  // Mettre à jour le poids suggéré quand le poids actuel change
+  useEffect(() => {
+    if (newGoalCurrent && !isNaN(parseFloat(newGoalCurrent))) {
+      const currentWeight = parseFloat(newGoalCurrent);
+      const target = suggestTargetWeight(currentWeight);
+      if (target !== suggestedTarget) {
+        setSuggestedTarget(target);
+      }
+    }
+  }, [newGoalCurrent, suggestTargetWeight, suggestedTarget]);
+
+  const handleExerciseSelect = useCallback((exercise: string, exerciseKey?: string) => {
+    setIsExerciseModalVisible(false);
+    setNewGoalExercise(exercise);
+    setNewGoalExerciseKey(exerciseKey || exercise);
+    const weight = getCurrentWeight(exerciseKey || exercise);
+    if (weight) {
+      setNewGoalCurrent(weight.toString());
+    }
+  }, [getCurrentWeight]);
+
+  const handleUseLastWorkout = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    if (highestWeight) {
+      setNewGoalCurrent(highestWeight.toString());
+      const target = suggestTargetWeight(highestWeight);
+      if (target) {
+        setSuggestedTarget(target);
+      }
+    }
+  }, [highestWeight, suggestTargetWeight]);
+
+  const handleUseSuggested = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    if (suggestedTarget) {
+      setNewGoalTarget(suggestedTarget.toString());
+    }
+  }, [suggestedTarget]);
+
+  const handleOpenExerciseModal = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setIsExerciseModalVisible(true);
+  }, []);
+
+  const handleCloseExerciseModal = useCallback(() => {
+    setIsExerciseModalVisible(false);
+  }, []);
 
   const saveGoal = async () => {
     if (!newGoalExercise.trim() || !newGoalCurrent || !newGoalTarget) {
@@ -461,10 +516,7 @@ export default function NewGoalScreen() {
             <Text variant="body" style={styles.formLabel}>{t('timer.exercise')}</Text>
             <TouchableOpacity 
               style={styles.exerciseSelectorButton}
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                setIsExerciseModalVisible(true);
-              }}
+              onPress={handleOpenExerciseModal}
             >
               <Text
                 style={[
@@ -495,16 +547,10 @@ export default function NewGoalScreen() {
               {newGoalExercise && hasPreviousWorkouts && highestWeight && (
                 <Button
                   variant="secondary"
-                  title={`${t('goals.useLastWorkout')} (${highestWeight}kg)`}
-                  onPress={() => {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    setNewGoalCurrent(highestWeight.toString());
-                    const target = suggestTargetWeight(highestWeight);
-                    if (target) {
-                      setSuggestedTarget(target);
-                    }
-                  }}
+                  title={t('goals.useLastWorkout')}
+                  onPress={handleUseLastWorkout}
                   style={styles.suggestedButton}
+                  textStyle={styles.suggestedButtonText}
                 />
               )}
             </View>
@@ -526,11 +572,9 @@ export default function NewGoalScreen() {
                 <Button
                   variant="secondary"
                   title={t('goals.useSuggested')}
-                  onPress={() => {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    setNewGoalTarget(suggestedTarget.toString());
-                  }}
+                  onPress={handleUseSuggested}
                   style={styles.suggestedButton}
+                  textStyle={styles.suggestedButtonText}
                 />
               )}
             </View>
@@ -553,7 +597,7 @@ export default function NewGoalScreen() {
         visible={isExerciseModalVisible}
         transparent
         animationType="slide"
-        onRequestClose={() => setIsExerciseModalVisible(false)}
+        onRequestClose={handleCloseExerciseModal}
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
@@ -562,21 +606,14 @@ export default function NewGoalScreen() {
               <Button
                 variant="icon"
                 icon={<X size={24} color={theme.colors.text.primary} />}
-                onPress={() => setIsExerciseModalVisible(false)}
+                onPress={handleCloseExerciseModal}
                 style={styles.modalCloseButton}
               />
             </View>
 
             <ExerciseList
               exercise={newGoalExercise}
-              setExercise={(exercise) => {
-                setIsExerciseModalVisible(false);
-                setNewGoalExercise(exercise);
-                const weight = getCurrentWeight(exercise);
-                if (weight) {
-                  setNewGoalCurrent(weight.toString());
-                }
-              }}
+              setExercise={handleExerciseSelect}
               selectedMuscle={selectedMuscleGroup}
               setSelectedMuscle={handleMuscleGroupSelect}
             />

@@ -81,4 +81,13 @@ const styles = StyleSheet.create({
   chartContainer: {
     marginTop: 16,
   },
-}); 
+});
+
+const SkeletonComponents = {
+  WorkoutCardSkeleton,
+  ExerciseCardSkeleton,
+  StatsCardSkeleton,
+  ChartSkeleton
+};
+
+export default SkeletonComponents; 

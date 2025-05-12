@@ -20,11 +20,17 @@ export function useGoals(workouts: Workout[]) {
     const exerciseWorkouts = workouts.filter(w => w.exercise === exerciseName);
     if (exerciseWorkouts.length === 0) return null;
 
-    exerciseWorkouts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    // Trouver le poids le plus lourd parmi tous les entraînements
+    let highestWeight = 0;
+    exerciseWorkouts.forEach(workout => {
+      workout.series.forEach(series => {
+        if (series.weight > highestWeight) {
+          highestWeight = series.weight;
+        }
+      });
+    });
 
-    const mostRecentWorkout = exerciseWorkouts[0];
-    const workingSet = mostRecentWorkout.series.find(s => s.type === 'workingSet');
-    return workingSet?.weight || null;
+    return highestWeight || null;
   }, [workouts]);
 
   const suggestTargetWeight = useCallback((currentWeight: number): number | null => {

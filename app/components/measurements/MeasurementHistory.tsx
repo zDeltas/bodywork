@@ -6,7 +6,6 @@ import { fr } from 'date-fns/locale';
 import { useTheme } from '@/app/hooks/useTheme';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { MeasurementKey } from './MeasurementBodyMap';
-import { MeasurementTranslationKey } from '@/translations';
 import { BarChart3, Clock } from 'lucide-react-native';
 import { WorkoutDateUtils } from '@/app/types/workout';
 import { StatsCardSkeleton, ChartSkeleton } from '@/app/components/ui/SkeletonComponents';
@@ -112,23 +111,23 @@ const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({
 
   const getMeasurementOptions = () => {
     return [
-      { key: 'weight' as const, label: t('workout.weightKg') },
-      { key: 'neck' as MeasurementKey, label: t('measurements.neck' as MeasurementTranslationKey) },
-      { key: 'shoulders' as MeasurementKey, label: t('measurements.shoulders' as MeasurementTranslationKey) },
-      { key: 'chest' as MeasurementKey, label: t('measurements.chest' as MeasurementTranslationKey) },
-      { key: 'arms' as MeasurementKey, label: t('measurements.arms' as MeasurementTranslationKey) },
-      { key: 'forearms' as MeasurementKey, label: t('measurements.forearms' as MeasurementTranslationKey) },
-      { key: 'waist' as MeasurementKey, label: t('measurements.waist' as MeasurementTranslationKey) },
-      { key: 'hips' as MeasurementKey, label: t('measurements.hips' as MeasurementTranslationKey) },
-      { key: 'thighs' as MeasurementKey, label: t('measurements.thighs' as MeasurementTranslationKey) },
-      { key: 'calves' as MeasurementKey, label: t('measurements.calves' as MeasurementTranslationKey) }
+      { key: 'weight' as MeasurementKey, label: t('workout.weightKg') },
+      { key: 'neck' as MeasurementKey, label: t('measurements.neck') },
+      { key: 'shoulders' as MeasurementKey, label: t('measurements.shoulders') },
+      { key: 'chest' as MeasurementKey, label: t('measurements.chest') },
+      { key: 'arms' as MeasurementKey, label: t('measurements.arms') },
+      { key: 'forearms' as MeasurementKey, label: t('measurements.forearms') },
+      { key: 'waist' as MeasurementKey, label: t('measurements.waist') },
+      { key: 'hips' as MeasurementKey, label: t('measurements.hips') },
+      { key: 'thighs' as MeasurementKey, label: t('measurements.thighs') },
+      { key: 'calves' as MeasurementKey, label: t('measurements.calves') }
     ];
   };
 
   const calculateProgress = (current: number, previous: number, key: string): number => {
     const threshold = key === 'weight' ? 0.1 : 1;
     if (Math.abs(current - previous) < threshold) return 0;
-    
+
     const progress = ((current - previous) / previous) * 100;
     return key === 'weight' ? -progress : progress;
   };

@@ -57,4 +57,18 @@ export interface StatsData {
   }[];
 }
 
-export type Period = '1m' | '3m' | '6m'; 
+export type Period = '1m' | '3m' | '6m';
+
+export type CommonTypes = {
+  SeriesType: SeriesType;
+  Series: Series;
+  Workout: Workout;
+  Exercise: Exercise;
+  WorkoutSummary: WorkoutSummary;
+  WorkoutStats: WorkoutStats;
+  Goal: Goal;
+  StatsData: StatsData;
+  Period: Period;
+};
+
+export default CommonTypes; 

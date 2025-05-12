@@ -77,4 +77,6 @@ export const Button: React.FC<ButtonProps> = ({
       {children}
     </TouchableOpacity>
   );
-}; 
+};
+
+export default Button; 

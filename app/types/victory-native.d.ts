@@ -19,4 +19,23 @@ declare module 'victory-native' {
     material: any;
     grayscale: any;
   }
-} 
+}
+
+export type VictoryNativeTypes = {
+  VictoryChart: React.FC<any>;
+  VictoryLine: React.FC<any>;
+  VictoryAxis: React.FC<any>;
+  VictoryTheme: {
+    material: any;
+    grayscale: any;
+  };
+  VictoryScatter: React.FC<any>;
+  VictoryBar: React.FC<any>;
+  VictoryStack: React.FC<any>;
+  VictoryTooltip: React.FC<any>;
+  VictoryVoronoiContainer: React.FC<any>;
+  VictoryLegend: React.FC<any>;
+  VictoryThemeInterface: VictoryThemeInterface;
+};
+
+export default VictoryNativeTypes; 

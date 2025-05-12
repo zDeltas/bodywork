@@ -94,13 +94,13 @@ export default function StatsScreen() {
     }
   }, [searchQuery, exerciseOptions, getFilteredExercises]);
 
-  const handleSelectExercise = useCallback((exercise: ExerciseName) => {
+  const handleSelectExercise = useCallback((exercise: string, exerciseKey?: string) => {
     if (!exercise) return;
     setNewGoalExercise(exercise);
     setShowExerciseSelector(false);
     setSearchQuery('');
 
-    const currentWeight = getCurrentWeight(exercise);
+    const currentWeight = getCurrentWeight(exerciseKey || exercise);
     if (currentWeight !== null) {
       setNewGoalCurrent(currentWeight.toString());
       const target = suggestTargetWeight(currentWeight);
@@ -123,17 +123,61 @@ export default function StatsScreen() {
     }
   }, []);
 
-  if (!fontsLoaded || exercisesLoading) {
+  if (!fontsLoaded) {
     return (
       <View style={styles.container}>
-        <View style={styles.section}>
-          <StatsCardSkeleton />
-          <StatsCardSkeleton />
-          <StatsCardSkeleton />
-        </View>
-        <View style={styles.section}>
-          <ChartSkeleton />
-        </View>
+        <Header title={t('stats.title')} showBackButton={false} />
+        <ScrollView style={styles.content}>
+          <KpiMotivation
+            fadeAnim={fadeAnim}
+            bestProgressExercise={statsData.bestProgressExercise}
+            monthlyProgress={statsData.monthlyProgress}
+            trainingFrequency={statsData.trainingFrequency}
+            totalSets={statsData.workouts.reduce((total: number, workout: Workout) => total + workout.series.length, 0)}
+            totalWorkouts={statsData.workouts.length}
+          />
+          <StatsExerciseList
+            selectedMuscle={selectedMuscle}
+            setSelectedMuscle={setSelectedMuscle}
+            selectedExercise={selectedExercise}
+            setSelectedExercise={setSelectedExercise}
+            exerciseOptions={exerciseOptions}
+            onExerciseSelect={(exercise, exerciseKey) => {
+              handleSelectExercise(exercise as ExerciseName);
+              router.push({
+                pathname: '/components/exercises/exerciseDetails',
+                params: { exercise: exerciseKey }
+              });
+            }}
+            onMuscleSelect={handleMuscleSelect}
+          />
+          <View ref={graphsSectionRef}>
+            <StatsGoals
+              fadeAnim={fadeAnim}
+              goals={goals}
+              setGoals={setGoals}
+              workouts={statsData.workouts}
+              getCurrentWeight={getCurrentWeight}
+            />
+            {exercisesLoading ? (
+              <ChartSkeleton />
+            ) : (
+              <>
+                <StatsMuscleDistribution
+                  fadeAnim={fadeAnim}
+                  selectedPeriod={selectedPeriod}
+                  setSelectedPeriod={setSelectedPeriod}
+                  graphsSectionRef={graphsSectionRef as React.RefObject<View>}
+                  muscleGroups={statsData.muscleDistribution}
+                />
+                <StatsMuscleRestState
+                  fadeAnim={fadeAnim}
+                  workouts={statsData.workouts}
+                />
+              </>
+            )}
+          </View>
+        </ScrollView>
       </View>
     );
   }
@@ -180,18 +224,23 @@ export default function StatsScreen() {
             getCurrentWeight={getCurrentWeight}
           />
 
-          <StatsMuscleDistribution
-            fadeAnim={fadeAnim}
-            selectedPeriod={selectedPeriod}
-            setSelectedPeriod={setSelectedPeriod}
-            graphsSectionRef={graphsSectionRef as React.RefObject<View>}
-            muscleGroups={statsData.muscleDistribution}
-          />
-
-          <StatsMuscleRestState
-            fadeAnim={fadeAnim}
-            workouts={statsData.workouts}
-          />
+          {exercisesLoading ? (
+            <ChartSkeleton />
+          ) : (
+            <>
+              <StatsMuscleDistribution
+                fadeAnim={fadeAnim}
+                selectedPeriod={selectedPeriod}
+                setSelectedPeriod={setSelectedPeriod}
+                graphsSectionRef={graphsSectionRef as React.RefObject<View>}
+                muscleGroups={statsData.muscleDistribution}
+              />
+              <StatsMuscleRestState
+                fadeAnim={fadeAnim}
+                workouts={statsData.workouts}
+              />
+            </>
+          )}
         </View>
 
         {showExerciseSelector && (

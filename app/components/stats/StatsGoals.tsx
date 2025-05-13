@@ -1,73 +1,25 @@
-import React, { Dispatch, SetStateAction, useCallback, useState } from 'react';
+import React from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
-import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
 import GoalSection from '@/app/components/goal/GoalSection';
-import { Goal, Workout } from '@/app/types/common';
 
 interface StatsGoalsProps {
   fadeAnim: Animated.Value;
-  goals: Goal[];
-  setGoals: Dispatch<SetStateAction<Goal[]>>;
-  workouts: Workout[];
-  getCurrentWeight: (exercise: string) => number | null;
 }
 
-export default function StatsGoals({
-                                     fadeAnim,
-                                     goals,
-                                     setGoals,
-                                     workouts,
-                                     getCurrentWeight
-                                   }: StatsGoalsProps) {
-  const { t } = useTranslation();
+const createStyles = (theme: any) => StyleSheet.create({
+  container: {
+    marginBottom: theme.spacing.xl
+  }
+});
+
+export default function StatsGoals({ fadeAnim }: StatsGoalsProps) {
   const { theme } = useTheme();
-  const [showExerciseSelector, setShowExerciseSelector] = useState(false);
-  const [newGoalExercise, setNewGoalExercise] = useState('exercise_chest_benchPress');
-  const [newGoalCurrent, setNewGoalCurrent] = useState('');
-  const [suggestedTarget, setSuggestedTarget] = useState<number | null>(null);
-
-  const styles = StyleSheet.create({
-    container: {
-      marginBottom: theme.spacing.xl
-    }
-  });
-
-  const suggestTargetWeight = useCallback((currentWeight: number) => {
-    if (!currentWeight) return null;
-
-    const improvementFactor = currentWeight < 50 ? 0.05 : 0.025;
-    const suggestedImprovement = currentWeight * improvementFactor;
-    const roundingFactor = 2.5;
-    return Math.ceil((currentWeight + suggestedImprovement) / roundingFactor) * roundingFactor;
-  }, []);
-
-  const handleAddGoal = useCallback(() => {
-    if (!newGoalExercise || !newGoalCurrent) return;
-
-    const currentWeight = parseFloat(newGoalCurrent);
-    const target = suggestedTarget || currentWeight * 1.1; // 10% improvement by default
-
-    const newGoal: Goal = {
-      exercise: newGoalExercise,
-      current: currentWeight,
-      target,
-      progress: Math.min(Math.round((currentWeight / target) * 100), 100)
-    };
-
-    setGoals(prevGoals => [...prevGoals, newGoal]);
-    setShowExerciseSelector(false);
-    setNewGoalCurrent('');
-    setSuggestedTarget(null);
-  }, [newGoalExercise, newGoalCurrent, suggestedTarget, setGoals]);
+  const styles = createStyles(theme);
 
   return (
     <View style={styles.container}>
-      <GoalSection
-        fadeAnim={fadeAnim}
-        goals={goals}
-        setGoals={setGoals}
-      />
+      <GoalSection fadeAnim={fadeAnim} />
     </View>
   );
 } 

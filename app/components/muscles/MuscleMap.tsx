@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import Body, { ExtendedBodyPart, Slug } from 'react-native-body-highlighter';
-import { differenceInHours } from 'date-fns';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
 import Text from '@/app/components/ui/Text';
@@ -85,7 +84,7 @@ export default function MuscleMap({ workouts }: MuscleMapProps) {
 
   const getExtendedBodyParts = (workouts: Workout[]): ExtendedBodyPart[] => {
     return Object.entries(muscleGroupToSlug).map(([group, slug]) => ({
-    slug: slug as Slug,
+      slug: slug as Slug,
       restState: getMuscleRestState(workouts.filter(w => w.muscleGroup === group))
     }));
   };

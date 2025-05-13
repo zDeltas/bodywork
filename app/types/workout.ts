@@ -22,7 +22,3 @@ export const WorkoutDateUtils = {
     });
   }
 };
-
-const WorkoutTypesComponent = () => null;
-
-export default WorkoutTypesComponent; 

@@ -4,15 +4,13 @@ import MuscleMap from '@/app/components/muscles/MuscleMap';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
 import { Workout } from '@/app/types/common';
-import { StatsCardSkeleton } from '@/app/components/ui/SkeletonComponents';
 
 interface MuscleRestStateProps {
   fadeAnim: Animated.Value;
   workouts: Workout[];
-  isLoading: boolean;
 }
 
-const MuscleRestState: React.FC<MuscleRestStateProps> = ({ fadeAnim, workouts, isLoading }) => {
+const MuscleRestState: React.FC<MuscleRestStateProps> = ({ fadeAnim, workouts }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
 
@@ -30,12 +28,6 @@ const MuscleRestState: React.FC<MuscleRestStateProps> = ({ fadeAnim, workouts, i
       fontFamily: theme.typography.fontFamily.bold,
       marginBottom: theme.spacing.lg,
       color: theme.colors.text.primary
-    },
-    container: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      padding: theme.spacing.lg
     }
   });
 
@@ -47,14 +39,7 @@ const MuscleRestState: React.FC<MuscleRestStateProps> = ({ fadeAnim, workouts, i
       ]}
     >
       <Text style={styles.chartTitle}>{t('muscleMap.muscleRestState')}</Text>
-      {isLoading ? (
-        <View style={styles.container}>
-          <StatsCardSkeleton />
-          <StatsCardSkeleton />
-        </View>
-      ) : (
       <MuscleMap workouts={workouts} />
-      )}
     </Animated.View>
   );
 };

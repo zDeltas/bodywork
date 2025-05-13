@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
 import { Alert, Animated, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
@@ -7,6 +7,7 @@ import { useTheme } from '@/app/hooks/useTheme';
 import { router } from 'expo-router';
 import useGoals from '@/app/hooks/useGoals';
 import useWorkouts from '@/app/hooks/useWorkouts';
+import { Goal, Workout } from '@/app/types/common';
 
 interface GoalSectionProps {
   fadeAnim: Animated.Value;

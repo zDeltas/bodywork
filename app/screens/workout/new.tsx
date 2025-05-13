@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Modal, Pressable, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -14,7 +14,7 @@ import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold, useFonts } from '@e
 import ExerciseList from '@/app/components/exercises/ExerciseList';
 import { Series, SeriesType, Workout } from '@/app/types/common';
 import { WorkoutDateUtils } from '@/app/types/workout';
-import { MuscleGroupKey, muscleGroupKeys } from '@/app/components/exercises/ExerciseList';
+import { MuscleGroupKey } from '@/app/components/exercises/ExerciseList';
 import { TranslationKey } from '@/translations';
 import { useWorkouts } from '@/app/hooks/useWorkouts';
 
@@ -59,38 +59,10 @@ export default function NewWorkoutScreen() {
     showRpeDropdown: false,
     type: 'workingSet'
   }]);
-  const [suggestedWeight, setSuggestedWeight] = useState<number | null>(null);
   const params = useLocalSearchParams();
   const [selectedDate, setSelectedDate] = useState<string>(params.selectedDate as string || WorkoutDateUtils.getDatePart(new Date().toISOString()));
   const [showCalendar, setShowCalendar] = useState<boolean>(false);
   const [showExerciseSelector, setShowExerciseSelector] = useState<boolean>(false);
-
-  const calculateSuggestedWeight = (exercise: string, reps: number, rpe: number): number | null => {
-    const exerciseWorkouts = workouts.filter((w: Workout) => w.exercise === exercise);
-    if (exerciseWorkouts.length === 0) return null;
-
-    const lastWorkout = exerciseWorkouts[exerciseWorkouts.length - 1];
-    if (!lastWorkout.series || lastWorkout.series.length === 0) return null;
-
-    const workingSet = lastWorkout.series.find((s: Series) => s.type === 'workingSet');
-    if (!workingSet) return null;
-
-    const oneRepMax = workingSet.weight * (1 + 0.033 * workingSet.reps);
-    const rpeAdjustment = (10 - rpe) * 0.025;
-    const suggestedWeight = oneRepMax * (1 - rpeAdjustment) / (1 + 0.033 * reps);
-
-    return Math.round(suggestedWeight / 2.5) * 2.5;
-  };
-
-  const validateSeries = (series: Series[]): boolean => {
-    const validSeries = series.filter(s => s.weight > 0 || s.reps > 0);
-    if (validSeries.length === 0) return false;
-
-    return validSeries.every(s => {
-      if (s.type === 'warmUp') return true;
-      return s.rpe >= 1 && s.rpe <= 10;
-    });
-  };
 
   const processSeries = (series: EditableSeries[], rpe: string): Series[] => {
     return series.map(s => ({
@@ -101,48 +73,6 @@ export default function NewWorkoutScreen() {
       type: s.type || 'workingSet'
     }));
   };
-
-  const tryCalculateSuggestedWeight = useCallback(async (selectedExercise: string) => {
-    const currentReps = series[0]?.reps || '';
-    const currentRpe = series[0]?.rpe || rpe;
-
-    if (selectedExercise && currentReps && currentRpe) {
-      const weight = calculateSuggestedWeight(selectedExercise, parseInt(currentReps), parseInt(currentRpe));
-      setSuggestedWeight(weight);
-      return;
-    }
-
-    const sameExerciseWorkouts = workouts
-      .filter((w: Workout) => w.exercise === (exerciseKey || selectedExercise))
-      .sort((a: Workout, b: Workout) => new Date(b.date).getTime() - new Date(a.date).getTime());
-
-    if (sameExerciseWorkouts.length === 0) return;
-
-    const lastWorkout = sameExerciseWorkouts[0];
-    const lastWorkingSet = lastWorkout.series.find((s: Series) => s.type === 'workingSet') || lastWorkout.series[0];
-
-    if (currentReps && !currentRpe) {
-      const weight = calculateSuggestedWeight(selectedExercise, parseInt(currentReps), lastWorkingSet.rpe);
-      setSuggestedWeight(weight);
-    }
-    else if (!currentReps && currentRpe) {
-      const weight = calculateSuggestedWeight(selectedExercise, lastWorkingSet.reps, parseInt(currentRpe));
-      setSuggestedWeight(weight);
-    }
-    else if (!currentReps && !currentRpe) {
-      const newSeries = [...series];
-      if (newSeries.length > 0) {
-        newSeries[0] = {
-          ...newSeries[0],
-          reps: lastWorkingSet.reps.toString()
-        };
-        setSeries(newSeries);
-      }
-      setRpe(lastWorkingSet.rpe.toString());
-      const weight = calculateSuggestedWeight(selectedExercise, lastWorkingSet.reps, lastWorkingSet.rpe);
-      setSuggestedWeight(weight);
-    }
-  }, [series, rpe, workouts, exerciseKey, calculateSuggestedWeight]);
 
   const saveWorkout = async (): Promise<void> => {
     try {
@@ -168,16 +98,11 @@ export default function NewWorkoutScreen() {
         date: selectedDate ? WorkoutDateUtils.createISOString(selectedDate) : new Date().toISOString()
       };
 
-      const success = await saveWorkoutToStorage(workout);
-      
-      if (success) {
-        router.push({
-          pathname: '/(tabs)',
-          params: { refresh: 'true' }
-        });
-      } else {
-        console.error('Erreur lors de la sauvegarde de l\'entraînement');
-      }
+      await saveWorkoutToStorage(workout);
+      router.push({
+        pathname: '/(tabs)',
+        params: { refresh: 'true' }
+      });
     } catch (error) {
       console.error('Erreur lors de la sauvegarde:', error);
     }
@@ -281,7 +206,6 @@ export default function NewWorkoutScreen() {
                     setExercise(selectedExercise);
                     setExerciseKey(selectedExerciseKey || selectedExercise);
                     setShowExerciseSelector(false);
-                    tryCalculateSuggestedWeight(selectedExercise);
                   }}
                   setIsCustomExercise={() => {}}
                 />
@@ -389,23 +313,6 @@ export default function NewWorkoutScreen() {
                   <Weight color={theme.colors.primary} size={20} style={styles.sectionTitleIcon} />
                   <Text variant="body" style={styles.seriesInputLabel}>{t('workout.weightKg')}</Text>
                 </View>
-                {index === 0 && suggestedWeight !== null && (
-                  <View style={styles.suggestedWeightContainer}>
-                    <Text variant="caption" style={styles.suggestedWeightText}>
-                      {t('workout.suggested')}: {suggestedWeight} kg
-                    </Text>
-                    <TouchableOpacity
-                      onPress={() => {
-                        const newSeries = [...series];
-                        newSeries[index] = { ...newSeries[index], weight: suggestedWeight.toString() };
-                        setSeries(newSeries);
-                      }}
-                      style={styles.useSuggestedButton}
-                    >
-                      <Text variant="body" style={styles.useSuggestedButtonText}>{t('common.use')}</Text>
-                    </TouchableOpacity>
-                  </View>
-                )}
                 <TextInput
                   style={styles.compactInput}
                   value={item.weight}
@@ -431,10 +338,6 @@ export default function NewWorkoutScreen() {
                     const newSeries = [...series];
                     newSeries[index] = { ...newSeries[index], reps: value };
                     setSeries(newSeries);
-
-                    if (index === 0 && exercise && value && (item.rpe || rpe)) {
-                      tryCalculateSuggestedWeight(exercise);
-                    }
                   }}
                   placeholder="0"
                   placeholderTextColor={theme.colors.text.secondary}
@@ -477,9 +380,6 @@ export default function NewWorkoutScreen() {
                             rpe: rpeValue
                           };
                           setSeries(newSeries);
-                          if (index === 0 && exercise && item.reps && rpeValue) {
-                            tryCalculateSuggestedWeight(exercise);
-                          }
                         }}
                       >
                         <Text variant="body"
@@ -500,9 +400,6 @@ export default function NewWorkoutScreen() {
                             rpe: rpeValue
                           };
                           setSeries(newSeries);
-                          if (index === 0 && exercise && item.reps && rpeValue) {
-                            tryCalculateSuggestedWeight(exercise);
-                          }
                         }}
                       >
                         <Text variant="body"
@@ -765,35 +662,6 @@ const useStyles = () => {
     },
     column: {
       flex: 1
-    },
-    suggestedWeightContainer: {
-      flexDirection: 'column',
-      alignItems: 'center',
-      backgroundColor: theme.colors.primaryLight,
-      borderRadius: theme.borderRadius.md,
-      padding: theme.spacing.sm,
-      marginBottom: theme.spacing.sm,
-      borderWidth: 1,
-      borderColor: theme.colors.primaryBorder
-    },
-    suggestedWeightText: {
-      color: theme.colors.primary,
-      fontFamily: theme.typography.fontFamily.semiBold,
-      fontSize: theme.typography.fontSize.sm,
-      marginBottom: theme.spacing.xs,
-      textAlign: 'center'
-    },
-    useSuggestedButton: {
-      backgroundColor: theme.colors.primary,
-      paddingHorizontal: theme.spacing.md,
-      paddingVertical: theme.spacing.xs,
-      borderRadius: theme.borderRadius.xs,
-      ...theme.shadows.primary
-    },
-    useSuggestedButtonText: {
-      color: theme.colors.text.primary,
-      fontFamily: theme.typography.fontFamily.semiBold,
-      fontSize: theme.typography.fontSize.xs
     },
     compactInput: {
       backgroundColor: theme.colors.background.card,

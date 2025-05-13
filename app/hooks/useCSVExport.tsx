@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
-import { WorkoutDateUtils } from '@/app/types/workout';
-import { Workout } from '@/app/types/common';
+import { WorkoutDateUtils } from '@/types/workout';
+import { Workout } from '@/types/common';
 import { useTranslation } from './useTranslation';
 import { storageService } from '@/app/services';
 

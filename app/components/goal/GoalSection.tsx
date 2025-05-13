@@ -7,7 +7,7 @@ import { useTheme } from '@/app/hooks/useTheme';
 import { router } from 'expo-router';
 import useGoals from '@/app/hooks/useGoals';
 import useWorkouts from '@/app/hooks/useWorkouts';
-import { Goal, Workout } from '@/app/types/common';
+import { Goal, Workout } from '@/types/common';
 
 interface GoalSectionProps {
   fadeAnim: Animated.Value;

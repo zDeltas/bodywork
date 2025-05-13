@@ -13,7 +13,7 @@ import { useTheme } from '@/app/hooks/useTheme';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { MeasurementKey } from './MeasurementBodyMap';
 import { BarChart3, Clock } from 'lucide-react-native';
-import { WorkoutDateUtils } from '@/app/types/workout';
+import { WorkoutDateUtils } from '@/types/workout';
 import { StatsCardSkeleton, ChartSkeleton } from '@/app/components/ui/SkeletonComponents';
 
 type Measurement = {

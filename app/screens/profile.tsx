@@ -15,7 +15,6 @@ import { router } from 'expo-router';
 
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
-import { useAuth } from '@/app/hooks/useAuth';
 import Header from '@/app/components/layout/Header';
 import Text from '@/app/components/ui/Text';
 
@@ -91,7 +90,6 @@ function ProfileScreen() {
   const { theme } = useTheme();
   const styles = useStyles();
   const [showInstagramModal, setShowInstagramModal] = useState(false);
-  const { signInWithGoogle, signInWithApple, signOut, user } = useAuth();
 
   const openInstagram = async (useApp: boolean) => {
     const instagramUrl = 'instagram://user?username=gainiziapp';
@@ -114,68 +112,10 @@ function ProfileScreen() {
     setShowInstagramModal(false);
   };
 
-  const handleSignIn = async (method: 'google' | 'apple' | 'email') => {
-    try {
-      switch (method) {
-        case 'google':
-          await signInWithGoogle();
-          break;
-        case 'apple':
-          await signInWithApple();
-          break;
-        case 'email':
-          // TODO: Implement email sign in
-          break;
-      }
-    } catch (error) {
-      Alert.alert(t('common.error'), 'Authentication failed');
-    }
-  };
-
   return (
     <SafeAreaView style={styles.container}>
       <Header title={t('profile.title')} showBackButton={true} onBack={() => router.back()} />
       <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('profile.auth.title')}</Text>
-          <Text style={styles.sectionDescription}>{t('profile.auth.description')}</Text>
-
-          {!user ? (
-            <>
-              <SettingItem
-                icon="logo-google"
-                label={t('profile.auth.continueWithGoogle')}
-                onPress={() => handleSignIn('google')}
-                variant="primary"
-              />
-              <SettingItem
-                icon="logo-apple"
-                label={t('profile.auth.continueWithApple')}
-                onPress={() => handleSignIn('apple')}
-                variant="primary"
-              />
-              <SettingItem
-                icon="mail-outline"
-                label={t('profile.auth.continueWithEmail')}
-                onPress={() => handleSignIn('email')}
-                variant="primary"
-              />
-            </>
-          ) : (
-            <>
-              <View style={styles.userInfo}>
-                <Text style={styles.userEmail}>{user.email}</Text>
-              </View>
-              <SettingItem
-                icon="log-out-outline"
-                label={t('profile.auth.signOut')}
-                onPress={signOut}
-                variant="secondary"
-              />
-            </>
-          )}
-        </View>
-
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t('profile.account')}</Text>
           <SettingItem
@@ -248,12 +188,13 @@ function ProfileScreen() {
                   {t('profile.instagramModal.later')}
                 </Text>
               </TouchableOpacity>
-
               <TouchableOpacity
                 style={[styles.modalButton, styles.modalButtonPrimary]}
                 onPress={() => openInstagram(true)}
               >
-                <Text style={styles.modalButtonText}>{t('profile.instagramModal.follow')}</Text>
+                <Text style={[styles.modalButtonText, { color: theme.colors.primary }]}>
+                  {t('profile.instagramModal.follow')}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>

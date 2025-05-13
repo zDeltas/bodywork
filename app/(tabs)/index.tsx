@@ -7,7 +7,7 @@ import { useTheme } from '@/app/hooks/useTheme';
 import { Activity, Dumbbell, Layers, Repeat } from 'lucide-react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Header from '@/app/components/layout/Header';
-import { Workout, WorkoutDateUtils } from '@/app/types/workout';
+import { Workout, WorkoutDateUtils } from '@/types/workout';
 import { TranslationKey } from '@/translations';
 import { useWorkouts } from '@/app/hooks/useWorkouts';
 

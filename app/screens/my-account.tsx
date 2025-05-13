@@ -1,13 +1,12 @@
 import React from 'react';
-import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
-import * as Haptics from 'expo-haptics';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
 import Header from '@/app/components/layout/Header';
 import { router } from 'expo-router';
 import Text from '@/app/components/ui/Text';
+import { Ionicons } from '@expo/vector-icons';
 
 function MyAccountScreen() {
   const { t } = useTranslation();
@@ -18,21 +17,11 @@ function MyAccountScreen() {
     <SafeAreaView style={styles.container}>
       <Header title={t('profile.myAccount')} showBackButton={true} onBack={() => router.back()} />
 
-      <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: 100 }}>
-        <View style={styles.section}>
-          <TouchableOpacity
-            style={styles.settingItem}
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              // TODO: Implement account creation
-            }}
-          >
-            <View style={styles.settingInfo}>
-              <Ionicons name="person-add-outline" size={24} color={theme.colors.primary} />
-              <Text style={styles.settingLabel}>{t('profile.createAccount')}</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color={theme.colors.text.secondary} />
-          </TouchableOpacity>
+      <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
+        <View style={styles.constructionContainer}>
+          <Ionicons name="construct-outline" size={64} color={theme.colors.primary} />
+          <Text style={styles.constructionTitle}>{t('common.inConstruction')}</Text>
+          <Text style={styles.constructionText}>{t('common.featureComingSoon')}</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -49,27 +38,30 @@ const useStyles = () => {
     },
     content: {
       flex: 1,
+    },
+    contentContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
       padding: theme.spacing.lg,
     },
-    section: {
-      marginBottom: theme.spacing.xl,
-    },
-    settingItem: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
+    constructionContainer: {
       alignItems: 'center',
-      paddingVertical: theme.spacing.md,
-      borderBottomWidth: 1,
-      borderBottomColor: theme.colors.border.default,
+      justifyContent: 'center',
+      padding: theme.spacing.xl,
     },
-    settingInfo: {
-      flexDirection: 'row',
-      alignItems: 'center',
-    },
-    settingLabel: {
-      fontSize: theme.typography.fontSize.base,
+    constructionTitle: {
+      fontSize: theme.typography.fontSize.xl,
       color: theme.colors.text.primary,
-      marginLeft: theme.spacing.md,
+      marginTop: theme.spacing.lg,
+      marginBottom: theme.spacing.sm,
+      fontFamily: theme.typography.fontFamily.bold,
+      textAlign: 'center',
+    },
+    constructionText: {
+      fontSize: theme.typography.fontSize.base,
+      color: theme.colors.text.secondary,
+      textAlign: 'center',
       fontFamily: theme.typography.fontFamily.regular,
     },
   });

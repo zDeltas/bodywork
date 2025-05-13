@@ -16,27 +16,6 @@ export interface Workout {
   date: string;
 }
 
-export interface Exercise {
-  name: string;
-  sets: number;
-  reps: number;
-  weight: number;
-}
-
-export interface WorkoutSummary {
-  id: string;
-  name: string;
-  duration: number;
-  exercises: Exercise[];
-}
-
-export interface WorkoutStats {
-  totalWorkouts: number;
-  totalExercises: number;
-  totalTime: number;
-  averageWorkoutTime: number;
-}
-
 export interface Goal {
   exercise: string;
   current: number;
@@ -58,17 +37,3 @@ export interface StatsData {
 }
 
 export type Period = '1m' | '3m' | '6m';
-
-export type CommonTypes = {
-  SeriesType: SeriesType;
-  Series: Series;
-  Workout: Workout;
-  Exercise: Exercise;
-  WorkoutSummary: WorkoutSummary;
-  WorkoutStats: WorkoutStats;
-  Goal: Goal;
-  StatsData: StatsData;
-  Period: Period;
-};
-
-export default CommonTypes;

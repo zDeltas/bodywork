@@ -34,8 +34,8 @@ import {
   useFonts,
 } from '@expo-google-fonts/inter';
 import ExerciseList from '@/app/components/exercises/ExerciseList';
-import { Series, SeriesType, Workout } from '@/app/types/common';
-import { WorkoutDateUtils } from '@/app/types/workout';
+import { Series, SeriesType, Workout } from '@/types/common';
+import { WorkoutDateUtils } from '@/types/workout';
 import { MuscleGroupKey } from '@/app/components/exercises/ExerciseList';
 import { TranslationKey } from '@/translations';
 import { useWorkouts } from '@/app/hooks/useWorkouts';

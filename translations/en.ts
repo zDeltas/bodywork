@@ -20,6 +20,8 @@ export default {
     select: 'Select',
     note: 'Note',
     custom: 'Custom',
+    inConstruction: 'Under Construction',
+    featureComingSoon: 'This feature is coming soon!',
   },
 
   // Settings screen

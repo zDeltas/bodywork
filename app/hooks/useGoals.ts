@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState, useMemo } from 'react';
-import { Workout } from '@/app/types/common';
+import { Workout } from '@/types/common';
 import storageService, { StorageKeys } from '../services/storage';
 
 export interface Goal {

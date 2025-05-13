@@ -10,7 +10,7 @@ import Body, { ExtendedBodyPart, Slug } from 'react-native-body-highlighter';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
 import Text from '@/app/components/ui/Text';
-import { Workout } from '@/app/types/common';
+import { Workout } from '@/types/common';
 import { useSettings } from '@/app/hooks/useSettings';
 
 interface MuscleMapProps {

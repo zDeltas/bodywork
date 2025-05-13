@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { WorkoutDateUtils } from '@/app/types/workout';
-import { Period, StatsData, Workout } from '@/app/types/common';
+import { WorkoutDateUtils } from '@/types/workout';
+import { Period, StatsData, Workout } from '@/types/common';
 import { differenceInDays, subMonths } from 'date-fns';
 import calculations from '@/app/utils/calculations';
 import { useTranslation } from '@/app/hooks/useTranslation';

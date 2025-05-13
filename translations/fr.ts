@@ -20,6 +20,8 @@ export default {
     select: 'Sélectionner',
     note: 'Note',
     custom: 'Personnalisé',
+    inConstruction: 'En Construction',
+    featureComingSoon: 'Cette fonctionnalité arrive bientôt !',
   },
 
   // Profile screen

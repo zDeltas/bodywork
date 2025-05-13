@@ -1,8 +1,6 @@
 import React from 'react';
 
 declare module 'victory-native' {
-  import React from 'react';
-
   export const VictoryChart: React.FC<any>;
   export const VictoryLine: React.FC<any>;
   export const VictoryAxis: React.FC<any>;
@@ -40,4 +38,6 @@ export type VictoryNativeTypes = {
   VictoryThemeInterface: VictoryThemeInterface;
 };
 
-export default VictoryNativeTypes;
+export default function VictoryNativeTypes() {
+  return null;
+}

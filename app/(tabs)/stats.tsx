@@ -11,7 +11,7 @@ import { useTranslation } from '@/app/hooks/useTranslation';
 import { router } from 'expo-router';
 import { useTheme } from '@/app/hooks/useTheme';
 import KpiMotivation from '@/app/components/stats/KpiMotivation';
-import { Workout } from '@/app/types/common';
+import { Workout } from '@/types/common';
 import StatsExerciseList from '@/app/components/stats/StatsExerciseList';
 import StatsGoals from '@/app/components/stats/StatsGoals';
 import StatsMuscleDistribution from '@/app/components/stats/StatsMuscleDistribution';

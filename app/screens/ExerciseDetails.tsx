@@ -1,17 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Dimensions, ScrollView, StyleSheet, TouchableOpacity, View, ActivityIndicator } from 'react-native';
+import { Animated, Dimensions, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { VictoryAxis, VictoryChart, VictoryLine, VictoryScatter, VictoryTheme, VictoryTooltip } from 'victory-native';
 import { format, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useLocalSearchParams } from 'expo-router';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
-import { Workout } from '@/app/types/common';
-import Header from '@/app/components/Header';
+import Header from '@/app/components/layout/Header';
 import Text from '@/app/components/ui/Text';
 import calculations from '@/app/utils/calculations';
 import { TranslationKey } from '@/translations';
-import { StatsCardSkeleton, ChartSkeleton } from '@/app/components/ui/SkeletonComponents';
+import { ChartSkeleton, StatsCardSkeleton } from '@/app/components/ui/SkeletonComponents';
 import useWorkouts from '@/app/hooks/useWorkouts';
 
 interface ExerciseData {
@@ -202,7 +201,7 @@ const ExerciseDetails = () => {
 
   useEffect(() => {
     if (!exercise || !workouts) return;
-    
+
     const filteredWorkouts = workouts.filter(w => w.exercise === exercise);
     const oneRMData: ExerciseData[] = [];
     const volumeDataArr: ExerciseData[] = [];
@@ -273,12 +272,12 @@ const ExerciseDetails = () => {
           ] as [number, number]
         };
       case 'reps':
-    return {
-      y: [
-        Math.max(0, Math.floor(min - padding)),
-        Math.ceil(max + padding)
-      ] as [number, number]
-    };
+        return {
+          y: [
+            Math.max(0, Math.floor(min - padding)),
+            Math.ceil(max + padding)
+          ] as [number, number]
+        };
     }
   };
 
@@ -287,7 +286,7 @@ const ExerciseDetails = () => {
     const date = new Date(datum.x);
     const formattedDate = format(date, 'dd/MM/yy', { locale: fr });
     let value = datum.y;
-    
+
     // Formater la valeur selon le type
     switch (selectedChartType) {
       case '1rm':
@@ -300,7 +299,7 @@ const ExerciseDetails = () => {
         value = `${Math.round(value)} reps`;
         break;
     }
-    
+
     return `${formattedDate}: ${value}`;
   };
 

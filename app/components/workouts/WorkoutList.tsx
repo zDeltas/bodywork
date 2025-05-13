@@ -3,7 +3,7 @@ import { FlatList, StyleSheet, View } from 'react-native';
 import Text from '@/app/components/ui/Text';
 import { useTheme } from '@/app/hooks/useTheme';
 import { WorkoutSummary } from '@/app/types/common';
-import { Button } from '@/app/components/Button';
+import { Button } from '@/app/components/ui/Button';
 
 interface WorkoutListProps {
   workouts: WorkoutSummary[];

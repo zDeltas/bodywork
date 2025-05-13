@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useTheme } from '@/app/hooks/useTheme';
 import { useTranslation } from '@/app/hooks/useTranslation';
-import Header from '@/app/components/Header';
+import Header from '@/app/components/layout/Header';
 import { BarChart, Calendar as CalendarIcon, ChevronDown, ListPlus, Scale } from 'lucide-react-native';
 import MeasurementBody, { MeasurementKey } from '@/app/components/measurements/MeasurementBodyMap';
 import MeasurementModal from '@/app/components/measurements/MeasurementModal';

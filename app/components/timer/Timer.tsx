@@ -11,7 +11,7 @@ import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
 import Text from '@/app/components/ui/Text';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
-import { Button } from '@/app/components/Button';
+import { Button } from '@/app/components/ui/Button';
 
 interface TimerProps {
   initialTime?: number;

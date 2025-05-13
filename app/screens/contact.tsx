@@ -13,7 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
-import Header from '@/app/components/Header';
+import Header from '@/app/components/layout/Header';
 import { router } from 'expo-router';
 
 export default function ContactScreen() {

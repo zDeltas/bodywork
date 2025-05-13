@@ -12,7 +12,7 @@ import StatsExerciseList from '@/app/components/stats/StatsExerciseList';
 import StatsGoals from '@/app/components/stats/StatsGoals';
 import StatsMuscleDistribution from '@/app/components/stats/StatsMuscleDistribution';
 import StatsMuscleRestState from '@/app/components/stats/StatsMuscleRestState';
-import Header from '@/app/components/Header';
+import Header from '@/app/components/layout/Header';
 import useStats from '@/app/hooks/useStats';
 import useGoals from '@/app/hooks/useGoals';
 import useExercises from '@/app/hooks/useExercises';

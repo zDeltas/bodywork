@@ -9,7 +9,7 @@ import * as Haptics from 'expo-haptics';
 import { TranslationKey } from '@/translations';
 import { useTheme } from '@/app/hooks/useTheme';
 import Text from '../components/ui/Text';
-import Header from '@/app/components/Header';
+import Header from '@/app/components/layout/Header';
 import Timer from '@/app/components/timer/Timer';
 
 SplashScreen.preventAutoHideAsync();

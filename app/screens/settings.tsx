@@ -8,7 +8,7 @@ import { useSettings } from '@/app/hooks/useSettings';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
 import { useCSVExport } from '@/app/hooks/useCSVExport';
-import Header from '@/app/components/Header';
+import Header from '@/app/components/layout/Header';
 import { router } from 'expo-router';
 import Text from '@/app/components/ui/Text';
 import { TranslationKey } from '@/translations';

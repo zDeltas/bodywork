@@ -18,16 +18,16 @@ interface ButtonProps {
 }
 
 export const Button: React.FC<ButtonProps> = ({
-  onPress,
-  title,
-  variant = 'primary',
-  size = 'medium',
-  disabled = false,
-  style,
-  textStyle,
-  icon,
-  children
-}) => {
+                                                onPress,
+                                                title,
+                                                variant = 'primary',
+                                                size = 'medium',
+                                                disabled = false,
+                                                style,
+                                                textStyle,
+                                                icon,
+                                                children
+                                              }) => {
   const { buttons } = useDynamicStyles();
 
   const getSizeStyles = (): ViewStyle => {
@@ -79,4 +79,4 @@ export const Button: React.FC<ButtonProps> = ({
   );
 };
 
-export default Button; 
+export default Button;

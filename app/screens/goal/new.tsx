@@ -18,10 +18,10 @@ import { useTranslation } from '@/app/hooks/useTranslation';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { useTheme } from '@/app/hooks/useTheme';
-import Header from '@/app/components/Header';
+import Header from '@/app/components/layout/Header';
 import Text from '@/app/components/ui/Text';
 import { ExerciseList, getMuscleGroups, getPredefinedExercises } from '@/app/components/exercises/ExerciseList';
-import { Button } from '@/app/components/Button';
+import { Button } from '@/app/components/ui/Button';
 import useGoals from '@/app/hooks/useGoals';
 import useWorkouts from '@/app/hooks/useWorkouts';
 
@@ -482,7 +482,7 @@ export default function NewGoalScreen() {
       };
       await addGoal(newGoal);
       router.push({
-        pathname: '/(tabs)',
+        pathname: '/(tabs)/stats',
         params: { refresh: 'true' }
       });
     } catch (error) {

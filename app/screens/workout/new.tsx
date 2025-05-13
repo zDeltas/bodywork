@@ -9,7 +9,7 @@ import { fr } from 'date-fns/locale';
 import Text from '../../components/ui/Text';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
-import Header from '@/app/components/Header';
+import Header from '@/app/components/layout/Header';
 import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold, useFonts } from '@expo-google-fonts/inter';
 import ExerciseList from '@/app/components/exercises/ExerciseList';
 import { Series, SeriesType, Workout } from '@/app/types/common';

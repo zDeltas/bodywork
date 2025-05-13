@@ -1,3 +1,5 @@
+import React from 'react';
+
 declare module 'victory-native' {
   import React from 'react';
 

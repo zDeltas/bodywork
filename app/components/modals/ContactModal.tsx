@@ -4,7 +4,7 @@ import { BlurView } from 'expo-blur';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
 import { StatsCardSkeleton } from '@/app/components/ui/SkeletonComponents';
-import { Button } from '@/app/components/Button';
+import { Button } from '@/app/components/ui/Button';
 
 interface ContactModalProps {
   isVisible: boolean;
@@ -81,74 +81,74 @@ export default function ContactModal({ isVisible, onClose }: ContactModalProps) 
           <StatsCardSkeleton />
         </View>
       ) : (
-      <View style={styles.modalContent}>
-        <Text style={styles.modalTitle}>{t('contact.title')}</Text>
+        <View style={styles.modalContent}>
+          <Text style={styles.modalTitle}>{t('contact.title')}</Text>
 
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>{t('contact.name')}</Text>
-          <TextInput
-            style={[styles.input, formErrors.name && styles.inputError]}
-            value={contactForm.name}
-            onChangeText={(text) => setContactForm(prev => ({ ...prev, name: text }))}
-            placeholder={t('contact.namePlaceholder')}
-            placeholderTextColor={theme.colors.text.secondary}
-          />
-          {formErrors.name && (
-            <Text style={styles.errorText}>{formErrors.name}</Text>
-          )}
-        </View>
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>{t('contact.name')}</Text>
+            <TextInput
+              style={[styles.input, formErrors.name && styles.inputError]}
+              value={contactForm.name}
+              onChangeText={(text) => setContactForm(prev => ({ ...prev, name: text }))}
+              placeholder={t('contact.namePlaceholder')}
+              placeholderTextColor={theme.colors.text.secondary}
+            />
+            {formErrors.name && (
+              <Text style={styles.errorText}>{formErrors.name}</Text>
+            )}
+          </View>
 
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>{t('contact.email')}</Text>
-          <TextInput
-            style={[styles.input, formErrors.email && styles.inputError]}
-            value={contactForm.email}
-            onChangeText={(text) => setContactForm(prev => ({ ...prev, email: text }))}
-            placeholder={t('contact.emailPlaceholder')}
-            placeholderTextColor={theme.colors.text.secondary}
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-          {formErrors.email && (
-            <Text style={styles.errorText}>{formErrors.email}</Text>
-          )}
-        </View>
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>{t('contact.email')}</Text>
+            <TextInput
+              style={[styles.input, formErrors.email && styles.inputError]}
+              value={contactForm.email}
+              onChangeText={(text) => setContactForm(prev => ({ ...prev, email: text }))}
+              placeholder={t('contact.emailPlaceholder')}
+              placeholderTextColor={theme.colors.text.secondary}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+            {formErrors.email && (
+              <Text style={styles.errorText}>{formErrors.email}</Text>
+            )}
+          </View>
 
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>{t('contact.message')}</Text>
-          <TextInput
-            style={[styles.textArea, formErrors.message && styles.inputError]}
-            value={contactForm.message}
-            onChangeText={(text) => setContactForm(prev => ({ ...prev, message: text }))}
-            placeholder={t('contact.messagePlaceholder')}
-            placeholderTextColor={theme.colors.text.secondary}
-            multiline
-            numberOfLines={4}
-            textAlignVertical="top"
-          />
-          {formErrors.message && (
-            <Text style={styles.errorText}>{formErrors.message}</Text>
-          )}
-        </View>
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>{t('contact.message')}</Text>
+            <TextInput
+              style={[styles.textArea, formErrors.message && styles.inputError]}
+              value={contactForm.message}
+              onChangeText={(text) => setContactForm(prev => ({ ...prev, message: text }))}
+              placeholder={t('contact.messagePlaceholder')}
+              placeholderTextColor={theme.colors.text.secondary}
+              multiline
+              numberOfLines={4}
+              textAlignVertical="top"
+            />
+            {formErrors.message && (
+              <Text style={styles.errorText}>{formErrors.message}</Text>
+            )}
+          </View>
 
-        <View style={styles.modalButtons}>
-          <Button
-            variant="secondary"
-            title={t('common.cancel')}
-            onPress={onClose}
-            disabled={isSending}
-            style={styles.modalButton}
-          />
-          <Button
-            variant="primary"
-            title={isSending ? undefined : t('contact.send')}
-            onPress={handleSubmit}
-            disabled={isSending}
-            style={styles.modalButton}
-            icon={isSending ? <ActivityIndicator size="small" color={theme.colors.text.primary} /> : undefined}
-          />
+          <View style={styles.modalButtons}>
+            <Button
+              variant="secondary"
+              title={t('common.cancel')}
+              onPress={onClose}
+              disabled={isSending}
+              style={styles.modalButton}
+            />
+            <Button
+              variant="primary"
+              title={isSending ? undefined : t('contact.send')}
+              onPress={handleSubmit}
+              disabled={isSending}
+              style={styles.modalButton}
+              icon={isSending ? <ActivityIndicator size="small" color={theme.colors.text.primary} /> : undefined}
+            />
+          </View>
         </View>
-      </View>
       )}
     </BlurView>
   );
@@ -237,4 +237,4 @@ const useStyles = () => {
       justifyContent: 'center'
     }
   });
-}; 
+};

@@ -13,7 +13,7 @@ const Skeleton: React.FC<SkeletonProps> = ({
   width = '100%',
   height = 20,
   borderRadius = 4,
-  style
+  style,
 }) => {
   const { theme } = useTheme();
   const animatedValue = new Animated.Value(0);
@@ -25,7 +25,7 @@ const Skeleton: React.FC<SkeletonProps> = ({
         duration: 1000,
         easing: Easing.linear,
         useNativeDriver: true,
-      })
+      }),
     );
 
     animation.start();
@@ -81,4 +81,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Skeleton; 
+export default Skeleton;

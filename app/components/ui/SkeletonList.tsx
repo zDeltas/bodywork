@@ -35,4 +35,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SkeletonList; 
+export default SkeletonList;

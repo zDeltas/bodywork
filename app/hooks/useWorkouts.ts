@@ -15,7 +15,9 @@ export function useWorkouts() {
       setWorkouts(stored || []);
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err : new Error('Erreur lors du chargement des entraînements'));
+      setError(
+        err instanceof Error ? err : new Error('Erreur lors du chargement des entraînements'),
+      );
       setWorkouts([]);
     } finally {
       setLoading(false);
@@ -31,13 +33,15 @@ export function useWorkouts() {
       }
     };
     load();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, [loadWorkouts]);
 
   // Ajouter ou mettre à jour un workout
   const saveWorkout = useCallback(async (workout: Workout) => {
-    setWorkouts(prev => {
-      const idx = prev.findIndex(w => w.id === workout.id);
+    setWorkouts((prev) => {
+      const idx = prev.findIndex((w) => w.id === workout.id);
       let updated;
       if (idx >= 0) {
         updated = [...prev];
@@ -55,8 +59,8 @@ export function useWorkouts() {
 
   // Supprimer un workout
   const deleteWorkout = useCallback(async (id: string) => {
-    setWorkouts(prev => {
-      const updated = prev.filter(w => w.id !== id);
+    setWorkouts((prev) => {
+      const updated = prev.filter((w) => w.id !== id);
       storageService.deleteWorkout(id).then(async () => {
         const stored = await storageService.getWorkouts();
         setWorkouts(stored || []);
@@ -66,43 +70,69 @@ export function useWorkouts() {
   }, []);
 
   // Fonction pour récupérer un workout par son ID
-  const getWorkoutById = useCallback((id: string) => {
-    return workouts.find(workout => workout.id === id) || null;
-  }, [workouts]);
+  const getWorkoutById = useCallback(
+    (id: string) => {
+      return workouts.find((workout) => workout.id === id) || null;
+    },
+    [workouts],
+  );
 
   // Fonction pour filtrer les workouts par exercice
-  const getWorkoutsByExercise = useCallback((exercise: string) => {
-    return workouts.filter(workout => workout.exercise === exercise);
-  }, [workouts]);
+  const getWorkoutsByExercise = useCallback(
+    (exercise: string) => {
+      return workouts.filter((workout) => workout.exercise === exercise);
+    },
+    [workouts],
+  );
 
   // Fonction pour filtrer les workouts par groupe musculaire
-  const getWorkoutsByMuscleGroup = useCallback((muscleGroup: string) => {
-    return workouts.filter(workout => workout.muscleGroup === muscleGroup);
-  }, [workouts]);
+  const getWorkoutsByMuscleGroup = useCallback(
+    (muscleGroup: string) => {
+      return workouts.filter((workout) => workout.muscleGroup === muscleGroup);
+    },
+    [workouts],
+  );
 
   // Fonction pour filtrer les workouts par date
-  const getWorkoutsByDate = useCallback((date: string) => {
-    return workouts.filter(workout => {
-      const workoutDate = workout.date.split('T')[0];
-      return workoutDate === date;
-    });
-  }, [workouts]);
+  const getWorkoutsByDate = useCallback(
+    (date: string) => {
+      return workouts.filter((workout) => {
+        const workoutDate = workout.date.split('T')[0];
+        return workoutDate === date;
+      });
+    },
+    [workouts],
+  );
 
-  const contextValue = useMemo(() => ({
-    workouts,
-    loading,
-    error,
-    saveWorkout,
-    deleteWorkout,
-    getWorkoutById,
-    getWorkoutsByExercise,
-    getWorkoutsByMuscleGroup,
-    getWorkoutsByDate,
-    setWorkouts,
-    refreshWorkouts: loadWorkouts
-  }), [workouts, loading, error, saveWorkout, deleteWorkout, getWorkoutById, getWorkoutsByExercise, getWorkoutsByMuscleGroup, getWorkoutsByDate, loadWorkouts]);
+  const contextValue = useMemo(
+    () => ({
+      workouts,
+      loading,
+      error,
+      saveWorkout,
+      deleteWorkout,
+      getWorkoutById,
+      getWorkoutsByExercise,
+      getWorkoutsByMuscleGroup,
+      getWorkoutsByDate,
+      setWorkouts,
+      refreshWorkouts: loadWorkouts,
+    }),
+    [
+      workouts,
+      loading,
+      error,
+      saveWorkout,
+      deleteWorkout,
+      getWorkoutById,
+      getWorkoutsByExercise,
+      getWorkoutsByMuscleGroup,
+      getWorkoutsByDate,
+      loadWorkouts,
+    ],
+  );
 
   return contextValue;
 }
 
-export default useWorkouts; 
+export default useWorkouts;

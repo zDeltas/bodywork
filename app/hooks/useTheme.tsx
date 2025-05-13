@@ -13,7 +13,7 @@ export const useTheme = () => {
 
   return {
     theme,
-    isDarkMode: settings.theme === 'dark'
+    isDarkMode: settings.theme === 'dark',
   };
 };
 

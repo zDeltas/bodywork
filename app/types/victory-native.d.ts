@@ -40,4 +40,4 @@ export type VictoryNativeTypes = {
   VictoryThemeInterface: VictoryThemeInterface;
 };
 
-export default VictoryNativeTypes; 
+export default VictoryNativeTypes;

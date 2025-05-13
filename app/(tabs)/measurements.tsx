@@ -3,7 +3,13 @@ import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'rea
 import { useTheme } from '@/app/hooks/useTheme';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import Header from '@/app/components/layout/Header';
-import { BarChart, Calendar as CalendarIcon, ChevronDown, ListPlus, Scale } from 'lucide-react-native';
+import {
+  BarChart,
+  Calendar as CalendarIcon,
+  ChevronDown,
+  ListPlus,
+  Scale,
+} from 'lucide-react-native';
 import MeasurementBody, { MeasurementKey } from '@/app/components/measurements/MeasurementBodyMap';
 import MeasurementModal from '@/app/components/measurements/MeasurementModal';
 import MeasurementHistoryModal from '@/app/components/measurements/MeasurementHistoryModal';
@@ -16,7 +22,15 @@ import { TranslationKey } from '@/translations';
 import useMeasurements from '@/app/hooks/useMeasurements';
 
 const MEASUREMENT_KEYS: MeasurementKey[] = [
-  'neck', 'shoulders', 'chest', 'arms', 'forearms', 'waist', 'hips', 'thighs', 'calves'
+  'neck',
+  'shoulders',
+  'chest',
+  'arms',
+  'forearms',
+  'waist',
+  'hips',
+  'thighs',
+  'calves',
 ];
 
 const getMeasurementTranslationKey = (key: MeasurementKey): TranslationKey => {
@@ -30,10 +44,13 @@ export default function MeasurementsScreen() {
   const { theme } = useTheme();
   const { t } = useTranslation();
   const [viewMode, setViewMode] = useState<ViewMode>('history');
-  const [modal, setModal] = useState<{ key: MeasurementKey | null, open: boolean }>({ key: null, open: false });
-  const [historyModal, setHistoryModal] = useState<{ key: MeasurementKey | null, open: boolean }>({
+  const [modal, setModal] = useState<{ key: MeasurementKey | null; open: boolean }>({
     key: null,
-    open: false
+    open: false,
+  });
+  const [historyModal, setHistoryModal] = useState<{ key: MeasurementKey | null; open: boolean }>({
+    key: null,
+    open: false,
   });
   const [showCalendar, setShowCalendar] = useState(false);
   const [showWeightModal, setShowWeightModal] = useState(false);
@@ -45,7 +62,7 @@ export default function MeasurementsScreen() {
     loading,
     updateMeasurement,
     updateWeight,
-    setSelectedDate
+    setSelectedDate,
   } = useMeasurements();
 
   const openMeasurementModal = (key: MeasurementKey) => setModal({ key, open: true });
@@ -68,30 +85,30 @@ export default function MeasurementsScreen() {
 
   const getHistory = (key: MeasurementKey) =>
     allMeasurements
-      .filter(m => m.measurements[key] > 0)
-      .map(m => ({ date: m.date, value: m.measurements[key] }))
+      .filter((m) => m.measurements[key] > 0)
+      .map((m) => ({ date: m.date, value: m.measurements[key] }))
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
   const getWeightHistory = () =>
     allMeasurements
-      .filter(m => m.weight > 0)
-      .map(m => ({ date: m.date, value: m.weight }))
+      .filter((m) => m.weight > 0)
+      .map((m) => ({ date: m.date, value: m.weight }))
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
   // Styles
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: theme.colors.background.main
+      backgroundColor: theme.colors.background.main,
     },
     content: {
-      flex: 1
+      flex: 1,
     },
     measurementInputContainer: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       padding: 16,
-      marginBottom: 8
+      marginBottom: 8,
     },
     inputCard: {
       flex: 1,
@@ -99,52 +116,52 @@ export default function MeasurementsScreen() {
       borderRadius: theme.borderRadius.lg,
       padding: 12,
       marginHorizontal: 4,
-      ...theme.shadows.sm
+      ...theme.shadows.sm,
     },
     inputHeader: {
       flexDirection: 'row',
       alignItems: 'center',
-      marginBottom: 8
+      marginBottom: 8,
     },
     inputLabel: {
       marginLeft: 6,
       fontWeight: 'bold',
       color: theme.colors.text.primary,
-      fontSize: 14
+      fontSize: 14,
     },
     dateDisplay: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      paddingVertical: 6
+      paddingVertical: 6,
     },
     dateText: {
       color: theme.colors.text.primary,
-      fontSize: 16
+      fontSize: 16,
     },
     calendarOverlay: {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
-      backgroundColor: 'rgba(0,0,0,0.7)'
+      backgroundColor: 'rgba(0,0,0,0.7)',
     },
     calendarModal: {
       backgroundColor: theme.colors.background.card,
       borderRadius: theme.borderRadius.lg,
       padding: 24,
       width: 340,
-      maxWidth: '90%'
+      maxWidth: '90%',
     },
     calendarCloseButton: {
       backgroundColor: theme.colors.primary,
       borderRadius: theme.borderRadius.md,
       paddingVertical: 10,
       marginTop: 16,
-      alignItems: 'center'
+      alignItems: 'center',
     },
     calendarCloseText: {
       color: theme.colors.text.primary,
-      fontWeight: 'bold'
+      fontWeight: 'bold',
     },
     viewToggle: {
       flexDirection: 'row',
@@ -152,7 +169,7 @@ export default function MeasurementsScreen() {
       backgroundColor: theme.colors.background.card,
       padding: 4,
       margin: 16,
-      ...theme.shadows.sm
+      ...theme.shadows.sm,
     },
     toggleButton: {
       flex: 1,
@@ -161,28 +178,25 @@ export default function MeasurementsScreen() {
       borderRadius: theme.borderRadius.full,
       flexDirection: 'row',
       alignItems: 'center',
-      justifyContent: 'center'
+      justifyContent: 'center',
     },
     activeToggle: {
-      backgroundColor: theme.colors.primary
+      backgroundColor: theme.colors.primary,
     },
     toggleText: {
       color: theme.colors.text.secondary,
-      marginLeft: 6
+      marginLeft: 6,
     },
     activeToggleText: {
       color: theme.colors.text.primary,
-      fontWeight: 'bold'
-    }
+      fontWeight: 'bold',
+    },
   });
 
   const renderDateWeight = () => (
     <View style={styles.measurementInputContainer}>
       {/* Date selection */}
-      <TouchableOpacity
-        style={styles.inputCard}
-        onPress={() => setShowCalendar(true)}
-      >
+      <TouchableOpacity style={styles.inputCard} onPress={() => setShowCalendar(true)}>
         <View style={styles.inputHeader}>
           <CalendarIcon size={18} color={theme.colors.primary} />
           <Text style={styles.inputLabel}>Date</Text>
@@ -196,10 +210,7 @@ export default function MeasurementsScreen() {
       </TouchableOpacity>
 
       {/* Weight input */}
-      <TouchableOpacity
-        style={styles.inputCard}
-        onPress={openWeightModal}
-      >
+      <TouchableOpacity style={styles.inputCard} onPress={openWeightModal}>
         <View style={styles.inputHeader}>
           <Scale size={18} color={theme.colors.primary} />
           <Text style={styles.inputLabel}>{t('workout.weight')}</Text>
@@ -224,7 +235,9 @@ export default function MeasurementsScreen() {
             <Calendar
               current={measurements.date}
               onDayPress={onCalendarDayPress}
-              markedDates={{ [measurements.date]: { selected: true, selectedColor: theme.colors.primary } }}
+              markedDates={{
+                [measurements.date]: { selected: true, selectedColor: theme.colors.primary },
+              }}
               theme={{
                 backgroundColor: theme.colors.background.card,
                 calendarBackground: theme.colors.background.card,
@@ -238,7 +251,7 @@ export default function MeasurementsScreen() {
                 selectedDotColor: theme.colors.text.primary,
                 arrowColor: theme.colors.primary,
                 monthTextColor: theme.colors.text.primary,
-                indicatorColor: theme.colors.primary
+                indicatorColor: theme.colors.primary,
               }}
             />
             <TouchableOpacity
@@ -259,7 +272,10 @@ export default function MeasurementsScreen() {
         style={[styles.toggleButton, viewMode === 'history' && styles.activeToggle]}
         onPress={() => setViewMode('history')}
       >
-        <BarChart size={18} color={viewMode === 'history' ? theme.colors.text.primary : theme.colors.text.secondary} />
+        <BarChart
+          size={18}
+          color={viewMode === 'history' ? theme.colors.text.primary : theme.colors.text.secondary}
+        />
         <Text style={[styles.toggleText, viewMode === 'history' && styles.activeToggleText]}>
           {t('measurements.historyMode')}
         </Text>
@@ -269,7 +285,10 @@ export default function MeasurementsScreen() {
         style={[styles.toggleButton, viewMode === 'input' && styles.activeToggle]}
         onPress={() => setViewMode('input')}
       >
-        <ListPlus size={18} color={viewMode === 'input' ? theme.colors.text.primary : theme.colors.text.secondary} />
+        <ListPlus
+          size={18}
+          color={viewMode === 'input' ? theme.colors.text.primary : theme.colors.text.secondary}
+        />
         <Text style={[styles.toggleText, viewMode === 'input' && styles.activeToggleText]}>
           {t('measurements.inputMode')}
         </Text>
@@ -281,10 +300,10 @@ export default function MeasurementsScreen() {
     <>
       {renderDateWeight()}
       <MeasurementBody
-        points={MEASUREMENT_KEYS.map(key => ({
+        points={MEASUREMENT_KEYS.map((key) => ({
           key,
           label: t(getMeasurementTranslationKey(key)),
-          color: theme.colors.measurement[key]
+          color: theme.colors.measurement[key],
         }))}
         values={measurements.measurements}
         onPointPress={openMeasurementModal}
@@ -293,18 +312,12 @@ export default function MeasurementsScreen() {
   );
 
   const renderHistoryMode = () => (
-    <MeasurementHistory
-      measurements={allMeasurements}
-      isLoading={loading}
-    />
+    <MeasurementHistory measurements={allMeasurements} isLoading={loading} />
   );
 
   return (
     <View style={styles.container}>
-      <Header
-        title={t('measurements.title')}
-        showBackButton={false}
-      />
+      <Header title={t('measurements.title')} showBackButton={false} />
       {renderViewToggle()}
       <ScrollView style={styles.content}>
         {viewMode === 'input' ? renderInputMode() : renderHistoryMode()}

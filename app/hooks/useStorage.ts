@@ -30,18 +30,23 @@ export function useStorage<T>(key: StorageKeys, initialValue: T) {
   }, [key]);
 
   // Fonction pour mettre à jour les données
-  const updateData = useCallback(async (newData: T) => {
-    try {
-      setLoading(true);
-      await storageService.setItem<T>(key, newData);
-      setData(newData);
-      setError(null);
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Une erreur est survenue lors de la mise à jour'));
-    } finally {
-      setLoading(false);
-    }
-  }, [key]);
+  const updateData = useCallback(
+    async (newData: T) => {
+      try {
+        setLoading(true);
+        await storageService.setItem<T>(key, newData);
+        setData(newData);
+        setError(null);
+      } catch (err) {
+        setError(
+          err instanceof Error ? err : new Error('Une erreur est survenue lors de la mise à jour'),
+        );
+      } finally {
+        setLoading(false);
+      }
+    },
+    [key],
+  );
 
   // Fonction pour supprimer les données
   const removeData = useCallback(async () => {
@@ -51,7 +56,9 @@ export function useStorage<T>(key: StorageKeys, initialValue: T) {
       setData(initialValue);
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err : new Error('Une erreur est survenue lors de la suppression'));
+      setError(
+        err instanceof Error ? err : new Error('Une erreur est survenue lors de la suppression'),
+      );
     } finally {
       setLoading(false);
     }
@@ -60,4 +67,4 @@ export function useStorage<T>(key: StorageKeys, initialValue: T) {
   return { data, loading, error, updateData, removeData };
 }
 
-export default useStorage; 
+export default useStorage;

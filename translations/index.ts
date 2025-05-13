@@ -3,14 +3,14 @@ import fr from './fr';
 
 export const translations = {
   en,
-  fr
+  fr,
 };
 
 // Improved type for accessing nested translations
 type RecursiveKeyOf<TObj extends object> = {
   [TKey in keyof TObj & (string | number)]: TObj[TKey] extends object
     ? `${TKey}` | `${TKey}.${RecursiveKeyOf<TObj[TKey]>}`
-    : `${TKey}`
+    : `${TKey}`;
 }[keyof TObj & (string | number)];
 
 export type TranslationKey = RecursiveKeyOf<typeof en>;

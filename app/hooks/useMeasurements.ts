@@ -12,20 +12,28 @@ const initialMeasurements: Measurement = {
   date: new Date().toISOString().split('T')[0],
   weight: 0,
   measurements: {
-    neck: 0, shoulders: 0, chest: 0, arms: 0, forearms: 0, waist: 0, hips: 0, thighs: 0, calves: 0
-  }
+    neck: 0,
+    shoulders: 0,
+    chest: 0,
+    arms: 0,
+    forearms: 0,
+    waist: 0,
+    hips: 0,
+    thighs: 0,
+    calves: 0,
+  },
 };
 
 // Fonction utilitaire pour regrouper les mesures par date
 function groupMeasurementsByDate(stored: any[]): Measurement[] {
   const byDate: Record<string, Measurement> = {};
-  stored.forEach(m => {
+  stored.forEach((m) => {
     const date = m.date.split('T')[0];
     if (!byDate[date]) {
       byDate[date] = {
         date,
         weight: 0,
-        measurements: { ...initialMeasurements.measurements }
+        measurements: { ...initialMeasurements.measurements },
       };
     }
     if (m.type === 'weight') {
@@ -34,7 +42,9 @@ function groupMeasurementsByDate(stored: any[]): Measurement[] {
       byDate[date].measurements[m.type as MeasurementKey] = m.value;
     }
   });
-  return Object.values(byDate).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  return Object.values(byDate).sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+  );
 }
 
 export function useMeasurements() {
@@ -54,7 +64,7 @@ export function useMeasurements() {
           const arr = stored && stored.length > 0 ? groupMeasurementsByDate(stored) : [];
           setAllMeasurements(arr);
           const today = new Date().toISOString().split('T')[0];
-          const found = arr.find(m => m.date === today);
+          const found = arr.find((m) => m.date === today);
           setMeasurements(found || { ...initialMeasurements, date: today });
           setError(null);
         }
@@ -69,19 +79,21 @@ export function useMeasurements() {
       }
     };
     load();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   // Mettre à jour une mesure corporelle
   const updateMeasurement = useCallback(async (key: MeasurementKey, value: number) => {
-    setMeasurements(prev => {
+    setMeasurements((prev) => {
       const updated = {
         ...prev,
-        measurements: { ...prev.measurements, [key]: value }
+        measurements: { ...prev.measurements, [key]: value },
       };
       // Mise à jour locale immédiate
-      setAllMeasurements(prevAll => {
-        const idx = prevAll.findIndex(m => m.date === updated.date);
+      setAllMeasurements((prevAll) => {
+        const idx = prevAll.findIndex((m) => m.date === updated.date);
         let arr;
         if (idx >= 0) {
           arr = [...prevAll];
@@ -92,29 +104,31 @@ export function useMeasurements() {
         return arr.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
       });
       // Sauvegarde asynchrone
-      storageService.saveMeasurement({
-        id: `${updated.date}_${key}`,
-        date: new Date(updated.date).toISOString(),
-        type: key,
-        value,
-        unit: 'cm'
-      }).then(async () => {
-        const stored = await storageService.getMeasurements();
-        setAllMeasurements(stored ? groupMeasurementsByDate(stored) : []);
-      });
+      storageService
+        .saveMeasurement({
+          id: `${updated.date}_${key}`,
+          date: new Date(updated.date).toISOString(),
+          type: key,
+          value,
+          unit: 'cm',
+        })
+        .then(async () => {
+          const stored = await storageService.getMeasurements();
+          setAllMeasurements(stored ? groupMeasurementsByDate(stored) : []);
+        });
       return updated;
     });
   }, []);
 
   // Mettre à jour le poids
   const updateWeight = useCallback(async (value: number) => {
-    setMeasurements(prev => {
+    setMeasurements((prev) => {
       const updated = {
         ...prev,
-        weight: value
+        weight: value,
       };
-      setAllMeasurements(prevAll => {
-        const idx = prevAll.findIndex(m => m.date === updated.date);
+      setAllMeasurements((prevAll) => {
+        const idx = prevAll.findIndex((m) => m.date === updated.date);
         let arr;
         if (idx >= 0) {
           arr = [...prevAll];
@@ -124,40 +138,56 @@ export function useMeasurements() {
         }
         return arr.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
       });
-      storageService.saveMeasurement({
-        id: `${updated.date}_weight`,
-        date: new Date(updated.date).toISOString(),
-        type: 'weight',
-        value,
-        unit: 'kg'
-      }).then(async () => {
-        const stored = await storageService.getMeasurements();
-        setAllMeasurements(stored ? groupMeasurementsByDate(stored) : []);
-      });
+      storageService
+        .saveMeasurement({
+          id: `${updated.date}_weight`,
+          date: new Date(updated.date).toISOString(),
+          type: 'weight',
+          value,
+          unit: 'kg',
+        })
+        .then(async () => {
+          const stored = await storageService.getMeasurements();
+          setAllMeasurements(stored ? groupMeasurementsByDate(stored) : []);
+        });
       return updated;
     });
   }, []);
 
   // Changer la date sélectionnée
-  const setSelectedDate = useCallback((date: string) => {
-    setMeasurements(prev => {
-      const found = allMeasurements.find(m => m.date === date);
-      return found ? found : { ...initialMeasurements, date };
-    });
-  }, [allMeasurements]);
+  const setSelectedDate = useCallback(
+    (date: string) => {
+      setMeasurements((prev) => {
+        const found = allMeasurements.find((m) => m.date === date);
+        return found ? found : { ...initialMeasurements, date };
+      });
+    },
+    [allMeasurements],
+  );
 
   // Exposer les valeurs mémoïsées pour éviter les re-rendus inutiles
-  const contextValue = useMemo(() => ({
-    measurements,
-    allMeasurements,
-    loading,
-    error,
-    updateMeasurement,
-    updateWeight,
-    setSelectedDate
-  }), [measurements, allMeasurements, loading, error, updateMeasurement, updateWeight, setSelectedDate]);
+  const contextValue = useMemo(
+    () => ({
+      measurements,
+      allMeasurements,
+      loading,
+      error,
+      updateMeasurement,
+      updateWeight,
+      setSelectedDate,
+    }),
+    [
+      measurements,
+      allMeasurements,
+      loading,
+      error,
+      updateMeasurement,
+      updateWeight,
+      setSelectedDate,
+    ],
+  );
 
   return contextValue;
 }
 
-export default useMeasurements; 
+export default useMeasurements;

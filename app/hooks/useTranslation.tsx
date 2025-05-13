@@ -32,9 +32,8 @@ export const useTranslation = () => {
 
   return {
     t,
-    language
+    language,
   };
 };
 
 export default useTranslation;
-

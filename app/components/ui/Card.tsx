@@ -9,12 +9,12 @@ interface CardProps extends ViewProps {
 }
 
 export default function Card({
-                               variant = 'default',
-                               style,
-                               children,
-                               animated = true,
-                               ...props
-                             }: CardProps) {
+  variant = 'default',
+  style,
+  children,
+  animated = true,
+  ...props
+}: CardProps) {
   const styles = useStyles();
 
   const CardComponent = animated ? Animated.View : View;
@@ -22,11 +22,7 @@ export default function Card({
   return (
     <CardComponent
       entering={animated ? FadeIn.duration(300) : undefined}
-      style={[
-        styles.card,
-        styles[variant],
-        style
-      ]}
+      style={[styles.card, styles[variant], style]}
       {...props}
     >
       {children}
@@ -47,12 +43,12 @@ const useStyles = () => {
           shadowColor: '#000',
           shadowOffset: { width: 0, height: 2 },
           shadowOpacity: 0.1,
-          shadowRadius: 4
+          shadowRadius: 4,
         },
         android: {
-          elevation: 4
-        }
-      })
+          elevation: 4,
+        },
+      }),
     },
     default: {},
     highlighted: {
@@ -63,12 +59,12 @@ const useStyles = () => {
           shadowColor: theme.colors.primary,
           shadowOffset: { width: 0, height: 2 },
           shadowOpacity: 0.2,
-          shadowRadius: 4
+          shadowRadius: 4,
         },
         android: {
-          elevation: 6
-        }
-      })
+          elevation: 6,
+        },
+      }),
     },
     secondary: {
       backgroundColor: theme.colors.background.button,
@@ -77,12 +73,12 @@ const useStyles = () => {
           shadowColor: '#000',
           shadowOffset: { width: 0, height: 1 },
           shadowOpacity: 0.05,
-          shadowRadius: 2
+          shadowRadius: 2,
         },
         android: {
-          elevation: 2
-        }
-      })
-    }
+          elevation: 2,
+        },
+      }),
+    },
   });
-}; 
+};

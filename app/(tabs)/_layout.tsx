@@ -2,7 +2,12 @@ import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { router, Tabs } from 'expo-router';
 import { Calendar, ChartLine as LineChart, Clock, Plus, Ruler } from 'lucide-react-native';
 import { useTheme } from '@/app/hooks/useTheme';
-import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold, useFonts } from '@expo-google-fonts/inter';
+import {
+  Inter_400Regular,
+  Inter_600SemiBold,
+  Inter_700Bold,
+  useFonts,
+} from '@expo-google-fonts/inter';
 import * as SplashScreen from 'expo-splash-screen';
 import { useCallback } from 'react';
 
@@ -15,7 +20,7 @@ function TabLayout() {
   const [fontsLoaded, fontError] = useFonts({
     'Inter-Regular': Inter_400Regular,
     'Inter-SemiBold': Inter_600SemiBold,
-    'Inter-Bold': Inter_700Bold
+    'Inter-Bold': Inter_700Bold,
   });
 
   const onLayoutRootView = useCallback(async () => {
@@ -28,7 +33,7 @@ function TabLayout() {
     const today = new Date().toISOString().split('T')[0];
     router.push({
       pathname: '/screens/workout/new',
-      params: { selectedDate: today }
+      params: { selectedDate: today },
     });
   };
 
@@ -48,49 +53,41 @@ function TabLayout() {
             elevation: 0,
             shadowOpacity: 0,
             height: 60,
-            paddingBottom: 10
+            paddingBottom: 10,
           },
           tabBarLabelStyle: {
             fontFamily: 'Inter-Regular',
-            fontSize: 12
+            fontSize: 12,
           },
-          headerShown: false
+          headerShown: false,
         }}
       >
         <Tabs.Screen
           name="index"
           options={{
             title: 'Workouts',
-            tabBarIcon: ({ color, size }) => (
-              <Calendar size={size} color={color} />
-            )
+            tabBarIcon: ({ color, size }) => <Calendar size={size} color={color} />,
           }}
         />
         <Tabs.Screen
           name="timer"
           options={{
             title: 'Timer',
-            tabBarIcon: ({ color, size }) => (
-              <Clock size={size} color={color} />
-            )
+            tabBarIcon: ({ color, size }) => <Clock size={size} color={color} />,
           }}
         />
         <Tabs.Screen
           name="stats"
           options={{
             title: 'Stats',
-            tabBarIcon: ({ color, size }) => (
-              <LineChart size={size} color={color} />
-            )
+            tabBarIcon: ({ color, size }) => <LineChart size={size} color={color} />,
           }}
         />
         <Tabs.Screen
           name="measurements"
           options={{
             title: 'Measures',
-            tabBarIcon: ({ color, size }) => (
-              <Ruler size={size} color={color} />
-            )
+            tabBarIcon: ({ color, size }) => <Ruler size={size} color={color} />,
           }}
         />
       </Tabs>
@@ -121,8 +118,8 @@ const useStyles = () => {
       backgroundColor: theme.colors.primary,
       bottom: 70,
       right: theme.spacing.base,
-      zIndex: 999
-    }
+      zIndex: 999,
+    },
   });
 };
 

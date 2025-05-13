@@ -71,4 +71,4 @@ export type CommonTypes = {
   Period: Period;
 };
 
-export default CommonTypes; 
+export default CommonTypes;

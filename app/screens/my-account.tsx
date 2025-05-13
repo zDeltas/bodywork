@@ -16,11 +16,7 @@ function MyAccountScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header
-        title={t('profile.myAccount')}
-        showBackButton={true}
-        onBack={() => router.back()}
-      />
+      <Header title={t('profile.myAccount')} showBackButton={true} onBack={() => router.back()} />
 
       <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: 100 }}>
         <View style={styles.section}>
@@ -39,7 +35,6 @@ function MyAccountScreen() {
           </TouchableOpacity>
         </View>
       </ScrollView>
-
     </SafeAreaView>
   );
 }
@@ -50,14 +45,14 @@ const useStyles = () => {
   return StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: theme.colors.background.main
+      backgroundColor: theme.colors.background.main,
     },
     content: {
       flex: 1,
-      padding: theme.spacing.lg
+      padding: theme.spacing.lg,
     },
     section: {
-      marginBottom: theme.spacing.xl
+      marginBottom: theme.spacing.xl,
     },
     settingItem: {
       flexDirection: 'row',
@@ -65,19 +60,19 @@ const useStyles = () => {
       alignItems: 'center',
       paddingVertical: theme.spacing.md,
       borderBottomWidth: 1,
-      borderBottomColor: theme.colors.border.default
+      borderBottomColor: theme.colors.border.default,
     },
     settingInfo: {
       flexDirection: 'row',
-      alignItems: 'center'
+      alignItems: 'center',
     },
     settingLabel: {
       fontSize: theme.typography.fontSize.base,
       color: theme.colors.text.primary,
       marginLeft: theme.spacing.md,
-      fontFamily: theme.typography.fontFamily.regular
-    }
+      fontFamily: theme.typography.fontFamily.regular,
+    },
   });
-}; 
+};
 
 export default MyAccountScreen;

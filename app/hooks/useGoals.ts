@@ -14,24 +14,27 @@ export function useGoals(workouts: Workout[]) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  const getCurrentWeight = useCallback((exerciseName: string): number | null => {
-    if (!exerciseName || workouts.length === 0) return null;
+  const getCurrentWeight = useCallback(
+    (exerciseName: string): number | null => {
+      if (!exerciseName || workouts.length === 0) return null;
 
-    const exerciseWorkouts = workouts.filter(w => w.exercise === exerciseName);
-    if (exerciseWorkouts.length === 0) return null;
+      const exerciseWorkouts = workouts.filter((w) => w.exercise === exerciseName);
+      if (exerciseWorkouts.length === 0) return null;
 
-    // Trouver le poids le plus lourd parmi tous les entraînements
-    let highestWeight = 0;
-    exerciseWorkouts.forEach(workout => {
-      workout.series.forEach(series => {
-        if (series.weight > highestWeight) {
-          highestWeight = series.weight;
-        }
+      // Trouver le poids le plus lourd parmi tous les entraînements
+      let highestWeight = 0;
+      exerciseWorkouts.forEach((workout) => {
+        workout.series.forEach((series) => {
+          if (series.weight > highestWeight) {
+            highestWeight = series.weight;
+          }
+        });
       });
-    });
 
-    return highestWeight || null;
-  }, [workouts]);
+      return highestWeight || null;
+    },
+    [workouts],
+  );
 
   const suggestTargetWeight = useCallback((currentWeight: number): number | null => {
     if (!currentWeight) return null;
@@ -55,7 +58,11 @@ export function useGoals(workouts: Workout[]) {
         }
       } catch (err) {
         if (mounted) {
-          setError(err instanceof Error ? err : new Error('Une erreur est survenue lors du chargement des goals'));
+          setError(
+            err instanceof Error
+              ? err
+              : new Error('Une erreur est survenue lors du chargement des goals'),
+          );
           setGoals([]);
         }
       } finally {
@@ -64,13 +71,15 @@ export function useGoals(workouts: Workout[]) {
     };
 
     loadGoals();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   // Mettre à jour les goals quand les workouts changent
   useEffect(() => {
     if (workouts.length > 0 && goals.length > 0) {
-      const updatedGoals = goals.map(goal => {
+      const updatedGoals = goals.map((goal) => {
         const currentWeight = getCurrentWeight(goal.exercise);
         if (currentWeight) {
           const progress = Math.min(Math.round((currentWeight / goal.target) * 100), 100);
@@ -82,7 +91,7 @@ export function useGoals(workouts: Workout[]) {
       if (JSON.stringify(updatedGoals) !== JSON.stringify(goals)) {
         setGoals(updatedGoals);
         // Utiliser le service de stockage pour sauvegarder les goals mis à jour
-        storageService.setItem(StorageKeys.GOALS, updatedGoals).catch(err => {
+        storageService.setItem(StorageKeys.GOALS, updatedGoals).catch((err) => {
           console.error('Erreur lors de la sauvegarde des goals:', err);
         });
       }
@@ -90,7 +99,7 @@ export function useGoals(workouts: Workout[]) {
   }, [workouts, goals, getCurrentWeight]);
 
   const addGoal = useCallback(async (goal: Goal) => {
-    setGoals(prev => {
+    setGoals((prev) => {
       const updated = [...prev, goal];
       storageService.saveGoal(goal).then(async () => {
         const stored = await storageService.getGoals();
@@ -101,8 +110,8 @@ export function useGoals(workouts: Workout[]) {
   }, []);
 
   const deleteGoal = useCallback(async (exercise: string) => {
-    setGoals(prev => {
-      const updated = prev.filter(g => g.exercise !== exercise);
+    setGoals((prev) => {
+      const updated = prev.filter((g) => g.exercise !== exercise);
       storageService.deleteGoal(exercise).then(async () => {
         const stored = await storageService.getGoals();
         setGoals(stored || []);
@@ -112,8 +121,8 @@ export function useGoals(workouts: Workout[]) {
   }, []);
 
   const updateGoal = useCallback(async (goal: Goal) => {
-    setGoals(prev => {
-      const updated = prev.map(g => g.exercise === goal.exercise ? goal : g);
+    setGoals((prev) => {
+      const updated = prev.map((g) => (g.exercise === goal.exercise ? goal : g));
       storageService.saveGoal(goal).then(async () => {
         const stored = await storageService.getGoals();
         setGoals(stored || []);
@@ -122,19 +131,22 @@ export function useGoals(workouts: Workout[]) {
     });
   }, []);
 
-  const contextValue = useMemo(() => ({
-    goals,
-    loading,
-    error,
-    addGoal,
-    deleteGoal,
-    updateGoal,
-    setGoals,
-    getCurrentWeight,
-    suggestTargetWeight
-  }), [goals, loading, error, addGoal, deleteGoal, updateGoal]);
+  const contextValue = useMemo(
+    () => ({
+      goals,
+      loading,
+      error,
+      addGoal,
+      deleteGoal,
+      updateGoal,
+      setGoals,
+      getCurrentWeight,
+      suggestTargetWeight,
+    }),
+    [goals, loading, error, addGoal, deleteGoal, updateGoal],
+  );
 
   return contextValue;
 }
 
-export default useGoals; 
+export default useGoals;

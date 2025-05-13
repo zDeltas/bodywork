@@ -15,7 +15,14 @@ interface Props {
   onShowHistory: (key: MeasurementKey) => void;
 }
 
-const MeasurementModal: React.FC<Props> = ({ open, keyName, value, onClose, onSave, onShowHistory }) => {
+const MeasurementModal: React.FC<Props> = ({
+  open,
+  keyName,
+  value,
+  onClose,
+  onSave,
+  onShowHistory,
+}) => {
   const { theme } = useTheme();
   const { t } = useTranslation();
   const [input, setInput] = useState(value > 0 ? value.toString() : '');
@@ -46,11 +53,16 @@ const MeasurementModal: React.FC<Props> = ({ open, keyName, value, onClose, onSa
       statusBarTranslucent
     >
       <View style={[styles.overlay, { backgroundColor: 'rgba(0,0,0,0.7)' }]}>
-        <View style={[styles.content, {
-          backgroundColor: theme.colors.background.card,
-          borderRadius: theme.borderRadius.lg,
-          ...theme.shadows.lg
-        }]}>
+        <View
+          style={[
+            styles.content,
+            {
+              backgroundColor: theme.colors.background.card,
+              borderRadius: theme.borderRadius.lg,
+              ...theme.shadows.lg,
+            },
+          ]}
+        >
           <View style={styles.header}>
             <Ruler size={22} color={theme.colors.primary} />
             <Text style={[styles.title, { color: theme.colors.text.primary }]}>
@@ -68,11 +80,14 @@ const MeasurementModal: React.FC<Props> = ({ open, keyName, value, onClose, onSa
           <View style={styles.inputSection}>
             <View style={styles.inputContainer}>
               <TextInput
-                style={[styles.input, {
-                  color: theme.colors.text.primary,
-                  borderColor: theme.colors.border.default,
-                  backgroundColor: theme.colors.background.input
-                }]}
+                style={[
+                  styles.input,
+                  {
+                    color: theme.colors.text.primary,
+                    borderColor: theme.colors.border.default,
+                    backgroundColor: theme.colors.background.input,
+                  },
+                ]}
                 value={input}
                 onChangeText={handleInputChange}
                 keyboardType="numeric"
@@ -118,13 +133,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 24
+    padding: 24,
   },
   content: {
     width: '90%',
     maxWidth: 400,
     padding: 0,
-    overflow: 'hidden'
+    overflow: 'hidden',
   },
   header: {
     flexDirection: 'row',
@@ -132,23 +147,23 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0,0,0,0.1)'
+    borderBottomColor: 'rgba(0,0,0,0.1)',
   },
   title: {
     fontSize: 18,
     fontWeight: 'bold',
     flex: 1,
-    marginLeft: 10
+    marginLeft: 10,
   },
   closeButton: {
-    padding: 4
+    padding: 4,
   },
   inputSection: {
-    padding: 24
+    padding: 24,
   },
   inputContainer: {
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   input: {
     flex: 1,
@@ -156,16 +171,16 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 14,
     fontSize: 24,
-    textAlign: 'center'
+    textAlign: 'center',
   },
   unit: {
     marginLeft: 12,
-    fontSize: 18
+    fontSize: 18,
   },
   buttonContainer: {
     flexDirection: 'row',
     borderTopWidth: 1,
-    borderTopColor: 'rgba(0,0,0,0.1)'
+    borderTopColor: 'rgba(0,0,0,0.1)',
   },
   historyButton: {
     flex: 1,
@@ -174,14 +189,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRightWidth: 1,
-    borderRightColor: 'rgba(0,0,0,0.1)'
+    borderRightColor: 'rgba(0,0,0,0.1)',
   },
   saveButton: {
     flex: 1,
     padding: 16,
     justifyContent: 'center',
-    alignItems: 'center'
-  }
+    alignItems: 'center',
+  },
 });
 
-export default MeasurementModal; 
+export default MeasurementModal;

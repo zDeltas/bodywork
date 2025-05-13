@@ -51,7 +51,7 @@ const defaultValues: StorageData = {
     weightUnit: 'kg',
     gender: 'male',
     language: 'fr',
-    theme: 'dark'
+    theme: 'dark',
   },
   [StorageKeys.FAVORITE_EXERCISES]: [],
   [StorageKeys.RECENT_EXERCISES]: [],
@@ -68,7 +68,7 @@ class StorageService {
   async initialize(): Promise<void> {
     try {
       const version = await this.getItem<string>(StorageKeys.STORAGE_VERSION);
-      
+
       if (!version) {
         // Premier lancement, initialiser la version
         await this.setItem(StorageKeys.STORAGE_VERSION, CURRENT_STORAGE_VERSION);
@@ -77,7 +77,7 @@ class StorageService {
         await this.migrateStorage(version, CURRENT_STORAGE_VERSION);
       }
     } catch (error) {
-      console.error('Erreur lors de l\'initialisation du stockage:', error);
+      console.error("Erreur lors de l'initialisation du stockage:", error);
     }
   }
 
@@ -90,36 +90,36 @@ class StorageService {
       // Sauvegarder les paramètres et la version actuels
       const settings = await this.getSettings();
       const version = await this.getItem<string>(StorageKeys.STORAGE_VERSION);
-      
+
       // Clés à réinitialiser
       const keysToReset = [
         StorageKeys.WORKOUTS,
         StorageKeys.GOALS,
         StorageKeys.MEASUREMENTS,
         StorageKeys.FAVORITE_EXERCISES,
-        StorageKeys.RECENT_EXERCISES
+        StorageKeys.RECENT_EXERCISES,
       ];
-      
+
       // Supprimer les données
       await AsyncStorage.multiRemove(keysToReset);
-      
+
       // Réinitialiser avec les valeurs par défaut
       for (const key of keysToReset) {
         await this.setItem(key, defaultValues[key]);
       }
-      
+
       // Vérifier que les données ont bien été réinitialisées
       const allReset = await Promise.all(
         keysToReset.map(async (key) => {
           const value = await this.getItem(key);
           return Array.isArray(value) && value.length === 0;
-        })
+        }),
       );
-      
-      if (!allReset.every(reset => reset)) {
-        throw new Error('Certaines données n\'ont pas été correctement réinitialisées');
+
+      if (!allReset.every((reset) => reset)) {
+        throw new Error("Certaines données n'ont pas été correctement réinitialisées");
       }
-      
+
       console.log('Toutes les données ont été réinitialisées avec succès');
     } catch (error) {
       console.error('Erreur lors de la réinitialisation des données:', error);
@@ -172,7 +172,7 @@ class StorageService {
     try {
       await AsyncStorage.clear();
     } catch (error) {
-      console.error('Erreur lors de l\'effacement du stockage:', error);
+      console.error("Erreur lors de l'effacement du stockage:", error);
     }
   }
 
@@ -181,13 +181,13 @@ class StorageService {
    */
   private async migrateStorage(fromVersion: string, toVersion: string): Promise<void> {
     console.log(`Migration du stockage de la version ${fromVersion} vers ${toVersion}`);
-    
+
     // Implémentez ici la logique de migration entre les versions
     // Par exemple:
     // if (fromVersion === '1.0' && toVersion === '1.1') {
     //   // Migration spécifique de 1.0 à 1.1
     // }
-    
+
     // Mettre à jour la version
     await this.setItem(StorageKeys.STORAGE_VERSION, toVersion);
   }
@@ -200,20 +200,20 @@ class StorageService {
 
   async saveWorkout(workout: Workout): Promise<void> {
     const workouts = await this.getWorkouts();
-    const index = workouts.findIndex(w => w.id === workout.id);
-    
+    const index = workouts.findIndex((w) => w.id === workout.id);
+
     if (index !== -1) {
       workouts[index] = workout;
     } else {
       workouts.push(workout);
     }
-    
+
     await this.setItem(StorageKeys.WORKOUTS, workouts);
   }
 
   async deleteWorkout(id: string): Promise<void> {
     const workouts = await this.getWorkouts();
-    const filteredWorkouts = workouts.filter(w => w.id !== id);
+    const filteredWorkouts = workouts.filter((w) => w.id !== id);
     await this.setItem(StorageKeys.WORKOUTS, filteredWorkouts);
   }
 
@@ -225,20 +225,20 @@ class StorageService {
 
   async saveGoal(goal: Goal): Promise<void> {
     const goals = await this.getGoals();
-    const index = goals.findIndex(g => g.exercise === goal.exercise);
-    
+    const index = goals.findIndex((g) => g.exercise === goal.exercise);
+
     if (index !== -1) {
       goals[index] = goal;
     } else {
       goals.push(goal);
     }
-    
+
     await this.setItem(StorageKeys.GOALS, goals);
   }
 
   async deleteGoal(exercise: string): Promise<void> {
     const goals = await this.getGoals();
-    const filteredGoals = goals.filter(g => g.exercise !== exercise);
+    const filteredGoals = goals.filter((g) => g.exercise !== exercise);
     await this.setItem(StorageKeys.GOALS, filteredGoals);
   }
 
@@ -250,20 +250,20 @@ class StorageService {
 
   async saveMeasurement(measurement: Measurement): Promise<void> {
     const measurements = await this.getMeasurements();
-    const index = measurements.findIndex(m => m.id === measurement.id);
-    
+    const index = measurements.findIndex((m) => m.id === measurement.id);
+
     if (index !== -1) {
       measurements[index] = measurement;
     } else {
       measurements.push(measurement);
     }
-    
+
     await this.setItem(StorageKeys.MEASUREMENTS, measurements);
   }
 
   async deleteMeasurement(id: string): Promise<void> {
     const measurements = await this.getMeasurements();
-    const filteredMeasurements = measurements.filter(m => m.id !== id);
+    const filteredMeasurements = measurements.filter((m) => m.id !== id);
     await this.setItem(StorageKeys.MEASUREMENTS, filteredMeasurements);
   }
 
@@ -297,7 +297,7 @@ class StorageService {
 
   async removeFavoriteExercise(exercise: string): Promise<string[]> {
     const favorites = await this.getFavoriteExercises();
-    const updatedFavorites = favorites.filter(e => e !== exercise);
+    const updatedFavorites = favorites.filter((e) => e !== exercise);
     await this.setItem(StorageKeys.FAVORITE_EXERCISES, updatedFavorites);
     return updatedFavorites;
   }
@@ -311,7 +311,7 @@ class StorageService {
   async addRecentExercise(exercise: string): Promise<string[]> {
     const recents = await this.getRecentExercises();
     // Supprimer l'exercice s'il existe déjà pour le mettre en tête de liste
-    const filteredRecents = recents.filter(e => e !== exercise);
+    const filteredRecents = recents.filter((e) => e !== exercise);
     // Limiter à 10 exercices récents
     const updatedRecents = [exercise, ...filteredRecents].slice(0, 10);
     await this.setItem(StorageKeys.RECENT_EXERCISES, updatedRecents);
@@ -321,4 +321,4 @@ class StorageService {
 
 // Export d'une instance unique du service
 export const storageService = new StorageService();
-export default storageService; 
+export default storageService;

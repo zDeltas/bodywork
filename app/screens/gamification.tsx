@@ -97,20 +97,20 @@ const useStyles = () => {
   return StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: theme.colors.background.main
+      backgroundColor: theme.colors.background.main,
     },
     content: {
       flex: 1,
-      padding: theme.spacing.lg
+      padding: theme.spacing.lg,
     },
     section: {
-      marginBottom: theme.spacing.xl
+      marginBottom: theme.spacing.xl,
     },
     sectionTitle: {
       fontSize: theme.typography.fontSize.lg,
       fontFamily: theme.typography.fontFamily.bold,
       color: theme.colors.primary,
-      marginBottom: theme.spacing.md
+      marginBottom: theme.spacing.md,
     },
     challengeCard: {
       backgroundColor: theme.colors.background.card,
@@ -118,46 +118,46 @@ const useStyles = () => {
       padding: theme.spacing.lg,
       marginBottom: theme.spacing.md,
       borderWidth: 1,
-      borderColor: theme.colors.border.default
+      borderColor: theme.colors.border.default,
     },
     challengeHeader: {
       flexDirection: 'row',
       alignItems: 'center',
-      marginBottom: theme.spacing.md
+      marginBottom: theme.spacing.md,
     },
     challengeName: {
       fontSize: theme.typography.fontSize.base,
       fontFamily: theme.typography.fontFamily.semiBold,
       color: theme.colors.text.primary,
-      marginLeft: theme.spacing.md
+      marginLeft: theme.spacing.md,
     },
     challengeProgress: {
-      marginTop: theme.spacing.sm
+      marginTop: theme.spacing.sm,
     },
     progressBar: {
       height: 8,
       backgroundColor: theme.colors.background.main,
       borderRadius: theme.borderRadius.full,
-      overflow: 'hidden'
+      overflow: 'hidden',
     },
     progressFill: {
       height: '100%',
       backgroundColor: theme.colors.primary,
-      borderRadius: theme.borderRadius.full
+      borderRadius: theme.borderRadius.full,
     },
     progressText: {
       fontSize: theme.typography.fontSize.sm,
       color: theme.colors.text.secondary,
       marginTop: theme.spacing.xs,
-      textAlign: 'right'
+      textAlign: 'right',
     },
     badgesContainer: {
       flexDirection: 'row',
       justifyContent: 'space-around',
-      marginBottom: theme.spacing.lg
+      marginBottom: theme.spacing.lg,
     },
     badgeItem: {
-      alignItems: 'center'
+      alignItems: 'center',
     },
     badgeIcon: {
       width: 64,
@@ -167,13 +167,13 @@ const useStyles = () => {
       alignItems: 'center',
       marginBottom: theme.spacing.sm,
       borderWidth: 1,
-      borderColor: theme.colors.border.default
+      borderColor: theme.colors.border.default,
     },
     badgeLabel: {
       fontSize: theme.typography.fontSize.sm,
       color: theme.colors.text.secondary,
-      fontFamily: theme.typography.fontFamily.regular
-    }
+      fontFamily: theme.typography.fontFamily.regular,
+    },
   });
 };
 

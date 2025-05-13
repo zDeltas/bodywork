@@ -21,19 +21,19 @@ interface StatsMuscleDistributionProps {
 }
 
 export default function StatsMuscleDistribution({
-                                                  fadeAnim,
-                                                  selectedPeriod,
-                                                  setSelectedPeriod,
-                                                  graphsSectionRef,
-                                                  muscleGroups
-                                                }: StatsMuscleDistributionProps) {
+  fadeAnim,
+  selectedPeriod,
+  setSelectedPeriod,
+  graphsSectionRef,
+  muscleGroups,
+}: StatsMuscleDistributionProps) {
   const { t } = useTranslation();
   const { theme } = useTheme();
 
   const styles = StyleSheet.create({
     container: {
-      marginBottom: theme.spacing.xl
-    }
+      marginBottom: theme.spacing.xl,
+    },
   });
 
   return (
@@ -47,4 +47,4 @@ export default function StatsMuscleDistribution({
       />
     </View>
   );
-} 
+}

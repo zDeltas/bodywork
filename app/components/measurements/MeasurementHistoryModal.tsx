@@ -43,16 +43,21 @@ const MeasurementHistoryModal: React.FC<Props> = ({ open, keyName, onClose, hist
       statusBarTranslucent
     >
       <View style={[styles.overlay, { backgroundColor: 'rgba(0,0,0,0.7)' }]}>
-        <View style={[styles.content, {
-          backgroundColor: theme.colors.background.card,
-          borderRadius: theme.borderRadius.lg
-        }]}>
+        <View
+          style={[
+            styles.content,
+            {
+              backgroundColor: theme.colors.background.card,
+              borderRadius: theme.borderRadius.lg,
+            },
+          ]}
+        >
           <Text style={[styles.title, { color: theme.colors.text.primary }]}>
             {getTitle(keyName)} - {t('measurements.history')}
           </Text>
           <FlatList
             data={history}
-            keyExtractor={item => item.date}
+            keyExtractor={(item) => item.date}
             renderItem={({ item }) => (
               <View style={styles.row}>
                 <Text style={{ color: theme.colors.text.primary }}>{item.date}</Text>
@@ -61,10 +66,17 @@ const MeasurementHistoryModal: React.FC<Props> = ({ open, keyName, onClose, hist
                 </Text>
               </View>
             )}
-            ListEmptyComponent={<Text style={{ color: theme.colors.text.secondary }}>{t('measurements.noData')}</Text>}
+            ListEmptyComponent={
+              <Text style={{ color: theme.colors.text.secondary }}>{t('measurements.noData')}</Text>
+            }
           />
-          <TouchableOpacity style={[styles.button, { backgroundColor: theme.colors.primary }]} onPress={onClose}>
-            <Text style={{ color: theme.colors.text.primary, textAlign: 'center' }}>{t('common.close')}</Text>
+          <TouchableOpacity
+            style={[styles.button, { backgroundColor: theme.colors.primary }]}
+            onPress={onClose}
+          >
+            <Text style={{ color: theme.colors.text.primary, textAlign: 'center' }}>
+              {t('common.close')}
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -77,28 +89,28 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 24
+    padding: 24,
   },
   content: {
     width: '100%',
     maxWidth: 400,
-    padding: 24
+    padding: 24,
   },
   title: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 16
+    marginBottom: 16,
   },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 8
+    marginBottom: 8,
   },
   button: {
     marginTop: 16,
     padding: 12,
-    borderRadius: 10
-  }
+    borderRadius: 10,
+  },
 });
 
-export default MeasurementHistoryModal; 
+export default MeasurementHistoryModal;

@@ -19,7 +19,7 @@ export default {
     use: 'Use',
     select: 'Select',
     note: 'Note',
-    custom: 'Custom'
+    custom: 'Custom',
   },
 
   // Settings screen
@@ -48,19 +48,20 @@ export default {
     resetData: 'Reset Data',
     resetDataConfirmation: 'Are you sure you want to reset all data? This action cannot be undone.',
     dataResetSuccess: 'All data has been successfully reset.',
-    errorResettingData: 'An error occurred while resetting the data.'
+    errorResettingData: 'An error occurred while resetting the data.',
   },
 
   // About section
   about: {
     title: 'BodyWork',
     version: 'Version 1.0.0',
-    description: 'An application to track your workouts, measure your progress and achieve your fitness goals.',
+    description:
+      'An application to track your workouts, measure your progress and achieve your fitness goals.',
     developer: 'Developer',
     contact: 'Contact',
     website: 'Website',
     privacyPolicy: 'Privacy Policy',
-    termsOfService: 'Terms of Service'
+    termsOfService: 'Terms of Service',
   },
 
   // Contact section
@@ -79,8 +80,8 @@ export default {
       nameRequired: 'Name is required',
       emailRequired: 'Email is required',
       emailInvalid: 'Email is invalid',
-      messageRequired: 'Message is required'
-    }
+      messageRequired: 'Message is required',
+    },
   },
 
   // Muscle Map
@@ -90,7 +91,7 @@ export default {
     muscleRestState: 'Muscle rest state',
     restPeriod0to24: '0-24h',
     restPeriod24to72: '24-72h',
-    restPeriod72plus: '72h+'
+    restPeriod72plus: '72h+',
   },
 
   // Workout screen
@@ -123,7 +124,7 @@ export default {
     usePreviousValues: 'Use previous values',
     notApplicable: 'N/A',
     selectDate: 'Select a date',
-    duplicateLastSeries: 'Duplicate last series'
+    duplicateLastSeries: 'Duplicate last series',
   },
 
   // Timer screen
@@ -142,7 +143,7 @@ export default {
     standard: 'Standard',
     long: 'Long',
     veryLong: 'Very Long',
-    series: 'Series'
+    series: 'Series',
   },
 
   // Stats screen
@@ -176,7 +177,7 @@ export default {
     selectExercise: 'Select an exercise',
     allExercises: 'All exercises',
     volume: 'Volume',
-    repetitions: 'Repetitions'
+    repetitions: 'Repetitions',
   },
 
   // Goals
@@ -193,20 +194,21 @@ export default {
     useLastWorkout: 'Use Last Workout',
     useSuggested: 'Use Suggested',
     exerciseNotFound: 'Exercise Not Found',
-    exerciseNotFoundMessage: 'You need to have workout history for this exercise before setting a goal.',
+    exerciseNotFoundMessage:
+      'You need to have workout history for this exercise before setting a goal.',
     pleaseCompleteAllFields: 'Please complete all fields',
     invalidWeightValues: 'Invalid weight values',
     errorSavingGoal: 'Error saving goal',
     goalDetails: 'Goal Details',
     currentWeightDescription: 'Current weight',
-    targetWeightDescription: 'Target weight'
+    targetWeightDescription: 'Target weight',
   },
 
   // Time periods
   periods: {
     oneMonth: '1 month',
     threeMonths: '3 months',
-    sixMonths: '6 months'
+    sixMonths: '6 months',
   },
 
   // Exercise selector
@@ -217,7 +219,7 @@ export default {
     noFavorites: 'No favorite exercises yet',
     noRecentExercises: 'No recent exercises',
     searchResults: 'Search Results',
-    noExercisesInGroup: 'No exercises available in this muscle group'
+    noExercisesInGroup: 'No exercises available in this muscle group',
   },
 
   // Muscle groups
@@ -231,7 +233,7 @@ export default {
     triceps: 'Triceps',
     core: 'Core',
     cardio: 'Cardio',
-    other: 'Other'
+    other: 'Other',
   },
 
   // Measurements screen
@@ -255,13 +257,13 @@ export default {
     noDataForSelection: 'No data for this selection',
     inputMode: 'Input',
     historyMode: 'History',
-    lastUpdate: 'Last update'
+    lastUpdate: 'Last update',
   },
 
   // Exercise details screen
   exerciseDetails: {
     estimated_1rm: 'Estimated 1RM',
-    last_session: 'Last Session'
+    last_session: 'Last Session',
   },
 
   // Exercise names - Chest
@@ -332,7 +334,7 @@ export default {
       title: 'Follow us on Instagram',
       message: 'Would you like to follow us on Instagram?',
       follow: 'Follow us',
-      later: 'Later'
+      later: 'Later',
     },
     auth: {
       title: 'Sign in',
@@ -342,14 +344,14 @@ export default {
       continueWithGoogle: 'Continue with Google',
       continueWithApple: 'Continue with Apple',
       continueWithEmail: 'Continue with Email',
-      notSignedIn: 'Not signed in'
+      notSignedIn: 'Not signed in',
     },
     challenges: {
       title: 'Challenges',
       comingSoon: 'Coming Soon',
       description: 'Complete challenges to earn badges and track your progress!',
       locked: 'Locked',
-      unlocked: 'Unlocked'
-    }
-  }
+      unlocked: 'Unlocked',
+    },
+  },
 };

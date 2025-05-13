@@ -18,7 +18,7 @@ export default function ContactModal({ isVisible, onClose }: ContactModalProps) 
   const [contactForm, setContactForm] = useState({
     name: '',
     email: '',
-    message: ''
+    message: '',
   });
   const [isSending, setIsSending] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
@@ -49,12 +49,12 @@ export default function ContactModal({ isVisible, onClose }: ContactModalProps) 
       const response = await fetch('/api/send-email', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           ...contactForm,
-          to: 'mon-adresse@example.com'
-        })
+          to: 'mon-adresse@example.com',
+        }),
       });
 
       if (!response.ok) {
@@ -89,13 +89,11 @@ export default function ContactModal({ isVisible, onClose }: ContactModalProps) 
             <TextInput
               style={[styles.input, formErrors.name && styles.inputError]}
               value={contactForm.name}
-              onChangeText={(text) => setContactForm(prev => ({ ...prev, name: text }))}
+              onChangeText={(text) => setContactForm((prev) => ({ ...prev, name: text }))}
               placeholder={t('contact.namePlaceholder')}
               placeholderTextColor={theme.colors.text.secondary}
             />
-            {formErrors.name && (
-              <Text style={styles.errorText}>{formErrors.name}</Text>
-            )}
+            {formErrors.name && <Text style={styles.errorText}>{formErrors.name}</Text>}
           </View>
 
           <View style={styles.formGroup}>
@@ -103,15 +101,13 @@ export default function ContactModal({ isVisible, onClose }: ContactModalProps) 
             <TextInput
               style={[styles.input, formErrors.email && styles.inputError]}
               value={contactForm.email}
-              onChangeText={(text) => setContactForm(prev => ({ ...prev, email: text }))}
+              onChangeText={(text) => setContactForm((prev) => ({ ...prev, email: text }))}
               placeholder={t('contact.emailPlaceholder')}
               placeholderTextColor={theme.colors.text.secondary}
               keyboardType="email-address"
               autoCapitalize="none"
             />
-            {formErrors.email && (
-              <Text style={styles.errorText}>{formErrors.email}</Text>
-            )}
+            {formErrors.email && <Text style={styles.errorText}>{formErrors.email}</Text>}
           </View>
 
           <View style={styles.formGroup}>
@@ -119,16 +115,14 @@ export default function ContactModal({ isVisible, onClose }: ContactModalProps) 
             <TextInput
               style={[styles.textArea, formErrors.message && styles.inputError]}
               value={contactForm.message}
-              onChangeText={(text) => setContactForm(prev => ({ ...prev, message: text }))}
+              onChangeText={(text) => setContactForm((prev) => ({ ...prev, message: text }))}
               placeholder={t('contact.messagePlaceholder')}
               placeholderTextColor={theme.colors.text.secondary}
               multiline
               numberOfLines={4}
               textAlignVertical="top"
             />
-            {formErrors.message && (
-              <Text style={styles.errorText}>{formErrors.message}</Text>
-            )}
+            {formErrors.message && <Text style={styles.errorText}>{formErrors.message}</Text>}
           </View>
 
           <View style={styles.modalButtons}>
@@ -145,7 +139,11 @@ export default function ContactModal({ isVisible, onClose }: ContactModalProps) 
               onPress={handleSubmit}
               disabled={isSending}
               style={styles.modalButton}
-              icon={isSending ? <ActivityIndicator size="small" color={theme.colors.text.primary} /> : undefined}
+              icon={
+                isSending ? (
+                  <ActivityIndicator size="small" color={theme.colors.text.primary} />
+                ) : undefined
+              }
             />
           </View>
         </View>
@@ -166,7 +164,7 @@ const useStyles = () => {
       bottom: 0,
       justifyContent: 'center',
       alignItems: 'center',
-      padding: theme.spacing.lg
+      padding: theme.spacing.lg,
     },
     modalContent: {
       backgroundColor: theme.colors.background.card,
@@ -176,23 +174,23 @@ const useStyles = () => {
       maxWidth: 500,
       borderWidth: 1,
       borderColor: theme.colors.border.default,
-      ...theme.shadows.lg
+      ...theme.shadows.lg,
     },
     modalTitle: {
       fontSize: theme.typography.fontSize.xl,
       fontFamily: theme.typography.fontFamily.bold,
       color: theme.colors.text.primary,
       marginBottom: theme.spacing.lg,
-      textAlign: 'center'
+      textAlign: 'center',
     },
     formGroup: {
-      marginBottom: theme.spacing.md
+      marginBottom: theme.spacing.md,
     },
     label: {
       fontSize: theme.typography.fontSize.base,
       color: theme.colors.text.primary,
       marginBottom: theme.spacing.xs,
-      fontFamily: theme.typography.fontFamily.semiBold
+      fontFamily: theme.typography.fontFamily.semiBold,
     },
     input: {
       backgroundColor: theme.colors.background.main,
@@ -202,7 +200,7 @@ const useStyles = () => {
       color: theme.colors.text.primary,
       borderWidth: 1,
       borderColor: theme.colors.border.default,
-      fontFamily: theme.typography.fontFamily.regular
+      fontFamily: theme.typography.fontFamily.regular,
     },
     textArea: {
       backgroundColor: theme.colors.background.main,
@@ -213,28 +211,28 @@ const useStyles = () => {
       borderWidth: 1,
       borderColor: theme.colors.border.default,
       fontFamily: theme.typography.fontFamily.regular,
-      minHeight: 100
+      minHeight: 100,
     },
     inputError: {
-      borderColor: theme.colors.error
+      borderColor: theme.colors.error,
     },
     errorText: {
       color: theme.colors.error,
       fontSize: theme.typography.fontSize.sm,
       marginTop: theme.spacing.xs,
-      fontFamily: theme.typography.fontFamily.regular
+      fontFamily: theme.typography.fontFamily.regular,
     },
     modalButtons: {
       flexDirection: 'row',
       justifyContent: 'space-between',
-      marginTop: theme.spacing.lg
+      marginTop: theme.spacing.lg,
     },
     modalButton: {
       flex: 1,
       paddingVertical: theme.spacing.md,
       borderRadius: theme.borderRadius.md,
       alignItems: 'center',
-      justifyContent: 'center'
-    }
+      justifyContent: 'center',
+    },
   });
 };

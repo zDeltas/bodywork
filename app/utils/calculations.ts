@@ -1,5 +1,5 @@
 const calculateEstimated1RM = (weight: number, reps: number): number => {
-  return Math.round(weight * (1 + (reps / 30)));
+  return Math.round(weight * (1 + reps / 30));
 };
 
 const calculateVolume = (weight: number, reps: number, sets: number): number => {
@@ -8,7 +8,7 @@ const calculateVolume = (weight: number, reps: number, sets: number): number => 
 
 const calculations = {
   calculateEstimated1RM,
-  calculateVolume
+  calculateVolume,
 };
 
-export default calculations; 
+export default calculations;

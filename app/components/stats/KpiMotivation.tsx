@@ -7,7 +7,7 @@ import Text from '@/app/components/ui/Text';
 
 interface KpiMotivationProps {
   fadeAnim: Animated.Value;
-  bestProgressExercise: { progress: number, exercise: string } | null;
+  bestProgressExercise: { progress: number; exercise: string } | null;
   monthlyProgress: number;
   trainingFrequency: number;
   totalSets: number;
@@ -15,13 +15,13 @@ interface KpiMotivationProps {
 }
 
 const KpiMotivation: React.FC<KpiMotivationProps> = ({
-                                                       fadeAnim,
-                                                       bestProgressExercise,
-                                                       monthlyProgress,
-                                                       trainingFrequency,
-                                                       totalSets,
-                                                       totalWorkouts
-                                                     }) => {
+  fadeAnim,
+  bestProgressExercise,
+  monthlyProgress,
+  trainingFrequency,
+  totalSets,
+  totalWorkouts,
+}) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
 
@@ -30,7 +30,7 @@ const KpiMotivation: React.FC<KpiMotivationProps> = ({
       style={[
         styles.card,
         { marginHorizontal: theme.spacing.lg },
-        { opacity: fadeAnim, transform: [{ scale: fadeAnim }] }
+        { opacity: fadeAnim, transform: [{ scale: fadeAnim }] },
       ]}
     >
       <LinearGradient
@@ -41,14 +41,19 @@ const KpiMotivation: React.FC<KpiMotivationProps> = ({
       >
         <Text
           variant="subheading"
-          style={[styles.kpiLabel, {
-            marginBottom: theme.spacing.base,
-            color: theme.colors.text.primary,
-            textAlign: 'left'
-          }]}
+          style={[
+            styles.kpiLabel,
+            {
+              marginBottom: theme.spacing.base,
+              color: theme.colors.text.primary,
+              textAlign: 'left',
+            },
+          ]}
         >
           {bestProgressExercise && bestProgressExercise.progress && bestProgressExercise.exercise
-            ? t('stats.progressionText').replace('{progress}', bestProgressExercise.progress.toString()).replace('{exercise}', bestProgressExercise.exercise)
+            ? t('stats.progressionText')
+                .replace('{progress}', bestProgressExercise.progress.toString())
+                .replace('{exercise}', bestProgressExercise.exercise)
             : monthlyProgress > 0
               ? t('stats.progressionTextMonth').replace('{progress}', monthlyProgress.toString())
               : t('stats.progressionTextNone')}
@@ -80,30 +85,30 @@ const KpiMotivation: React.FC<KpiMotivationProps> = ({
 
 const styles = StyleSheet.create({
   card: {
-    marginBottom: 20
+    marginBottom: 20,
   },
   statGradient: {
     padding: 20,
-    borderRadius: 16
+    borderRadius: 16,
   },
   kpiContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 10
+    marginTop: 10,
   },
   kpiItem: {
-    alignItems: 'center'
+    alignItems: 'center',
   },
   kpiValue: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#fff'
+    color: '#fff',
   },
   kpiLabel: {
     fontSize: 14,
     color: '#fff',
-    opacity: 0.8
-  }
+    opacity: 0.8,
+  },
 });
 
 export default KpiMotivation;

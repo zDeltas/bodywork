@@ -5,7 +5,7 @@ import Skeleton from './Skeleton';
 
 export const WorkoutCardSkeleton = () => {
   const { theme } = useTheme();
-  
+
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background.card }]}>
       <Skeleton height={24} width="60%" style={styles.title} />
@@ -21,7 +21,7 @@ export const WorkoutCardSkeleton = () => {
 
 export const ExerciseCardSkeleton = () => {
   const { theme } = useTheme();
-  
+
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background.card }]}>
       <Skeleton height={24} width="70%" style={styles.title} />
@@ -36,7 +36,7 @@ export const ExerciseCardSkeleton = () => {
 
 export const StatsCardSkeleton = () => {
   const { theme } = useTheme();
-  
+
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background.card }]}>
       <Skeleton height={20} width="40%" style={styles.title} />
@@ -47,7 +47,7 @@ export const StatsCardSkeleton = () => {
 
 export const ChartSkeleton = () => {
   const { theme } = useTheme();
-  
+
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background.card }]}>
       <Skeleton height={24} width="50%" style={styles.title} />
@@ -87,7 +87,7 @@ const SkeletonComponents = {
   WorkoutCardSkeleton,
   ExerciseCardSkeleton,
   StatsCardSkeleton,
-  ChartSkeleton
+  ChartSkeleton,
 };
 
-export default SkeletonComponents; 
+export default SkeletonComponents;

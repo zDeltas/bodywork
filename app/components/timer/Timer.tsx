@@ -3,7 +3,7 @@ import { Platform, StyleSheet, Vibration, View, ViewStyle } from 'react-native';
 import {
   Inter_400Regular as InterRegular,
   Inter_600SemiBold as InterSemiBold,
-  useFonts
+  useFonts,
 } from '@expo-google-fonts/inter';
 import { Minus, Pause, Play, Plus, RotateCcw } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
@@ -24,14 +24,14 @@ interface TimerProps {
 }
 
 export default function Timer({
-                                initialTime = 60,
-                                mode = 'timer',
-                                onComplete,
-                                sets = 1,
-                                restTime = 60,
-                                exerciseName = 'Exercise',
-                                onSetsChange
-                              }: TimerProps) {
+  initialTime = 60,
+  mode = 'timer',
+  onComplete,
+  sets = 1,
+  restTime = 60,
+  exerciseName = 'Exercise',
+  onSetsChange,
+}: TimerProps) {
   const { t } = useTranslation();
   const { theme } = useTheme();
   const styles = useStyles();
@@ -42,7 +42,7 @@ export default function Timer({
   const [isResting, setIsResting] = useState(false);
   const [fontsLoaded] = useFonts({
     'Inter-Regular': InterRegular,
-    'Inter-SemiBold': InterSemiBold
+    'Inter-SemiBold': InterSemiBold,
   });
 
   const handleWorkComplete = useCallback(() => {
@@ -67,7 +67,7 @@ export default function Timer({
       Vibration.vibrate([0, 500, 200, 500]);
     }
     setIsResting(false);
-    setCurrentSet(prev => prev + 1);
+    setCurrentSet((prev) => prev + 1);
     if (currentSet < sets) {
       setWorkTime(initialTime);
     } else {
@@ -76,14 +76,17 @@ export default function Timer({
     }
   }, [currentSet, sets, initialTime, onComplete]);
 
-  const handleSetChange = useCallback((newSets: number) => {
-    const updatedSets = Math.max(1, newSets);
-    onSetsChange?.(updatedSets);
-    if (currentSet > updatedSets) {
-      setCurrentSet(updatedSets);
-    }
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-  }, [currentSet, onSetsChange]);
+  const handleSetChange = useCallback(
+    (newSets: number) => {
+      const updatedSets = Math.max(1, newSets);
+      onSetsChange?.(updatedSets);
+      if (currentSet > updatedSets) {
+        setCurrentSet(updatedSets);
+      }
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    },
+    [currentSet, onSetsChange],
+  );
 
   useEffect(() => {
     if (!isRunning) {
@@ -98,7 +101,7 @@ export default function Timer({
     if (isRunning) {
       interval = setInterval(() => {
         if (isResting) {
-          setRestTimeState(prev => {
+          setRestTimeState((prev) => {
             if (prev <= 1) {
               handleRestComplete();
               return restTime;
@@ -107,7 +110,7 @@ export default function Timer({
           });
         } else {
           if (mode === 'timer') {
-            setWorkTime(prev => {
+            setWorkTime((prev) => {
               if (prev <= 1) {
                 handleWorkComplete();
                 return initialTime;
@@ -115,7 +118,7 @@ export default function Timer({
               return prev - 1;
             });
           } else {
-            setWorkTime(prev => prev + 1);
+            setWorkTime((prev) => prev + 1);
           }
         }
       }, 1000);
@@ -155,7 +158,10 @@ export default function Timer({
         exiting={FadeOut.duration(300)}
         style={[
           styles.content,
-          { backgroundColor: isResting ? theme.colors.error : theme.colors.success, borderRadius: 28 }
+          {
+            backgroundColor: isResting ? theme.colors.error : theme.colors.success,
+            borderRadius: 28,
+          },
         ]}
       >
         <View style={styles.contentInner}>
@@ -167,19 +173,20 @@ export default function Timer({
             <Button
               variant="icon"
               icon={<Minus size={16} color={theme.colors.background.main} />}
-              onPress={() => setCurrentSet(prev => Math.max(1, prev - 1))}
+              onPress={() => setCurrentSet((prev) => Math.max(1, prev - 1))}
               disabled={currentSet <= 1}
               style={{ ...styles.setButton, opacity: currentSet <= 1 ? 0.5 : 1 }}
             />
 
             <Text style={[styles.setInfo, { color: theme.colors.background.main }]}>
-              {typeof t('timer.series') === 'string' ? String(t('timer.series')) : 'Series'} {currentSet}/{sets}
+              {typeof t('timer.series') === 'string' ? String(t('timer.series')) : 'Series'}{' '}
+              {currentSet}/{sets}
             </Text>
 
             <Button
               variant="icon"
               icon={<Plus size={16} color={theme.colors.background.main} />}
-              onPress={() => setCurrentSet(prev => Math.min(sets, prev + 1))}
+              onPress={() => setCurrentSet((prev) => Math.min(sets, prev + 1))}
               disabled={currentSet >= sets}
               style={{ ...styles.setButton, opacity: currentSet >= sets ? 0.5 : 1 }}
             />
@@ -194,9 +201,18 @@ export default function Timer({
       <View style={styles.controls}>
         <Button
           variant="primary"
-          icon={isRunning ? <Pause size={24} color={theme.colors.background.main} /> : <Play size={24} color={theme.colors.background.main} />}
+          icon={
+            isRunning ? (
+              <Pause size={24} color={theme.colors.background.main} />
+            ) : (
+              <Play size={24} color={theme.colors.background.main} />
+            )
+          }
           onPress={toggleTimer}
-          style={{ ...styles.button, backgroundColor: isRunning ? theme.colors.error : theme.colors.success }}
+          style={{
+            ...styles.button,
+            backgroundColor: isRunning ? theme.colors.error : theme.colors.success,
+          }}
         />
 
         <Button
@@ -219,7 +235,7 @@ const useStyles = () => {
       justifyContent: 'center',
       alignItems: 'center',
       width: '100%',
-      gap: 24
+      gap: 24,
     },
     content: {
       width: '100%',
@@ -230,23 +246,23 @@ const useStyles = () => {
           shadowColor: '#000',
           shadowOffset: { width: 0, height: 4 },
           shadowOpacity: 0.15,
-          shadowRadius: 12
+          shadowRadius: 12,
         },
         android: {
-          elevation: 8
-        }
-      })
+          elevation: 8,
+        },
+      }),
     },
     contentInner: {
       alignItems: 'center',
-      gap: 12
+      gap: 12,
     },
     setsContainer: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
       gap: 12,
-      marginVertical: 4
+      marginVertical: 4,
     },
     setButton: {
       width: 28,
@@ -254,32 +270,32 @@ const useStyles = () => {
       borderRadius: 14,
       backgroundColor: 'rgba(255, 255, 255, 0.2)',
       justifyContent: 'center',
-      alignItems: 'center'
+      alignItems: 'center',
     },
     setInfo: {
       fontSize: Platform.OS === 'ios' ? 22 : 20,
       fontWeight: '600',
       opacity: 0.9,
       textAlign: 'center',
-      minWidth: 100
+      minWidth: 100,
     },
     time: {
       fontSize: Platform.OS === 'ios' ? 72 : 64,
       fontWeight: '700',
       textAlign: 'center',
       includeFontPadding: false,
-      lineHeight: Platform.OS === 'ios' ? 84 : 76
+      lineHeight: Platform.OS === 'ios' ? 84 : 76,
     },
     phaseText: {
       fontSize: Platform.OS === 'ios' ? 24 : 22,
       fontWeight: '600',
       textTransform: 'uppercase',
-      letterSpacing: 1
+      letterSpacing: 1,
     },
     controls: {
       flexDirection: 'row',
       justifyContent: 'center',
-      gap: 16
+      gap: 16,
     },
     button: {
       width: 56,
@@ -292,12 +308,12 @@ const useStyles = () => {
           shadowColor: '#000',
           shadowOffset: { width: 0, height: 2 },
           shadowOpacity: 0.15,
-          shadowRadius: 6
+          shadowRadius: 6,
         },
         android: {
-          elevation: 4
-        }
-      })
-    }
+          elevation: 4,
+        },
+      }),
+    },
   });
 };

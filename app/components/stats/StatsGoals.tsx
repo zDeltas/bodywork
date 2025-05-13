@@ -7,11 +7,12 @@ interface StatsGoalsProps {
   fadeAnim: Animated.Value;
 }
 
-const createStyles = (theme: any) => StyleSheet.create({
-  container: {
-    marginBottom: theme.spacing.xl
-  }
-});
+const createStyles = (theme: any) =>
+  StyleSheet.create({
+    container: {
+      marginBottom: theme.spacing.xl,
+    },
+  });
 
 export default function StatsGoals({ fadeAnim }: StatsGoalsProps) {
   const { theme } = useTheme();
@@ -22,4 +23,4 @@ export default function StatsGoals({ fadeAnim }: StatsGoalsProps) {
       <GoalSection fadeAnim={fadeAnim} />
     </View>
   );
-} 
+}

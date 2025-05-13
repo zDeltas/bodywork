@@ -19,7 +19,7 @@ export default {
     use: 'Utiliser',
     select: 'Sélectionner',
     note: 'Note',
-    custom: 'Personnalisé'
+    custom: 'Personnalisé',
   },
 
   // Profile screen
@@ -31,35 +31,36 @@ export default {
     exportData: 'Exporter les données',
     resetData: 'Réinitialiser les données',
     social: 'Social',
-    share: 'Partager l\'application',
-    rate: 'Évaluer l\'application',
+    share: "Partager l'application",
+    rate: "Évaluer l'application",
     settings: 'Paramètres',
-    appSettings: 'Paramètres de l\'application',
+    appSettings: "Paramètres de l'application",
     instagram: 'Instagram',
     instagramHandle: '@gainiziapp',
     instagramModal: {
       title: 'Suivez-nous sur Instagram',
       message: 'Voulez-vous nous suivre sur Instagram ?',
       follow: 'Nous suivre',
-      later: 'Plus tard'
+      later: 'Plus tard',
     },
     auth: {
       title: 'Connexion',
-      description: 'Connectez-vous pour synchroniser vos données et accéder à toutes les fonctionnalités',
+      description:
+        'Connectez-vous pour synchroniser vos données et accéder à toutes les fonctionnalités',
       signIn: 'Se connecter',
       signOut: 'Se déconnecter',
       continueWithGoogle: 'Continuer avec Google',
       continueWithApple: 'Continuer avec Apple',
       continueWithEmail: 'Continuer avec Email',
-      notSignedIn: 'Non connecté'
+      notSignedIn: 'Non connecté',
     },
     challenges: {
       title: 'Défis',
       comingSoon: 'Bientôt disponible',
       description: 'Complétez des défis pour gagner des badges et suivre votre progression !',
       locked: 'Verrouillé',
-      unlocked: 'Débloqué'
-    }
+      unlocked: 'Débloqué',
+    },
   },
 
   // Settings screen
@@ -71,8 +72,8 @@ export default {
     exportToCSV: 'Exporter en CSV',
     noWorkoutsToExport: 'Aucun entraînement à exporter',
     exportSuccess: 'Export réussi',
-    sharingNotAvailable: 'Le partage n\'est pas disponible sur cet appareil',
-    exportError: 'Erreur lors de l\'export',
+    sharingNotAvailable: "Le partage n'est pas disponible sur cet appareil",
+    exportError: "Erreur lors de l'export",
     gender: 'Genre',
     male: 'Homme',
     female: 'Femme',
@@ -86,21 +87,23 @@ export default {
     dark: 'Sombre',
     light: 'Clair',
     resetData: 'Réinitialiser les données',
-    resetDataConfirmation: 'Êtes-vous sûr de vouloir réinitialiser toutes les données ? Cette action est irréversible.',
+    resetDataConfirmation:
+      'Êtes-vous sûr de vouloir réinitialiser toutes les données ? Cette action est irréversible.',
     dataResetSuccess: 'Toutes les données ont été réinitialisées avec succès.',
-    errorResettingData: 'Une erreur est survenue lors de la réinitialisation des données.'
+    errorResettingData: 'Une erreur est survenue lors de la réinitialisation des données.',
   },
 
   // About section
   about: {
     title: 'BodyWork',
     version: 'Version 1.0.0',
-    description: 'Une application pour suivre vos entraînements, mesurer vos progrès et atteindre vos objectifs de remise en forme.',
+    description:
+      'Une application pour suivre vos entraînements, mesurer vos progrès et atteindre vos objectifs de remise en forme.',
     developer: 'Développeur',
     contact: 'Contact',
     website: 'Site web',
     privacyPolicy: 'Politique de confidentialité',
-    termsOfService: 'Conditions d\'utilisation'
+    termsOfService: "Conditions d'utilisation",
   },
 
   // Muscle Map
@@ -110,18 +113,18 @@ export default {
     muscleRestState: 'État de repos des muscles',
     restPeriod0to24: '0-24h',
     restPeriod24to72: '24-72h',
-    restPeriod72plus: '72h+'
+    restPeriod72plus: '72h+',
   },
 
   // Workout screen
   workout: {
-    noWorkoutsToday: 'Aucun entraînement enregistré aujourd\'hui',
+    noWorkoutsToday: "Aucun entraînement enregistré aujourd'hui",
     startWorkout: 'Commencer un entraînement',
     weight: 'Poids',
     reps: 'Répétitions',
     sets: 'Séries',
     rpe: 'RPE',
-    warmUpSeries: 'Séries d\'échauffement',
+    warmUpSeries: "Séries d'échauffement",
     workingSeries: 'Séries de travail',
     newWorkout: 'Nouvel entraînement',
     customExercise: 'Exercice personnalisé',
@@ -130,12 +133,12 @@ export default {
     suggested: 'Suggéré',
     rpeTitle: 'RPE (Rate of Perceived Exertion)',
     rpeDescription: '1 = Très facile, 10 = Effort maximal',
-    addExercise: 'Ajouter l\'exercice',
+    addExercise: "Ajouter l'exercice",
     searchExercises: 'Chercher des exercices...',
     seriesType: 'Type de série',
     warmUp: 'Échauffement',
     workingSet: 'Série de travail',
-    warmUpDescription: 'Série d\'échauffement (RPE non pris en compte)',
+    warmUpDescription: "Série d'échauffement (RPE non pris en compte)",
     workingSetDescription: 'Série de travail (RPE important)',
     addSeries: 'Ajouter une série',
     series: 'Series',
@@ -143,7 +146,7 @@ export default {
     usePreviousValues: 'Utiliser les valeurs précédentes',
     notApplicable: 'N/A',
     selectDate: 'Sélectionner une date',
-    duplicateLastSeries: 'Dupliquer la dernière série'
+    duplicateLastSeries: 'Dupliquer la dernière série',
   },
 
   // Timer screen
@@ -155,14 +158,14 @@ export default {
     customTime: 'Temps personnalisé',
     minutes: 'Minutes',
     seconds: 'Secondes',
-    exerciseName: 'Nom de l\'exercice',
-    enterExerciseName: 'Entrez le nom de l\'exercice',
+    exerciseName: "Nom de l'exercice",
+    enterExerciseName: "Entrez le nom de l'exercice",
     exercise: 'Exercice',
     quick: 'Rapide',
     standard: 'Standard',
     long: 'Long',
     veryLong: 'Très long',
-    series: 'Séries'
+    series: 'Séries',
   },
 
   // Stats screen
@@ -172,7 +175,7 @@ export default {
     totalWorkouts: 'Total des entraînements',
     totalExercises: 'Total des exercices',
     totalVolume: 'Volume total',
-    avgWorkoutTime: 'Temps moyen d\'entraînement',
+    avgWorkoutTime: "Temps moyen d'entraînement",
     progressionTextNone: 'Aucune donnée de progression disponible',
     attendance: 'Assiduité',
     series: 'Séries',
@@ -196,7 +199,7 @@ export default {
     selectExercise: 'Sélectionner un exercice',
     allExercises: 'Tous les exercices',
     volume: 'Volume',
-    repetitions: 'Répétitions'
+    repetitions: 'Répétitions',
   },
 
   // Goals
@@ -208,25 +211,26 @@ export default {
     currentWeight: 'Poids actuel',
     targetWeight: 'Poids cible',
     selectExerciseForGoal: 'Sélectionner un exercice',
-    deleteGoal: 'Supprimer l\'objectif',
-    deleteGoalConfirmation: 'Êtes-vous sûr de vouloir supprimer l\'objectif pour {exercise} ?',
+    deleteGoal: "Supprimer l'objectif",
+    deleteGoalConfirmation: "Êtes-vous sûr de vouloir supprimer l'objectif pour {exercise} ?",
     useLastWorkout: 'Utiliser le dernier entraînement',
     useSuggested: 'Utiliser la suggestion',
     exerciseNotFound: 'Exercice non trouvé',
-    exerciseNotFoundMessage: 'Vous devez avoir un historique d\'entraînement pour cet exercice avant de définir un objectif.',
+    exerciseNotFoundMessage:
+      "Vous devez avoir un historique d'entraînement pour cet exercice avant de définir un objectif.",
     pleaseCompleteAllFields: 'Veuillez remplir tous les champs',
     invalidWeightValues: 'Valeurs de poids invalides',
-    errorSavingGoal: 'Erreur lors de la sauvegarde de l\'objectif',
-    goalDetails: 'Détails de l\'objectif',
+    errorSavingGoal: "Erreur lors de la sauvegarde de l'objectif",
+    goalDetails: "Détails de l'objectif",
     currentWeightDescription: 'Poids actuel',
-    targetWeightDescription: 'Poids cible'
+    targetWeightDescription: 'Poids cible',
   },
 
   // Time periods
   periods: {
     oneMonth: '1 mois',
     threeMonths: '3 mois',
-    sixMonths: '6 mois'
+    sixMonths: '6 mois',
   },
 
   // Exercise selector
@@ -234,10 +238,10 @@ export default {
     searchExercise: 'Rechercher un exercice...',
     favorites: 'Favoris',
     recentExercises: 'Exercices récents',
-    noFavorites: 'Pas encore d\'exercices favoris',
+    noFavorites: "Pas encore d'exercices favoris",
     noRecentExercises: 'Aucun exercice récent',
     searchResults: 'Résultats de recherche',
-    noExercisesInGroup: 'Aucun exercice disponible dans ce groupe musculaire'
+    noExercisesInGroup: 'Aucun exercice disponible dans ce groupe musculaire',
   },
 
   // Muscle groups
@@ -251,7 +255,7 @@ export default {
     triceps: 'Triceps',
     core: 'Abdominaux',
     cardio: 'Cardio',
-    other: 'Autre'
+    other: 'Autre',
   },
 
   // Measurements screen
@@ -271,17 +275,17 @@ export default {
     history: 'Historique',
     historyOf: 'Historique {part}',
     noData: 'Aucune donnée',
-    noHistoryData: 'Aucune donnée d\'historique disponible',
+    noHistoryData: "Aucune donnée d'historique disponible",
     noDataForSelection: 'Aucune donnée pour cette sélection',
     inputMode: 'Saisie',
     historyMode: 'Historique',
-    lastUpdate: 'Dernière mise à jour'
+    lastUpdate: 'Dernière mise à jour',
   },
 
   // Exercise details screen
   exerciseDetails: {
     estimated_1rm: '1RM estimé',
-    last_session: 'Dernière séance'
+    last_session: 'Dernière séance',
   },
 
   // Exercise names - Chest
@@ -310,7 +314,7 @@ export default {
   exercise_shoulders_lateralRaises: 'Élévations latérales',
   exercise_shoulders_frontRaises: 'Élévations frontales',
   exercise_shoulders_rearDeltFlyes: 'Oiseau pour deltoïdes postérieurs',
-  exercise_shoulders_shrugs: 'Haussements d\'épaules',
+  exercise_shoulders_shrugs: "Haussements d'épaules",
 
   // Exercise names - Biceps
   exercise_biceps_barbellCurl: 'Curl barre',
@@ -344,12 +348,12 @@ export default {
     messagePlaceholder: 'Entrez votre message',
     send: 'Envoyer',
     success: 'Message envoyé avec succès',
-    error: 'Erreur lors de l\'envoi du message',
+    error: "Erreur lors de l'envoi du message",
     errors: {
       nameRequired: 'Le nom est requis',
-      emailRequired: 'L\'email est requis',
-      emailInvalid: 'L\'email n\'est pas valide',
-      messageRequired: 'Le message est requis'
-    }
-  }
+      emailRequired: "L'email est requis",
+      emailInvalid: "L'email n'est pas valide",
+      messageRequired: 'Le message est requis',
+    },
+  },
 };

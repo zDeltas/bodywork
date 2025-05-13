@@ -15,11 +15,11 @@ export const useCSVExport = () => {
     let csvContent = 'ID,Date,Exercise,Weight (kg),Reps,Sets,RPE,Type,Note\n';
 
     // Add each workout as a row
-    workouts.forEach(workout => {
+    workouts.forEach((workout) => {
       const date = WorkoutDateUtils.getDatePart(workout.date);
 
       // Add each series as a separate row
-      workout.series.forEach(series => {
+      workout.series.forEach((series) => {
         const row = [
           workout.id,
           date,
@@ -29,7 +29,7 @@ export const useCSVExport = () => {
           1, // Each series is one set
           series.rpe || 'N/A',
           series.type,
-          `"${series.note?.replace(/"/g, '""') || ''}"`  // Escape quotes in notes
+          `"${series.note?.replace(/"/g, '""') || ''}"`, // Escape quotes in notes
         ].join(',');
 
         csvContent += row + '\n';
@@ -46,7 +46,7 @@ export const useCSVExport = () => {
 
       // Get workouts from storage service
       const workouts = await storageService.getWorkouts();
-      
+
       if (!workouts || workouts.length === 0) {
         console.log('No workouts found');
         setIsExporting(false);
@@ -63,7 +63,7 @@ export const useCSVExport = () => {
 
       // Write CSV content to the file
       await FileSystem.writeAsStringAsync(filePath, csvContent, {
-        encoding: FileSystem.EncodingType.UTF8
+        encoding: FileSystem.EncodingType.UTF8,
       });
 
       // Share the file
@@ -71,7 +71,7 @@ export const useCSVExport = () => {
         await Sharing.shareAsync(filePath, {
           mimeType: 'text/csv',
           dialogTitle: t('settings.exportToCSV'),
-          UTI: 'public.comma-separated-values-text'
+          UTI: 'public.comma-separated-values-text',
         });
 
         setIsExporting(false);
@@ -90,7 +90,7 @@ export const useCSVExport = () => {
 
   return {
     isExporting,
-    exportWorkoutsToCSV
+    exportWorkoutsToCSV,
   };
 };
 

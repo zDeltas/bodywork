@@ -18,16 +18,16 @@ interface ButtonProps {
 }
 
 export const Button: React.FC<ButtonProps> = ({
-                                                onPress,
-                                                title,
-                                                variant = 'primary',
-                                                size = 'medium',
-                                                disabled = false,
-                                                style,
-                                                textStyle,
-                                                icon,
-                                                children
-                                              }) => {
+  onPress,
+  title,
+  variant = 'primary',
+  size = 'medium',
+  disabled = false,
+  style,
+  textStyle,
+  icon,
+  children,
+}) => {
   const { buttons } = useDynamicStyles();
 
   const getSizeStyles = (): ViewStyle => {
@@ -47,12 +47,7 @@ export const Button: React.FC<ButtonProps> = ({
     }
   };
 
-  const buttonStyles = [
-    buttons[variant],
-    getSizeStyles(),
-    disabled && buttons.disabled,
-    style,
-  ];
+  const buttonStyles = [buttons[variant], getSizeStyles(), disabled && buttons.disabled, style];
 
   const getTextStyle = (): TextStyle => {
     if (variant === 'icon') {
@@ -61,17 +56,10 @@ export const Button: React.FC<ButtonProps> = ({
     return buttons[`${variant}Text` as keyof typeof buttons] as TextStyle;
   };
 
-  const textStyles = [
-    getTextStyle(),
-    textStyle,
-  ];
+  const textStyles = [getTextStyle(), textStyle];
 
   return (
-    <TouchableOpacity
-      onPress={onPress}
-      disabled={disabled}
-      style={buttonStyles}
-    >
+    <TouchableOpacity onPress={onPress} disabled={disabled} style={buttonStyles}>
       {icon && icon}
       {title && <Text style={textStyles}>{title}</Text>}
       {children}

@@ -1,18 +1,7 @@
-import storageService, { 
-  StorageKeys,
-  Settings,
-  Measurement,
-  StorageData
-} from './storage';
+import storageService, { StorageKeys, Settings, Measurement, StorageData } from './storage';
 
-export {
-  storageService,
-  StorageKeys,
-  Settings,
-  Measurement,
-  StorageData
-};
+export { storageService, StorageKeys, Settings, Measurement, StorageData };
 
 export default {
-  storage: storageService
-}; 
+  storage: storageService,
+};

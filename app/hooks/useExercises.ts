@@ -14,14 +14,18 @@ export function useExercises() {
         setLoading(true);
         const [favorites, recents] = await Promise.all([
           storageService.getFavoriteExercises(),
-          storageService.getRecentExercises()
+          storageService.getRecentExercises(),
         ]);
-        
+
         setFavoriteExercises(favorites);
         setRecentExercises(recents);
         setError(null);
       } catch (err) {
-        setError(err instanceof Error ? err : new Error('Une erreur est survenue lors du chargement des exercices'));
+        setError(
+          err instanceof Error
+            ? err
+            : new Error('Une erreur est survenue lors du chargement des exercices'),
+        );
       } finally {
         setLoading(false);
       }
@@ -37,7 +41,11 @@ export function useExercises() {
       setFavoriteExercises(updatedFavorites);
       return true;
     } catch (err) {
-      setError(err instanceof Error ? err : new Error('Une erreur est survenue lors de l\'ajout aux favoris'));
+      setError(
+        err instanceof Error
+          ? err
+          : new Error("Une erreur est survenue lors de l'ajout aux favoris"),
+      );
       return false;
     }
   }, []);
@@ -48,22 +56,32 @@ export function useExercises() {
       setFavoriteExercises(updatedFavorites);
       return true;
     } catch (err) {
-      setError(err instanceof Error ? err : new Error('Une erreur est survenue lors de la suppression des favoris'));
+      setError(
+        err instanceof Error
+          ? err
+          : new Error('Une erreur est survenue lors de la suppression des favoris'),
+      );
       return false;
     }
   }, []);
 
-  const isFavorite = useCallback((exercise: string) => {
-    return favoriteExercises.includes(exercise);
-  }, [favoriteExercises]);
+  const isFavorite = useCallback(
+    (exercise: string) => {
+      return favoriteExercises.includes(exercise);
+    },
+    [favoriteExercises],
+  );
 
-  const toggleFavorite = useCallback(async (exercise: string) => {
-    if (isFavorite(exercise)) {
-      return removeFavoriteExercise(exercise);
-    } else {
-      return addFavoriteExercise(exercise);
-    }
-  }, [isFavorite, addFavoriteExercise, removeFavoriteExercise]);
+  const toggleFavorite = useCallback(
+    async (exercise: string) => {
+      if (isFavorite(exercise)) {
+        return removeFavoriteExercise(exercise);
+      } else {
+        return addFavoriteExercise(exercise);
+      }
+    },
+    [isFavorite, addFavoriteExercise, removeFavoriteExercise],
+  );
 
   // Fonctions pour les exercices récents
   const addRecentExercise = useCallback(async (exercise: string) => {
@@ -72,7 +90,11 @@ export function useExercises() {
       setRecentExercises(updatedRecents);
       return true;
     } catch (err) {
-      setError(err instanceof Error ? err : new Error('Une erreur est survenue lors de l\'ajout aux récents'));
+      setError(
+        err instanceof Error
+          ? err
+          : new Error("Une erreur est survenue lors de l'ajout aux récents"),
+      );
       return false;
     }
   }, []);
@@ -86,8 +108,8 @@ export function useExercises() {
     removeFavoriteExercise,
     isFavorite,
     toggleFavorite,
-    addRecentExercise
+    addRecentExercise,
   };
 }
 
-export default useExercises; 
+export default useExercises;

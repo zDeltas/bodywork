@@ -67,53 +67,53 @@ const styles = StyleSheet.create({
 ### Colors
 
 ```typescript
-colors.primary           // Main accent color (orange)
-colors.primaryLight      // Light version of primary color
-colors.success           // Success color (green)
-colors.error             // Error color (red)
-colors.background.main   // Main background color
-colors.background.card   // Card background color
-colors.text.primary      // Primary text color
-colors.text.secondary    // Secondary text color
-colors.border.default    // Default border color
+colors.primary; // Main accent color (orange)
+colors.primaryLight; // Light version of primary color
+colors.success; // Success color (green)
+colors.error; // Error color (red)
+colors.background.main; // Main background color
+colors.background.card; // Card background color
+colors.text.primary; // Primary text color
+colors.text.secondary; // Secondary text color
+colors.border.default; // Default border color
 ```
 
 ### Typography
 
 ```typescript
-typography.fontFamily.regular   // Regular font
-typography.fontFamily.semiBold  // Semi-bold font
-typography.fontFamily.bold      // Bold font
-typography.fontSize.base        // Base font size (16)
-typography.fontSize.sm          // Small font size (12)
-typography.fontSize.lg          // Large font size (18)
+typography.fontFamily.regular; // Regular font
+typography.fontFamily.semiBold; // Semi-bold font
+typography.fontFamily.bold; // Bold font
+typography.fontSize.base; // Base font size (16)
+typography.fontSize.sm; // Small font size (12)
+typography.fontSize.lg; // Large font size (18)
 ```
 
 ### Spacing
 
 ```typescript
-spacing.xs    // Extra small spacing (4)
-spacing.sm    // Small spacing (8)
-spacing.base  // Base spacing (16)
-spacing.lg    // Large spacing (20)
-spacing.xl    // Extra large spacing (24)
+spacing.xs; // Extra small spacing (4)
+spacing.sm; // Small spacing (8)
+spacing.base; // Base spacing (16)
+spacing.lg; // Large spacing (20)
+spacing.xl; // Extra large spacing (24)
 ```
 
 ### Border Radius
 
 ```typescript
-borderRadius.sm     // Small border radius (8)
-borderRadius.base   // Base border radius (12)
-borderRadius.lg     // Large border radius (16)
+borderRadius.sm; // Small border radius (8)
+borderRadius.base; // Base border radius (12)
+borderRadius.lg; // Large border radius (16)
 ```
 
 ### Shadows
 
 ```typescript
-shadows.sm      // Small shadow
-shadows.md      // Medium shadow
-shadows.lg      // Large shadow
-shadows.primary // Primary color shadow
+shadows.sm; // Small shadow
+shadows.md; // Medium shadow
+shadows.lg; // Large shadow
+shadows.primary; // Primary color shadow
 ```
 
 ## Pre-styled Components
@@ -121,53 +121,53 @@ shadows.primary // Primary color shadow
 ### Buttons
 
 ```typescript
-buttons.primary       // Primary button (orange)
-buttons.primaryText   // Primary button text
-buttons.secondary     // Secondary button (dark gray)
-buttons.secondaryText // Secondary button text
-buttons.outline       // Outline button
-buttons.outlineText   // Outline button text
-buttons.icon          // Icon button (circular)
-buttons.disabled      // Disabled state (apply with spread operator)
+buttons.primary; // Primary button (orange)
+buttons.primaryText; // Primary button text
+buttons.secondary; // Secondary button (dark gray)
+buttons.secondaryText; // Secondary button text
+buttons.outline; // Outline button
+buttons.outlineText; // Outline button text
+buttons.icon; // Icon button (circular)
+buttons.disabled; // Disabled state (apply with spread operator)
 ```
 
 ### Cards
 
 ```typescript
-cards.default      // Standard card
-cards.highlighted  // Highlighted card (with primary color border)
+cards.default; // Standard card
+cards.highlighted; // Highlighted card (with primary color border)
 ```
 
 ### Inputs
 
 ```typescript
-inputs.default    // Standard input
-inputs.compact    // Compact input (smaller)
-inputs.multiline  // Multiline input (for notes, etc.)
+inputs.default; // Standard input
+inputs.compact; // Compact input (smaller)
+inputs.multiline; // Multiline input (for notes, etc.)
 ```
 
 ### Typography
 
 ```typescript
-text.h1           // Heading 1
-text.h2           // Heading 2
-text.h3           // Heading 3
-text.body         // Body text
-text.bodySmall    // Small body text
-text.label        // Label text
-text.accent       // Accent text (primary color)
-text.secondary    // Secondary text (gray)
+text.h1; // Heading 1
+text.h2; // Heading 2
+text.h3; // Heading 3
+text.body; // Body text
+text.bodySmall; // Small body text
+text.label; // Label text
+text.accent; // Accent text (primary color)
+text.secondary; // Secondary text (gray)
 ```
 
 ### Layout
 
 ```typescript
-layout.screen       // Screen container
-layout.content      // Content container
-layout.header       // Header
-layout.row          // Row layout
-layout.center       // Centered content
-layout.spaceBetween // Space between items
+layout.screen; // Screen container
+layout.content; // Content container
+layout.header; // Header
+layout.row; // Row layout
+layout.center; // Centered content
+layout.spaceBetween; // Space between items
 ```
 
 ## Example
@@ -184,9 +184,7 @@ const ExampleComponent = () => {
     <View style={styles.container}>
       <View style={styles.card}>
         <Text style={styles.title}>Example Component</Text>
-        <Text style={styles.description}>
-          This is an example of using the theme system.
-        </Text>
+        <Text style={styles.description}>This is an example of using the theme system.</Text>
         <TouchableOpacity style={styles.button}>
           <Text style={styles.buttonText}>Press Me</Text>
         </TouchableOpacity>

@@ -26,109 +26,106 @@ const GoalSection: React.FC<GoalSectionProps> = ({ fadeAnim }) => {
       padding: theme.spacing.lg,
       marginHorizontal: theme.spacing.lg,
       marginBottom: theme.spacing.xl,
-      ...theme.shadows.sm
+      ...theme.shadows.sm,
     },
     chartTitle: {
       fontSize: theme.typography.fontSize.lg,
       fontFamily: theme.typography.fontFamily.bold,
       marginBottom: theme.spacing.lg,
-      color: theme.colors.text.primary
+      color: theme.colors.text.primary,
     },
     noGoalsContainer: {
       alignItems: 'center',
       justifyContent: 'center',
-      padding: theme.spacing.lg
+      padding: theme.spacing.lg,
     },
     noGoalsText: {
       fontSize: theme.typography.fontSize.base,
       color: theme.colors.text.secondary,
-      textAlign: 'center'
+      textAlign: 'center',
     },
     goalItem: {
       marginBottom: theme.spacing.lg,
-      borderRadius: theme.borderRadius.base
+      borderRadius: theme.borderRadius.base,
     },
     goalHeader: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      marginBottom: theme.spacing.sm
+      marginBottom: theme.spacing.sm,
     },
     goalTitle: {
       fontSize: theme.typography.fontSize.base,
       fontFamily: theme.typography.fontFamily.semiBold,
       color: theme.colors.text.primary,
-      flex: 1
+      flex: 1,
     },
     goalHeaderRight: {
       flexDirection: 'row',
-      alignItems: 'center'
+      alignItems: 'center',
     },
     goalValues: {
-      marginRight: theme.spacing.md
+      marginRight: theme.spacing.md,
     },
     goalCurrent: {
       fontSize: theme.typography.fontSize.base,
       fontFamily: theme.typography.fontFamily.semiBold,
-      color: theme.colors.success
+      color: theme.colors.success,
     },
     goalSeparator: {
       fontSize: theme.typography.fontSize.base,
-      color: theme.colors.text.secondary
+      color: theme.colors.text.secondary,
     },
     goalTarget: {
       fontSize: theme.typography.fontSize.base,
       fontFamily: theme.typography.fontFamily.semiBold,
-      color: theme.colors.primary
+      color: theme.colors.primary,
     },
     deleteGoalButton: {
-      padding: theme.spacing.xs
+      padding: theme.spacing.xs,
     },
     goalProgressContainer: {
       height: theme.spacing.sm,
       backgroundColor: theme.colors.background.button,
       borderRadius: theme.borderRadius.xs,
       overflow: 'hidden',
-      marginBottom: theme.spacing.sm
+      marginBottom: theme.spacing.sm,
     },
     goalProgressBar: {
       height: '100%',
-      borderRadius: theme.borderRadius.xs
+      borderRadius: theme.borderRadius.xs,
     },
     goalProgressLow: {
-      backgroundColor: theme.colors.error
+      backgroundColor: theme.colors.error,
     },
     goalProgressMedium: {
-      backgroundColor: theme.colors.primary
+      backgroundColor: theme.colors.primary,
     },
     goalProgressHigh: {
-      backgroundColor: theme.colors.success
+      backgroundColor: theme.colors.success,
     },
     goalProgressText: {
       fontSize: theme.typography.fontSize.md,
-      color: theme.colors.text.secondary
+      color: theme.colors.text.secondary,
     },
     addGoalButton: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
       marginTop: theme.spacing.md,
-      padding: theme.spacing.md
+      padding: theme.spacing.md,
     },
     addGoalText: {
       marginLeft: theme.spacing.sm,
       fontSize: theme.typography.fontSize.base,
       color: theme.colors.primary,
-      fontFamily: theme.typography.fontFamily.semiBold
-    }
+      fontFamily: theme.typography.fontFamily.semiBold,
+    },
   });
 
   return (
     <Animated.View
-      style={[
-        styles.chartContainer,
-        { opacity: fadeAnim, transform: [{ scale: fadeAnim }] }
-      ]}
+      style={[styles.chartContainer, { opacity: fadeAnim, transform: [{ scale: fadeAnim }] }]}
     >
       <Text style={styles.chartTitle}>{t('stats.goals')}</Text>
 
@@ -156,7 +153,7 @@ const GoalSection: React.FC<GoalSectionProps> = ({ fadeAnim }) => {
                       [
                         {
                           text: t('common.cancel'),
-                          style: 'cancel'
+                          style: 'cancel',
                         },
                         {
                           text: t('common.delete'),
@@ -164,9 +161,9 @@ const GoalSection: React.FC<GoalSectionProps> = ({ fadeAnim }) => {
                           onPress: () => {
                             deleteGoal(goal.exercise);
                             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                          }
-                        }
-                      ]
+                          },
+                        },
+                      ],
                     );
                   }}
                 >
@@ -180,16 +177,21 @@ const GoalSection: React.FC<GoalSectionProps> = ({ fadeAnim }) => {
                 style={[
                   styles.goalProgressBar,
                   { width: `${goal.progress}%` },
-                  goal.progress > 80 ? styles.goalProgressHigh :
-                    goal.progress > 50 ? styles.goalProgressMedium :
-                      styles.goalProgressLow
+                  goal.progress > 80
+                    ? styles.goalProgressHigh
+                    : goal.progress > 50
+                      ? styles.goalProgressMedium
+                      : styles.goalProgressLow,
                 ]}
               />
             </View>
 
             <Text style={styles.goalProgressText}>
               {goal.progress < 100
-                ? t('goals.goalRemaining').replace('{remaining}', (goal.target - goal.current).toString())
+                ? t('goals.goalRemaining').replace(
+                    '{remaining}',
+                    (goal.target - goal.current).toString(),
+                  )
                 : t('goals.goalAchieved')}
             </Text>
           </View>

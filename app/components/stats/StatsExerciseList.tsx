@@ -14,21 +14,21 @@ interface StatsExerciseListProps {
 }
 
 export default function StatsExerciseList({
-                                            selectedMuscle,
-                                            setSelectedMuscle,
-                                            selectedExercise,
-                                            setSelectedExercise,
-                                            exerciseOptions,
-                                            onExerciseSelect,
-                                            onMuscleSelect
-                                          }: StatsExerciseListProps) {
+  selectedMuscle,
+  setSelectedMuscle,
+  selectedExercise,
+  setSelectedExercise,
+  exerciseOptions,
+  onExerciseSelect,
+  onMuscleSelect,
+}: StatsExerciseListProps) {
   const { theme } = useTheme();
 
   const styles = StyleSheet.create({
     container: {
       marginBottom: theme.spacing.xl,
-      paddingHorizontal: theme.spacing.lg
-    }
+      paddingHorizontal: theme.spacing.lg,
+    },
   });
 
   return (
@@ -43,4 +43,4 @@ export default function StatsExerciseList({
       />
     </View>
   );
-} 
+}

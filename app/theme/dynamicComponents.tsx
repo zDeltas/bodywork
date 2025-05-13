@@ -25,12 +25,12 @@ export const useDynamicStyles = () => {
       borderRadius: theme.borderRadius.base,
       alignItems: 'center',
       justifyContent: 'center',
-      ...theme.shadows.primary
+      ...theme.shadows.primary,
     },
     primaryText: {
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.bold,
-      fontSize: theme.typography.fontSize.lg
+      fontSize: theme.typography.fontSize.lg,
     },
 
     // Secondary button (dark gray)
@@ -41,12 +41,12 @@ export const useDynamicStyles = () => {
       borderRadius: theme.borderRadius.base,
       alignItems: 'center',
       justifyContent: 'center',
-      ...theme.shadows.sm
+      ...theme.shadows.sm,
     },
     secondaryText: {
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.semiBold,
-      fontSize: theme.typography.fontSize.base
+      fontSize: theme.typography.fontSize.base,
     },
 
     // Outline button (transparent with border)
@@ -58,12 +58,12 @@ export const useDynamicStyles = () => {
       alignItems: 'center',
       justifyContent: 'center',
       borderWidth: 1,
-      borderColor: theme.colors.primary
+      borderColor: theme.colors.primary,
     },
     outlineText: {
       color: theme.colors.primary,
       fontFamily: theme.typography.fontFamily.semiBold,
-      fontSize: theme.typography.fontSize.base
+      fontSize: theme.typography.fontSize.base,
     },
 
     // Icon button (circular)
@@ -74,13 +74,13 @@ export const useDynamicStyles = () => {
       backgroundColor: theme.colors.background.button,
       justifyContent: 'center',
       alignItems: 'center',
-      ...theme.shadows.sm
+      ...theme.shadows.sm,
     },
 
     // Disabled state
     disabled: {
-      opacity: 0.6
-    }
+      opacity: 0.6,
+    },
   });
 
   /**
@@ -92,7 +92,7 @@ export const useDynamicStyles = () => {
       backgroundColor: theme.colors.background.card,
       borderRadius: theme.borderRadius.lg,
       padding: theme.spacing.base,
-      ...theme.shadows.sm
+      ...theme.shadows.sm,
     },
 
     // Highlighted card
@@ -102,8 +102,8 @@ export const useDynamicStyles = () => {
       padding: theme.spacing.base,
       borderWidth: 1,
       borderColor: theme.colors.primary,
-      ...theme.shadows.sm
-    }
+      ...theme.shadows.sm,
+    },
   });
 
   /**
@@ -120,7 +120,7 @@ export const useDynamicStyles = () => {
       fontSize: theme.typography.fontSize.base,
       borderWidth: 1,
       borderColor: theme.colors.border.default,
-      ...theme.shadows.sm
+      ...theme.shadows.sm,
     },
 
     // Compact input (smaller)
@@ -134,7 +134,7 @@ export const useDynamicStyles = () => {
       borderWidth: 1,
       borderColor: theme.colors.border.default,
       ...theme.shadows.sm,
-      textAlign: 'center'
+      textAlign: 'center',
     },
 
     // Multiline input (for notes, etc.)
@@ -149,8 +149,8 @@ export const useDynamicStyles = () => {
       borderColor: theme.colors.border.default,
       ...theme.shadows.sm,
       minHeight: 80,
-      textAlignVertical: 'top'
-    }
+      textAlignVertical: 'top',
+    },
   });
 
   /**
@@ -161,17 +161,17 @@ export const useDynamicStyles = () => {
     h1: {
       fontFamily: theme.typography.fontFamily.bold,
       fontSize: theme.typography.fontSize['3xl'],
-      color: theme.colors.text.primary
+      color: theme.colors.text.primary,
     },
     h2: {
       fontFamily: theme.typography.fontFamily.bold,
       fontSize: theme.typography.fontSize['2xl'],
-      color: theme.colors.text.primary
+      color: theme.colors.text.primary,
     },
     h3: {
       fontFamily: theme.typography.fontFamily.semiBold,
       fontSize: theme.typography.fontSize.xl,
-      color: theme.colors.text.primary
+      color: theme.colors.text.primary,
     },
 
     // Body text
@@ -179,12 +179,12 @@ export const useDynamicStyles = () => {
       fontFamily: theme.typography.fontFamily.regular,
       fontSize: theme.typography.fontSize.base,
       color: theme.colors.text.primary,
-      lineHeight: theme.typography.lineHeight.normal
+      lineHeight: theme.typography.lineHeight.normal,
     },
     bodySmall: {
       fontFamily: theme.typography.fontFamily.regular,
       fontSize: theme.typography.fontSize.md,
-      color: theme.colors.text.primary
+      color: theme.colors.text.primary,
     },
 
     // Special text styles
@@ -192,28 +192,28 @@ export const useDynamicStyles = () => {
       fontFamily: theme.typography.fontFamily.semiBold,
       fontSize: theme.typography.fontSize.base,
       color: theme.colors.text.primary,
-      marginBottom: theme.spacing.sm
+      marginBottom: theme.spacing.sm,
     },
     accent: {
       color: theme.colors.text.accent,
-      fontFamily: theme.typography.fontFamily.semiBold
+      fontFamily: theme.typography.fontFamily.semiBold,
     },
     secondary: {
       color: theme.colors.text.secondary,
-      fontFamily: theme.typography.fontFamily.regular
+      fontFamily: theme.typography.fontFamily.regular,
     },
     title: {
-      marginBottom: theme.spacing.lg
+      marginBottom: theme.spacing.lg,
     },
     subtitle: {
-      marginBottom: theme.spacing.md
+      marginBottom: theme.spacing.md,
     },
     description: {
-      marginBottom: theme.spacing.base
+      marginBottom: theme.spacing.base,
     },
     caption: {
-      marginTop: theme.spacing.xs
-    }
+      marginTop: theme.spacing.xs,
+    },
   });
 
   /**
@@ -223,13 +223,13 @@ export const useDynamicStyles = () => {
     // Screen container
     screen: {
       flex: 1,
-      backgroundColor: theme.colors.background.main
+      backgroundColor: theme.colors.background.main,
     },
 
     // Content container
     content: {
       flex: 1,
-      padding: theme.layout.contentPadding
+      padding: theme.layout.contentPadding,
     },
 
     // Header
@@ -241,25 +241,25 @@ export const useDynamicStyles = () => {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      ...theme.shadows.md
+      ...theme.shadows.md,
     },
 
     // Row
     row: {
       flexDirection: 'row',
-      alignItems: 'center'
+      alignItems: 'center',
     },
 
     // Centered content
     center: {
       justifyContent: 'center',
-      alignItems: 'center'
+      alignItems: 'center',
     },
 
     // Space between items
     spaceBetween: {
-      justifyContent: 'space-between'
-    }
+      justifyContent: 'space-between',
+    },
   });
 
   return {
@@ -267,7 +267,7 @@ export const useDynamicStyles = () => {
     cards,
     inputs,
     text,
-    layout
+    layout,
   };
 };
 

@@ -21,22 +21,19 @@ const MuscleRestState: React.FC<MuscleRestStateProps> = ({ fadeAnim, workouts })
       padding: theme.spacing.lg,
       marginHorizontal: theme.spacing.lg,
       marginBottom: theme.spacing.xl,
-      ...theme.shadows.sm
+      ...theme.shadows.sm,
     },
     chartTitle: {
       fontSize: theme.typography.fontSize.lg,
       fontFamily: theme.typography.fontFamily.bold,
       marginBottom: theme.spacing.lg,
-      color: theme.colors.text.primary
-    }
+      color: theme.colors.text.primary,
+    },
   });
 
   return (
     <Animated.View
-      style={[
-        styles.chartContainer,
-        { opacity: fadeAnim, transform: [{ scale: fadeAnim }] }
-      ]}
+      style={[styles.chartContainer, { opacity: fadeAnim, transform: [{ scale: fadeAnim }] }]}
     >
       <Text style={styles.chartTitle}>{t('muscleMap.muscleRestState')}</Text>
       <MuscleMap workouts={workouts} />

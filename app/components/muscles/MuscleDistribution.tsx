@@ -23,12 +23,12 @@ interface MuscleDistributionProps {
 }
 
 const MuscleDistribution: React.FC<MuscleDistributionProps> = ({
-                                                                 fadeAnim,
-                                                                 muscleGroups,
-                                                                 selectedPeriod,
-                                                                 setSelectedPeriod,
-                                                                 graphsSectionRef
-                                                               }) => {
+  fadeAnim,
+  muscleGroups,
+  selectedPeriod,
+  setSelectedPeriod,
+  graphsSectionRef,
+}) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
 
@@ -39,78 +39,78 @@ const MuscleDistribution: React.FC<MuscleDistributionProps> = ({
       padding: theme.spacing.lg,
       marginHorizontal: theme.spacing.lg,
       marginBottom: theme.spacing.xl,
-      ...theme.shadows.sm
+      ...theme.shadows.sm,
     },
     chartTitleContainer: {
       flexDirection: 'column',
-      marginBottom: theme.spacing.lg
+      marginBottom: theme.spacing.lg,
     },
     chartTitle: {
       fontSize: theme.typography.fontSize.lg,
       fontFamily: theme.typography.fontFamily.bold,
       marginBottom: theme.spacing.xs,
-      color: theme.colors.text.primary
+      color: theme.colors.text.primary,
     },
     chartSubtitle: {
       fontSize: theme.typography.fontSize.sm,
       fontFamily: theme.typography.fontFamily.regular,
       color: theme.colors.text.secondary,
-      marginBottom: theme.spacing.sm
+      marginBottom: theme.spacing.sm,
     },
     filterContainer: {
       flexDirection: 'row',
       backgroundColor: theme.colors.background.main,
       borderRadius: theme.borderRadius.xl,
-      padding: theme.spacing.xs
+      padding: theme.spacing.xs,
     },
     filterButton: {
       paddingHorizontal: theme.spacing.md,
       paddingVertical: theme.spacing.sm,
-      borderRadius: theme.borderRadius.lg
+      borderRadius: theme.borderRadius.lg,
     },
     filterButtonActive: {
       backgroundColor: theme.colors.primary,
-      color: 'white'
+      color: 'white',
     },
     filterText: {
       fontSize: theme.typography.fontSize.sm,
-      color: theme.colors.text.secondary
+      color: theme.colors.text.secondary,
     },
     filterTextActive: {
       color: theme.colors.text.primary,
-      fontFamily: theme.typography.fontFamily.semiBold
+      fontFamily: theme.typography.fontFamily.semiBold,
     },
     legendContainer: {
       flexDirection: 'row',
       flexWrap: 'wrap',
       justifyContent: 'center',
       marginTop: theme.spacing.md,
-      gap: theme.spacing.sm
+      gap: theme.spacing.sm,
     },
     legendItem: {
       flexDirection: 'row',
       alignItems: 'center',
-      marginRight: theme.spacing.sm
+      marginRight: theme.spacing.sm,
     },
     legendColor: {
       width: 12,
       height: 12,
       borderRadius: 6,
-      marginRight: theme.spacing.xs
+      marginRight: theme.spacing.xs,
     },
     legendText: {
       fontSize: theme.typography.fontSize.sm,
-      color: theme.colors.text.secondary
+      color: theme.colors.text.secondary,
     },
     emptyStateContainer: {
       alignItems: 'center',
       justifyContent: 'center',
-      height: 200
+      height: 200,
     },
     emptyStateText: {
       color: theme.colors.text.secondary,
-      textAlign: 'center'
-    }
+      textAlign: 'center',
+    },
   });
 
   // Vérifier si des données sont disponibles
@@ -119,14 +119,13 @@ const MuscleDistribution: React.FC<MuscleDistributionProps> = ({
   return (
     <Animated.View
       ref={graphsSectionRef}
-      style={[
-        styles.chartContainer,
-        { opacity: fadeAnim, transform: [{ scale: fadeAnim }] }
-      ]}
+      style={[styles.chartContainer, { opacity: fadeAnim, transform: [{ scale: fadeAnim }] }]}
     >
       <View style={styles.chartTitleContainer}>
         <Text style={styles.chartTitle}>{t('stats.muscleDistribution')}</Text>
-        <Text style={styles.chartSubtitle}>Répartition du volume d'entraînement par groupe musculaire</Text>
+        <Text style={styles.chartSubtitle}>
+          Répartition du volume d'entraînement par groupe musculaire
+        </Text>
         <View style={styles.filterContainer}>
           <TouchableOpacity
             style={[styles.filterButton, selectedPeriod === '1m' && styles.filterButtonActive]}
@@ -170,7 +169,7 @@ const MuscleDistribution: React.FC<MuscleDistributionProps> = ({
             data={muscleGroups}
             x="name"
             y="value"
-            colorScale={muscleGroups.map(g => g.color)}
+            colorScale={muscleGroups.map((g) => g.color)}
             width={Dimensions.get('window').width - 40}
             height={300}
             innerRadius={70}
@@ -179,21 +178,21 @@ const MuscleDistribution: React.FC<MuscleDistributionProps> = ({
               labels: {
                 fill: theme.colors.text.primary,
                 fontSize: theme.typography.fontSize.sm,
-                fontFamily: theme.typography.fontFamily.regular
+                fontFamily: theme.typography.fontFamily.regular,
               },
               data: {
                 fill: ({ datum }) => datum.color,
                 fillOpacity: 0.9,
                 stroke: theme.colors.background.main,
-                strokeWidth: 2
-              }
+                strokeWidth: 2,
+              },
             }}
             labelComponent={
               <VictoryLabel
                 style={{
                   fill: theme.colors.text.primary,
                   fontSize: theme.typography.fontSize.sm,
-                  fontFamily: theme.typography.fontFamily.regular
+                  fontFamily: theme.typography.fontFamily.regular,
                 }}
                 text={({ datum }) => `${datum.name}\n${datum.value}%`}
               />
@@ -203,7 +202,9 @@ const MuscleDistribution: React.FC<MuscleDistributionProps> = ({
             {muscleGroups.map((group, index) => (
               <View key={index} style={styles.legendItem}>
                 <View style={[styles.legendColor, { backgroundColor: group.color }]} />
-                <Text style={styles.legendText}>{group.name} ({group.value}%)</Text>
+                <Text style={styles.legendText}>
+                  {group.name} ({group.value}%)
+                </Text>
               </View>
             ))}
           </View>

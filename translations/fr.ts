@@ -22,6 +22,46 @@ export default {
     custom: 'Personnalisé'
   },
 
+  // Profile screen
+  profile: {
+    title: 'Profil',
+    account: 'Compte',
+    myAccount: 'Mon Compte',
+    createAccount: 'Créer un compte',
+    exportData: 'Exporter les données',
+    resetData: 'Réinitialiser les données',
+    social: 'Social',
+    share: 'Partager l\'application',
+    rate: 'Évaluer l\'application',
+    settings: 'Paramètres',
+    appSettings: 'Paramètres de l\'application',
+    instagram: 'Instagram',
+    instagramHandle: '@gainiziapp',
+    instagramModal: {
+      title: 'Suivez-nous sur Instagram',
+      message: 'Voulez-vous nous suivre sur Instagram ?',
+      follow: 'Nous suivre',
+      later: 'Plus tard'
+    },
+    auth: {
+      title: 'Connexion',
+      description: 'Connectez-vous pour synchroniser vos données et accéder à toutes les fonctionnalités',
+      signIn: 'Se connecter',
+      signOut: 'Se déconnecter',
+      continueWithGoogle: 'Continuer avec Google',
+      continueWithApple: 'Continuer avec Apple',
+      continueWithEmail: 'Continuer avec Email',
+      notSignedIn: 'Non connecté'
+    },
+    challenges: {
+      title: 'Défis',
+      comingSoon: 'Bientôt disponible',
+      description: 'Complétez des défis pour gagner des badges et suivre votre progression !',
+      locked: 'Verrouillé',
+      unlocked: 'Débloqué'
+    }
+  },
+
   // Settings screen
   settings: {
     title: 'Paramètres',

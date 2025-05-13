@@ -62,6 +62,27 @@ export default function RootLayout() {
                   }}
                 />
                 <Stack.Screen
+                  name="screens/profile"
+                  options={{
+                    headerShown: false,
+                    animation: 'slide_from_right'
+                  }}
+                />
+                <Stack.Screen
+                  name="screens/gamification"
+                  options={{
+                    headerShown: false,
+                    animation: 'slide_from_right'
+                  }}
+                />
+                <Stack.Screen
+                  name="screens/my-account"
+                  options={{
+                    headerShown: false,
+                    animation: 'slide_from_right'
+                  }}
+                />
+                <Stack.Screen
                   name="screens/contact"
                   options={{
                     presentation: 'card',

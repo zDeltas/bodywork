@@ -143,8 +143,8 @@ export default function WorkoutScreen() {
       <Header
         title={t('common.appTitle')}
         rightComponent={
-          <TouchableOpacity onPress={navigateToSettings}>
-            <Ionicons name="settings-outline" size={24} color={theme.colors.primary} />
+          <TouchableOpacity onPress={() => router.push('/screens/profile')}>
+            <Ionicons name="person-outline" size={24} color={theme.colors.primary} />
           </TouchableOpacity>
         }
       />
@@ -367,6 +367,7 @@ const useStyles = () => {
     calendarContainer: {
       borderRadius: theme.borderRadius.lg,
       overflow: 'hidden',
+      marginTop: theme.spacing.sm,
       marginLeft: theme.spacing.sm,
       marginRight: theme.spacing.sm,
       marginBottom: theme.spacing.sm,

@@ -311,5 +311,45 @@ export default {
   exercise_core_russianTwist: 'Russian Twist',
   exercise_core_legRaises: 'Leg Raises',
   exercise_core_crunches: 'Crunches',
-  exercise_core_hangingKneeRaises: 'Hanging Knee Raises'
+  exercise_core_hangingKneeRaises: 'Hanging Knee Raises',
+
+  // Profile screen
+  profile: {
+    title: 'Profile',
+    account: 'Account',
+    myAccount: 'My Account',
+    createAccount: 'Create Account',
+    exportData: 'Export Data',
+    resetData: 'Reset Data',
+    social: 'Social',
+    share: 'Share App',
+    rate: 'Rate App',
+    settings: 'Settings',
+    appSettings: 'App Settings',
+    instagram: 'Instagram',
+    instagramHandle: '@gainiziapp',
+    instagramModal: {
+      title: 'Follow us on Instagram',
+      message: 'Would you like to follow us on Instagram?',
+      follow: 'Follow us',
+      later: 'Later'
+    },
+    auth: {
+      title: 'Sign in',
+      description: 'Sign in to sync your data and access all features',
+      signIn: 'Sign in',
+      signOut: 'Sign out',
+      continueWithGoogle: 'Continue with Google',
+      continueWithApple: 'Continue with Apple',
+      continueWithEmail: 'Continue with Email',
+      notSignedIn: 'Not signed in'
+    },
+    challenges: {
+      title: 'Challenges',
+      comingSoon: 'Coming Soon',
+      description: 'Complete challenges to earn badges and track your progress!',
+      locked: 'Locked',
+      unlocked: 'Unlocked'
+    }
+  }
 };

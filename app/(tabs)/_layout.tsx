@@ -37,6 +37,10 @@ function TabLayout() {
     });
   };
 
+  const handleLongPress = () => {
+    router.push('/screens/routines/new');
+  };
+
   if (!fontsLoaded && !fontError) {
     return null;
   }
@@ -96,6 +100,7 @@ function TabLayout() {
       <TouchableOpacity
         style={styles.floatingButton}
         onPress={handleAddButtonPress}
+        onLongPress={handleLongPress}
         activeOpacity={0.8}
       >
         <Plus color={theme.colors.text.primary} size={28} />

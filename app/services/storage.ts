@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Goal, Workout, Series, StatsData } from '../types/common';
+import { Goal, Workout, Series, StatsData, WorkoutSession } from '../types/common';
 
 // Énumérations pour les clés de stockage
 export enum StorageKeys {
@@ -10,6 +10,8 @@ export enum StorageKeys {
   FAVORITE_EXERCISES = 'favoriteExercises',
   RECENT_EXERCISES = 'recentExercises',
   STORAGE_VERSION = 'storage_version',
+  ROUTINES = 'routines',
+  WORKOUT_SESSIONS = 'workout_sessions'
 }
 
 // Version actuelle du stockage (pour les migrations futures)
@@ -40,6 +42,8 @@ export type StorageData = {
   [StorageKeys.FAVORITE_EXERCISES]: string[];
   [StorageKeys.RECENT_EXERCISES]: string[];
   [StorageKeys.STORAGE_VERSION]: string;
+  [StorageKeys.ROUTINES]: any[];
+  [StorageKeys.WORKOUT_SESSIONS]: WorkoutSession[];
 };
 
 // Valeurs par défaut
@@ -56,6 +60,8 @@ const defaultValues: StorageData = {
   [StorageKeys.FAVORITE_EXERCISES]: [],
   [StorageKeys.RECENT_EXERCISES]: [],
   [StorageKeys.STORAGE_VERSION]: CURRENT_STORAGE_VERSION,
+  [StorageKeys.ROUTINES]: [],
+  [StorageKeys.WORKOUT_SESSIONS]: [],
 };
 
 /**
@@ -316,6 +322,65 @@ class StorageService {
     const updatedRecents = [exercise, ...filteredRecents].slice(0, 10);
     await this.setItem(StorageKeys.RECENT_EXERCISES, updatedRecents);
     return updatedRecents;
+  }
+
+  // Méthodes spécifiques pour les routines
+  async getRoutines(): Promise<any[]> {
+    const routines = await this.getItem<any[]>(StorageKeys.ROUTINES);
+    return routines || defaultValues[StorageKeys.ROUTINES];
+  }
+
+  async saveRoutine(routine: any): Promise<void> {
+    const routines = await this.getRoutines();
+    const index = routines.findIndex((r) => r.id === routine.id);
+    if (index !== -1) {
+      routines[index] = routine;
+    } else {
+      routines.push(routine);
+    }
+    await this.setItem(StorageKeys.ROUTINES, routines);
+  }
+
+  async deleteRoutine(id: string): Promise<void> {
+    const routines = await this.getRoutines();
+    const filteredRoutines = routines.filter((r) => r.id !== id);
+    await this.setItem(StorageKeys.ROUTINES, filteredRoutines);
+  }
+
+  // Méthodes pour les séances d'entraînement
+  async getWorkoutSessions(): Promise<WorkoutSession[]> {
+    const sessions = await this.getItem<WorkoutSession[]>(StorageKeys.WORKOUT_SESSIONS);
+    return sessions || [];
+  }
+
+  async getWorkoutSession(id: string): Promise<WorkoutSession | null> {
+    const sessions = await this.getWorkoutSessions();
+    return sessions.find(s => s.id === id) || null;
+  }
+
+  async saveWorkoutSession(session: WorkoutSession): Promise<void> {
+    const sessions = await this.getWorkoutSessions();
+    const index = sessions.findIndex(s => s.id === session.id);
+
+    if (index !== -1) {
+      sessions[index] = session;
+    } else {
+      sessions.push(session);
+    }
+
+    await this.setItem(StorageKeys.WORKOUT_SESSIONS, sessions);
+  }
+
+  async deleteWorkoutSession(id: string): Promise<void> {
+    const sessions = await this.getWorkoutSessions();
+    const filteredSessions = sessions.filter(s => s.id !== id);
+    await this.setItem(StorageKeys.WORKOUT_SESSIONS, filteredSessions);
+  }
+
+  // Méthode pour récupérer une routine spécifique
+  async getRoutine(id: string): Promise<any | null> {
+    const routines = await this.getRoutines();
+    return routines.find(r => r.id === id) || null;
   }
 }
 

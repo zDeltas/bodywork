@@ -22,6 +22,7 @@ export default {
     custom: 'Personnalisé',
     inConstruction: 'En Construction',
     featureComingSoon: 'Cette fonctionnalité arrive bientôt !',
+    next: 'Suivant',
   },
 
   // Profile screen
@@ -149,6 +150,14 @@ export default {
     notApplicable: 'N/A',
     selectDate: 'Sélectionner une date',
     duplicateLastSeries: 'Dupliquer la dernière série',
+    exercise: 'Exercice',
+    completeSeries: 'Marquer la série terminée',
+    finalRPE: 'RPE final',
+    reps: 'répétitions',
+    restTime: 'Temps de repos',
+    series: 'Série',
+    configureSeries: 'Configurer les séries',
+    selectRestTime: 'Sélectionner le temps de repos'
   },
 
   // Timer screen
@@ -357,5 +366,29 @@ export default {
       emailInvalid: "L'email n'est pas valide",
       messageRequired: 'Le message est requis',
     },
+  },
+
+  // Routine screen
+  routine: {
+    createTitle: 'Nouvelle routine',
+    title: 'Titre',
+    titlePlaceholder: 'Entrez le titre de la routine',
+    description: 'Description',
+    descriptionPlaceholder: 'Entrez une description pour votre routine',
+    selectExercises: 'Sélectionner les exercices',
+    addExercise: 'Ajouter un exercice',
+    noExerciseSelected: 'Aucun exercice sélectionné',
+    addExerciseToStart: 'Ajoutez un exercice pour commencer',
+    saved: 'Routine enregistrée !',
+    configureSeries: 'Configurer les séries',
+    seriesType: 'Type de série',
+    warmUp: 'Échauffement',
+    workingSet: 'Série de travail',
+    warmUpDescription: "Série d'échauffement",
+    workingSetDescription: 'Série de travail',
+    selectRestTime: 'Sélectionner le temps de repos',
+    addSeries: 'Ajouter une série',
+    usePreviousValues: 'Utiliser les valeurs précédentes',
+    optionalNote: 'Note optionnelle',
   },
 };

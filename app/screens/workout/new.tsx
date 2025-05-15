@@ -33,7 +33,7 @@ import {
   Inter_700Bold,
   useFonts,
 } from '@expo-google-fonts/inter';
-import ExerciseList from '@/app/components/exercises/ExerciseList';
+import ExerciseListModal from '@/app/components/exercises/ExerciseListModal';
 import { Series, SeriesType, Workout } from '@/types/common';
 import { WorkoutDateUtils } from '@/types/workout';
 import { MuscleGroupKey } from '@/app/components/exercises/ExerciseList';
@@ -207,44 +207,22 @@ export default function NewWorkoutScreen() {
           </View>
         </Modal>
 
-        <Modal
+        <ExerciseListModal
           visible={showExerciseSelector}
-          transparent={true}
-          animationType="slide"
-          onRequestClose={() => setShowExerciseSelector(false)}
-        >
-          <View style={styles.modalOverlay}>
-            <View style={[styles.modalContent, { height: '80%' }]}>
-              <View style={styles.modalHeader}>
-                <Text variant="heading" style={styles.modalTitle}>
-                  {t('stats.selectExercise')}
-                </Text>
-                <TouchableOpacity
-                  style={styles.modalCloseButton}
-                  onPress={() => setShowExerciseSelector(false)}
-                >
-                  <X color={theme.colors.text.primary} size={24} />
-                </TouchableOpacity>
-              </View>
-              <ScrollView style={{ flex: 1 }}>
-                <ExerciseList
-                  selectedMuscle={selectedMuscle}
-                  setSelectedMuscle={(muscleGroup: string, muscleKey?: string) => {
-                    setSelectedMuscle(muscleGroup);
-                    setSelectedMuscleKey(muscleKey || muscleGroup);
-                  }}
-                  exercise={exercise}
-                  setExercise={(selectedExercise, selectedExerciseKey) => {
-                    setExercise(selectedExercise);
-                    setExerciseKey(selectedExerciseKey || selectedExercise);
-                    setShowExerciseSelector(false);
-                  }}
-                  setIsCustomExercise={() => {}}
-                />
-              </ScrollView>
-            </View>
-          </View>
-        </Modal>
+          onClose={() => setShowExerciseSelector(false)}
+          selectedMuscle={selectedMuscle}
+          setSelectedMuscle={(muscleGroup: string, muscleKey?: string) => {
+            setSelectedMuscle(muscleGroup);
+            setSelectedMuscleKey(muscleKey || muscleGroup);
+          }}
+          exercise={exercise}
+          setExercise={(selectedExercise, selectedExerciseKey) => {
+            setExercise(selectedExercise);
+            setExerciseKey(selectedExerciseKey || selectedExercise);
+            setShowExerciseSelector(false);
+          }}
+          setIsCustomExercise={() => {}}
+        />
 
         <TouchableOpacity
           style={styles.exerciseButton}

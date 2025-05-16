@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { storageService } from '@/app/services/storage';
+import { useRouter } from 'expo-router';
+import { useTheme } from '@/app/hooks/useTheme';
+import { Play } from 'lucide-react-native';
 
 type Routine = {
   id: string;
@@ -22,6 +25,9 @@ type Routine = {
 
 export default function RoutinesListScreen() {
   const [routines, setRoutines] = useState<Routine[]>([]);
+  const router = useRouter();
+  const { theme } = useTheme();
+  const styles = useStyles(theme);
 
   useEffect(() => {
     const loadRoutines = async () => {
@@ -31,6 +37,13 @@ export default function RoutinesListScreen() {
     };
     loadRoutines();
   }, []);
+
+  const handleStartRoutine = (routineId: string) => {
+    router.push({
+      pathname: '/screens/workout/session',
+      params: { routineId }
+    });
+  };
 
   const renderRoutine = ({ item }: { item: Routine }) => (
     <View style={styles.routineCard}>
@@ -42,6 +55,13 @@ export default function RoutinesListScreen() {
       <Text style={styles.routineDate}>
         Créée le {new Date(item.createdAt).toLocaleDateString()}
       </Text>
+      <TouchableOpacity
+        style={styles.startButton}
+        onPress={() => handleStartRoutine(item.id)}
+      >
+        <Play size={20} color={theme.colors.text.primary} />
+        <Text style={styles.startButtonText}>Démarrer</Text>
+      </TouchableOpacity>
     </View>
   );
 
@@ -58,7 +78,7 @@ export default function RoutinesListScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = (theme: any) => StyleSheet.create({
   container: { 
     flex: 1, 
     padding: 16,
@@ -103,5 +123,20 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#666',
     marginTop: 32,
-  }
+  },
+  startButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.colors.primary,
+    padding: theme.spacing.sm,
+    borderRadius: theme.borderRadius.md,
+    marginTop: theme.spacing.sm,
+    gap: theme.spacing.xs,
+  },
+  startButtonText: {
+    color: theme.colors.text.primary,
+    fontSize: theme.typography.fontSize.base,
+    fontWeight: '600',
+  },
 }); 

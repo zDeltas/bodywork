@@ -1,6 +1,6 @@
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { router, Tabs } from 'expo-router';
-import { Calendar, ChartLine as LineChart, Clock, Plus, Ruler } from 'lucide-react-native';
+import { BookCheck, Calendar, ChartLine as LineChart, Clock, Ruler } from 'lucide-react-native';
 import { useTheme } from '@/app/hooks/useTheme';
 import {
   Inter_400Regular,
@@ -29,18 +29,6 @@ function TabLayout() {
     }
   }, [fontsLoaded, fontError]);
 
-  const handleAddButtonPress = () => {
-    const today = new Date().toISOString().split('T')[0];
-    router.push({
-      pathname: '/screens/workout/new',
-      params: { selectedDate: today },
-    });
-  };
-
-  const handleLongPress = () => {
-    router.push('/screens/routines/new');
-  };
-
   if (!fontsLoaded && !fontError) {
     return null;
   }
@@ -66,6 +54,13 @@ function TabLayout() {
           headerShown: false,
         }}
       >
+        <Tabs.Screen
+          name="routines"
+          options={{
+            title: 'Routines',
+            tabBarIcon: ({ color, size }) => <BookCheck size={size} color={color} />,
+          }}
+        />
         <Tabs.Screen
           name="index"
           options={{
@@ -95,16 +90,6 @@ function TabLayout() {
           }}
         />
       </Tabs>
-
-      {/* Floating Action Button */}
-      <TouchableOpacity
-        style={styles.floatingButton}
-        onPress={handleAddButtonPress}
-        onLongPress={handleLongPress}
-        activeOpacity={0.8}
-      >
-        <Plus color={theme.colors.text.primary} size={28} />
-      </TouchableOpacity>
     </View>
   );
 }
@@ -112,20 +97,7 @@ function TabLayout() {
 const useStyles = () => {
   const { theme } = useTheme();
 
-  return StyleSheet.create({
-    floatingButton: {
-      position: 'absolute',
-      width: 60,
-      height: 60,
-      borderRadius: theme.borderRadius.full,
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: theme.colors.primary,
-      bottom: 70,
-      right: theme.spacing.base,
-      zIndex: 999,
-    },
-  });
+  return StyleSheet.create({});
 };
 
 export default TabLayout;

@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Workout } from '../types/common';
-import storageService, { StorageKeys } from '../services/storage';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Workout } from '@/types/common';
+import { storageService } from '@/app/services/storage';
 
 export function useWorkouts() {
   const [workouts, setWorkouts] = useState<Workout[]>([]);
@@ -16,7 +16,7 @@ export function useWorkouts() {
       setError(null);
     } catch (err) {
       setError(
-        err instanceof Error ? err : new Error('Erreur lors du chargement des entraînements'),
+        err instanceof Error ? err : new Error('Erreur lors du chargement des entraînements')
       );
       setWorkouts([]);
     } finally {
@@ -74,7 +74,7 @@ export function useWorkouts() {
     (id: string) => {
       return workouts.find((workout) => workout.id === id) || null;
     },
-    [workouts],
+    [workouts]
   );
 
   // Fonction pour filtrer les workouts par exercice
@@ -82,7 +82,7 @@ export function useWorkouts() {
     (exercise: string) => {
       return workouts.filter((workout) => workout.exercise === exercise);
     },
-    [workouts],
+    [workouts]
   );
 
   // Fonction pour filtrer les workouts par groupe musculaire
@@ -90,7 +90,7 @@ export function useWorkouts() {
     (muscleGroup: string) => {
       return workouts.filter((workout) => workout.muscleGroup === muscleGroup);
     },
-    [workouts],
+    [workouts]
   );
 
   // Fonction pour filtrer les workouts par date
@@ -101,7 +101,7 @@ export function useWorkouts() {
         return workoutDate === date;
       });
     },
-    [workouts],
+    [workouts]
   );
 
   const contextValue = useMemo(
@@ -116,7 +116,7 @@ export function useWorkouts() {
       getWorkoutsByMuscleGroup,
       getWorkoutsByDate,
       setWorkouts,
-      refreshWorkouts: loadWorkouts,
+      refreshWorkouts: loadWorkouts
     }),
     [
       workouts,
@@ -128,8 +128,8 @@ export function useWorkouts() {
       getWorkoutsByExercise,
       getWorkoutsByMuscleGroup,
       getWorkoutsByDate,
-      loadWorkouts,
-    ],
+      loadWorkouts
+    ]
   );
 
   return contextValue;

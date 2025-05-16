@@ -128,12 +128,6 @@ export default {
     notApplicable: 'N/A',
     selectDate: 'Select a date',
     duplicateLastSeries: 'Duplicate last series',
-    exercise: 'Exercise',
-    completeSeries: 'Mark series as completed',
-    finalRPE: 'Final RPE',
-    restTime: 'Rest time',
-    configureSeries: 'Configure series',
-    selectRestTime: 'Select rest time'
   },
 
   // Timer screen
@@ -210,7 +204,8 @@ export default {
     errorSavingGoal: 'Error saving goal',
     goalDetails: 'Goal Details',
     currentWeightDescription: 'Current weight',
-    targetWeightDescription: 'Target weight'
+    targetWeightDescription: 'Target weight',
+    completedSeries: 'Completed series',
   },
 
   // Time periods

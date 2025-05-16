@@ -10,6 +10,7 @@ import Header from '@/app/components/layout/Header';
 import { Workout, WorkoutDateUtils } from '@/types/workout';
 import { TranslationKey } from '@/translations';
 import { useWorkouts } from '@/app/hooks/useWorkouts';
+import { FloatingActionButton } from '@/app/components/FloatingActionButton';
 
 LocaleConfig.locales['fr'] = {
   monthNames: [
@@ -302,6 +303,7 @@ export default function WorkoutScreen() {
           </View>
         )}
       </ScrollView>
+      <FloatingActionButton />
     </View>
   );
 }

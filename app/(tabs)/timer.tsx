@@ -11,6 +11,7 @@ import { useTheme } from '@/app/hooks/useTheme';
 import Text from '../components/ui/Text';
 import Header from '@/app/components/layout/Header';
 import Timer from '@/app/components/timer/Timer';
+import { FloatingActionButton } from '@/app/components/FloatingActionButton';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -502,6 +503,7 @@ export default function TimerScreen() {
         LinearGradient={LinearGradient}
         Haptics={Haptics}
       />
+      <FloatingActionButton />
     </View>
   );
 }

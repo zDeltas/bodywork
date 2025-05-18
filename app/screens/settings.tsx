@@ -11,7 +11,6 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
-import * as Haptics from 'expo-haptics';
 import { useSettings } from '@/app/hooks/useSettings';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
@@ -22,6 +21,7 @@ import Text from '@/app/components/ui/Text';
 import { TranslationKey } from '@/translations';
 import { StatsCardSkeleton } from '@/app/components/ui/SkeletonComponents';
 import { storageService } from '@/app/services';
+import { useHaptics } from '@/src/hooks/useHaptics';
 
 export default function SettingsScreen() {
   const { settings, updateSettings, isLoading } = useSettings();
@@ -30,34 +30,35 @@ export default function SettingsScreen() {
   const { isExporting, exportWorkoutsToCSV } = useCSVExport();
   const styles = useStyles();
   const [showAbout, setShowAbout] = useState(false);
+  const haptics = useHaptics();
 
   const toggleWeightUnit = () => {
     const newUnit = settings.weightUnit === 'kg' ? 'lb' : 'kg';
     updateSettings({ weightUnit: newUnit as 'kg' | 'lb' });
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptics.impactLight();
   };
 
   const toggleGender = () => {
     const newGender = settings.gender === 'male' ? 'female' : 'male';
     updateSettings({ gender: newGender as 'male' | 'female' });
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptics.impactLight();
   };
 
   const toggleLanguage = () => {
     const newLanguage = settings.language === 'en' ? 'fr' : 'en';
     updateSettings({ language: newLanguage as 'en' | 'fr' });
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptics.impactLight();
   };
 
   const toggleTheme = () => {
     const newTheme = settings.theme === 'dark' ? 'light' : 'dark';
     updateSettings({ theme: newTheme as 'dark' | 'light' });
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptics.impactLight();
   };
 
   const toggleAbout = () => {
     setShowAbout(!showAbout);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptics.impactLight();
   };
 
   const handleResetData = async () => {
@@ -74,6 +75,14 @@ export default function SettingsScreen() {
         t('settings.errorResettingData'),
         error instanceof Error ? error.message : String(error),
       );
+    }
+  };
+
+  const handleExportData = async () => {
+    haptics.impactLight();
+    const result = await exportWorkoutsToCSV();
+    if (!result.success) {
+      Alert.alert(t('common.error'), result.message);
     }
   };
 
@@ -149,13 +158,7 @@ export default function SettingsScreen() {
 
             <TouchableOpacity
               style={styles.settingItem}
-              onPress={async () => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                const result = await exportWorkoutsToCSV();
-                if (!result.success) {
-                  Alert.alert(t('common.error'), result.message);
-                }
-              }}
+              onPress={handleExportData}
               disabled={isExporting}
             >
               <View style={styles.settingInfo}>

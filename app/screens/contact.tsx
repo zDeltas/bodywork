@@ -10,7 +10,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import * as Haptics from 'expo-haptics';
+import { useHaptics } from '@/src/hooks/useHaptics';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
 import Header from '@/app/components/layout/Header';
@@ -31,6 +31,7 @@ export default function ContactScreen() {
     email: '',
     message: '',
   });
+  const haptics = useHaptics();
 
   const validateForm = () => {
     const newErrors = {
@@ -64,7 +65,7 @@ export default function ContactScreen() {
 
   const handleSubmit = async () => {
     if (!validateForm()) {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      haptics.error();
       return;
     }
 
@@ -82,12 +83,12 @@ export default function ContactScreen() {
         throw new Error('Failed to send message');
       }
 
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      haptics.success();
       Alert.alert(t('common.success'), t('contact.success'));
       setFormData({ name: '', email: '', message: '' });
       setErrors({ name: '', email: '', message: '' });
     } catch (error) {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      haptics.error();
       Alert.alert(t('common.error'), t('contact.error'));
     } finally {
       setIsSending(false);

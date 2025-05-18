@@ -10,13 +10,13 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
 
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
 import Header from '@/app/components/layout/Header';
 import Text from '@/app/components/ui/Text';
+import { useHaptics } from '@/src/hooks/useHaptics';
 
 interface SettingItemProps {
   icon: keyof typeof Ionicons.glyphMap;
@@ -29,6 +29,7 @@ interface SettingItemProps {
 const SettingItem = ({ icon, label, onPress, subLabel, variant = 'default' }: SettingItemProps) => {
   const { theme } = useTheme();
   const styles = useStyles();
+  const haptics = useHaptics();
 
   const getIconColor = () => {
     switch (variant) {
@@ -49,7 +50,7 @@ const SettingItem = ({ icon, label, onPress, subLabel, variant = 'default' }: Se
         variant === 'secondary' && styles.settingItemSecondary,
       ]}
       onPress={() => {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        haptics.impactLight();
         onPress();
       }}
     >
@@ -90,6 +91,7 @@ function ProfileScreen() {
   const { theme } = useTheme();
   const styles = useStyles();
   const [showInstagramModal, setShowInstagramModal] = useState(false);
+  const haptics = useHaptics();
 
   const openInstagram = async (useApp: boolean) => {
     const instagramUrl = 'instagram://user?username=gainiziapp';
@@ -110,6 +112,11 @@ function ProfileScreen() {
       Alert.alert(t('common.error'), 'Could not open Instagram');
     }
     setShowInstagramModal(false);
+  };
+
+  const handleEditProfile = () => {
+    haptics.impactLight();
+    // ... rest of the code ...
   };
 
   return (

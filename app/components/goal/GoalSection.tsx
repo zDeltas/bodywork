@@ -1,9 +1,9 @@
 import React, { Dispatch, SetStateAction } from 'react';
 import { Alert, Animated, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import * as Haptics from 'expo-haptics';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
+import { useHaptics } from '@/src/hooks/useHaptics';
 import { router } from 'expo-router';
 import useGoals from '@/app/hooks/useGoals';
 import useWorkouts from '@/app/hooks/useWorkouts';
@@ -16,6 +16,7 @@ interface GoalSectionProps {
 const GoalSection: React.FC<GoalSectionProps> = ({ fadeAnim }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
+  const haptics = useHaptics();
   const { workouts } = useWorkouts();
   const { goals, deleteGoal } = useGoals(workouts);
 
@@ -160,7 +161,7 @@ const GoalSection: React.FC<GoalSectionProps> = ({ fadeAnim }) => {
                           style: 'destructive',
                           onPress: () => {
                             deleteGoal(goal.exercise);
-                            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                            haptics.impactMedium();
                           },
                         },
                       ],
@@ -201,7 +202,7 @@ const GoalSection: React.FC<GoalSectionProps> = ({ fadeAnim }) => {
       <TouchableOpacity
         style={styles.addGoalButton}
         onPress={() => {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+          haptics.impactMedium();
           router.push('/screens/goal/new');
         }}
       >

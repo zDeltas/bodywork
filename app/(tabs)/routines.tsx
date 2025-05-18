@@ -22,8 +22,8 @@ import { fr } from 'date-fns/locale';
 import Button from '@/app/components/ui/Button';
 import FloatButtonAction from '@/app/components/ui/FloatButtonAction';
 import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
-import * as Haptics from 'expo-haptics';
 import Animated, { Easing, interpolate, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { useHaptics } from '@/src/hooks/useHaptics';
 
 type Routine = {
   id: string;
@@ -119,6 +119,7 @@ const RoutineItem = React.memo(({
   theme: any;
   styles: any;
 }) => {
+  const haptics = useHaptics();
   const totalSeries = item.exercises.reduce((total, exercise) => total + exercise.series.length, 0);
   const estimatedTime = Math.ceil(item.exercises.reduce((total, exercise) => {
     return total + exercise.series.reduce((seriesTotal, series) => {
@@ -198,7 +199,7 @@ const RoutineItem = React.memo(({
     >
       <TouchableOpacity
         onLongPress={() => {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+          haptics.impactMedium();
         }}
         delayLongPress={200}
         style={styles.routineCard}
@@ -303,6 +304,7 @@ export default function RoutinesListScreen() {
   const scale = useSharedValue(1);
   const searchBarWidth = useSharedValue(0);
   const searchBarOpacity = useSharedValue(0);
+  const haptics = useHaptics();
 
   useEffect(() => {
     loadRoutines();
@@ -322,7 +324,7 @@ export default function RoutinesListScreen() {
   const handleSearchFocus = () => {
     setIsSearchFocused(true);
     animateSearchBar(true);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptics.impactLight();
   };
 
   const handleSearchBlur = () => {
@@ -335,7 +337,7 @@ export default function RoutinesListScreen() {
   const clearSearch = () => {
     setSearchQuery('');
     animateSearchBar(false);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptics.impactLight();
   };
 
   const loadRoutines = async () => {
@@ -344,7 +346,7 @@ export default function RoutinesListScreen() {
   };
 
   const handleStartRoutine = (routineId: string) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    haptics.impactMedium();
     router.push({
       pathname: '/screens/workout/session',
       params: { routineId }
@@ -352,14 +354,14 @@ export default function RoutinesListScreen() {
   };
 
   const handleCreateRoutine = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    haptics.impactMedium();
     router.push({
       pathname: '/screens/routines/new'
     });
   };
 
   const toggleFavorite = async (routineId: string) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptics.impactLight();
     const updatedRoutines = routines.map(routine =>
       routine.id === routineId
         ? { ...routine, favorite: !routine.favorite }
@@ -373,7 +375,7 @@ export default function RoutinesListScreen() {
   };
 
   const handleEditRoutine = (routineId: string) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptics.impactLight();
     router.push({
       pathname: '/screens/routines/new',
       params: { routineId }
@@ -381,7 +383,7 @@ export default function RoutinesListScreen() {
   };
 
   const handleDeleteRoutine = async (routineId: string) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    haptics.impactMedium();
     Alert.alert(
       'Supprimer la routine',
       'Êtes-vous sûr de vouloir supprimer cette routine ?',
@@ -404,7 +406,7 @@ export default function RoutinesListScreen() {
   };
 
   const handleShareRoutine = async (routine: Routine) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptics.impactLight();
     try {
       const routineData = {
         title: routine.title,
@@ -601,7 +603,7 @@ export default function RoutinesListScreen() {
             <TouchableOpacity
               style={[styles.filterButton, showFavoritesOnly && styles.filterButtonActive]}
               onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                haptics.impactLight();
                 setShowFavoritesOnly(!showFavoritesOnly);
               }}
             >

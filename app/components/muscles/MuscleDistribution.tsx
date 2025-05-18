@@ -1,9 +1,9 @@
 import React from 'react';
 import { Animated, Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { VictoryLabel, VictoryPie } from 'victory-native';
-import * as Haptics from 'expo-haptics';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
+import { useHaptics } from '@/src/hooks/useHaptics';
 import Text from '@/app/components/ui/Text';
 
 interface MuscleGroupData {
@@ -31,6 +31,7 @@ const MuscleDistribution: React.FC<MuscleDistributionProps> = ({
 }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
+  const haptics = useHaptics();
 
   const styles = StyleSheet.create({
     chartContainer: {
@@ -131,7 +132,7 @@ const MuscleDistribution: React.FC<MuscleDistributionProps> = ({
             style={[styles.filterButton, selectedPeriod === '1m' && styles.filterButtonActive]}
             onPress={() => {
               setSelectedPeriod('1m');
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              haptics.impactLight();
             }}
           >
             <Text style={[styles.filterText, selectedPeriod === '1m' && styles.filterTextActive]}>
@@ -142,7 +143,7 @@ const MuscleDistribution: React.FC<MuscleDistributionProps> = ({
             style={[styles.filterButton, selectedPeriod === '3m' && styles.filterButtonActive]}
             onPress={() => {
               setSelectedPeriod('3m');
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              haptics.impactLight();
             }}
           >
             <Text style={[styles.filterText, selectedPeriod === '3m' && styles.filterTextActive]}>
@@ -153,7 +154,7 @@ const MuscleDistribution: React.FC<MuscleDistributionProps> = ({
             style={[styles.filterButton, selectedPeriod === '6m' && styles.filterButtonActive]}
             onPress={() => {
               setSelectedPeriod('6m');
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              haptics.impactLight();
             }}
           >
             <Text style={[styles.filterText, selectedPeriod === '6m' && styles.filterTextActive]}>

@@ -5,7 +5,6 @@ import { Clock, Minus, Plus, Timer as TimerIcon } from 'lucide-react-native';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { TimerPickerModal } from 'react-native-timer-picker';
 import { LinearGradient } from 'expo-linear-gradient';
-import * as Haptics from 'expo-haptics';
 import { TranslationKey } from '@/translations';
 import { useTheme } from '@/app/hooks/useTheme';
 import Text from '../components/ui/Text';
@@ -13,6 +12,7 @@ import Header from '@/app/components/layout/Header';
 import Timer from '@/app/components/timer/Timer';
 import FloatButtonAction from '@/app/components/ui/FloatButtonAction';
 import { useRouter } from 'expo-router';
+import { useHaptics } from '@/src/hooks/useHaptics';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -205,6 +205,7 @@ const useStyles = (theme: any) => {
 export default function TimerScreen() {
   const { t } = useTranslation();
   const { theme } = useTheme();
+  const haptics = useHaptics();
   const styles = useStyles(theme);
   const [mode, setMode] = useState<'timer' | 'stopwatch'>('timer');
   const [selectedTime, setSelectedTime] = useState(60);
@@ -460,7 +461,7 @@ export default function TimerScreen() {
         minuteLabel="min"
         secondLabel="sec"
         LinearGradient={LinearGradient}
-        Haptics={Haptics}
+        Haptics={haptics}
       />
 
       <TimerPickerModal
@@ -503,7 +504,7 @@ export default function TimerScreen() {
         minuteLabel="min"
         secondLabel="sec"
         LinearGradient={LinearGradient}
-        Haptics={Haptics}
+        Haptics={haptics}
       />
       <FloatButtonAction
         icon={<Plus size={24} color={theme.colors.background.main} />}

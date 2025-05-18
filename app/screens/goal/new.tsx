@@ -21,7 +21,7 @@ import { router } from 'expo-router';
 import { ChevronDown, X } from 'lucide-react-native';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import Animated, { FadeIn } from 'react-native-reanimated';
-import * as Haptics from 'expo-haptics';
+import { useHaptics } from '@/src/hooks/useHaptics';
 import { useTheme } from '@/app/hooks/useTheme';
 import Header from '@/app/components/layout/Header';
 import Text from '@/app/components/ui/Text';
@@ -382,6 +382,7 @@ export default function NewGoalScreen() {
   // Utiliser les hooks optimisés
   const { workouts } = useWorkouts();
   const { addGoal, getCurrentWeight, suggestTargetWeight } = useGoals(workouts);
+  const haptics = useHaptics();
 
   // Charger les options d'exercice à partir des workouts et des exercices prédéfinis
   useEffect(() => {
@@ -429,6 +430,7 @@ export default function NewGoalScreen() {
 
   const handleExerciseSelect = useCallback(
     (exercise: string, exerciseKey?: string) => {
+      haptics.impactLight();
       setIsExerciseModalVisible(false);
       setNewGoalExercise(exercise);
       setNewGoalExerciseKey(exerciseKey || exercise);
@@ -437,11 +439,11 @@ export default function NewGoalScreen() {
         setNewGoalCurrent(weight.toString());
       }
     },
-    [getCurrentWeight],
+    [getCurrentWeight, haptics],
   );
 
   const handleUseLastWorkout = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptics.impactLight();
     if (highestWeight) {
       setNewGoalCurrent(highestWeight.toString());
       const target = suggestTargetWeight(highestWeight);
@@ -449,23 +451,33 @@ export default function NewGoalScreen() {
         setSuggestedTarget(target);
       }
     }
-  }, [highestWeight, suggestTargetWeight]);
+  }, [highestWeight, suggestTargetWeight, haptics]);
 
   const handleUseSuggested = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptics.impactLight();
     if (suggestedTarget) {
       setNewGoalTarget(suggestedTarget.toString());
     }
-  }, [suggestedTarget]);
+  }, [suggestedTarget, haptics]);
 
   const handleOpenExerciseModal = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptics.impactLight();
     setIsExerciseModalVisible(true);
-  }, []);
+  }, [haptics]);
 
   const handleCloseExerciseModal = useCallback(() => {
     setIsExerciseModalVisible(false);
   }, []);
+
+  const handleTargetChange = (value: string) => {
+    haptics.impactLight();
+    setNewGoalTarget(value);
+  };
+
+  const handleCurrentChange = (value: string) => {
+    haptics.impactLight();
+    setNewGoalCurrent(value);
+  };
 
   const saveGoal = async () => {
     if (!newGoalExercise.trim() || !newGoalCurrent || !newGoalTarget) {
@@ -553,7 +565,7 @@ export default function NewGoalScreen() {
                 placeholder="0"
                 placeholderTextColor={theme.colors.text.secondary}
                 value={newGoalCurrent}
-                onChangeText={setNewGoalCurrent}
+                onChangeText={handleCurrentChange}
                 keyboardType="numeric"
               />
               {newGoalExercise && hasPreviousWorkouts && highestWeight && (
@@ -581,7 +593,7 @@ export default function NewGoalScreen() {
                 placeholder="0"
                 placeholderTextColor={theme.colors.text.disabled}
                 value={newGoalTarget}
-                onChangeText={setNewGoalTarget}
+                onChangeText={handleTargetChange}
                 keyboardType="numeric"
               />
               {suggestedTarget && (

@@ -6,9 +6,9 @@ import {
   useFonts,
 } from '@expo-google-fonts/inter';
 import { Minus, Pause, Play, Plus, RotateCcw } from 'lucide-react-native';
-import * as Haptics from 'expo-haptics';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
+import { useHaptics } from '@/src/hooks/useHaptics';
 import Text from '@/app/components/ui/Text';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { Button } from '@/app/components/ui/Button';
@@ -34,6 +34,7 @@ export default function Timer({
 }: TimerProps) {
   const { t } = useTranslation();
   const { theme } = useTheme();
+  const haptics = useHaptics();
   const styles = useStyles();
   const [workTime, setWorkTime] = useState(mode === 'timer' ? initialTime : 0);
   const [restTimeState, setRestTimeState] = useState(restTime);
@@ -48,7 +49,7 @@ export default function Timer({
   const handleWorkComplete = useCallback(() => {
     if (currentSet < sets) {
       if (Platform.OS === 'ios') {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        haptics.success();
       } else {
         Vibration.vibrate([0, 500, 200, 500]);
       }
@@ -58,11 +59,11 @@ export default function Timer({
       setIsRunning(false);
       onComplete?.();
     }
-  }, [currentSet, sets, restTime, onComplete]);
+  }, [currentSet, sets, restTime, onComplete, haptics]);
 
   const handleRestComplete = useCallback(() => {
     if (Platform.OS === 'ios') {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      haptics.success();
     } else {
       Vibration.vibrate([0, 500, 200, 500]);
     }
@@ -74,7 +75,7 @@ export default function Timer({
       setIsRunning(false);
       onComplete?.();
     }
-  }, [currentSet, sets, initialTime, onComplete]);
+  }, [currentSet, sets, initialTime, onComplete, haptics]);
 
   const handleSetChange = useCallback(
     (newSets: number) => {
@@ -83,9 +84,9 @@ export default function Timer({
       if (currentSet > updatedSets) {
         setCurrentSet(updatedSets);
       }
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      haptics.impactLight();
     },
-    [currentSet, onSetsChange],
+    [currentSet, onSetsChange, haptics],
   );
 
   useEffect(() => {
@@ -135,8 +136,8 @@ export default function Timer({
 
   const toggleTimer = useCallback(() => {
     setIsRunning((prev) => !prev);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-  }, []);
+    haptics.impactLight();
+  }, [haptics]);
 
   const resetTimer = useCallback(() => {
     setIsRunning(false);
@@ -144,8 +145,8 @@ export default function Timer({
     setCurrentSet(1);
     setWorkTime(mode === 'timer' ? initialTime : 0);
     setRestTimeState(restTime);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-  }, [initialTime, restTime, mode]);
+    haptics.impactMedium();
+  }, [initialTime, restTime, mode, haptics]);
 
   if (!fontsLoaded) {
     return null;

@@ -1,16 +1,29 @@
-import React, { useEffect, useState } from 'react';
-import { Modal, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import {
+  Alert,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text as RNText,
+  TouchableOpacity,
+  View,
+  Vibration,
+  Modal,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
+import { useHaptics } from '@/src/hooks/useHaptics';
+import Header from '@/app/components/layout/Header';
+import Timer from '@/app/components/timer/Timer';
+import { storageService } from '@/app/services/storage';
+import { Workout } from '@/types/common';
+import { AlertTriangle, Check, X } from 'lucide-react-native';
+import BottomBarTimer from '@/app/components/timer/BottomBarTimer';
+import FloatButtonAction from '@/app/components/ui/FloatButtonAction';
 import Text from '@/app/components/ui/Text';
 import Button from '@/app/components/ui/Button';
-import BottomBarTimer from '@/app/components/timer/BottomBarTimer';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { storageService } from '@/app/services/storage';
-import { AlertTriangle, Check, X } from 'lucide-react-native';
-import * as Haptics from 'expo-haptics';
-import Header from '@/app/components/layout/Header';
-import FloatButtonAction from '@/app/components/ui/FloatButtonAction';
 
 type Exercise = {
   name: string;
@@ -37,7 +50,7 @@ export default function WorkoutSessionScreen() {
   const { t } = useTranslation();
   const { theme } = useTheme();
   const styles = useStyles(theme);
-  const router = useRouter();
+  const haptics = useHaptics();
   const { routineId } = useLocalSearchParams();
 
   const [routine, setRoutine] = useState<Routine | null>(null);
@@ -254,7 +267,7 @@ export default function WorkoutSessionScreen() {
                 ]}
                 onPress={() => {
                   setRpe(value.toString());
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  haptics.impactLight();
                 }}
               >
                 <Text
@@ -280,6 +293,11 @@ export default function WorkoutSessionScreen() {
       </View>
     </Modal>
   );
+
+  const handleFinishWorkout = useCallback(() => {
+    haptics.impactLight();
+    router.push('/(tabs)/workout/summary' as any);
+  }, [haptics]);
 
   return (
     <View style={styles.container}>

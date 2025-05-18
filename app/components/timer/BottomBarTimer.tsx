@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Platform, StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet, View, TouchableOpacity } from 'react-native';
 import { Pause, Play, Plus, Minus } from 'lucide-react-native';
-import * as Haptics from 'expo-haptics';
+import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
+import { useHaptics } from '@/src/hooks/useHaptics';
 import Text from '@/app/components/ui/Text';
 import { Button } from '@/app/components/ui/Button';
 
@@ -17,7 +18,9 @@ export default function BottomBarTimer({
   onComplete,
   autoStart = false,
 }: BottomBarTimerProps) {
+  const { t } = useTranslation();
   const { theme } = useTheme();
+  const haptics = useHaptics();
   const styles = useStyles();
   const [time, setTime] = useState(initialTime);
   const [isRunning, setIsRunning] = useState(autoStart);
@@ -51,13 +54,13 @@ export default function BottomBarTimer({
 
   const toggleTimer = useCallback(() => {
     setIsRunning((prev) => !prev);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-  }, []);
+    haptics.impactLight();
+  }, [haptics]);
 
   const adjustTime = useCallback((seconds: number) => {
     setTime((prev) => Math.max(0, prev + seconds));
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-  }, []);
+    haptics.impactLight();
+  }, [haptics]);
 
   return (
     <View style={styles.container}>
@@ -86,16 +89,16 @@ export default function BottomBarTimer({
           </View>
         </View>
         <View style={styles.playRow}>
-          <Button
-            variant="primary"
-            icon={isRunning ? (
+          <TouchableOpacity
+            style={styles.playButton}
+            onPress={toggleTimer}
+          >
+            {isRunning ? (
               <Pause size={32} color={theme.colors.background.main} />
             ) : (
               <Play size={32} color={theme.colors.background.main} />
             )}
-            onPress={toggleTimer}
-            style={styles.playButton}
-          />
+          </TouchableOpacity>
         </View>
       </View>
     </View>

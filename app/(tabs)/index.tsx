@@ -10,7 +10,7 @@ import Header from '@/app/components/layout/Header';
 import { Workout, WorkoutDateUtils } from '@/types/workout';
 import { TranslationKey } from '@/translations';
 import { useWorkouts } from '@/app/hooks/useWorkouts';
-import { FloatingActionButton } from '@/app/components/FloatingActionButton';
+import FloatButtonAction from '@/app/components/ui/FloatButtonAction';
 
 LocaleConfig.locales['fr'] = {
   monthNames: [
@@ -160,13 +160,6 @@ export default function WorkoutScreen() {
     return workoutDate === selectedDate;
   });
 
-  /**
-   * Navigation vers les paramètres
-   */
-  const navigateToSettings = (): void => {
-    router.push('/screens/settings');
-  };
-
   return (
     <View style={styles.container}>
       <Header
@@ -303,7 +296,10 @@ export default function WorkoutScreen() {
           </View>
         )}
       </ScrollView>
-      <FloatingActionButton />
+      <FloatButtonAction
+        icon="plus"
+        onPress={() => router.push('/screens/workout/new')}
+      />
     </View>
   );
 }

@@ -9,6 +9,8 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { storageService } from '@/app/services/storage';
 import { AlertTriangle, Check, X } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
+import Header from '@/app/components/layout/Header';
+import FloatButtonAction from '@/app/components/ui/FloatButtonAction';
 
 type Exercise = {
   name: string;
@@ -64,7 +66,7 @@ export default function WorkoutSessionScreen() {
   if (!routine) {
     return (
       <View style={styles.container}>
-        <Text>Chargement...</Text>
+        <Text style={styles.loadingText}>Chargement...</Text>
       </View>
     );
   }
@@ -84,6 +86,7 @@ export default function WorkoutSessionScreen() {
       setShowRpeModal(true);
     } else {
       const rest = convertTimeToSeconds(currentSeries.rest);
+      console.log(rest);
       setRestTime(rest);
       setIsResting(true);
       setRpe('');
@@ -153,6 +156,73 @@ export default function WorkoutSessionScreen() {
     router.push('/(tabs)');
   };
 
+  const renderProgressBar = () => {
+    const totalExercises = routine.exercises.length;
+    const progress = ((currentExerciseIndex + 1) / totalExercises) * 100;
+    
+    return (
+      <View style={styles.progressContainer}>
+        <View style={styles.progressBar}>
+          <View style={[styles.progressFill, { width: `${progress}%` }]} />
+        </View>
+        <Text variant="caption" style={styles.progressText}>
+          {currentExerciseIndex + 1}/{totalExercises} {t('workout.exercises' as any)}
+        </Text>
+      </View>
+    );
+  };
+
+  const renderCurrentExercise = () => (
+    <View style={styles.exerciseCard}>
+      <Text variant="heading" style={styles.exerciseTitle}>
+        {currentExercise.name}
+      </Text>
+      <View style={styles.seriesInfo}>
+        <View style={styles.seriesRow}>
+          <Text variant="body" style={styles.seriesLabel}>{t('workout.series' as any)}</Text>
+          <Text variant="heading" style={styles.seriesValue}>
+            {currentSeriesIndex + 1}/{currentExercise.series.length}
+          </Text>
+        </View>
+        <View style={styles.seriesRow}>
+          <Text variant="body" style={styles.seriesLabel}>{t('workout.weight' as any)}</Text>
+          <Text variant="heading" style={styles.seriesValue}>{currentSeries.weight} kg</Text>
+        </View>
+        <View style={styles.seriesRow}>
+          <Text variant="body" style={styles.seriesLabel}>{t('workout.reps' as any)}</Text>
+          <Text variant="heading" style={styles.seriesValue}>{currentSeries.reps}</Text>
+        </View>
+        <View style={styles.seriesRow}>
+          <Text variant="body" style={styles.seriesLabel}>{t('workout.rest' as any)}</Text>
+          <Text variant="heading" style={styles.seriesValue}>{currentSeries.rest}</Text>
+        </View>
+      </View>
+    </View>
+  );
+
+  const renderNextExercise = () => {
+    const nextExercise = getNextExercise();
+    if (!nextExercise) return null;
+
+    return (
+      <View style={styles.nextExerciseCard}>
+        <Text variant="subheading" style={styles.nextExerciseTitle}>
+          {t('workout.nextExercise' as any)}
+        </Text>
+        <Text variant="heading" style={styles.nextExerciseName}>
+          {nextExercise.name}
+        </Text>
+        {nextExercise.series[0] && (
+          <View style={styles.nextExerciseDetails}>
+            <Text variant="body" style={styles.nextExerciseDetail}>
+              {nextExercise.series[0].weight}kg × {nextExercise.series[0].reps} {t('workout.reps' as any)}
+            </Text>
+          </View>
+        )}
+      </View>
+    );
+  };
+
   const renderRpeModal = () => (
     <Modal
       visible={showRpeModal}
@@ -204,6 +274,7 @@ export default function WorkoutSessionScreen() {
             onPress={handleRpeSave}
             style={styles.saveButton}
             disabled={!rpe}
+            size="large"
           />
         </View>
       </View>
@@ -212,80 +283,47 @@ export default function WorkoutSessionScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleCancel} style={styles.cancelButton}>
-          <X size={28} color={theme.colors.text.primary} />
-        </TouchableOpacity>
-      </View>
-      <View style={styles.progressBar}>
-        <Text style={styles.progressText}>
-          {t('workout.exercise' as any)} {progress}
-        </Text>
-      </View>
+      <Header 
+        title={routine.title}
+        showBackButton={true}
+        onBack={handleCancel}
+      />
 
+      {renderProgressBar()}
+      
       <ScrollView style={styles.content}>
-        <View style={styles.exerciseCard}>
-          <Text variant="heading" style={styles.exerciseName}>
-            {currentExercise.name}
-          </Text>
-          <Text variant="body" style={styles.seriesInfo}>
-            {t('workout.series')} {currentSeriesIndex + 1}/{currentExercise.series.length}
-          </Text>
-          <Text variant="body" style={styles.seriesDetails}>
-            {currentSeries.weight}kg × {currentSeries.reps} {t('workout.reps')}
-          </Text>
-          {currentSeries.note && (
-            <Text variant="caption" style={styles.note}>
-              {currentSeries.note}
-            </Text>
-          )}
-        </View>
-
-        {isResting && getNextExercise() && (
-          <View style={styles.nextExerciseContainer}>
-            <Text variant="body" style={styles.nextExerciseTitle}>
-              {t('workout.nextExercise' as any)}:
-            </Text>
-            <Text variant="heading" style={styles.nextExerciseName}>
-              {getNextExercise()?.name}
-            </Text>
-            {getNextExercise()?.series[0] && (
-              <Text variant="body" style={styles.nextExerciseDetails}>
-                {getNextExercise()?.series[0].weight}kg × {getNextExercise()?.series[0].reps} {t('workout.reps')}
-              </Text>
-            )}
-          </View>
-        )}
+        {renderCurrentExercise()}
+        
+        {isResting && renderNextExercise()}
       </ScrollView>
 
       {isResting ? (
-        <BottomBarTimer
-          initialTime={restTime}
-          onComplete={handleRestComplete}
-          autoStart={true}
-        />
-      ) : (
-        <View style={styles.exerciseContainer}>
-          <Button
-            title={t('workout.completedSeries' as any)}
-            onPress={handleCompletedSeries}
-            style={styles.completeButton}
-            icon={<Check size={24} color={theme.colors.text.primary} />}
+        <View style={styles.timerContainer}>
+          <BottomBarTimer
+            initialTime={restTime}
+            onComplete={handleRestComplete}
+            autoStart={true}
           />
         </View>
+      ) : (
+        <FloatButtonAction
+          icon={<Check size={24} color={theme.colors.background.main} />}
+          onPress={handleCompletedSeries}
+        />
       )}
 
       {routineFinished && (
         <Modal visible transparent animationType="fade">
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
-              <Text variant="heading" style={styles.modalTitle}>Routine terminée !</Text>
+              <Text variant="heading" style={styles.modalTitle}>{t('workout.routineCompleted' as any)}</Text>
               <Button 
-                title="Retour à l'accueil" 
+                title={t('common.backToHome' as any)}
                 onPress={() => {
                   setRoutineFinished(false);
                   router.push('/(tabs)');
-                }} 
+                }}
+                size="large"
               />
             </View>
           </View>
@@ -295,23 +333,27 @@ export default function WorkoutSessionScreen() {
       <Modal visible={showCancelModal} transparent animationType="fade"
              onRequestClose={() => setShowCancelModal(false)}>
         <View style={styles.modalOverlay}>
-          <View style={styles.cancelModalContent}>
-            <AlertTriangle size={40} color={theme.colors.error} style={{ alignSelf: 'center', marginBottom: 12 }} />
-            <Text variant="heading" style={styles.cancelModalTitle}>Quitter la routine ?</Text>
-            <Text style={styles.cancelModalMessage}>Voulez-vous vraiment quitter la routine en cours ? Les progrès ne
-              seront pas enregistrés.</Text>
-            <View style={styles.cancelModalButtons}>
+          <View style={styles.modalContent}>
+            <AlertTriangle size={40} color={theme.colors.error} style={styles.modalIcon} />
+            <Text variant="heading" style={styles.modalTitle}>{t('workout.quitRoutine' as any)}</Text>
+            <Text style={styles.modalMessage}>{t('workout.quitRoutineMessage' as any)}</Text>
+            <View style={styles.modalButtons}>
               <Button
-                title="Continuer"
+                title={t('common.continue' as any)}
                 variant="secondary"
                 onPress={() => setShowCancelModal(false)}
-                style={styles.cancelModalButtonSecondary}
+                style={styles.modalButton}
               />
               <Button
-                title="Quitter"
+                title={t('common.quit' as any)}
                 variant="primary"
                 onPress={handleConfirmCancel}
-                style={styles.cancelModalButtonPrimary}
+                style={{
+                  flex: 1,
+                  backgroundColor: 'transparent',
+                  borderWidth: 1,
+                  borderColor: theme.colors.error
+                }}
                 textStyle={{ color: theme.colors.error }}
               />
             </View>
@@ -329,33 +371,32 @@ const useStyles = (theme: any) => StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.background.main
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    height: 56,
-    paddingHorizontal: theme.spacing.base,
-    marginTop: theme.spacing.base
+  loadingText: {
+    color: theme.colors.text.primary,
+    fontSize: theme.typography.fontSize.lg
   },
-  cancelButton: {
-    padding: 8,
-    borderRadius: 24
+  progressContainer: {
+    padding: theme.spacing.lg,
+    backgroundColor: theme.colors.background.card,
   },
   progressBar: {
-    backgroundColor: theme.colors.background.card,
-    padding: theme.spacing.base,
-    alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border.default
+    height: 4,
+    backgroundColor: theme.colors.background.button,
+    borderRadius: theme.borderRadius.full,
+    overflow: 'hidden',
+    marginBottom: theme.spacing.xs,
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: theme.colors.primary,
   },
   progressText: {
-    fontSize: theme.typography.fontSize.base,
-    color: theme.colors.text.primary
+    color: theme.colors.text.secondary,
+    textAlign: 'center',
   },
   content: {
     flex: 1,
-    padding: theme.spacing.base,
-    paddingBottom: 120
+    padding: theme.spacing.lg,
   },
   exerciseCard: {
     backgroundColor: theme.colors.background.card,
@@ -364,57 +405,108 @@ const useStyles = (theme: any) => StyleSheet.create({
     marginBottom: theme.spacing.lg,
     ...theme.shadows.sm
   },
-  exerciseName: {
-    fontSize: theme.typography.fontSize.xl,
-    marginBottom: theme.spacing.sm
+  exerciseTitle: {
+    marginBottom: theme.spacing.lg,
+    color: theme.colors.text.primary,
   },
   seriesInfo: {
-    color: theme.colors.text.secondary,
-    marginBottom: theme.spacing.xs
+    gap: theme.spacing.md,
   },
-  seriesDetails: {
+  seriesRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  seriesLabel: {
+    color: theme.colors.text.secondary,
+  },
+  seriesValue: {
     color: theme.colors.text.primary,
-    marginBottom: theme.spacing.xs
   },
-  note: {
+  nextExerciseCard: {
+    backgroundColor: theme.colors.background.button,
+    borderRadius: theme.borderRadius.lg,
+    padding: theme.spacing.lg,
+    marginBottom: theme.spacing.lg,
+  },
+  nextExerciseTitle: {
     color: theme.colors.text.secondary,
-    fontStyle: 'italic'
+    marginBottom: theme.spacing.xs,
+  },
+  nextExerciseName: {
+    color: theme.colors.text.primary,
+    marginBottom: theme.spacing.xs,
+  },
+  nextExerciseDetails: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  nextExerciseDetail: {
+    color: theme.colors.text.secondary,
+  },
+  timerContainer: {
+    backgroundColor: theme.colors.background.card,
+    padding: theme.spacing.lg,
+    borderTopLeftRadius: theme.borderRadius.lg,
+    borderTopRightRadius: theme.borderRadius.lg,
+    ...theme.shadows.lg
   },
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-end'
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: theme.spacing.lg,
   },
   modalContent: {
     backgroundColor: theme.colors.background.card,
-    borderTopLeftRadius: theme.borderRadius.lg,
-    borderTopRightRadius: theme.borderRadius.lg,
+    borderRadius: theme.borderRadius.lg,
     padding: theme.spacing.lg,
-    ...theme.shadows.lg
+    width: '100%',
+    maxWidth: 400,
   },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: theme.spacing.lg
+    marginBottom: theme.spacing.lg,
   },
   modalTitle: {
     fontSize: theme.typography.fontSize.xl,
-    color: theme.colors.text.primary
+    color: theme.colors.text.primary,
+    textAlign: 'center',
+    marginBottom: theme.spacing.md,
+  },
+  modalIcon: {
+    alignSelf: 'center',
+    marginBottom: theme.spacing.lg,
+  },
+  modalMessage: {
+    fontSize: theme.typography.fontSize.base,
+    color: theme.colors.text.secondary,
+    textAlign: 'center',
+    marginBottom: theme.spacing.xl,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    gap: theme.spacing.md,
+  },
+  modalButton: {
+    flex: 1,
   },
   modalCloseButton: {
     width: 44,
     height: 44,
     borderRadius: theme.borderRadius.full,
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   rpeContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
     gap: theme.spacing.sm,
-    marginBottom: theme.spacing.lg
+    marginBottom: theme.spacing.lg,
   },
   rpeButton: {
     width: 60,
@@ -426,92 +518,16 @@ const useStyles = (theme: any) => StyleSheet.create({
     ...theme.shadows.sm
   },
   rpeButtonSelected: {
-    backgroundColor: theme.colors.primary
+    backgroundColor: theme.colors.primary,
   },
   rpeButtonText: {
     fontSize: theme.typography.fontSize.xl,
-    color: theme.colors.text.primary
+    color: theme.colors.text.primary,
   },
   rpeButtonTextSelected: {
-    color: theme.colors.text.primary
+    color: theme.colors.text.primary,
   },
   saveButton: {
     backgroundColor: theme.colors.primary,
-    marginTop: theme.spacing.base
   },
-  exerciseContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: theme.colors.background.card,
-    padding: theme.spacing.lg,
-    borderTopLeftRadius: theme.borderRadius.lg,
-    borderTopRightRadius: theme.borderRadius.lg,
-    ...theme.shadows.lg
-  },
-  completeButton: {
-    backgroundColor: theme.colors.primary,
-    height: 56
-  },
-  nextExerciseContainer: {
-    marginTop: theme.spacing.xl,
-    padding: theme.spacing.lg,
-    backgroundColor: theme.colors.background.button,
-    borderRadius: theme.borderRadius.md
-  },
-  nextExerciseTitle: {
-    color: theme.colors.text.secondary,
-    marginBottom: theme.spacing.xs
-  },
-  nextExerciseName: {
-    color: theme.colors.text.primary,
-    marginBottom: theme.spacing.xs
-  },
-  nextExerciseDetails: {
-    color: theme.colors.text.secondary
-  },
-  cancelModalContent: {
-    backgroundColor: theme.colors.background.card,
-    borderRadius: theme.borderRadius.lg,
-    padding: theme.spacing.lg,
-    width: '80%',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 8
-  },
-  cancelModalTitle: {
-    fontSize: theme.typography.fontSize.lg,
-    fontWeight: 'bold',
-    marginBottom: theme.spacing.sm,
-    color: theme.colors.text.primary,
-    textAlign: 'center'
-  },
-  cancelModalMessage: {
-    fontSize: theme.typography.fontSize.base,
-    color: theme.colors.text.secondary,
-    marginBottom: theme.spacing.lg,
-    textAlign: 'center'
-  },
-  cancelModalButtons: {
-    flexDirection: 'row',
-    gap: theme.spacing.base,
-    width: '100%',
-    justifyContent: 'space-between'
-  },
-  cancelModalButtonSecondary: {
-    flex: 1,
-    backgroundColor: theme.colors.background.button,
-    marginRight: theme.spacing.xs
-  },
-  cancelModalButtonPrimary: {
-    flex: 1,
-    backgroundColor: theme.colors.background.card,
-    borderWidth: 1,
-    borderColor: theme.colors.error,
-    marginLeft: theme.spacing.xs
-  }
 }); 

@@ -69,7 +69,7 @@ export default function NewRoutineScreen() {
   const openEditExercise = (index: number) => {
     const ex = exercises[index];
     setSelectedMuscle('');
-    setSelectedExercise({ name: ex.name, key: ex.key });
+    setSelectedExercise({ name: ex.name, key: ex.translationKey });
     setSeries(ex.series);
     setEditingIndex(index);
     setShowSeriesConfig(true);
@@ -80,7 +80,8 @@ export default function NewRoutineScreen() {
     if (!selectedExercise) return;
     const newEx = {
       name: selectedExercise.name,
-      key: `${selectedExercise.key}_${Date.now()}`, // Ajout d'un timestamp pour garantir l'unicité
+      key: `exercise_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`, // Clé unique pour React
+      translationKey: selectedExercise.key, // Clé pour la traduction
       series: [...series]
     };
     setExercises((prev) => {

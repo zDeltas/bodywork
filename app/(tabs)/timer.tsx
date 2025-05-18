@@ -11,7 +11,8 @@ import { useTheme } from '@/app/hooks/useTheme';
 import Text from '../components/ui/Text';
 import Header from '@/app/components/layout/Header';
 import Timer from '@/app/components/timer/Timer';
-import { FloatingActionButton } from '@/app/components/FloatingActionButton';
+import FloatButtonAction from '@/app/components/ui/FloatButtonAction';
+import { useRouter } from 'expo-router';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -214,6 +215,7 @@ export default function TimerScreen() {
   const [showCustomRestTimeModal, setShowCustomRestTimeModal] = useState(false);
   const [isCustomTime, setIsCustomTime] = useState(false);
   const [isCustomRestTime, setIsCustomRestTime] = useState(false);
+  const router = useRouter();
 
   const handleTimerComplete = () => {
     // Vous pouvez ajouter une notification ou un son ici
@@ -503,7 +505,10 @@ export default function TimerScreen() {
         LinearGradient={LinearGradient}
         Haptics={Haptics}
       />
-      <FloatingActionButton />
+      <FloatButtonAction
+        icon="plus"
+        onPress={() => router.push('/screens/workout/new')}
+      />
     </View>
   );
 }

@@ -259,7 +259,8 @@ export default {
     triceps: 'Triceps',
     core: 'Abdominaux',
     cardio: 'Cardio',
-    other: 'Autre'
+    other: 'Autre',
+    exercise: 'Exercice'
   },
 
   // Measurements screen

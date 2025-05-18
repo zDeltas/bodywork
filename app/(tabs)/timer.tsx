@@ -506,7 +506,7 @@ export default function TimerScreen() {
         Haptics={Haptics}
       />
       <FloatButtonAction
-        icon="plus"
+        icon={<Plus size={24} color={theme.colors.background.main} />}
         onPress={() => router.push('/screens/workout/new')}
       />
     </View>

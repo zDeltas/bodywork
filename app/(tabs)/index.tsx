@@ -4,7 +4,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
-import { Activity, Dumbbell, Layers, Repeat } from 'lucide-react-native';
+import { Activity, Dumbbell, Layers, Plus, Repeat } from 'lucide-react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Header from '@/app/components/layout/Header';
 import { Workout, WorkoutDateUtils } from '@/types/workout';
@@ -297,7 +297,7 @@ export default function WorkoutScreen() {
         )}
       </ScrollView>
       <FloatButtonAction
-        icon="plus"
+        icon={<Plus size={24} color={theme.colors.background.main} />}
         onPress={() => router.push('/screens/workout/new')}
       />
     </View>

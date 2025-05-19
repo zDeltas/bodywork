@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { AlertTriangle, Check } from 'lucide-react-native';
+import { Check } from 'lucide-react-native';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useHaptics } from '@/src/hooks/useHaptics';
 import { useTheme } from '@/app/hooks/useTheme';
@@ -30,7 +30,7 @@ const initialState: SessionState = {
   rpe: ''
 };
 
-export default function WorkoutSessionScreen() {
+function WorkoutSessionScreen() {
   const { t } = useTranslation();
   const { theme } = useTheme();
   const styles = useStyles(theme);
@@ -42,7 +42,9 @@ export default function WorkoutSessionScreen() {
   const [showCancelModal, setShowCancelModal] = useState(false);
 
   const convertTimeToSeconds = useCallback((timeStr: string): number => {
+    if (!timeStr) return 60; // 1 minute par défaut
     const [minutes, seconds] = timeStr.split(':').map(Number);
+    if (isNaN(minutes) || isNaN(seconds)) return 60; // 1 minute par défaut si format invalide
     return (minutes * 60) + seconds;
   }, []);
 
@@ -308,21 +310,6 @@ const useStyles = (theme: any) => StyleSheet.create({
     textAlign: 'center',
     marginBottom: theme.spacing.md
   },
-  modalIcon: {
-    alignSelf: 'center',
-    marginBottom: theme.spacing.lg
-  },
-  modalMessage: {
-    fontSize: theme.typography.fontSize.base,
-    color: theme.colors.text.secondary,
-    textAlign: 'center',
-    marginBottom: theme.spacing.xl
-  },
-  modalButtons: {
-    flexDirection: 'row',
-    gap: theme.spacing.md
-  },
-  modalButton: {
-    flex: 1
-  }
-}); 
+});
+
+export default WorkoutSessionScreen;

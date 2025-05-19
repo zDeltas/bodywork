@@ -15,7 +15,6 @@ SplashScreen.preventAutoHideAsync();
 
 function TabLayout() {
   const { theme } = useTheme();
-  const styles = useStyles();
 
   const [fontsLoaded, fontError] = useFonts({
     'Inter-Regular': Inter_400Regular,
@@ -94,11 +93,5 @@ function TabLayout() {
     </View>
   );
 }
-
-const useStyles = () => {
-  const { theme } = useTheme();
-
-  return StyleSheet.create({});
-};
 
 export default TabLayout;

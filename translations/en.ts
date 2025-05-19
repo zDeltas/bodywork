@@ -128,6 +128,12 @@ export default {
     notApplicable: 'N/A',
     selectDate: 'Select a date',
     duplicateLastSeries: 'Duplicate last series',
+    routineCompleted: 'Routine completed!',
+    quitRoutine: 'Quit Routine',
+    quitRoutineMessage: 'Are you sure you want to quit this routine? Your progress will be lost.',
+    exercises: 'exercises',
+    nextExercise: 'Next Exercise',
+    loading: 'Loading...'
   },
 
   // Timer screen

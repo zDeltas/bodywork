@@ -150,7 +150,13 @@ export default {
     notApplicable: 'N/A',
     selectDate: 'Sélectionner une date',
     duplicateLastSeries: 'Dupliquer la dernière série',
-    completedSeries: 'Serie terminée'
+    completedSeries: 'Serie terminée',
+    routineCompleted: 'La routine est terminée !',
+    quitRoutine: 'Arrêter la routine',
+    quitRoutineMessage: 'Êtes-vous sûr de vouloir abandonner cette routine ? Vos progrès seront perdus.',
+    exercises: 'exercices',
+    nextExercise: 'Exercice suivant',
+    loading: 'Chargement...'
   },
 
   // Timer screen

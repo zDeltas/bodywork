@@ -1,0 +1,311 @@
+import React, { useState } from 'react';
+import { TouchableOpacity, View, Text, StyleSheet } from 'react-native';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
+import {
+  ArrowRight,
+  Clock,
+  Dumbbell,
+  MoreVertical,
+  Play,
+  Star,
+  TrendingUp,
+  Edit,
+  Share as ShareIcon,
+  Trash2
+} from 'lucide-react-native';
+import { useHaptics } from '@/src/hooks/useHaptics';
+import { Routine, RoutineStats } from '@/app/types/routine';
+import Modal from '@/app/components/ui/Modal';
+import { useTheme } from '@/app/hooks/useTheme';
+
+type RoutineItemProps = {
+  item: Routine;
+  onStart: (id: string) => void;
+  onEdit: (id: string) => void;
+  onDelete: (id: string) => void;
+  onToggleFavorite: (id: string) => void;
+  onShare: (routine: Routine) => void;
+};
+
+const calculateStats = (routine: Routine): RoutineStats => {
+  const totalSeries = routine.exercises.reduce((total, exercise) => total + exercise.series.length, 0);
+  const estimatedTime = Math.ceil(routine.exercises.reduce((total, exercise) => {
+    return total + exercise.series.reduce((seriesTotal, series) => {
+      const [minutes, seconds] = series.rest.split(':').map(Number);
+      return seriesTotal + (minutes * 60 + seconds);
+    }, 0);
+  }, 0) / 60);
+  const isRecent = new Date(routine.createdAt).getTime() > Date.now() - 7 * 24 * 60 * 60 * 1000;
+
+  return {
+    totalExercises: routine.exercises.length,
+    totalSeries,
+    estimatedTime,
+    isRecent
+  };
+};
+
+export const RoutineItem = React.memo(({
+  item,
+  onStart,
+  onEdit,
+  onDelete,
+  onToggleFavorite,
+  onShare
+}: RoutineItemProps) => {
+  const [showActionsModal, setShowActionsModal] = useState(false);
+  const haptics = useHaptics();
+  const { theme } = useTheme();
+  const styles = useStyles(theme);
+  const stats = calculateStats(item);
+
+  const handleAction = (action: () => void) => {
+    setShowActionsModal(false);
+    action();
+  };
+
+  const renderStats = () => {
+    const statsArray = [
+      {
+        icon: <Dumbbell size={16} color={theme.colors.text.secondary} />,
+        text: `${stats.totalExercises} exo${stats.totalExercises > 1 ? 's' : ''}`
+      },
+      {
+        icon: <Clock size={16} color={theme.colors.text.secondary} />,
+        text: `${stats.estimatedTime} min`
+      },
+      {
+        icon: <Text style={styles.statText}>{stats.totalSeries} séries</Text>
+      }
+    ];
+
+    if (item.usageCount) {
+      statsArray.push({
+        icon: <TrendingUp size={16} color={theme.colors.text.secondary} />,
+        text: `${item.usageCount} utilisation${item.usageCount > 1 ? 's' : ''}`
+      });
+    }
+
+    if (item.totalTime) {
+      const hours = Math.floor(item.totalTime / 60);
+      const minutes = item.totalTime % 60;
+      statsArray.push({
+        icon: <Clock size={16} color={theme.colors.text.secondary} />,
+        text: hours > 0
+          ? `${hours}h${minutes > 0 ? ` ${minutes}min` : ''}`
+          : `${minutes}min`
+      });
+    }
+
+    return statsArray;
+  };
+
+  return (
+    <>
+      <TouchableOpacity
+        onLongPress={() => haptics.impactMedium()}
+        delayLongPress={200}
+        style={styles.routineCard}
+      >
+        <View style={styles.routineHeader}>
+          <View style={styles.routineTitleContainer}>
+            <Text style={styles.routineTitle}>{item.title}</Text>
+            {stats.isRecent && (
+              <View style={styles.newBadge}>
+                <Text style={styles.newBadgeText}>Nouveau</Text>
+              </View>
+            )}
+          </View>
+          <TouchableOpacity onPress={() => onToggleFavorite(item.id)}>
+            <Star
+              size={20}
+              color={item.favorite ? theme.colors.primary : theme.colors.text.secondary}
+              fill={item.favorite ? theme.colors.primary : 'none'}
+            />
+          </TouchableOpacity>
+        </View>
+
+        {item.description && (
+          <Text style={styles.routineDescription}>{item.description}</Text>
+        )}
+
+        <View style={styles.routineStats}>
+          {renderStats().map((stat, index) => (
+            <View key={index} style={styles.statItem}>
+              {stat.icon}
+              {stat.text && <Text style={styles.statText}>{stat.text}</Text>}
+            </View>
+          ))}
+        </View>
+
+        <View style={styles.routineFooter}>
+          <Text style={styles.routineDate}>
+            {item.lastUsed
+              ? `Dernière utilisation : ${format(new Date(item.lastUsed), 'dd MMM yyyy', { locale: fr })}`
+              : `Créée le ${format(new Date(item.createdAt), 'dd MMM yyyy', { locale: fr })}`}
+          </Text>
+          <View style={styles.routineActions}>
+            <TouchableOpacity
+              style={styles.moreButton}
+              onPress={() => {
+                haptics.impactLight();
+                setShowActionsModal(true);
+              }}
+            >
+              <MoreVertical size={20} color={theme.colors.text.secondary} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.startButton}
+              onPress={() => onStart(item.id)}
+            >
+              <Play size={20} color={theme.colors.text.primary} />
+              <Text style={styles.startButtonText}>Démarrer</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </TouchableOpacity>
+
+      <Modal
+        visible={showActionsModal}
+        onClose={() => setShowActionsModal(false)}
+        title="Actions"
+      >
+        <View style={styles.modalActions}>
+          <TouchableOpacity
+            style={styles.modalAction}
+            onPress={() => handleAction(() => onEdit(item.id))}
+          >
+            <Edit size={24} color={theme.colors.text.primary} />
+            <Text style={styles.modalActionText}>Modifier</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.modalAction}
+            onPress={() => handleAction(() => onShare(item))}
+          >
+            <ShareIcon size={24} color={theme.colors.text.primary} />
+            <Text style={styles.modalActionText}>Partager</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.modalAction, styles.modalActionDelete]}
+            onPress={() => handleAction(() => onDelete(item.id))}
+          >
+            <Trash2 size={24} color={theme.colors.error} />
+            <Text style={[styles.modalActionText, styles.modalActionTextDelete]}>
+              Supprimer
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+    </>
+  );
+});
+
+const useStyles = (theme: any) => StyleSheet.create({
+  routineCard: {
+    backgroundColor: theme.colors.background.card,
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+    ...theme.shadows.sm
+  },
+  routineHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8
+  },
+  routineTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8
+  },
+  routineTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: theme.colors.text.primary
+  },
+  newBadge: {
+    backgroundColor: theme.colors.primary,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 12
+  },
+  newBadgeText: {
+    color: theme.colors.background.main,
+    fontSize: 12,
+    fontWeight: '600'
+  },
+  routineDescription: {
+    fontSize: 14,
+    color: theme.colors.text.secondary,
+    marginBottom: 12
+  },
+  routineStats: {
+    flexDirection: 'row',
+    gap: 16,
+    marginBottom: 12
+  },
+  statItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4
+  },
+  statText: {
+    fontSize: 14,
+    color: theme.colors.text.secondary
+  },
+  routineFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 8
+  },
+  routineDate: {
+    fontSize: 12,
+    color: theme.colors.text.secondary
+  },
+  routineActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8
+  },
+  moreButton: {
+    padding: 8
+  },
+  startButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.colors.primary,
+    padding: theme.spacing.sm,
+    borderRadius: theme.borderRadius.md,
+    gap: theme.spacing.xs
+  },
+  startButtonText: {
+    color: theme.colors.text.primary,
+    fontSize: theme.typography.fontSize.base,
+    fontWeight: '600'
+  },
+  modalActions: {
+    gap: 16
+  },
+  modalAction: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    borderRadius: 8,
+    backgroundColor: theme.colors.background.button,
+    gap: 12
+  },
+  modalActionDelete: {
+    backgroundColor: theme.colors.error + '20'
+  },
+  modalActionText: {
+    fontSize: 16,
+    color: theme.colors.text.primary
+  },
+  modalActionTextDelete: {
+    color: theme.colors.error
+  }
+}); 

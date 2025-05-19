@@ -19,6 +19,7 @@ import { storageService } from '@/app/services/storage';
 import { v4 as uuidv4 } from 'uuid';
 import { useRouter } from 'expo-router';
 import { TimerPickerModal } from 'react-native-timer-picker';
+import { Exercise, Series } from '@/app/types/routine';
 
 // Structure de base pour la routine en cours de création
 const initialRoutine = {
@@ -44,7 +45,7 @@ export default function NewRoutineScreen() {
 
   const [step, setStep] = useState(1);
   const [routine, setRoutine] = useState(initialRoutine);
-  const [exercises, setExercises] = useState<any[]>([]); // [{ name, key, series }]
+  const [exercises, setExercises] = useState<Exercise[]>([]);
   const [selectedMuscle, setSelectedMuscle] = useState('');
   const [selectedExercise, setSelectedExercise] = useState<{ name: string; key: string } | null>(null);
   const [series, setSeries] = useState<RoutineSeries[]>([
@@ -70,7 +71,13 @@ export default function NewRoutineScreen() {
     const ex = exercises[index];
     setSelectedMuscle('');
     setSelectedExercise({ name: ex.name, key: ex.translationKey });
-    setSeries(ex.series);
+    setSeries(ex.series.map((s) => ({
+      weight: s.weight.toString(),
+      reps: s.reps.toString(),
+      note: s.note,
+      rest: s.rest,
+      type: s.type,
+    })));
     setEditingIndex(index);
     setShowSeriesConfig(true);
   };
@@ -78,11 +85,18 @@ export default function NewRoutineScreen() {
   // Ajoute ou met à jour un exercice dans la routine
   const saveExercise = () => {
     if (!selectedExercise) return;
-    const newEx = {
+    const formattedSeries: Series[] = series.map((s) => ({
+      weight: parseFloat(s.weight) || 0,
+      reps: parseInt(s.reps) || 0,
+      note: s.note,
+      rest: s.rest,
+      type: s.type,
+    }));
+    const newEx: Exercise = {
       name: selectedExercise.name,
       key: `${selectedExercise.key}_${Date.now()}`,
       translationKey: selectedExercise.key,
-      series: [...series]
+      series: formattedSeries,
     };
     setExercises((prev) => {
       if (editingIndex !== null) {
@@ -493,14 +507,7 @@ export default function NewRoutineScreen() {
         id: `routine_${Date.now()}_${Math.random().toString(36)}`,
         title: routine.title.trim(),
         description: routine.description.trim(),
-        exercises: exercises.map(ex => ({
-          ...ex,
-          series: ex.series.map((s: RoutineSeries) => ({
-            ...s,
-            weight: parseFloat(s.weight) || 0,
-            reps: parseInt(s.reps) || 0
-          }))
-        })),
+        exercises: exercises,
         createdAt: new Date().toISOString()
       };
 

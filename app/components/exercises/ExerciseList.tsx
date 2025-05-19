@@ -6,6 +6,7 @@ import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
 import Text from '@/app/components/ui/Text';
 import { ExerciseCardSkeleton } from '@/app/components/ui/SkeletonComponents';
+import { Exercise } from '@/app/types/routine';
 
 export type MuscleGroupKey =
   | 'chest'
@@ -83,20 +84,16 @@ export const predefinedExercisesByKey: Record<MuscleGroupKey, string[]> = {
   ],
 };
 
-// Define a type for the exercise mapping
-export type ExerciseMapping = {
-  translatedName: string;
-  key: string;
-};
-
 export const getPredefinedExercises = (t: (key: string) => string) => {
-  const result: Record<string, ExerciseMapping[]> = {};
+  const result: Record<string, Exercise[]> = {};
 
   muscleGroupKeys.forEach((key) => {
     // Translate both the muscle group key and each exercise name
     result[t(`muscleGroups.${key}`)] = predefinedExercisesByKey[key].map((exerciseKey) => ({
-      translatedName: t(exerciseKey),
+      name: t(exerciseKey),
       key: exerciseKey,
+      translationKey: exerciseKey,
+      series: [], // par défaut vide, à remplir lors de l'ajout à une routine
     }));
   });
 
@@ -139,9 +136,7 @@ export const ExerciseList: React.FC<ExerciseListProps> = ({
   const styles = useStyles();
   const [searchQuery, setSearchQuery] = React.useState('');
   const [expandedMuscleGroups, setExpandedMuscleGroups] = React.useState<string[]>([]);
-  const [filteredExercises, setFilteredExercises] = React.useState<{
-    [key: string]: ExerciseMapping[];
-  }>({});
+  const [filteredExercises, setFilteredExercises] = React.useState<{ [key: string]: Exercise[] }>({});
 
   // Get translated muscle groups and predefined exercises
   const muscleGroups = getMuscleGroups(t as (key: string) => string);
@@ -167,11 +162,11 @@ export const ExerciseList: React.FC<ExerciseListProps> = ({
     }
 
     const query = searchQuery.toLowerCase().trim();
-    const filtered: { [key: string]: ExerciseMapping[] } = {};
+    const filtered: { [key: string]: Exercise[] } = {};
 
     Object.entries(predefinedExercises).forEach(([muscleGroup, exercises]) => {
       const matchingExercises = exercises.filter((ex) =>
-        ex.translatedName.toLowerCase().includes(query),
+        ex.name.toLowerCase().includes(query),
       );
 
       if (matchingExercises.length > 0) {
@@ -292,18 +287,18 @@ export const ExerciseList: React.FC<ExerciseListProps> = ({
                         <TouchableOpacity
                           style={[
                             styles.exerciseListItem,
-                            exercise === ex.translatedName && styles.exerciseListItemSelected,
+                            exercise === ex.name && styles.exerciseListItemSelected,
                           ]}
                           onPress={() => {
-                            setExercise(ex.translatedName, ex.key);
+                            setExercise(ex.name, ex.translationKey);
                             // Notify parent component that an exercise was selected
                             if (onExerciseSelect) {
-                              onExerciseSelect(ex.translatedName, ex.key);
+                              onExerciseSelect(ex.name, ex.translationKey);
                             }
                           }}
                         >
                           <Text variant="body" style={styles.exerciseName}>
-                            {ex.translatedName}
+                            {ex.name}
                           </Text>
                         </TouchableOpacity>
                       </Animated.View>

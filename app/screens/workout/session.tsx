@@ -17,7 +17,7 @@ import { ProgressBar } from '@/app/components/session/ProgressBar';
 import { CurrentExercise } from '@/app/components/session/CurrentExercise';
 import { NextExercise } from '@/app/components/session/NextExercise';
 import { RpeModal } from '@/app/components/session/RpeModal';
-import { Routine, SessionState, Workout } from '@/app/types/routine';
+import { Routine, SessionState, Workout, Exercise } from '@/app/types/routine';
 
 const initialState: SessionState = {
   currentExerciseIndex: 0,
@@ -50,7 +50,7 @@ function WorkoutSessionScreen() {
 
   const handleCompletedSeries = useCallback(() => {
     if (!routine) return;
-    const currentExercise = routine.exercises[sessionState.currentExerciseIndex];
+    const currentExercise: Exercise = routine.exercises[sessionState.currentExerciseIndex];
     const currentSeries = currentExercise.series[sessionState.currentSeriesIndex];
 
     if (currentSeries.type === 'workingSet') {
@@ -97,7 +97,7 @@ function WorkoutSessionScreen() {
 
   const handleRestComplete = useCallback(async () => {
     if (!routine) return;
-    const currentExercise = routine.exercises[sessionState.currentExerciseIndex];
+    const currentExercise: Exercise = routine.exercises[sessionState.currentExerciseIndex];
 
     setSessionState(prev => ({
       ...prev,
@@ -141,7 +141,7 @@ function WorkoutSessionScreen() {
 
   const getNextExercise = useCallback(() => {
     if (!routine) return null;
-    const currentExercise = routine.exercises[sessionState.currentExerciseIndex];
+    const currentExercise: Exercise = routine.exercises[sessionState.currentExerciseIndex];
 
     if (sessionState.currentSeriesIndex < currentExercise.series.length - 1) {
       return currentExercise;
@@ -184,7 +184,7 @@ function WorkoutSessionScreen() {
     );
   }
 
-  const currentExercise = routine.exercises[sessionState.currentExerciseIndex];
+  const currentExercise: Exercise = routine.exercises[sessionState.currentExerciseIndex];
   const currentSeries = currentExercise.series[sessionState.currentSeriesIndex];
 
   return (

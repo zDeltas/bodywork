@@ -10,6 +10,7 @@ export type Series = {
 export type Exercise = {
   name: string;
   key: string;
+  translationKey: string;
   series: Series[];
 };
 

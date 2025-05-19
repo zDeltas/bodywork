@@ -80,8 +80,8 @@ export default function NewRoutineScreen() {
     if (!selectedExercise) return;
     const newEx = {
       name: selectedExercise.name,
-      key: `exercise_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`, // Clé unique pour React
-      translationKey: selectedExercise.key, // Clé pour la traduction
+      key: `${selectedExercise.key}_${Date.now()}`,
+      translationKey: selectedExercise.key,
       series: [...series]
     };
     setExercises((prev) => {

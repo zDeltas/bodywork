@@ -112,8 +112,8 @@ function WorkoutSessionScreen() {
     } else {
       const workout: Workout = {
         id: Date.now().toString(),
-        muscleGroup: currentExercise.key.split('_')[0],
-        exercise: currentExercise.key,
+        muscleGroup: currentExercise.translationKey.split('_')[0],
+        exercise: currentExercise.translationKey,
         name: currentExercise.name,
         series: currentExercise.series,
         date: new Date().toISOString()
@@ -162,7 +162,7 @@ function WorkoutSessionScreen() {
 
   const handleFinishWorkout = useCallback(() => {
     haptics.impactLight();
-    router.push('/(tabs)/workout/summary' as any);
+    router.push('/(tabs)');
   }, [haptics]);
 
   useEffect(() => {
@@ -292,23 +292,24 @@ const useStyles = (theme: any) => StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: theme.spacing.lg
   },
   modalContent: {
-    backgroundColor: theme.colors.background.card,
-    borderRadius: theme.borderRadius.lg,
-    padding: theme.spacing.lg,
-    width: '100%',
-    maxWidth: 400
+    backgroundColor: theme.colors.background.card ?? '#222',
+    borderRadius: theme.borderRadius.lg ?? 16,
+    padding: theme.spacing.lg ?? 24,
+    width: '90%',
+    maxWidth: 400,
+    alignItems: 'center',
   },
   modalTitle: {
-    fontSize: theme.typography.fontSize.xl,
-    color: theme.colors.text.primary,
+    fontSize: theme.typography.fontSize.xl ?? 22,
+    color: theme.colors.text.primary ?? '#fff',
     textAlign: 'center',
-    marginBottom: theme.spacing.md
+    marginBottom: theme.spacing.md ?? 16,
   },
 });
 

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { ActivityIndicator, Alert, StyleSheet, Text, TextInput, View } from 'react-native';
-import { BlurView } from 'expo-blur';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
 import { StatsCardSkeleton } from '@/app/components/ui/SkeletonComponents';
 import { Button } from '@/app/components/ui/Button';
+import Modal from '@/app/components/ui/Modal';
 
 interface ContactModalProps {
   isVisible: boolean;
@@ -15,66 +15,53 @@ export default function ContactModal({ isVisible, onClose }: ContactModalProps) 
   const { t } = useTranslation();
   const { theme } = useTheme();
   const styles = useStyles();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSending, setIsSending] = useState(false);
   const [contactForm, setContactForm] = useState({
     name: '',
     email: '',
-    message: '',
+    message: ''
   });
-  const [isSending, setIsSending] = useState(false);
-  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
-  const [isLoading, setIsLoading] = useState(false);
-
-  const validateForm = () => {
-    const errors: Record<string, string> = {};
-    if (!contactForm.name.trim()) {
-      errors.name = t('contact.errors.nameRequired');
-    }
-    if (!contactForm.email.trim()) {
-      errors.email = t('contact.errors.emailRequired');
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactForm.email)) {
-      errors.email = t('contact.errors.emailInvalid');
-    }
-    if (!contactForm.message.trim()) {
-      errors.message = t('contact.errors.messageRequired');
-    }
-    setFormErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
+  const [formErrors, setFormErrors] = useState({
+    name: '',
+    email: '',
+    message: ''
+  });
 
   const handleSubmit = async () => {
-    if (!validateForm()) return;
+    // Validation
+    const errors = {
+      name: !contactForm.name ? t('contact.errors.nameRequired') : '',
+      email: !contactForm.email ? t('contact.errors.emailRequired') : '',
+      message: !contactForm.message ? t('contact.errors.messageRequired') : ''
+    };
+
+    setFormErrors(errors);
+
+    if (Object.values(errors).some(error => error)) {
+      return;
+    }
 
     setIsSending(true);
     try {
-      const response = await fetch('/api/send-email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...contactForm,
-          to: 'mon-adresse@example.com',
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to send email');
-      }
-
-      Alert.alert(t('common.success'), t('contact.success'));
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      Alert.alert(t('contact.success'), t('contact.success'));
       onClose();
-      setContactForm({ name: '', email: '', message: '' });
     } catch (error) {
-      Alert.alert(t('common.error'), t('contact.error'));
+      Alert.alert(t('contact.error'), t('contact.error'));
     } finally {
       setIsSending(false);
     }
   };
 
-  if (!isVisible) return null;
-
   return (
-    <BlurView intensity={20} style={styles.modalContainer}>
+    <Modal
+      visible={isVisible}
+      onClose={onClose}
+      title={t('contact.title')}
+      showCloseButton={true}
+    >
       {isLoading ? (
         <View style={styles.modalContent}>
           <StatsCardSkeleton />
@@ -82,8 +69,6 @@ export default function ContactModal({ isVisible, onClose }: ContactModalProps) 
         </View>
       ) : (
         <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>{t('contact.title')}</Text>
-
           <View style={styles.formGroup}>
             <Text style={styles.label}>{t('contact.name')}</Text>
             <TextInput
@@ -148,7 +133,7 @@ export default function ContactModal({ isVisible, onClose }: ContactModalProps) 
           </View>
         </View>
       )}
-    </BlurView>
+    </Modal>
   );
 }
 
@@ -156,32 +141,8 @@ const useStyles = () => {
   const { theme } = useTheme();
 
   return StyleSheet.create({
-    modalContainer: {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      justifyContent: 'center',
-      alignItems: 'center',
-      padding: theme.spacing.lg,
-    },
     modalContent: {
-      backgroundColor: theme.colors.background.card,
-      borderRadius: theme.borderRadius.lg,
       padding: theme.spacing.lg,
-      width: '90%',
-      maxWidth: 500,
-      borderWidth: 1,
-      borderColor: theme.colors.border.default,
-      ...theme.shadows.lg,
-    },
-    modalTitle: {
-      fontSize: theme.typography.fontSize.xl,
-      fontFamily: theme.typography.fontFamily.bold,
-      color: theme.colors.text.primary,
-      marginBottom: theme.spacing.lg,
-      textAlign: 'center',
     },
     formGroup: {
       marginBottom: theme.spacing.md,
@@ -220,19 +181,15 @@ const useStyles = () => {
       color: theme.colors.error,
       fontSize: theme.typography.fontSize.sm,
       marginTop: theme.spacing.xs,
-      fontFamily: theme.typography.fontFamily.regular,
     },
     modalButtons: {
       flexDirection: 'row',
-      justifyContent: 'space-between',
+      justifyContent: 'flex-end',
+      gap: theme.spacing.md,
       marginTop: theme.spacing.lg,
     },
     modalButton: {
-      flex: 1,
-      paddingVertical: theme.spacing.md,
-      borderRadius: theme.borderRadius.md,
-      alignItems: 'center',
-      justifyContent: 'center',
+      minWidth: 100,
     },
   });
 };

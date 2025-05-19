@@ -1,29 +1,41 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
+  ActivityIndicator,
   Alert,
+  Keyboard,
   Platform,
   ScrollView,
   StyleSheet,
-  Text as RNText,
-  TouchableOpacity,
+  TextInput,
   View,
-  Vibration,
-  Modal,
+  ViewStyle,
+  TouchableOpacity,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import {
+  Inter_400Regular,
+  Inter_600SemiBold,
+  Inter_700Bold,
+  useFonts,
+} from '@expo-google-fonts/inter';
+import * as SplashScreen from 'expo-splash-screen';
 import { router, useLocalSearchParams } from 'expo-router';
+import { AlertTriangle, ChevronDown, X } from 'lucide-react-native';
 import { useTranslation } from '@/app/hooks/useTranslation';
-import { useTheme } from '@/app/hooks/useTheme';
+import Animated, { FadeIn } from 'react-native-reanimated';
 import { useHaptics } from '@/src/hooks/useHaptics';
+import { useTheme } from '@/app/hooks/useTheme';
 import Header from '@/app/components/layout/Header';
-import Timer from '@/app/components/timer/Timer';
-import { storageService } from '@/app/services/storage';
-import { Workout } from '@/types/common';
-import { AlertTriangle, Check, X } from 'lucide-react-native';
-import BottomBarTimer from '@/app/components/timer/BottomBarTimer';
-import FloatButtonAction from '@/app/components/ui/FloatButtonAction';
 import Text from '@/app/components/ui/Text';
-import Button from '@/app/components/ui/Button';
+import {
+  ExerciseList,
+  getMuscleGroups,
+  getPredefinedExercises,
+} from '@/app/components/exercises/ExerciseList';
+import { Button } from '@/app/components/ui/Button';
+import useGoals from '@/app/hooks/useGoals';
+import useWorkouts from '@/app/hooks/useWorkouts';
+import Modal from '@/app/components/ui/Modal';
+import { TranslationKey } from '@/translations';
 
 type Exercise = {
   name: string;
@@ -239,58 +251,42 @@ export default function WorkoutSessionScreen() {
   const renderRpeModal = () => (
     <Modal
       visible={showRpeModal}
-      transparent
-      animationType="slide"
-      onRequestClose={() => setShowRpeModal(false)}
+      onClose={() => setShowRpeModal(false)}
+      title={t('workout.rpe')}
+      showCloseButton={true}
     >
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
-          <View style={styles.modalHeader}>
-            <Text variant="heading" style={styles.modalTitle}>
-              {t('workout.rpe')}
-            </Text>
-            <TouchableOpacity
-              style={styles.modalCloseButton}
-              onPress={() => setShowRpeModal(false)}
+      <View style={styles.rpeContainer}>
+        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((value) => (
+          <TouchableOpacity
+            key={value}
+            style={[
+              styles.rpeButton,
+              rpe === value.toString() && styles.rpeButtonSelected
+            ]}
+            onPress={() => {
+              setRpe(value.toString());
+              haptics.impactLight();
+            }}
+          >
+            <Text
+              style={[
+                styles.rpeButtonText,
+                rpe === value.toString() && styles.rpeButtonTextSelected
+              ]}
             >
-              <X color={theme.colors.text.primary} size={24} />
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.rpeContainer}>
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((value) => (
-              <TouchableOpacity
-                key={value}
-                style={[
-                  styles.rpeButton,
-                  rpe === value.toString() && styles.rpeButtonSelected
-                ]}
-                onPress={() => {
-                  setRpe(value.toString());
-                  haptics.impactLight();
-                }}
-              >
-                <Text
-                  style={[
-                    styles.rpeButtonText,
-                    rpe === value.toString() && styles.rpeButtonTextSelected
-                  ]}
-                >
-                  {value}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-
-          <Button
-            title={t('common.save')}
-            onPress={handleRpeSave}
-            style={styles.saveButton}
-            disabled={!rpe}
-            size="large"
-          />
-        </View>
+              {value}
+            </Text>
+          </TouchableOpacity>
+        ))}
       </View>
+
+      <Button
+        title={t('common.save')}
+        onPress={handleRpeSave}
+        style={styles.saveButton}
+        disabled={!rpe}
+        size="large"
+      />
     </Modal>
   );
 
@@ -348,34 +344,33 @@ export default function WorkoutSessionScreen() {
         </Modal>
       )}
 
-      <Modal visible={showCancelModal} transparent animationType="fade"
-             onRequestClose={() => setShowCancelModal(false)}>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <AlertTriangle size={40} color={theme.colors.error} style={styles.modalIcon} />
-            <Text variant="heading" style={styles.modalTitle}>{t('workout.quitRoutine' as any)}</Text>
-            <Text style={styles.modalMessage}>{t('workout.quitRoutineMessage' as any)}</Text>
-            <View style={styles.modalButtons}>
-              <Button
-                title={t('common.continue' as any)}
-                variant="secondary"
-                onPress={() => setShowCancelModal(false)}
-                style={styles.modalButton}
-              />
-              <Button
-                title={t('common.quit' as any)}
-                variant="primary"
-                onPress={handleConfirmCancel}
-                style={{
-                  flex: 1,
-                  backgroundColor: 'transparent',
-                  borderWidth: 1,
-                  borderColor: theme.colors.error
-                }}
-                textStyle={{ color: theme.colors.error }}
-              />
-            </View>
-          </View>
+      <Modal
+        visible={showCancelModal}
+        onClose={() => setShowCancelModal(false)}
+        title={t('workout.quitRoutine' as TranslationKey)}
+        showCloseButton={true}
+      >
+        <AlertTriangle size={40} color={theme.colors.error} style={styles.modalIcon} />
+        <Text style={styles.modalMessage}>{t('workout.quitRoutineMessage' as TranslationKey)}</Text>
+        <View style={styles.modalButtons}>
+          <Button
+            title={t('common.continue' as TranslationKey)}
+            variant="secondary"
+            onPress={() => setShowCancelModal(false)}
+            style={styles.modalButton}
+          />
+          <Button
+            title={t('common.quit' as TranslationKey)}
+            variant="primary"
+            onPress={handleConfirmCancel}
+            style={{
+              flex: 1,
+              backgroundColor: 'transparent',
+              borderWidth: 1,
+              borderColor: theme.colors.error
+            }}
+            textStyle={{ color: theme.colors.error }}
+          />
         </View>
       </Modal>
 

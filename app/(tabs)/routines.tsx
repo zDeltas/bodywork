@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, FlatList, Share, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, FlatList, Share, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { storageService } from '@/app/services/storage';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@/app/hooks/useTheme';
@@ -7,23 +7,22 @@ import {
   ArrowRight,
   Clock,
   Dumbbell,
-  Edit,
   MoreVertical,
   Play,
   Plus,
-  Search,
   Star,
-  Trash2,
   TrendingUp,
-  X
+  Edit,
+  Share as ShareIcon,
+  Trash2
 } from 'lucide-react-native';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import Button from '@/app/components/ui/Button';
 import FloatButtonAction from '@/app/components/ui/FloatButtonAction';
-import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
-import Animated, { Easing, interpolate, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useHaptics } from '@/src/hooks/useHaptics';
+import Modal from '@/app/components/ui/Modal';
 
 type Routine = {
   id: string;
@@ -101,15 +100,15 @@ const PREMADE_ROUTINES = [
 ];
 
 const RoutineItem = React.memo(({
-                                  item,
-                                  onStart,
-                                  onEdit,
-                                  onDelete,
-                                  onToggleFavorite,
-                                  onShare,
-                                  theme,
-                                  styles
-                                }: {
+  item,
+  onStart,
+  onEdit,
+  onDelete,
+  onToggleFavorite,
+  onShare,
+  theme,
+  styles
+}: {
   item: Routine;
   onStart: (id: string) => void;
   onEdit: (id: string) => void;
@@ -120,6 +119,7 @@ const RoutineItem = React.memo(({
   styles: any;
 }) => {
   const haptics = useHaptics();
+  const [showActionsModal, setShowActionsModal] = useState(false);
   const totalSeries = item.exercises.reduce((total, exercise) => total + exercise.series.length, 0);
   const estimatedTime = Math.ceil(item.exercises.reduce((total, exercise) => {
     return total + exercise.series.reduce((seriesTotal, series) => {
@@ -148,55 +148,13 @@ const RoutineItem = React.memo(({
     });
   }
 
-  const renderLeftActions = () => {
-    return (
-      <View style={[styles.swipeAction, styles.startAction]}>
-        <TouchableOpacity
-          style={styles.swipeActionButton}
-          onPress={() => onStart(item.id)}
-        >
-          <Play size={24} color={theme.colors.background.main} />
-          <Text style={styles.swipeActionText}>Démarrer</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  };
-
-  const renderRightActions = () => {
-    return (
-      <View style={styles.swipeActions}>
-        <View style={[styles.swipeAction, styles.editAction]}>
-          <TouchableOpacity
-            style={styles.swipeActionButton}
-            onPress={() => onEdit(item.id)}
-          >
-            <Edit size={24} color={theme.colors.background.main} />
-            <Text style={styles.swipeActionText}>Modifier</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={[styles.swipeAction, styles.deleteAction]}>
-          <TouchableOpacity
-            style={styles.swipeActionButton}
-            onPress={() => onDelete(item.id)}
-          >
-            <Trash2 size={24} color={theme.colors.background.main} />
-            <Text style={styles.swipeActionText}>Supprimer</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
+  const handleAction = (action: () => void) => {
+    setShowActionsModal(false);
+    action();
   };
 
   return (
-    <Swipeable
-      renderLeftActions={renderLeftActions}
-      renderRightActions={renderRightActions}
-      leftThreshold={40}
-      rightThreshold={40}
-      friction={2}
-      overshootRight={false}
-      overshootLeft={false}
-    >
+    <>
       <TouchableOpacity
         onLongPress={() => {
           haptics.impactMedium();
@@ -250,29 +208,8 @@ const RoutineItem = React.memo(({
             <TouchableOpacity
               style={styles.moreButton}
               onPress={() => {
-                Alert.alert(
-                  'Actions',
-                  'Que souhaitez-vous faire ?',
-                  [
-                    {
-                      text: 'Modifier',
-                      onPress: () => onEdit(item.id)
-                    },
-                    {
-                      text: 'Partager',
-                      onPress: () => onShare(item)
-                    },
-                    {
-                      text: 'Supprimer',
-                      style: 'destructive',
-                      onPress: () => onDelete(item.id)
-                    },
-                    {
-                      text: 'Annuler',
-                      style: 'cancel'
-                    }
-                  ]
-                );
+                haptics.impactLight();
+                setShowActionsModal(true);
               }}
             >
               <MoreVertical size={20} color={theme.colors.text.secondary} />
@@ -287,58 +224,51 @@ const RoutineItem = React.memo(({
           </View>
         </View>
       </TouchableOpacity>
-    </Swipeable>
+
+      <Modal
+        visible={showActionsModal}
+        onClose={() => setShowActionsModal(false)}
+        title="Actions"
+      >
+        <View style={styles.modalActions}>
+          <TouchableOpacity
+            style={styles.modalAction}
+            onPress={() => handleAction(() => onEdit(item.id))}
+          >
+            <Edit size={24} color={theme.colors.text.primary} />
+            <Text style={styles.modalActionText}>Modifier</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.modalAction}
+            onPress={() => handleAction(() => onShare(item))}
+          >
+            <ShareIcon size={24} color={theme.colors.text.primary} />
+            <Text style={styles.modalActionText}>Partager</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.modalAction, styles.modalActionDelete]}
+            onPress={() => handleAction(() => onDelete(item.id))}
+          >
+            <Trash2 size={24} color={theme.colors.error} />
+            <Text style={[styles.modalActionText, styles.modalActionTextDelete]}>Supprimer</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+    </>
   );
 });
 
 export default function RoutinesListScreen() {
   const [routines, setRoutines] = useState<Routine[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
-  const [isSearchFocused, setIsSearchFocused] = useState(false);
   const router = useRouter();
   const { theme } = useTheme();
   const styles = useStyles(theme);
-  const [isDragging, setIsDragging] = useState(false);
-  const dragY = useSharedValue(0);
-  const scale = useSharedValue(1);
-  const searchBarWidth = useSharedValue(0);
-  const searchBarOpacity = useSharedValue(0);
   const haptics = useHaptics();
 
   useEffect(() => {
     loadRoutines();
   }, []);
-
-  const animateSearchBar = (show: boolean) => {
-    searchBarWidth.value = withTiming(show ? 1 : 0, {
-      duration: 200,
-      easing: Easing.bezier(0.25, 0.1, 0.25, 1)
-    });
-    searchBarOpacity.value = withTiming(show ? 1 : 0, {
-      duration: 200,
-      easing: Easing.bezier(0.25, 0.1, 0.25, 1)
-    });
-  };
-
-  const handleSearchFocus = () => {
-    setIsSearchFocused(true);
-    animateSearchBar(true);
-    haptics.impactLight();
-  };
-
-  const handleSearchBlur = () => {
-    setIsSearchFocused(false);
-    if (!searchQuery) {
-      animateSearchBar(false);
-    }
-  };
-
-  const clearSearch = () => {
-    setSearchQuery('');
-    animateSearchBar(false);
-    haptics.impactLight();
-  };
 
   const loadRoutines = async () => {
     const loadedRoutines = await storageService.getRoutines();
@@ -432,7 +362,6 @@ export default function RoutinesListScreen() {
       });
 
       if (result.action === Share.sharedAction) {
-        // Mettre à jour les statistiques de partage
         const updatedRoutine = {
           ...routine,
           usageCount: (routine.usageCount || 0) + 1
@@ -445,45 +374,10 @@ export default function RoutinesListScreen() {
     }
   };
 
-  const getTotalSeries = (exercises: Routine['exercises']) => {
-    return exercises.reduce((total, exercise) => total + exercise.series.length, 0);
-  };
-
-  const getEstimatedTime = (exercises: Routine['exercises']) => {
-    const totalRestTime = exercises.reduce((total, exercise) => {
-      return total + exercise.series.reduce((seriesTotal, series) => {
-        const [minutes, seconds] = series.rest.split(':').map(Number);
-        return seriesTotal + (minutes * 60 + seconds);
-      }, 0);
-    }, 0);
-
-    const estimatedExerciseTime = exercises.length * 2 * 60; // 2 minutes par exercice
-    return Math.ceil((totalRestTime + estimatedExerciseTime) / 60);
-  };
-
-  const getRoutineStats = (routine: Routine) => {
-    const stats = [];
-
-    if (routine.usageCount) {
-      stats.push({
-        icon: <TrendingUp size={16} color={theme.colors.text.secondary} />,
-        text: `${routine.usageCount} utilisation${routine.usageCount > 1 ? 's' : ''}`
-      });
-    }
-
-    if (routine.totalTime) {
-      const hours = Math.floor(routine.totalTime / 60);
-      const minutes = routine.totalTime % 60;
-      stats.push({
-        icon: <Clock size={16} color={theme.colors.text.secondary} />,
-        text: hours > 0
-          ? `${hours}h${minutes > 0 ? ` ${minutes}min` : ''}`
-          : `${minutes}min`
-      });
-    }
-
-    return stats;
-  };
+  const filteredRoutines = routines.filter(routine => {
+    const matchesFavorite = !showFavoritesOnly || routine.favorite;
+    return matchesFavorite;
+  });
 
   const renderEmptyState = () => (
     <View style={styles.emptyContainer}>
@@ -553,53 +447,12 @@ export default function RoutinesListScreen() {
     />
   );
 
-  const filteredRoutines = routines.filter(routine => {
-    const matchesSearch = routine.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      routine.description?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesFavorite = !showFavoritesOnly || routine.favorite;
-    return matchesSearch && matchesFavorite;
-  });
-
-  const renderSearchBar = () => {
-    const animatedStyle = useAnimatedStyle(() => {
-      return {
-        width: `${interpolate(
-          searchBarWidth.value,
-          [0, 1],
-          [0, 100]
-        )}%`,
-        opacity: searchBarOpacity.value
-      };
-    });
-
-    return (
-      <Animated.View style={[styles.searchContainer, animatedStyle]}>
-        <Search size={20} color={theme.colors.text.secondary} style={styles.searchIcon} />
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Rechercher une routine..."
-          placeholderTextColor={theme.colors.text.secondary}
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          onFocus={handleSearchFocus}
-          onBlur={handleSearchBlur}
-        />
-        {searchQuery ? (
-          <TouchableOpacity onPress={clearSearch} style={styles.clearButton}>
-            <X size={20} color={theme.colors.text.secondary} />
-          </TouchableOpacity>
-        ) : null}
-      </Animated.View>
-    );
-  };
-
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <View style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.title}>Mes routines</Text>
           <View style={styles.headerActions}>
-            {renderSearchBar()}
             <TouchableOpacity
               style={[styles.filterButton, showFavoritesOnly && styles.filterButtonActive]}
               onPress={() => {
@@ -625,7 +478,7 @@ export default function RoutinesListScreen() {
         <FloatButtonAction
           icon={<Plus size={24} color={theme.colors.background.main} />}
           onPress={handleCreateRoutine}
-          style={[isDragging && styles.fabHidden]}
+          style={[styles.fabHidden]}
         />
       </View>
     </GestureHandlerRootView>
@@ -643,6 +496,24 @@ const useStyles = (theme: any) => StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 16,
     color: theme.colors.text.primary
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  filterButton: {
+    padding: 8,
+    borderRadius: 20,
+    backgroundColor: theme.colors.background.button
+  },
+  filterButtonActive: {
+    backgroundColor: theme.colors.primary + '20'
   },
   routineCard: {
     backgroundColor: theme.colors.background.card,
@@ -811,79 +682,25 @@ const useStyles = (theme: any) => StyleSheet.create({
     opacity: 0,
     transform: [{ scale: 0 }]
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16
+  modalActions: {
+    gap: 16,
   },
-  filterButton: {
-    padding: 8,
-    borderRadius: 20,
-    backgroundColor: theme.colors.background.button
-  },
-  filterButtonActive: {
-    backgroundColor: theme.colors.primary + '20'
-  },
-  swipeActions: {
-    flexDirection: 'row',
-    alignItems: 'center'
-  },
-  swipeAction: {
-    width: 100,
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  swipeActionButton: {
-    width: '100%',
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 16
-  },
-  swipeActionText: {
-    color: theme.colors.background.main,
-    fontSize: 12,
-    fontWeight: '600',
-    marginTop: 4
-  },
-  startAction: {
-    backgroundColor: theme.colors.primary
-  },
-  editAction: {
-    backgroundColor: theme.colors.primary
-  },
-  deleteAction: {
-    backgroundColor: theme.colors.error
-  },
-  headerActions: {
+  modalAction: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8
-  },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    padding: 12,
+    borderRadius: 8,
     backgroundColor: theme.colors.background.button,
-    borderRadius: 20,
-    paddingHorizontal: 12,
-    height: 40,
-    overflow: 'hidden'
+    gap: 12,
   },
-  searchIcon: {
-    marginRight: 8
+  modalActionDelete: {
+    backgroundColor: theme.colors.error + '20',
   },
-  searchInput: {
-    flex: 1,
-    height: '100%',
+  modalActionText: {
+    fontSize: 16,
     color: theme.colors.text.primary,
-    fontSize: theme.typography.fontSize.base
   },
-  clearButton: {
-    padding: 4
+  modalActionTextDelete: {
+    color: theme.colors.error,
   },
-  routineCardContainer: {
-    marginBottom: 12
-  }
 }); 

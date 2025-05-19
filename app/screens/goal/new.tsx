@@ -2,7 +2,8 @@ import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
-  Modal,
+  Keyboard,
+  Platform,
   ScrollView,
   StyleSheet,
   TextInput,
@@ -33,6 +34,7 @@ import {
 import { Button } from '@/app/components/ui/Button';
 import useGoals from '@/app/hooks/useGoals';
 import useWorkouts from '@/app/hooks/useWorkouts';
+import Modal from '@/app/components/ui/Modal';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -625,30 +627,16 @@ export default function NewGoalScreen() {
 
       <Modal
         visible={isExerciseModalVisible}
-        transparent
-        animationType="slide"
-        onRequestClose={handleCloseExerciseModal}
+        onClose={handleCloseExerciseModal}
+        title={t('goals.selectExerciseForGoal')}
+        showCloseButton={true}
       >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>{t('goals.selectExerciseForGoal')}</Text>
-              <Button
-                variant="icon"
-                icon={<X size={24} color={theme.colors.text.primary} />}
-                onPress={handleCloseExerciseModal}
-                style={styles.modalCloseButton}
-              />
-            </View>
-
-            <ExerciseList
-              exercise={newGoalExercise}
-              setExercise={handleExerciseSelect}
-              selectedMuscle={selectedMuscleGroup}
-              setSelectedMuscle={handleMuscleGroupSelect}
-            />
-          </View>
-        </View>
+        <ExerciseList
+          exercise={newGoalExercise}
+          setExercise={handleExerciseSelect}
+          selectedMuscle={selectedMuscleGroup}
+          setSelectedMuscle={handleMuscleGroupSelect}
+        />
       </Modal>
     </View>
   );

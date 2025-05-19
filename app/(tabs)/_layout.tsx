@@ -36,6 +36,7 @@ function TabLayout() {
   return (
     <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
       <Tabs
+        initialRouteName="index"
         screenOptions={{
           tabBarActiveTintColor: theme.colors.primary,
           tabBarInactiveTintColor: theme.colors.text.secondary,
@@ -62,17 +63,17 @@ function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="index"
-          options={{
-            title: 'Workouts',
-            tabBarIcon: ({ color, size }) => <Calendar size={size} color={color} />,
-          }}
-        />
-        <Tabs.Screen
           name="timer"
           options={{
             title: 'Timer',
             tabBarIcon: ({ color, size }) => <Clock size={size} color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="index"
+          options={{
+            title: 'Workouts',
+            tabBarIcon: ({ color, size }) => <Calendar size={size} color={color} />,
           }}
         />
         <Tabs.Screen

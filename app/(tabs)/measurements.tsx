@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useTheme } from '@/app/hooks/useTheme';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import Header from '@/app/components/layout/Header';
@@ -20,6 +20,7 @@ import { fr } from 'date-fns/locale';
 import { Calendar } from 'react-native-calendars';
 import { TranslationKey } from '@/translations';
 import useMeasurements from '@/app/hooks/useMeasurements';
+import Modal from '@/app/components/ui/Modal';
 
 const MEASUREMENT_KEYS: MeasurementKey[] = [
   'neck',
@@ -226,42 +227,32 @@ export default function MeasurementsScreen() {
       {/* Calendar modal */}
       <Modal
         visible={showCalendar}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowCalendar(false)}
+        onClose={() => setShowCalendar(false)}
+        title={t('common.selectDate' as TranslationKey)}
+        showCloseButton={true}
       >
-        <View style={styles.calendarOverlay}>
-          <View style={styles.calendarModal}>
-            <Calendar
-              current={measurements.date}
-              onDayPress={onCalendarDayPress}
-              markedDates={{
-                [measurements.date]: { selected: true, selectedColor: theme.colors.primary },
-              }}
-              theme={{
-                backgroundColor: theme.colors.background.card,
-                calendarBackground: theme.colors.background.card,
-                textSectionTitleColor: theme.colors.text.primary,
-                selectedDayBackgroundColor: theme.colors.primary,
-                selectedDayTextColor: theme.colors.text.primary,
-                todayTextColor: theme.colors.primary,
-                dayTextColor: theme.colors.text.primary,
-                textDisabledColor: theme.colors.text.disabled,
-                dotColor: theme.colors.primary,
-                selectedDotColor: theme.colors.text.primary,
-                arrowColor: theme.colors.primary,
-                monthTextColor: theme.colors.text.primary,
-                indicatorColor: theme.colors.primary,
-              }}
-            />
-            <TouchableOpacity
-              style={styles.calendarCloseButton}
-              onPress={() => setShowCalendar(false)}
-            >
-              <Text style={styles.calendarCloseText}>{t('common.close')}</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+        <Calendar
+          current={measurements.date}
+          onDayPress={onCalendarDayPress}
+          markedDates={{
+            [measurements.date]: { selected: true, selectedColor: theme.colors.primary },
+          }}
+          theme={{
+            backgroundColor: theme.colors.background.card,
+            calendarBackground: theme.colors.background.card,
+            textSectionTitleColor: theme.colors.text.primary,
+            selectedDayBackgroundColor: theme.colors.primary,
+            selectedDayTextColor: theme.colors.text.primary,
+            todayTextColor: theme.colors.primary,
+            dayTextColor: theme.colors.text.primary,
+            textDisabledColor: theme.colors.text.disabled,
+            dotColor: theme.colors.primary,
+            selectedDotColor: theme.colors.text.primary,
+            arrowColor: theme.colors.primary,
+            monthTextColor: theme.colors.text.primary,
+            indicatorColor: theme.colors.primary,
+          }}
+        />
       </Modal>
     </View>
   );
@@ -325,11 +316,11 @@ export default function MeasurementsScreen() {
       {/* Modale de saisie des mesures */}
       <MeasurementModal
         open={modal.open}
-        keyName={modal.key}
+        keyName={modal.key || ''}
         value={modal.key ? measurements.measurements[modal.key] : 0}
         onClose={closeMeasurementModal}
-        onSave={updateMeasurement}
-        onShowHistory={openHistoryModal}
+        onSave={(key: string, value: number) => updateMeasurement(key as MeasurementKey, value)}
+        onShowHistory={(key: string) => openHistoryModal(key as MeasurementKey)}
       />
       {/* Modale de saisie du poids */}
       <WeightModal

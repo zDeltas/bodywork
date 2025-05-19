@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useTheme } from '@/app/hooks/useTheme';
 import { useTranslation } from '@/app/hooks/useTranslation';
-import { MeasurementKey } from './MeasurementBodyMap';
+import { BarChart3, Ruler } from 'lucide-react-native';
+import Modal from '@/app/components/ui/Modal';
 import { MeasurementTranslationKey } from '@/translations';
-import { BarChart3, Ruler, X } from 'lucide-react-native';
 
 interface Props {
   open: boolean;
-  keyName: MeasurementKey | null;
+  keyName: string;
   value: number;
   onClose: () => void;
-  onSave: (key: MeasurementKey, value: number) => void;
-  onShowHistory: (key: MeasurementKey) => void;
+  onSave: (key: string, value: number) => void;
+  onShowHistory: (key: string) => void;
 }
 
 const MeasurementModal: React.FC<Props> = ({
@@ -47,117 +47,60 @@ const MeasurementModal: React.FC<Props> = ({
   return (
     <Modal
       visible={open}
-      transparent
-      animationType="fade"
-      onRequestClose={onClose}
-      statusBarTranslucent
+      onClose={onClose}
+      title={t(measurementKey)}
+      showCloseButton={true}
     >
-      <View style={[styles.overlay, { backgroundColor: 'rgba(0,0,0,0.7)' }]}>
-        <View
-          style={[
-            styles.content,
-            {
-              backgroundColor: theme.colors.background.card,
-              borderRadius: theme.borderRadius.lg,
-              ...theme.shadows.lg,
-            },
-          ]}
-        >
-          <View style={styles.header}>
-            <Ruler size={22} color={theme.colors.primary} />
-            <Text style={[styles.title, { color: theme.colors.text.primary }]}>
-              {t(measurementKey)}
-            </Text>
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={onClose}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            >
-              <X size={20} color={theme.colors.text.secondary} />
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.inputSection}>
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={[
-                  styles.input,
-                  {
-                    color: theme.colors.text.primary,
-                    borderColor: theme.colors.border.default,
-                    backgroundColor: theme.colors.background.input,
-                  },
-                ]}
-                value={input}
-                onChangeText={handleInputChange}
-                keyboardType="numeric"
-                placeholder="0"
-                placeholderTextColor={theme.colors.text.disabled}
-                autoFocus
-              />
-              <Text style={[styles.unit, { color: theme.colors.text.secondary }]}>cm</Text>
-            </View>
-          </View>
-
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={[styles.historyButton, { backgroundColor: theme.colors.background.button }]}
-              onPress={() => {
-                onShowHistory(keyName);
-                onClose();
-              }}
-            >
-              <BarChart3 size={18} color={theme.colors.text.primary} />
-              <Text style={{ color: theme.colors.text.primary, marginLeft: 8 }}>
-                {t('measurements.history')}
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.saveButton, { backgroundColor: theme.colors.primary }]}
-              onPress={handleSave}
-            >
-              <Text style={{ color: theme.colors.text.primary, fontWeight: 'bold' }}>
-                {t('common.save')}
-              </Text>
-            </TouchableOpacity>
-          </View>
+      <View style={styles.inputSection}>
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={[
+              styles.input,
+              {
+                color: theme.colors.text.primary,
+                borderColor: theme.colors.border.default,
+                backgroundColor: theme.colors.background.input,
+              },
+            ]}
+            value={input}
+            onChangeText={handleInputChange}
+            keyboardType="numeric"
+            placeholder="0"
+            placeholderTextColor={theme.colors.text.disabled}
+            autoFocus
+          />
+          <Text style={[styles.unit, { color: theme.colors.text.secondary }]}>cm</Text>
         </View>
+      </View>
+
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={[styles.historyButton, { backgroundColor: theme.colors.background.button }]}
+          onPress={() => {
+            onShowHistory(keyName);
+            onClose();
+          }}
+        >
+          <BarChart3 size={18} color={theme.colors.text.primary} />
+          <Text style={{ color: theme.colors.text.primary, marginLeft: 8 }}>
+            {t('measurements.history')}
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.saveButton, { backgroundColor: theme.colors.primary }]}
+          onPress={handleSave}
+        >
+          <Text style={{ color: theme.colors.text.primary, fontWeight: 'bold' }}>
+            {t('common.save')}
+          </Text>
+        </TouchableOpacity>
       </View>
     </Modal>
   );
 };
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 24,
-  },
-  content: {
-    width: '90%',
-    maxWidth: 400,
-    padding: 0,
-    overflow: 'hidden',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0,0,0,0.1)',
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    flex: 1,
-    marginLeft: 10,
-  },
-  closeButton: {
-    padding: 4,
-  },
   inputSection: {
     padding: 24,
   },

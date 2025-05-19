@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import {
   Alert,
   Linking,
-  Modal,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
@@ -17,6 +16,7 @@ import { useTheme } from '@/app/hooks/useTheme';
 import Header from '@/app/components/layout/Header';
 import Text from '@/app/components/ui/Text';
 import { useHaptics } from '@/src/hooks/useHaptics';
+import Modal from '@/app/components/ui/Modal';
 
 interface SettingItemProps {
   icon: keyof typeof Ionicons.glyphMap;
@@ -177,34 +177,29 @@ function ProfileScreen() {
 
       <Modal
         visible={showInstagramModal}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={() => setShowInstagramModal(false)}
+        onClose={() => setShowInstagramModal(false)}
+        title={t('profile.instagramModal.title')}
+        showCloseButton={true}
       >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>{t('profile.instagramModal.title')}</Text>
-            <Text style={styles.modalMessage}>{t('profile.instagramModal.message')}</Text>
+        <Text style={styles.modalMessage}>{t('profile.instagramModal.message')}</Text>
 
-            <View style={styles.modalButtons}>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.modalButtonSecondary]}
-                onPress={() => setShowInstagramModal(false)}
-              >
-                <Text style={[styles.modalButtonText, { color: theme.colors.text.secondary }]}>
-                  {t('profile.instagramModal.later')}
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.modalButtonPrimary]}
-                onPress={() => openInstagram(true)}
-              >
-                <Text style={[styles.modalButtonText, { color: theme.colors.primary }]}>
-                  {t('profile.instagramModal.follow')}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+        <View style={styles.modalButtons}>
+          <TouchableOpacity
+            style={[styles.modalButton, styles.modalButtonSecondary]}
+            onPress={() => setShowInstagramModal(false)}
+          >
+            <Text style={[styles.modalButtonText, { color: theme.colors.text.secondary }]}>
+              {t('profile.instagramModal.later')}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.modalButton, styles.modalButtonPrimary]}
+            onPress={() => openInstagram(true)}
+          >
+            <Text style={[styles.modalButtonText, { color: theme.colors.primary }]}>
+              {t('profile.instagramModal.follow')}
+            </Text>
+          </TouchableOpacity>
         </View>
       </Modal>
     </SafeAreaView>

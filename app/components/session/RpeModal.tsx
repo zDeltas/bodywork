@@ -34,28 +34,54 @@ const RpeModal = React.memo(({
       showCloseButton={true}
     >
       <View style={styles.rpeContainer}>
-        {Array.from({ length: 10 }, (_, i) => i + 1).map((value) => (
-          <TouchableOpacity
-            key={value}
-            style={[
-              styles.rpeButton,
-              rpe === value.toString() && styles.rpeButtonSelected
-            ]}
-            onPress={() => {
-              onRpeChange(value.toString());
-              haptics.impactLight();
-            }}
-          >
-            <Text
+        <View style={styles.rpeRow}>
+          {Array.from({ length: 5 }, (_, i) => i + 1).map((value) => (
+            <TouchableOpacity
+              key={value}
               style={[
-                styles.rpeButtonText,
-                rpe === value.toString() && styles.rpeButtonTextSelected
+                styles.rpeButton,
+                rpe === value.toString() && styles.rpeButtonSelected
               ]}
+              onPress={() => {
+                onRpeChange(value.toString());
+                haptics.impactLight();
+              }}
             >
-              {value}
-            </Text>
-          </TouchableOpacity>
-        ))}
+              <Text
+                style={[
+                  styles.rpeButtonText,
+                  rpe === value.toString() && styles.rpeButtonTextSelected
+                ]}
+              >
+                {value}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+        <View style={styles.rpeRow}>
+          {Array.from({ length: 5 }, (_, i) => i + 6).map((value) => (
+            <TouchableOpacity
+              key={value}
+              style={[
+                styles.rpeButton,
+                rpe === value.toString() && styles.rpeButtonSelected
+              ]}
+              onPress={() => {
+                onRpeChange(value.toString());
+                haptics.impactLight();
+              }}
+            >
+              <Text
+                style={[
+                  styles.rpeButtonText,
+                  rpe === value.toString() && styles.rpeButtonTextSelected
+                ]}
+              >
+                {value}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
       </View>
 
       <Button
@@ -74,11 +100,13 @@ const useStyles = () => {
 
   return StyleSheet.create({
     rpeContainer: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      justifyContent: 'center',
-      gap: theme.spacing.sm,
+      gap: theme.spacing.md,
       marginBottom: theme.spacing.lg
+    },
+    rpeRow: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      gap: theme.spacing.sm
     },
     rpeButton: {
       width: theme.layout.buttonSize.large,

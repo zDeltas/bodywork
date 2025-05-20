@@ -23,6 +23,7 @@ export default {
     inConstruction: 'En Construction',
     featureComingSoon: 'Cette fonctionnalité arrive bientôt !',
     next: 'Suivant',
+    finish: 'Terminer',
     or: 'ou',
     exercises: 'exercices',
     series: 'séries'

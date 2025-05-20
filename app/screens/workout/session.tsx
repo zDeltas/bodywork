@@ -1,180 +1,45 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router';
-import { Check } from 'lucide-react-native';
+import React, { useState } from 'react';
+import { ScrollView, StyleSheet, TextStyle, View, ViewStyle } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
+import { Check, Trophy } from 'lucide-react-native';
 import { useTranslation } from '@/app/hooks/useTranslation';
-import { useHaptics } from '@/src/hooks/useHaptics';
 import { useTheme } from '@/app/hooks/useTheme';
+import { useSession } from '@/app/hooks/useSession';
 import Header from '@/app/components/layout/Header';
 import Text from '@/app/components/ui/Text';
 import { Button } from '@/app/components/ui/Button';
 import Modal from '@/app/components/ui/Modal';
-import { ConfirmModal } from '@/app/components/ui/ConfirmModal';
-import storageService from '@/app/services/storage';
 import FloatButtonAction from '@/app/components/ui/FloatButtonAction';
 import BottomBarTimer from '@/app/components/timer/BottomBarTimer';
-import { ProgressBar } from '@/app/components/session/ProgressBar';
-import { CurrentExercise } from '@/app/components/session/CurrentExercise';
-import { NextExercise } from '@/app/components/session/NextExercise';
-import { RpeModal } from '@/app/components/session/RpeModal';
-import { Exercise, Routine, SessionState, Workout } from '@/types/common';
-
-const initialState: SessionState = {
-  currentExerciseIndex: 0,
-  currentSeriesIndex: 0,
-  isResting: false,
-  restTime: 0,
-  routineFinished: false,
-  completedExercises: [],
-  pendingSeries: null,
-  rpe: ''
-};
+import ProgressBar from '@/app/components/session/ProgressBar';
+import CurrentExercise from '@/app/components/session/CurrentExercise';
+import NextExercise from '@/app/components/session/NextExercise';
+import ConfirmModal from '@/app/components/ui/ConfirmModal';
+import RpeModal from '@/app/components/session/RpeModal';
+import { SessionState } from '@/types/common';
 
 function WorkoutSessionScreen() {
   const { theme } = useTheme();
   const { t } = useTranslation();
   const styles = useStyles();
-  const haptics = useHaptics();
   const { routineId } = useLocalSearchParams();
-
-  const [routine, setRoutine] = useState<Routine | null>(null);
-  const [sessionState, setSessionState] = useState<SessionState>(initialState);
   const [showCancelModal, setShowCancelModal] = useState(false);
 
-  const convertTimeToSeconds = useCallback((timeStr: string): number => {
-    if (!timeStr) return 1; // 1 sec par défaut
-    const [minutes, seconds] = timeStr.split(':').map(Number);
-    if (isNaN(minutes) || isNaN(seconds)) return 1; // 1 minute par défaut si format invalide
-    return (minutes * 60) + seconds;
-  }, []);
+  const {
+    routine,
+    sessionState,
+    setSessionState,
+    handleCompletedSeries,
+    handleRestComplete,
+    handleRpeSave,
+    handleCancel,
+    handleFinishWorkout
+  } = useSession(routineId as string);
 
-  const handleCompletedSeries = useCallback(() => {
-    if (!routine) return;
-    const currentExercise: Exercise = routine.exercises[sessionState.currentExerciseIndex];
-    const currentSeries = currentExercise.series[sessionState.currentSeriesIndex];
-
-    if (currentSeries.type === 'workingSet') {
-      setSessionState(prev => ({
-        ...prev,
-        pendingSeries: {
-          exerciseIdx: sessionState.currentExerciseIndex,
-          seriesIdx: sessionState.currentSeriesIndex
-        }
-      }));
-    } else {
-      const rest = convertTimeToSeconds(currentSeries.rest);
-      setSessionState(prev => ({
-        ...prev,
-        restTime: rest,
-        isResting: true,
-        rpe: '',
-        pendingSeries: null
-      }));
-    }
-  }, [routine, sessionState.currentExerciseIndex, sessionState.currentSeriesIndex, convertTimeToSeconds]);
-
-  const handleRpeSave = useCallback(() => {
-    if (!routine || !sessionState.pendingSeries) return;
-    const { exerciseIdx, seriesIdx } = sessionState.pendingSeries;
-    const updatedRoutine = { ...routine };
-    updatedRoutine.exercises = [...routine.exercises];
-    updatedRoutine.exercises[exerciseIdx] = { ...routine.exercises[exerciseIdx] };
-    updatedRoutine.exercises[exerciseIdx].series = [...routine.exercises[exerciseIdx].series];
-    updatedRoutine.exercises[exerciseIdx].series[seriesIdx] = {
-      ...routine.exercises[exerciseIdx].series[seriesIdx],
-      rpe: parseInt(sessionState.rpe) || 7
-    };
-    setRoutine(updatedRoutine);
-    const rest = convertTimeToSeconds(updatedRoutine.exercises[exerciseIdx].series[seriesIdx].rest);
-    setSessionState(prev => ({
-      ...prev,
-      restTime: rest,
-      isResting: true,
-      rpe: '',
-      pendingSeries: null
-    }));
-  }, [routine, sessionState.pendingSeries, sessionState.rpe, convertTimeToSeconds]);
-
-  const handleRestComplete = useCallback(async () => {
-    if (!routine) return;
-    const currentExercise: Exercise = routine.exercises[sessionState.currentExerciseIndex];
-
-    setSessionState(prev => ({
-      ...prev,
-      isResting: false
-    }));
-
-    if (sessionState.currentSeriesIndex < currentExercise.series.length - 1) {
-      setSessionState(prev => ({
-        ...prev,
-        currentSeriesIndex: prev.currentSeriesIndex + 1
-      }));
-    } else {
-      const workout: Workout = {
-        id: Date.now().toString(),
-        muscleGroup: currentExercise.translationKey.split('_')[0],
-        exercise: currentExercise.translationKey,
-        name: currentExercise.name,
-        series: currentExercise.series,
-        date: new Date().toISOString()
-      };
-      await storageService.saveWorkout(workout);
-      setSessionState(prev => ({
-        ...prev,
-        completedExercises: [...prev.completedExercises, workout]
-      }));
-
-      if (sessionState.currentExerciseIndex < routine.exercises.length - 1) {
-        setSessionState(prev => ({
-          ...prev,
-          currentExerciseIndex: prev.currentExerciseIndex + 1,
-          currentSeriesIndex: 0
-        }));
-      } else {
-        setSessionState(prev => ({
-          ...prev,
-          routineFinished: true
-        }));
-      }
-    }
-  }, [routine, sessionState.currentExerciseIndex, sessionState.currentSeriesIndex]);
-
-  const getNextExercise = useCallback(() => {
-    if (!routine) return null;
-    const currentExercise: Exercise = routine.exercises[sessionState.currentExerciseIndex];
-
-    if (sessionState.currentSeriesIndex < currentExercise.series.length - 1) {
-      return currentExercise;
-    } else if (sessionState.currentExerciseIndex < routine.exercises.length - 1) {
-      return routine.exercises[sessionState.currentExerciseIndex + 1];
-    }
-    return null;
-  }, [routine, sessionState.currentExerciseIndex, sessionState.currentSeriesIndex]);
-
-  const handleCancel = useCallback(() => {
-    setShowCancelModal(true);
-  }, []);
-
-  const handleConfirmCancel = useCallback(() => {
+  const handleConfirmCancel = () => {
     setShowCancelModal(false);
-    router.push('/(tabs)');
-  }, []);
-
-  const handleFinishWorkout = useCallback(() => {
-    haptics.impactLight();
-    router.push('/(tabs)');
-  }, [haptics]);
-
-  useEffect(() => {
-    const loadRoutine = async () => {
-      const routines = await storageService.getRoutines();
-      const foundRoutine = routines.find(r => r.id === routineId);
-      if (foundRoutine) {
-        setRoutine(foundRoutine);
-      }
-    };
-    loadRoutine();
-  }, [routineId]);
+    handleCancel();
+  };
 
   if (!routine) {
     return (
@@ -184,15 +49,20 @@ function WorkoutSessionScreen() {
     );
   }
 
-  const currentExercise: Exercise = routine.exercises[sessionState.currentExerciseIndex];
+  const currentExercise = routine.exercises[sessionState.currentExerciseIndex];
   const currentSeries = currentExercise.series[sessionState.currentSeriesIndex];
+  const nextExercise = sessionState.currentSeriesIndex < currentExercise.series.length - 1
+    ? currentExercise
+    : sessionState.currentExerciseIndex < routine.exercises.length - 1
+      ? routine.exercises[sessionState.currentExerciseIndex + 1]
+      : null;
 
   return (
     <View style={styles.container}>
       <Header
         title={routine.title}
         showBackButton={true}
-        onBack={handleCancel}
+        onBack={() => setShowCancelModal(true)}
       />
 
       <ProgressBar
@@ -208,8 +78,8 @@ function WorkoutSessionScreen() {
           currentSeriesIndex={sessionState.currentSeriesIndex}
         />
 
-        {sessionState.isResting && getNextExercise() && (
-          <NextExercise exercise={getNextExercise()!} />
+        {sessionState.isResting && nextExercise && (
+          <NextExercise exercise={nextExercise} />
         )}
       </ScrollView>
 
@@ -230,23 +100,41 @@ function WorkoutSessionScreen() {
 
       {sessionState.routineFinished && (
         <Modal
-          visible
-          transparent
-          animationType="fade"
-          onClose={() => setSessionState(prev => ({ ...prev, routineFinished: false }))}
+          visible={true}
+          showCloseButton={false}
+          title={undefined}
+          onClose={handleFinishWorkout}
+          contentStyle={styles.modalContent}
         >
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
-              <Text variant="heading" style={styles.modalTitle}>
-                {t('workout.routineCompleted')}
+          <View style={styles.successIconContainer}>
+            <Trophy size={56} color={theme.colors.primary} />
+          </View>
+          <Text style={styles.congratsTitle}>
+            {t('workout.routineCompleted')}
+          </Text>
+          <Text style={styles.congratsText}>
+            Félicitations, tu as terminé ta séance !
+          </Text>
+          <View style={styles.statsContainer}>
+            <View style={styles.statItem}>
+              <Text style={styles.statValue}>{routine.exercises.length}</Text>
+              <Text style={styles.statLabel}>{t('common.exercises')}</Text>
+            </View>
+            <View style={styles.statDivider} />
+            <View style={styles.statItem}>
+              <Text style={styles.statValue}>
+                {routine.exercises.reduce((total, exercise) => total + exercise.series.length, 0)}
               </Text>
-              <Button
-                title={t('common.next')}
-                onPress={handleFinishWorkout}
-                size="large"
-              />
+              <Text style={styles.statLabel}>{t('common.series')}</Text>
             </View>
           </View>
+          <Button
+            title={t('common.finish')}
+            onPress={handleFinishWorkout}
+            size="large"
+            variant="primary"
+            style={styles.actionButton}
+          />
         </Modal>
       )}
 
@@ -261,10 +149,10 @@ function WorkoutSessionScreen() {
 
       <RpeModal
         visible={!!sessionState.pendingSeries}
-        onClose={() => setSessionState(prev => ({ ...prev, pendingSeries: null }))}
+        onClose={() => setSessionState((prev: SessionState) => ({ ...prev, pendingSeries: null }))}
         onSave={handleRpeSave}
         rpe={sessionState.rpe}
-        onRpeChange={(value) => setSessionState(prev => ({ ...prev, rpe: value }))}
+        onRpeChange={(value) => setSessionState((prev: SessionState) => ({ ...prev, rpe: value }))}
       />
     </View>
   );
@@ -277,43 +165,82 @@ const useStyles = () => {
     container: {
       flex: 1,
       backgroundColor: theme.colors.background.main
-    },
+    } as ViewStyle,
     loadingText: {
       color: theme.colors.text.primary,
       fontSize: theme.typography.fontSize.lg
-    },
+    } as TextStyle,
     content: {
       flex: 1,
       padding: theme.spacing.lg
-    },
+    } as ViewStyle,
     timerContainer: {
       backgroundColor: theme.colors.background.card,
       padding: theme.spacing.lg,
       borderTopLeftRadius: theme.borderRadius.lg,
       borderTopRightRadius: theme.borderRadius.lg,
       ...theme.shadows.lg
-    },
-    modalOverlay: {
-      flex: 1,
-      backgroundColor: theme.colors.background.overlay,
+    } as ViewStyle,
+    modalContent: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: theme.spacing.xl
+    } as ViewStyle,
+    successIconContainer: {
+      alignItems: 'center',
+      marginBottom: theme.spacing.lg
+    } as ViewStyle,
+    congratsTitle: {
+      fontSize: theme.typography.fontSize['2xl'],
+      color: theme.colors.primary,
+      fontWeight: 'bold',
+      textAlign: 'center',
+      marginBottom: theme.spacing.sm
+    } as TextStyle,
+    congratsText: {
+      fontSize: theme.typography.fontSize.lg,
+      color: theme.colors.text.secondary,
+      textAlign: 'center',
+      marginBottom: theme.spacing.xl
+    } as TextStyle,
+    statsContainer: {
+      flexDirection: 'row',
       justifyContent: 'center',
       alignItems: 'center',
-      padding: theme.spacing.lg
-    },
-    modalContent: {
+      marginBottom: theme.spacing.xl,
+      paddingVertical: theme.spacing.lg,
+      paddingHorizontal: theme.spacing.xl,
       backgroundColor: theme.colors.background.card,
       borderRadius: theme.borderRadius.lg,
-      padding: theme.spacing.lg,
-      width: '90%',
-      maxWidth: 400,
+      width: '100%',
+      maxWidth: 350,
+      alignSelf: 'center'
+    } as ViewStyle,
+    statItem: {
+      flex: 1,
       alignItems: 'center'
-    },
-    modalTitle: {
-      fontSize: theme.typography.fontSize.xl,
-      color: theme.colors.text.primary,
-      textAlign: 'center',
-      marginBottom: theme.spacing.md
-    }
+    } as ViewStyle,
+    statValue: {
+      fontSize: theme.typography.fontSize['2xl'],
+      color: theme.colors.primary,
+      fontWeight: 'bold',
+      marginBottom: theme.spacing.xs
+    } as TextStyle,
+    statLabel: {
+      fontSize: theme.typography.fontSize.sm,
+      color: theme.colors.text.secondary
+    } as TextStyle,
+    statDivider: {
+      width: 1,
+      height: 40,
+      backgroundColor: theme.colors.border.default,
+      marginHorizontal: theme.spacing.xl
+    } as ViewStyle,
+    actionButton: {
+      width: '100%',
+      marginTop: theme.spacing.lg,
+      alignSelf: 'center'
+    } as ViewStyle
   });
 };
 

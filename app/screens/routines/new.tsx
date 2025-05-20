@@ -16,10 +16,9 @@ import ExerciseList from '@/app/components/exercises/ExerciseList';
 import { BarChart, ChevronDown, Edit2, Layers, Plus, TimerIcon, Weight, X } from 'lucide-react-native';
 import { useTheme } from '@/app/hooks/useTheme';
 import { storageService } from '@/app/services/storage';
-import { v4 as uuidv4 } from 'uuid';
 import { useRouter } from 'expo-router';
 import { TimerPickerModal } from 'react-native-timer-picker';
-import { Exercise, Series } from '@/app/types/routine';
+import { Exercise, Series } from '@/types/common';
 
 // Structure de base pour la routine en cours de création
 const initialRoutine = {
@@ -76,7 +75,7 @@ export default function NewRoutineScreen() {
       reps: s.reps.toString(),
       note: s.note,
       rest: s.rest,
-      type: s.type,
+      type: s.type
     })));
     setEditingIndex(index);
     setShowSeriesConfig(true);
@@ -90,13 +89,13 @@ export default function NewRoutineScreen() {
       reps: parseInt(s.reps) || 0,
       note: s.note,
       rest: s.rest,
-      type: s.type,
+      type: s.type
     }));
     const newEx: Exercise = {
       name: selectedExercise.name,
       key: `${selectedExercise.key}_${Date.now()}`,
       translationKey: selectedExercise.key,
-      series: formattedSeries,
+      series: formattedSeries
     };
     setExercises((prev) => {
       if (editingIndex !== null) {

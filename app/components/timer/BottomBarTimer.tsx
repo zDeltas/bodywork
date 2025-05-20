@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Platform, StyleSheet, View, TouchableOpacity } from 'react-native';
-import { Pause, Play, Plus, Minus } from 'lucide-react-native';
+import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Pause, Play } from 'lucide-react-native';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
 import { useHaptics } from '@/src/hooks/useHaptics';
@@ -14,10 +14,10 @@ interface BottomBarTimerProps {
 }
 
 export default function BottomBarTimer({
-  initialTime,
-  onComplete,
-  autoStart = false,
-}: BottomBarTimerProps) {
+                                         initialTime,
+                                         onComplete,
+                                         autoStart = false
+                                       }: BottomBarTimerProps) {
   const { t } = useTranslation();
   const { theme } = useTheme();
   const haptics = useHaptics();
@@ -123,31 +123,31 @@ const useStyles = () => {
       shadowOffset: { width: 0, height: -2 },
       shadowOpacity: 0.08,
       shadowRadius: 8,
-      elevation: 8,
+      elevation: 8
     },
     inner: {
       alignItems: 'center',
-      justifyContent: 'center',
+      justifyContent: 'center'
     },
     row: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
       width: '100%',
-      marginBottom: 8,
+      marginBottom: 8
     },
     playRow: {
       alignItems: 'center',
-      marginTop: 4,
+      marginTop: 4
     },
     time: {
       color: theme.colors.text.primary,
       textAlign: 'center',
-      minWidth: 160,
+      minWidth: 160
     },
     sideButtonWrapper: {
       flex: 1,
-      alignItems: 'center',
+      alignItems: 'center'
     },
     sideButton: {
       width: 48,
@@ -158,14 +158,14 @@ const useStyles = () => {
       alignItems: 'center',
       flexDirection: 'column',
       marginHorizontal: 4,
-      padding: 0,
+      padding: 0
     },
     sideButtonText: {
       fontSize: 12,
       color: theme.colors.text.primary,
       marginTop: 2,
       fontWeight: '600',
-      textAlign: 'center',
+      textAlign: 'center'
     },
     playButton: {
       width: 64,
@@ -179,7 +179,7 @@ const useStyles = () => {
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.18,
       shadowRadius: 8,
-      elevation: 4,
-    },
+      elevation: 4
+    }
   });
 }; 

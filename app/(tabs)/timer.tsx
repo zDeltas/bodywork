@@ -20,7 +20,7 @@ const WORKOUT_TIMES = {
   'timer.quick': 30,
   'timer.standard': 60,
   'timer.long': 90,
-  'timer.veryLong': 120,
+  'timer.veryLong': 120
 };
 
 // Define styles using the current theme
@@ -28,7 +28,7 @@ const useStyles = (theme: any) => {
   return StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: theme.colors.background.main,
+      backgroundColor: theme.colors.background.main
     },
     header: {
       paddingTop: theme.spacing.xl * 2,
@@ -37,18 +37,18 @@ const useStyles = (theme: any) => {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      backgroundColor: theme.colors.background.card,
+      backgroundColor: theme.colors.background.card
     },
     title: {
       fontSize: theme.typography.fontSize['3xl'],
       fontFamily: theme.typography.fontFamily.bold,
-      color: theme.colors.text.primary,
+      color: theme.colors.text.primary
     },
     modeSelector: {
       flexDirection: 'row',
       backgroundColor: theme.colors.background.button,
       borderRadius: theme.borderRadius.full,
-      padding: theme.spacing.xs,
+      padding: theme.spacing.xs
     },
     modeButton: {
       paddingVertical: theme.spacing.sm,
@@ -56,40 +56,40 @@ const useStyles = (theme: any) => {
       borderRadius: theme.borderRadius.full,
       justifyContent: 'center',
       alignItems: 'center',
-      minWidth: 44,
+      minWidth: 44
     },
     modeButtonActive: {
-      backgroundColor: theme.colors.primary,
+      backgroundColor: theme.colors.primary
     },
     modeText: {
       fontFamily: theme.typography.fontFamily.semiBold,
       fontSize: theme.typography.fontSize.sm,
-      color: theme.colors.text.secondary,
+      color: theme.colors.text.secondary
     },
     modeTextActive: {
-      color: theme.colors.text.primary,
+      color: theme.colors.text.primary
     },
     content: {
       flex: 1,
       padding: theme.spacing.lg,
-      paddingBottom: theme.spacing.xl * 2,
+      paddingBottom: theme.spacing.xl * 2
     },
     timerContainer: {
       width: '100%',
-      paddingHorizontal: 20,
+      paddingHorizontal: 20
     },
     sectionTitle: {
       fontSize: theme.typography.fontSize.xl,
       fontFamily: theme.typography.fontFamily.bold,
       color: theme.colors.text.primary,
       marginBottom: theme.spacing.md,
-      marginTop: theme.spacing.lg,
+      marginTop: theme.spacing.lg
     },
     timeGrid: {
       flexDirection: 'row',
       flexWrap: 'wrap',
       justifyContent: 'space-between',
-      marginBottom: theme.spacing.lg,
+      marginBottom: theme.spacing.lg
     },
     timeButton: {
       width: '48%',
@@ -98,28 +98,28 @@ const useStyles = (theme: any) => {
       padding: theme.spacing.md,
       marginBottom: theme.spacing.md,
       alignItems: 'center',
-      ...theme.shadows.sm,
+      ...theme.shadows.sm
     },
     timeButtonActive: {
       backgroundColor: theme.colors.primary,
       borderColor: theme.colors.primary,
-      borderWidth: 2,
+      borderWidth: 2
     },
     timeText: {
       fontFamily: theme.typography.fontFamily.semiBold,
       fontSize: theme.typography.fontSize.base,
-      color: theme.colors.text.primary,
+      color: theme.colors.text.primary
     },
     timeTextActive: {
       color: theme.colors.text.primary,
-      fontWeight: 'bold',
+      fontWeight: 'bold'
     },
     timeValue: {
       fontFamily: theme.typography.fontFamily.semiBold,
-      color: theme.colors.text.primary,
+      color: theme.colors.text.primary
     },
     timeValueActive: {
-      color: theme.colors.text.primary,
+      color: theme.colors.text.primary
     },
     customTimeButton: {
       width: '48%',
@@ -128,20 +128,20 @@ const useStyles = (theme: any) => {
       padding: theme.spacing.md,
       marginBottom: theme.spacing.md,
       alignItems: 'center',
-      ...theme.shadows.sm,
+      ...theme.shadows.sm
     },
     customTimeButtonActive: {
       backgroundColor: theme.colors.primary,
       borderColor: theme.colors.primary,
-      borderWidth: 2,
+      borderWidth: 2
     },
     customTimeText: {
       fontFamily: theme.typography.fontFamily.semiBold,
       fontSize: theme.typography.fontSize.base,
-      color: theme.colors.text.primary,
+      color: theme.colors.text.primary
     },
     customTimeTextActive: {
-      color: theme.colors.text.primary,
+      color: theme.colors.text.primary
     },
     input: {
       backgroundColor: theme.colors.background.input,
@@ -150,7 +150,7 @@ const useStyles = (theme: any) => {
       marginBottom: theme.spacing.lg,
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.regular,
-      fontSize: theme.typography.fontSize.base,
+      fontSize: theme.typography.fontSize.base
     },
     setsContainer: {
       flexDirection: 'row',
@@ -158,7 +158,7 @@ const useStyles = (theme: any) => {
       justifyContent: 'center',
       gap: 16,
       marginBottom: 24,
-      width: '100%',
+      width: '100%'
     },
     setsButton: {
       width: 40,
@@ -172,19 +172,19 @@ const useStyles = (theme: any) => {
           shadowColor: '#000',
           shadowOffset: { width: 0, height: 2 },
           shadowOpacity: 0.1,
-          shadowRadius: 4,
+          shadowRadius: 4
         },
         android: {
-          elevation: 2,
-        },
-      }),
+          elevation: 2
+        }
+      })
     },
     setsValue: {
       fontSize: theme.typography.fontSize.xl,
       fontFamily: theme.typography.fontFamily.bold,
       color: theme.colors.text.primary,
       minWidth: 30,
-      textAlign: 'center',
+      textAlign: 'center'
     },
     startButton: {
       backgroundColor: theme.colors.primary,
@@ -192,13 +192,13 @@ const useStyles = (theme: any) => {
       padding: theme.spacing.md,
       alignItems: 'center',
       marginTop: theme.spacing.lg,
-      ...theme.shadows.md,
+      ...theme.shadows.md
     },
     startButtonText: {
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.semiBold,
-      fontSize: theme.typography.fontSize.lg,
-    },
+      fontSize: theme.typography.fontSize.lg
+    }
   });
 };
 
@@ -297,7 +297,7 @@ export default function TimerScreen() {
                   key={key}
                   style={[
                     styles.timeButton,
-                    selectedTime === time && !isCustomTime && styles.timeButtonActive,
+                    selectedTime === time && !isCustomTime && styles.timeButtonActive
                   ]}
                   onPress={() => {
                     setSelectedTime(time);
@@ -307,7 +307,7 @@ export default function TimerScreen() {
                   <Text
                     style={[
                       styles.timeText,
-                      selectedTime === time && !isCustomTime && styles.timeTextActive,
+                      selectedTime === time && !isCustomTime && styles.timeTextActive
                     ]}
                   >
                     {typeof t(key as TranslationKey) === 'string'
@@ -317,7 +317,7 @@ export default function TimerScreen() {
                   <Text
                     style={[
                       styles.timeValue,
-                      selectedTime === time && !isCustomTime && styles.timeValueActive,
+                      selectedTime === time && !isCustomTime && styles.timeValueActive
                     ]}
                   >
                     {time < 60 ? `${time}s` : `${Math.floor(time / 60)}m ${time % 60}s`}
@@ -346,7 +346,7 @@ export default function TimerScreen() {
                   key={key}
                   style={[
                     styles.timeButton,
-                    selectedRestTime === time && !isCustomRestTime && styles.timeButtonActive,
+                    selectedRestTime === time && !isCustomRestTime && styles.timeButtonActive
                   ]}
                   onPress={() => {
                     setSelectedRestTime(time);
@@ -356,7 +356,7 @@ export default function TimerScreen() {
                   <Text
                     style={[
                       styles.timeText,
-                      selectedRestTime === time && !isCustomRestTime && styles.timeTextActive,
+                      selectedRestTime === time && !isCustomRestTime && styles.timeTextActive
                     ]}
                   >
                     {typeof t(key as TranslationKey) === 'string'
@@ -366,7 +366,7 @@ export default function TimerScreen() {
                   <Text
                     style={[
                       styles.timeValue,
-                      selectedRestTime === time && !isCustomRestTime && styles.timeValueActive,
+                      selectedRestTime === time && !isCustomRestTime && styles.timeValueActive
                     ]}
                   >
                     {time < 60 ? `${time}s` : `${Math.floor(time / 60)}m ${time % 60}s`}
@@ -433,28 +433,28 @@ export default function TimerScreen() {
         styles={{
           backgroundColor: theme.colors.background.card,
           pickerContainer: {
-            backgroundColor: theme.colors.background.card,
+            backgroundColor: theme.colors.background.card
           },
           pickerItem: {
             color: theme.colors.text.primary,
-            fontSize: theme.typography.fontSize['3xl'],
+            fontSize: theme.typography.fontSize['3xl']
           },
           pickerLabel: {
             color: theme.colors.text.primary,
             fontSize: theme.typography.fontSize.xl,
-            right: -20,
+            right: -20
           },
           theme: 'dark',
           pickerLabelContainer: {
-            width: 60,
+            width: 60
           },
           pickerItemContainer: {
-            width: 150,
+            width: 150
           },
           confirmButton: {
             backgroundColor: theme.colors.primary,
-            borderColor: theme.colors.primary,
-          },
+            borderColor: theme.colors.primary
+          }
         }}
         hideHours={true}
         padWithNItems={1}
@@ -476,28 +476,28 @@ export default function TimerScreen() {
         styles={{
           backgroundColor: theme.colors.background.card,
           pickerContainer: {
-            backgroundColor: theme.colors.background.card,
+            backgroundColor: theme.colors.background.card
           },
           pickerItem: {
             color: theme.colors.text.primary,
-            fontSize: theme.typography.fontSize['3xl'],
+            fontSize: theme.typography.fontSize['3xl']
           },
           pickerLabel: {
             color: theme.colors.text.primary,
             fontSize: theme.typography.fontSize.xl,
-            right: -20,
+            right: -20
           },
           theme: 'dark',
           pickerLabelContainer: {
-            width: 60,
+            width: 60
           },
           pickerItemContainer: {
-            width: 150,
+            width: 150
           },
           confirmButton: {
             backgroundColor: theme.colors.primary,
-            borderColor: theme.colors.primary,
-          },
+            borderColor: theme.colors.primary
+          }
         }}
         hideHours={true}
         padWithNItems={1}

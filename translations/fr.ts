@@ -22,7 +22,10 @@ export default {
     custom: 'Personnalisé',
     inConstruction: 'En Construction',
     featureComingSoon: 'Cette fonctionnalité arrive bientôt !',
-    next: 'Suivant'
+    next: 'Suivant',
+    or: 'ou',
+    exercises: 'exercices',
+    series: 'séries'
   },
 
   // Profile screen
@@ -390,5 +393,32 @@ export default {
     addSeries: 'Ajouter une série',
     usePreviousValues: 'Utiliser les valeurs précédentes',
     optionalNote: 'Note optionnelle'
+  },
+
+  // Routines
+  routines: {
+    emptyState: {
+      title: 'Aucune routine pour l\'instant',
+      description: 'Créez votre première routine d\'entraînement ou choisissez parmi nos suggestions',
+      createButton: 'Créer ma première routine',
+      suggestions: 'Suggestions'
+    },
+    item: {
+      new: 'Nouveau',
+      exercises: 'exercices',
+      exercise: 'exercice',
+      minutes: 'min',
+      hours: 'h',
+      series: 'séries',
+      usages: 'utilisations',
+      usage: 'utilisation',
+      lastUsed: 'Dernière utilisation :',
+      createdOn: 'Créée le',
+      actions: 'Actions',
+      edit: 'Modifier',
+      share: 'Partager',
+      delete: 'Supprimer',
+      start: 'Démarrer'
+    }
   }
 };

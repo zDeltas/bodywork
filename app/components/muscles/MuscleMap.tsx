@@ -1,11 +1,6 @@
 import React, { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-  withTiming,
-} from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import Body, { ExtendedBodyPart, Slug } from 'react-native-body-highlighter';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
@@ -40,7 +35,7 @@ const muscleSlugs: Record<string, Slug> = {
   ANKLES: 'ankles' as Slug,
   TIBIALIS: 'tibialis' as Slug,
   OBLIQUES: 'obliques' as Slug,
-  KNEES: 'knees' as Slug,
+  KNEES: 'knees' as Slug
 };
 
 const muscleGroupToSlug: Record<string, Slug> = {
@@ -50,7 +45,7 @@ const muscleGroupToSlug: Record<string, Slug> = {
   Shoulders: muscleSlugs.DELTOIDS,
   Biceps: muscleSlugs.BICEPS,
   Triceps: muscleSlugs.TRICEPS,
-  Core: muscleSlugs.ABS,
+  Core: muscleSlugs.ABS
 };
 
 export default function MuscleMap({ workouts }: MuscleMapProps) {
@@ -72,7 +67,7 @@ export default function MuscleMap({ workouts }: MuscleMapProps) {
   };
 
   const containerStyle = useAnimatedStyle(() => ({
-    transform: [{ rotateY: `${rotationValue.value}deg` }],
+    transform: [{ rotateY: `${rotationValue.value}deg` }]
   }));
 
   const getMuscleRestState = (muscleWorkouts: Workout[]) => {
@@ -90,7 +85,7 @@ export default function MuscleMap({ workouts }: MuscleMapProps) {
   const getExtendedBodyParts = (workouts: Workout[]): ExtendedBodyPart[] => {
     return Object.entries(muscleGroupToSlug).map(([group, slug]) => ({
       slug: slug as Slug,
-      restState: getMuscleRestState(workouts.filter((w) => w.muscleGroup === group)),
+      restState: getMuscleRestState(workouts.filter((w) => w.muscleGroup === group))
     }));
   };
 
@@ -99,7 +94,7 @@ export default function MuscleMap({ workouts }: MuscleMapProps) {
   const intensityColors = [
     theme.colors.error,
     theme.colors.text.warning,
-    theme.colors.text.disabled,
+    theme.colors.text.disabled
   ];
 
   return (
@@ -160,67 +155,67 @@ const useStyles = () => {
       flex: 1,
       alignItems: 'center',
       backgroundColor: theme.colors.background.card,
-      width: '100%',
+      width: '100%'
     },
     viewToggle: {
       flexDirection: 'row',
       marginBottom: theme.spacing.md,
       backgroundColor: theme.colors.background.button,
       borderRadius: theme.borderRadius.full,
-      padding: theme.spacing.xs,
+      padding: theme.spacing.xs
     },
     toggleButton: {
       paddingHorizontal: theme.spacing.lg,
       paddingVertical: theme.spacing.sm,
-      borderRadius: theme.borderRadius.full,
+      borderRadius: theme.borderRadius.full
     },
     toggleButtonActive: {
       backgroundColor: theme.colors.primary,
-      color: 'white',
+      color: 'white'
     },
     toggleText: {
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.semiBold,
-      fontSize: theme.typography.fontSize.sm,
+      fontSize: theme.typography.fontSize.sm
     },
     bodyContainer: {
       width: '100%',
       alignItems: 'center',
       justifyContent: 'center',
-      marginBottom: theme.spacing.md,
+      marginBottom: theme.spacing.md
     },
     legend: {
       backgroundColor: theme.colors.background.main,
       borderRadius: theme.borderRadius.md,
       padding: theme.spacing.md,
       marginTop: theme.spacing.lg,
-      width: '100%',
+      width: '100%'
     },
     legendTitle: {
       fontSize: theme.typography.fontSize.base,
       fontFamily: theme.typography.fontFamily.semiBold,
       color: theme.colors.text.primary,
       marginBottom: theme.spacing.sm,
-      textAlign: 'center',
+      textAlign: 'center'
     },
     legendItems: {
       flexDirection: 'row',
-      justifyContent: 'space-around',
+      justifyContent: 'space-around'
     },
     legendItem: {
       flexDirection: 'row',
-      alignItems: 'center',
+      alignItems: 'center'
     },
     legendColor: {
       width: 16,
       height: 16,
       borderRadius: 8,
-      marginRight: theme.spacing.sm,
+      marginRight: theme.spacing.sm
     },
     legendText: {
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.regular,
-      fontSize: theme.typography.fontSize.sm,
-    },
+      fontSize: theme.typography.fontSize.sm
+    }
   });
 };

@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, StyleSheet, FlatList } from 'react-native';
-import { WorkoutCardSkeleton, ExerciseCardSkeleton } from './SkeletonComponents';
+import { FlatList, StyleSheet } from 'react-native';
+import { ExerciseCardSkeleton, WorkoutCardSkeleton } from './SkeletonComponents';
 
 interface SkeletonListProps {
   type: 'workout' | 'exercise';
@@ -31,8 +31,8 @@ const SkeletonList: React.FC<SkeletonListProps> = ({ type, count = 3 }) => {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
-  },
+    padding: 16
+  }
 });
 
 export default SkeletonList;

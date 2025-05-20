@@ -9,7 +9,7 @@ const { wrapWithReanimatedMetroConfig } = require('react-native-reanimated/metro
 // Configure SVG Transformer
 config.transformer = {
   ...transformer,
-  babelTransformerPath: require.resolve('react-native-svg-transformer'),
+  babelTransformerPath: require.resolve('react-native-svg-transformer')
 };
 
 // Configure extensions and paths
@@ -18,9 +18,9 @@ config.resolver = {
   assetExts: resolver.assetExts.filter((ext) => ext !== 'svg'),
   sourceExts: [...resolver.sourceExts, 'svg'],
   extraNodeModules: {
-    '@': path.resolve(__dirname, 'app'),
+    '@': path.resolve(__dirname, 'app')
   },
-  unstable_enablePackageExports: false,
+  unstable_enablePackageExports: false
 };
 
 module.exports = wrapWithReanimatedMetroConfig(config);

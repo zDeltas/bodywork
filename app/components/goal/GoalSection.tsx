@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction } from 'react';
+import React from 'react';
 import { Alert, Animated, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from '@/app/hooks/useTranslation';
@@ -7,7 +7,6 @@ import { useHaptics } from '@/src/hooks/useHaptics';
 import { router } from 'expo-router';
 import useGoals from '@/app/hooks/useGoals';
 import useWorkouts from '@/app/hooks/useWorkouts';
-import { Goal, Workout } from '@/types/common';
 
 interface GoalSectionProps {
   fadeAnim: Animated.Value;
@@ -27,101 +26,101 @@ const GoalSection: React.FC<GoalSectionProps> = ({ fadeAnim }) => {
       padding: theme.spacing.lg,
       marginHorizontal: theme.spacing.lg,
       marginBottom: theme.spacing.xl,
-      ...theme.shadows.sm,
+      ...theme.shadows.sm
     },
     chartTitle: {
       fontSize: theme.typography.fontSize.lg,
       fontFamily: theme.typography.fontFamily.bold,
       marginBottom: theme.spacing.lg,
-      color: theme.colors.text.primary,
+      color: theme.colors.text.primary
     },
     noGoalsContainer: {
       alignItems: 'center',
       justifyContent: 'center',
-      padding: theme.spacing.lg,
+      padding: theme.spacing.lg
     },
     noGoalsText: {
       fontSize: theme.typography.fontSize.base,
       color: theme.colors.text.secondary,
-      textAlign: 'center',
+      textAlign: 'center'
     },
     goalItem: {
       marginBottom: theme.spacing.lg,
-      borderRadius: theme.borderRadius.base,
+      borderRadius: theme.borderRadius.base
     },
     goalHeader: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      marginBottom: theme.spacing.sm,
+      marginBottom: theme.spacing.sm
     },
     goalTitle: {
       fontSize: theme.typography.fontSize.base,
       fontFamily: theme.typography.fontFamily.semiBold,
       color: theme.colors.text.primary,
-      flex: 1,
+      flex: 1
     },
     goalHeaderRight: {
       flexDirection: 'row',
-      alignItems: 'center',
+      alignItems: 'center'
     },
     goalValues: {
-      marginRight: theme.spacing.md,
+      marginRight: theme.spacing.md
     },
     goalCurrent: {
       fontSize: theme.typography.fontSize.base,
       fontFamily: theme.typography.fontFamily.semiBold,
-      color: theme.colors.success,
+      color: theme.colors.success
     },
     goalSeparator: {
       fontSize: theme.typography.fontSize.base,
-      color: theme.colors.text.secondary,
+      color: theme.colors.text.secondary
     },
     goalTarget: {
       fontSize: theme.typography.fontSize.base,
       fontFamily: theme.typography.fontFamily.semiBold,
-      color: theme.colors.primary,
+      color: theme.colors.primary
     },
     deleteGoalButton: {
-      padding: theme.spacing.xs,
+      padding: theme.spacing.xs
     },
     goalProgressContainer: {
       height: theme.spacing.sm,
       backgroundColor: theme.colors.background.button,
       borderRadius: theme.borderRadius.xs,
       overflow: 'hidden',
-      marginBottom: theme.spacing.sm,
+      marginBottom: theme.spacing.sm
     },
     goalProgressBar: {
       height: '100%',
-      borderRadius: theme.borderRadius.xs,
+      borderRadius: theme.borderRadius.xs
     },
     goalProgressLow: {
-      backgroundColor: theme.colors.error,
+      backgroundColor: theme.colors.error
     },
     goalProgressMedium: {
-      backgroundColor: theme.colors.primary,
+      backgroundColor: theme.colors.primary
     },
     goalProgressHigh: {
-      backgroundColor: theme.colors.success,
+      backgroundColor: theme.colors.success
     },
     goalProgressText: {
       fontSize: theme.typography.fontSize.md,
-      color: theme.colors.text.secondary,
+      color: theme.colors.text.secondary
     },
     addGoalButton: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
       marginTop: theme.spacing.md,
-      padding: theme.spacing.md,
+      padding: theme.spacing.md
     },
     addGoalText: {
       marginLeft: theme.spacing.sm,
       fontSize: theme.typography.fontSize.base,
       color: theme.colors.primary,
-      fontFamily: theme.typography.fontFamily.semiBold,
-    },
+      fontFamily: theme.typography.fontFamily.semiBold
+    }
   });
 
   return (
@@ -154,7 +153,7 @@ const GoalSection: React.FC<GoalSectionProps> = ({ fadeAnim }) => {
                       [
                         {
                           text: t('common.cancel'),
-                          style: 'cancel',
+                          style: 'cancel'
                         },
                         {
                           text: t('common.delete'),
@@ -162,9 +161,9 @@ const GoalSection: React.FC<GoalSectionProps> = ({ fadeAnim }) => {
                           onPress: () => {
                             deleteGoal(goal.exercise);
                             haptics.impactMedium();
-                          },
-                        },
-                      ],
+                          }
+                        }
+                      ]
                     );
                   }}
                 >
@@ -182,7 +181,7 @@ const GoalSection: React.FC<GoalSectionProps> = ({ fadeAnim }) => {
                     ? styles.goalProgressHigh
                     : goal.progress > 50
                       ? styles.goalProgressMedium
-                      : styles.goalProgressLow,
+                      : styles.goalProgressLow
                 ]}
               />
             </View>
@@ -190,9 +189,9 @@ const GoalSection: React.FC<GoalSectionProps> = ({ fadeAnim }) => {
             <Text style={styles.goalProgressText}>
               {goal.progress < 100
                 ? t('goals.goalRemaining').replace(
-                    '{remaining}',
-                    (goal.target - goal.current).toString(),
-                  )
+                  '{remaining}',
+                  (goal.target - goal.current).toString()
+                )
                 : t('goals.goalAchieved')}
             </Text>
           </View>

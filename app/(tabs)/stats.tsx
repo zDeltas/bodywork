@@ -1,11 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, ScrollView, StyleSheet, View } from 'react-native';
-import {
-  Inter_400Regular,
-  Inter_600SemiBold,
-  Inter_700Bold,
-  useFonts,
-} from '@expo-google-fonts/inter';
+import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold, useFonts } from '@expo-google-fonts/inter';
 import * as SplashScreen from 'expo-splash-screen';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { router } from 'expo-router';
@@ -38,7 +33,7 @@ export default function StatsScreen() {
   const [fontsLoaded] = useFonts({
     'Inter-Regular': Inter_400Regular,
     'Inter-SemiBold': Inter_600SemiBold,
-    'Inter-Bold': Inter_700Bold,
+    'Inter-Bold': Inter_700Bold
   });
 
   // Refs
@@ -57,7 +52,7 @@ export default function StatsScreen() {
       Animated.timing(fadeAnim, {
         toValue: 1,
         duration: 500,
-        useNativeDriver: true,
+        useNativeDriver: true
       }).start();
     }
   }, [fontsLoaded]);
@@ -94,7 +89,7 @@ export default function StatsScreen() {
           trainingFrequency={statsData.trainingFrequency}
           totalSets={statsData.workouts.reduce(
             (total: number, workout: Workout) => total + workout.series.length,
-            0,
+            0
           )}
           totalWorkouts={statsData.workouts.length}
         />
@@ -108,7 +103,7 @@ export default function StatsScreen() {
           onExerciseSelect={(exercise, exerciseKey) => {
             router.push({
               pathname: '/screens/ExerciseDetails',
-              params: { exercise: exerciseKey },
+              params: { exercise: exerciseKey }
             });
           }}
           onMuscleSelect={handleMuscleSelect}
@@ -143,10 +138,10 @@ const useStyles = () => {
   return StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: theme.colors.background.main,
+      backgroundColor: theme.colors.background.main
     },
     content: {
-      flex: 1,
-    },
+      flex: 1
+    }
   });
 };

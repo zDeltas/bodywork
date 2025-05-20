@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 export default function ExecuteRoutineScreen() {
   // TODO: récupérer l'id de la routine via les params de navigation
@@ -15,5 +15,5 @@ export default function ExecuteRoutineScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16 },
-  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 16 },
+  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 16 }
 }); 

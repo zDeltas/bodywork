@@ -3,13 +3,7 @@ import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-nati
 import { useTheme } from '@/app/hooks/useTheme';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import Header from '@/app/components/layout/Header';
-import {
-  BarChart,
-  Calendar as CalendarIcon,
-  ChevronDown,
-  ListPlus,
-  Scale,
-} from 'lucide-react-native';
+import { BarChart, Calendar as CalendarIcon, ChevronDown, ListPlus, Scale } from 'lucide-react-native';
 import MeasurementBody, { MeasurementKey } from '@/app/components/measurements/MeasurementBodyMap';
 import MeasurementModal from '@/app/components/measurements/MeasurementModal';
 import MeasurementHistoryModal from '@/app/components/measurements/MeasurementHistoryModal';
@@ -31,11 +25,11 @@ const MEASUREMENT_KEYS: MeasurementKey[] = [
   'waist',
   'hips',
   'thighs',
-  'calves',
+  'calves'
 ];
 
 const getMeasurementTranslationKey = (key: MeasurementKey): TranslationKey => {
-  return `measurements.${key}` as TranslationKey;
+  return `measurements.${key}`;
 };
 
 // Les modes de vue disponibles
@@ -47,11 +41,11 @@ export default function MeasurementsScreen() {
   const [viewMode, setViewMode] = useState<ViewMode>('history');
   const [modal, setModal] = useState<{ key: MeasurementKey | null; open: boolean }>({
     key: null,
-    open: false,
+    open: false
   });
   const [historyModal, setHistoryModal] = useState<{ key: MeasurementKey | null; open: boolean }>({
     key: null,
-    open: false,
+    open: false
   });
   const [showCalendar, setShowCalendar] = useState(false);
   const [showWeightModal, setShowWeightModal] = useState(false);
@@ -63,7 +57,7 @@ export default function MeasurementsScreen() {
     loading,
     updateMeasurement,
     updateWeight,
-    setSelectedDate,
+    setSelectedDate
   } = useMeasurements();
 
   const openMeasurementModal = (key: MeasurementKey) => setModal({ key, open: true });
@@ -100,16 +94,16 @@ export default function MeasurementsScreen() {
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: theme.colors.background.main,
+      backgroundColor: theme.colors.background.main
     },
     content: {
-      flex: 1,
+      flex: 1
     },
     measurementInputContainer: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       padding: 16,
-      marginBottom: 8,
+      marginBottom: 8
     },
     inputCard: {
       flex: 1,
@@ -117,52 +111,52 @@ export default function MeasurementsScreen() {
       borderRadius: theme.borderRadius.lg,
       padding: 12,
       marginHorizontal: 4,
-      ...theme.shadows.sm,
+      ...theme.shadows.sm
     },
     inputHeader: {
       flexDirection: 'row',
       alignItems: 'center',
-      marginBottom: 8,
+      marginBottom: 8
     },
     inputLabel: {
       marginLeft: 6,
       fontWeight: 'bold',
       color: theme.colors.text.primary,
-      fontSize: 14,
+      fontSize: 14
     },
     dateDisplay: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      paddingVertical: 6,
+      paddingVertical: 6
     },
     dateText: {
       color: theme.colors.text.primary,
-      fontSize: 16,
+      fontSize: 16
     },
     calendarOverlay: {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
-      backgroundColor: 'rgba(0,0,0,0.7)',
+      backgroundColor: 'rgba(0,0,0,0.7)'
     },
     calendarModal: {
       backgroundColor: theme.colors.background.card,
       borderRadius: theme.borderRadius.lg,
       padding: 24,
       width: 340,
-      maxWidth: '90%',
+      maxWidth: '90%'
     },
     calendarCloseButton: {
       backgroundColor: theme.colors.primary,
       borderRadius: theme.borderRadius.md,
       paddingVertical: 10,
       marginTop: 16,
-      alignItems: 'center',
+      alignItems: 'center'
     },
     calendarCloseText: {
       color: theme.colors.text.primary,
-      fontWeight: 'bold',
+      fontWeight: 'bold'
     },
     viewToggle: {
       flexDirection: 'row',
@@ -170,7 +164,7 @@ export default function MeasurementsScreen() {
       backgroundColor: theme.colors.background.card,
       padding: 4,
       margin: 16,
-      ...theme.shadows.sm,
+      ...theme.shadows.sm
     },
     toggleButton: {
       flex: 1,
@@ -179,19 +173,19 @@ export default function MeasurementsScreen() {
       borderRadius: theme.borderRadius.full,
       flexDirection: 'row',
       alignItems: 'center',
-      justifyContent: 'center',
+      justifyContent: 'center'
     },
     activeToggle: {
-      backgroundColor: theme.colors.primary,
+      backgroundColor: theme.colors.primary
     },
     toggleText: {
       color: theme.colors.text.secondary,
-      marginLeft: 6,
+      marginLeft: 6
     },
     activeToggleText: {
       color: theme.colors.text.primary,
-      fontWeight: 'bold',
-    },
+      fontWeight: 'bold'
+    }
   });
 
   const renderDateWeight = () => (
@@ -228,14 +222,14 @@ export default function MeasurementsScreen() {
       <Modal
         visible={showCalendar}
         onClose={() => setShowCalendar(false)}
-        title={t('common.selectDate' as TranslationKey)}
+        title={t('workout.selectDate')}
         showCloseButton={true}
       >
         <Calendar
           current={measurements.date}
           onDayPress={onCalendarDayPress}
           markedDates={{
-            [measurements.date]: { selected: true, selectedColor: theme.colors.primary },
+            [measurements.date]: { selected: true, selectedColor: theme.colors.primary }
           }}
           theme={{
             backgroundColor: theme.colors.background.card,
@@ -250,7 +244,7 @@ export default function MeasurementsScreen() {
             selectedDotColor: theme.colors.text.primary,
             arrowColor: theme.colors.primary,
             monthTextColor: theme.colors.text.primary,
-            indicatorColor: theme.colors.primary,
+            indicatorColor: theme.colors.primary
           }}
         />
       </Modal>
@@ -294,7 +288,7 @@ export default function MeasurementsScreen() {
         points={MEASUREMENT_KEYS.map((key) => ({
           key,
           label: t(getMeasurementTranslationKey(key)),
-          color: theme.colors.measurement[key],
+          color: theme.colors.measurement[key]
         }))}
         values={measurements.measurements}
         onPointPress={openMeasurementModal}

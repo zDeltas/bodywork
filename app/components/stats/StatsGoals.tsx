@@ -10,8 +10,8 @@ interface StatsGoalsProps {
 const createStyles = (theme: any) =>
   StyleSheet.create({
     container: {
-      marginBottom: theme.spacing.xl,
-    },
+      marginBottom: theme.spacing.xl
+    }
   });
 
 export default function StatsGoals({ fadeAnim }: StatsGoalsProps) {

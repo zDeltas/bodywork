@@ -3,7 +3,7 @@ import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { useTheme } from '@/app/hooks/useTheme';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { MeasurementKey } from './MeasurementBodyMap';
-import { TranslationKey, MeasurementTranslationKey } from '@/translations';
+import { MeasurementTranslationKey } from '@/translations';
 import Modal from '@/app/components/ui/Modal';
 
 interface Props {
@@ -65,8 +65,8 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 8,
-  },
+    marginBottom: 8
+  }
 });
 
 export default MeasurementHistoryModal;

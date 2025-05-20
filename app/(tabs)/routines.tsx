@@ -7,10 +7,10 @@ import { Plus, Star } from 'lucide-react-native';
 import FloatButtonAction from '@/app/components/ui/FloatButtonAction';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useHaptics } from '@/src/hooks/useHaptics';
-import { Routine } from '@/app/types/routine';
-import { RoutineItem } from '@/app/components/routines/RoutineItem';
-import { EmptyState } from '@/app/components/routines/EmptyState';
-import { PREMADE_ROUTINES } from '@/app/data/premadeRoutines';
+import { Routine } from '@/types/common';
+import RoutineItem from '@/app/components/routines/RoutineItem';
+import EmptyState from '@/app/components/routines/EmptyState';
+import PREMADE_ROUTINES from '@/app/data/premadeRoutines';
 
 export default function RoutinesListScreen() {
   const [routines, setRoutines] = useState<Routine[]>([]);

@@ -1,23 +1,23 @@
 import React, { useState } from 'react';
-import { TouchableOpacity, View, Text, StyleSheet } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import {
-  ArrowRight,
   Clock,
   Dumbbell,
+  Edit,
   MoreVertical,
   Play,
-  Star,
-  TrendingUp,
-  Edit,
   Share as ShareIcon,
-  Trash2
+  Star,
+  Trash2,
+  TrendingUp
 } from 'lucide-react-native';
 import { useHaptics } from '@/src/hooks/useHaptics';
-import { Routine, RoutineStats } from '@/app/types/routine';
+import { Routine, RoutineStats } from '@/types/common';
 import Modal from '@/app/components/ui/Modal';
 import { useTheme } from '@/app/hooks/useTheme';
+import { useTranslation } from '@/app/hooks/useTranslation';
 
 type RoutineItemProps = {
   item: Routine;
@@ -32,6 +32,7 @@ const calculateStats = (routine: Routine): RoutineStats => {
   const totalSeries = routine.exercises.reduce((total, exercise) => total + exercise.series.length, 0);
   const estimatedTime = Math.ceil(routine.exercises.reduce((total, exercise) => {
     return total + exercise.series.reduce((seriesTotal, series) => {
+      if (!series.rest) return seriesTotal;
       const [minutes, seconds] = series.rest.split(':').map(Number);
       return seriesTotal + (minutes * 60 + seconds);
     }, 0);
@@ -46,17 +47,18 @@ const calculateStats = (routine: Routine): RoutineStats => {
   };
 };
 
-export const RoutineItem = React.memo(({
-  item,
-  onStart,
-  onEdit,
-  onDelete,
-  onToggleFavorite,
-  onShare
-}: RoutineItemProps) => {
+const RoutineItem = React.memo(({
+                                  item,
+                                  onStart,
+                                  onEdit,
+                                  onDelete,
+                                  onToggleFavorite,
+                                  onShare
+                                }: RoutineItemProps) => {
   const [showActionsModal, setShowActionsModal] = useState(false);
   const haptics = useHaptics();
   const { theme } = useTheme();
+  const { t } = useTranslation();
   const styles = useStyles(theme);
   const stats = calculateStats(item);
 
@@ -69,21 +71,21 @@ export const RoutineItem = React.memo(({
     const statsArray = [
       {
         icon: <Dumbbell size={16} color={theme.colors.text.secondary} />,
-        text: `${stats.totalExercises} exo${stats.totalExercises > 1 ? 's' : ''}`
+        text: `${stats.totalExercises} ${stats.totalExercises > 1 ? t('routines.item.exercises') : t('routines.item.exercise')}`
       },
       {
         icon: <Clock size={16} color={theme.colors.text.secondary} />,
-        text: `${stats.estimatedTime} min`
+        text: `${stats.estimatedTime} ${t('routines.item.minutes')}`
       },
       {
-        icon: <Text style={styles.statText}>{stats.totalSeries} séries</Text>
+        icon: <Text style={styles.statText}>{stats.totalSeries} {t('routines.item.series')}</Text>
       }
     ];
 
     if (item.usageCount) {
       statsArray.push({
         icon: <TrendingUp size={16} color={theme.colors.text.secondary} />,
-        text: `${item.usageCount} utilisation${item.usageCount > 1 ? 's' : ''}`
+        text: `${item.usageCount} ${item.usageCount > 1 ? t('routines.item.usages') : t('routines.item.usage')}`
       });
     }
 
@@ -93,8 +95,8 @@ export const RoutineItem = React.memo(({
       statsArray.push({
         icon: <Clock size={16} color={theme.colors.text.secondary} />,
         text: hours > 0
-          ? `${hours}h${minutes > 0 ? ` ${minutes}min` : ''}`
-          : `${minutes}min`
+          ? `${hours}${t('routines.item.hours')}${minutes > 0 ? ` ${minutes}${t('routines.item.minutes')}` : ''}`
+          : `${minutes}${t('routines.item.minutes')}`
       });
     }
 
@@ -113,7 +115,7 @@ export const RoutineItem = React.memo(({
             <Text style={styles.routineTitle}>{item.title}</Text>
             {stats.isRecent && (
               <View style={styles.newBadge}>
-                <Text style={styles.newBadgeText}>Nouveau</Text>
+                <Text style={styles.newBadgeText}>{t('routines.item.new')}</Text>
               </View>
             )}
           </View>
@@ -142,8 +144,8 @@ export const RoutineItem = React.memo(({
         <View style={styles.routineFooter}>
           <Text style={styles.routineDate}>
             {item.lastUsed
-              ? `Dernière utilisation : ${format(new Date(item.lastUsed), 'dd MMM yyyy', { locale: fr })}`
-              : `Créée le ${format(new Date(item.createdAt), 'dd MMM yyyy', { locale: fr })}`}
+              ? `${t('routines.item.lastUsed')} ${format(new Date(item.lastUsed), 'dd MMM yyyy', { locale: fr })}`
+              : `${t('routines.item.createdOn')} ${format(new Date(item.createdAt), 'dd MMM yyyy', { locale: fr })}`}
           </Text>
           <View style={styles.routineActions}>
             <TouchableOpacity
@@ -160,7 +162,7 @@ export const RoutineItem = React.memo(({
               onPress={() => onStart(item.id)}
             >
               <Play size={20} color={theme.colors.text.primary} />
-              <Text style={styles.startButtonText}>Démarrer</Text>
+              <Text style={styles.startButtonText}>{t('routines.item.start')}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -169,7 +171,7 @@ export const RoutineItem = React.memo(({
       <Modal
         visible={showActionsModal}
         onClose={() => setShowActionsModal(false)}
-        title="Actions"
+        title={t('routines.item.actions')}
       >
         <View style={styles.modalActions}>
           <TouchableOpacity
@@ -177,14 +179,14 @@ export const RoutineItem = React.memo(({
             onPress={() => handleAction(() => onEdit(item.id))}
           >
             <Edit size={24} color={theme.colors.text.primary} />
-            <Text style={styles.modalActionText}>Modifier</Text>
+            <Text style={styles.modalActionText}>{t('routines.item.edit')}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.modalAction}
             onPress={() => handleAction(() => onShare(item))}
           >
             <ShareIcon size={24} color={theme.colors.text.primary} />
-            <Text style={styles.modalActionText}>Partager</Text>
+            <Text style={styles.modalActionText}>{t('routines.item.share')}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.modalAction, styles.modalActionDelete]}
@@ -192,7 +194,7 @@ export const RoutineItem = React.memo(({
           >
             <Trash2 size={24} color={theme.colors.error} />
             <Text style={[styles.modalActionText, styles.modalActionTextDelete]}>
-              Supprimer
+              {t('routines.item.delete')}
             </Text>
           </TouchableOpacity>
         </View>
@@ -308,4 +310,6 @@ const useStyles = (theme: any) => StyleSheet.create({
   modalActionTextDelete: {
     color: theme.colors.error
   }
-}); 
+});
+
+export default RoutineItem; 

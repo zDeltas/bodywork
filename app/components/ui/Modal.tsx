@@ -17,16 +17,16 @@ interface ModalProps {
 }
 
 export default function Modal({
-  visible,
-  onClose,
-  title,
-  showCloseButton = true,
-  children,
-  animationType = 'fade',
-  transparent = true,
-  style,
-  contentStyle
-}: ModalProps) {
+                                visible,
+                                onClose,
+                                title,
+                                showCloseButton = true,
+                                children,
+                                animationType = 'fade',
+                                transparent = true,
+                                style,
+                                contentStyle
+                              }: ModalProps) {
   const { theme } = useTheme();
   const styles = useStyles(theme);
 
@@ -62,7 +62,7 @@ const useStyles = (theme: any) => StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: theme.spacing.lg,
+    padding: theme.spacing.lg
   },
   modalContent: {
     backgroundColor: theme.colors.background.card,
@@ -70,17 +70,17 @@ const useStyles = (theme: any) => StyleSheet.create({
     padding: theme.spacing.lg,
     width: '100%',
     maxWidth: 400,
-    ...theme.shadows.lg,
+    ...theme.shadows.lg
   },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: theme.spacing.lg,
+    marginBottom: theme.spacing.lg
   },
   modalTitle: {
     textAlign: 'center',
-    marginBottom: theme.spacing.lg,
+    marginBottom: theme.spacing.lg
   },
   modalCloseButton: {
     width: 44,
@@ -89,6 +89,6 @@ const useStyles = (theme: any) => StyleSheet.create({
     backgroundColor: theme.colors.background.button,
     justifyContent: 'center',
     alignItems: 'center',
-    ...theme.shadows.sm,
-  },
+    ...theme.shadows.sm
+  }
 }); 

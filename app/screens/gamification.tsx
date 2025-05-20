@@ -37,21 +37,21 @@ const useStyles = () => {
   return StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: theme.colors.background.main,
+      backgroundColor: theme.colors.background.main
     },
     content: {
-      flex: 1,
+      flex: 1
     },
     contentContainer: {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
-      padding: theme.spacing.lg,
+      padding: theme.spacing.lg
     },
     constructionContainer: {
       alignItems: 'center',
       justifyContent: 'center',
-      padding: theme.spacing.xl,
+      padding: theme.spacing.xl
     },
     constructionTitle: {
       fontSize: theme.typography.fontSize.xl,
@@ -59,14 +59,14 @@ const useStyles = () => {
       marginTop: theme.spacing.lg,
       marginBottom: theme.spacing.sm,
       fontFamily: theme.typography.fontFamily.bold,
-      textAlign: 'center',
+      textAlign: 'center'
     },
     constructionText: {
       fontSize: theme.typography.fontSize.base,
       color: theme.colors.text.secondary,
       textAlign: 'center',
-      fontFamily: theme.typography.fontFamily.regular,
-    },
+      fontFamily: theme.typography.fontFamily.regular
+    }
   });
 };
 

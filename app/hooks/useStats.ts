@@ -22,7 +22,7 @@ const getMuscleGroupColor = (muscleGroup: string): string => {
     shoulders: '#96CEB4',
     arms: '#FFEEAD',
     core: '#D4A5A5',
-    other: '#9B9B9B',
+    other: '#9B9B9B'
   };
   return colors[muscleGroup.toLowerCase()] || colors.other;
 };
@@ -34,7 +34,7 @@ const useStats = (selectedPeriod: Period) => {
     monthlyProgress: 0,
     trainingFrequency: 0,
     bestProgressExercise: null,
-    muscleDistribution: [],
+    muscleDistribution: []
   });
 
   const calculateMonthlyProgress = useCallback((workouts: Workout[]): number => {
@@ -47,10 +47,10 @@ const useStats = (selectedPeriod: Period) => {
     if (lastMonthWorkouts.length === 0) return 0;
 
     const firstWorkout = lastMonthWorkouts.reduce((min: Workout, workout: Workout) =>
-      new Date(workout.date) < new Date(min.date) ? workout : min,
+      new Date(workout.date) < new Date(min.date) ? workout : min
     );
     const lastWorkout = lastMonthWorkouts.reduce((max: Workout, workout: Workout) =>
-      new Date(workout.date) > new Date(max.date) ? workout : max,
+      new Date(workout.date) > new Date(max.date) ? workout : max
     );
 
     const firstWorkingSet =
@@ -60,7 +60,7 @@ const useStats = (selectedPeriod: Period) => {
 
     const first1RM = calculations.calculateEstimated1RM(
       firstWorkingSet.weight,
-      firstWorkingSet.reps,
+      firstWorkingSet.reps
     );
     const last1RM = calculations.calculateEstimated1RM(lastWorkingSet.weight, lastWorkingSet.reps);
 
@@ -73,7 +73,7 @@ const useStats = (selectedPeriod: Period) => {
         const workoutDate = new Date(workout.date);
         const startDate = subMonths(
           new Date(),
-          selectedPeriod === '1m' ? 1 : selectedPeriod === '3m' ? 3 : 6,
+          selectedPeriod === '1m' ? 1 : selectedPeriod === '3m' ? 3 : 6
         );
         return workoutDate >= startDate;
       });
@@ -83,15 +83,15 @@ const useStats = (selectedPeriod: Period) => {
       }
 
       const uniqueDates = new Set(
-        filteredWorkouts.map((w) => WorkoutDateUtils.getDatePart(w.date)),
+        filteredWorkouts.map((w) => WorkoutDateUtils.getDatePart(w.date))
       );
       const daysInPeriod = differenceInDays(
         new Date(),
-        subMonths(new Date(), selectedPeriod === '1m' ? 1 : selectedPeriod === '3m' ? 3 : 6),
+        subMonths(new Date(), selectedPeriod === '1m' ? 1 : selectedPeriod === '3m' ? 3 : 6)
       );
       return Math.round((uniqueDates.size / daysInPeriod) * 100);
     },
-    [selectedPeriod],
+    [selectedPeriod]
   );
 
   const getBestProgressExercise = useCallback(
@@ -104,7 +104,7 @@ const useStats = (selectedPeriod: Period) => {
             workout.series.find((s) => s.type === 'workingSet') || workout.series[0];
           const estimated1RM = calculations.calculateEstimated1RM(
             workingSet.weight,
-            workingSet.reps,
+            workingSet.reps
           );
 
           if (!acc[workout.exercise]) {
@@ -115,29 +115,29 @@ const useStats = (selectedPeriod: Period) => {
 
           return acc;
         },
-        {},
+        {}
       );
 
       const progressData = Object.entries(exerciseProgress)
         .map(([exercise, data]) => ({
           progress: Math.round(((data.last - data.first) / data.first) * 100),
-          exercise,
+          exercise
         }))
         .filter((data) => data.progress > 0);
 
       if (progressData.length === 0) return null;
 
       const bestExercise = progressData.reduce((max, current) =>
-        current.progress > max.progress ? current : max,
+        current.progress > max.progress ? current : max
       );
 
       // Translate the exercise name using the key
       return {
         progress: bestExercise.progress,
-        exercise: t(bestExercise.exercise as TranslationKey), // Translate the exercise key
+        exercise: t(bestExercise.exercise as TranslationKey) // Translate the exercise key
       };
     },
-    [t],
+    [t]
   );
 
   const getMuscleDistribution = (workouts: Workout[]): MuscleDistributionData[] => {
@@ -161,7 +161,7 @@ const useStats = (selectedPeriod: Period) => {
         name: t(`muscleGroups.${name.toLowerCase()}` as TranslationKey),
         value: Math.round((volume / totalVolume) * 100),
         color: getMuscleGroupColor(name),
-        originalName: name,
+        originalName: name
       }))
       .sort((a, b) => b.value - a.value);
   };
@@ -176,8 +176,8 @@ const useStats = (selectedPeriod: Period) => {
             ...workout,
             series: workout.series.map((series) => ({
               ...series,
-              type: series.type || 'workingSet',
-            })),
+              type: series.type || 'workingSet'
+            }))
           }));
 
           setStatsData({
@@ -185,7 +185,7 @@ const useStats = (selectedPeriod: Period) => {
             monthlyProgress: calculateMonthlyProgress(workouts),
             trainingFrequency: calculateTrainingFrequency(workouts),
             bestProgressExercise: getBestProgressExercise(workouts),
-            muscleDistribution: getMuscleDistribution(workouts),
+            muscleDistribution: getMuscleDistribution(workouts)
           });
         }
       } catch (error) {
@@ -199,7 +199,7 @@ const useStats = (selectedPeriod: Period) => {
     calculateMonthlyProgress,
     calculateTrainingFrequency,
     getBestProgressExercise,
-    getMuscleDistribution,
+    getMuscleDistribution
   ]);
 
   return statsData;

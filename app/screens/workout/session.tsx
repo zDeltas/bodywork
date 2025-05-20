@@ -17,7 +17,7 @@ import { ProgressBar } from '@/app/components/session/ProgressBar';
 import { CurrentExercise } from '@/app/components/session/CurrentExercise';
 import { NextExercise } from '@/app/components/session/NextExercise';
 import { RpeModal } from '@/app/components/session/RpeModal';
-import { Routine, SessionState, Workout, Exercise } from '@/app/types/routine';
+import { Exercise, Routine, SessionState, Workout } from '@/types/common';
 
 const initialState: SessionState = {
   currentExerciseIndex: 0,
@@ -31,9 +31,9 @@ const initialState: SessionState = {
 };
 
 function WorkoutSessionScreen() {
-  const { t } = useTranslation();
   const { theme } = useTheme();
-  const styles = useStyles(theme);
+  const { t } = useTranslation();
+  const styles = useStyles();
   const haptics = useHaptics();
   const { routineId } = useLocalSearchParams();
 
@@ -42,9 +42,9 @@ function WorkoutSessionScreen() {
   const [showCancelModal, setShowCancelModal] = useState(false);
 
   const convertTimeToSeconds = useCallback((timeStr: string): number => {
-    if (!timeStr) return 60; // 1 minute par défaut
+    if (!timeStr) return 1; // 1 sec par défaut
     const [minutes, seconds] = timeStr.split(':').map(Number);
-    if (isNaN(minutes) || isNaN(seconds)) return 60; // 1 minute par défaut si format invalide
+    if (isNaN(minutes) || isNaN(seconds)) return 1; // 1 minute par défaut si format invalide
     return (minutes * 60) + seconds;
   }, []);
 
@@ -270,47 +270,51 @@ function WorkoutSessionScreen() {
   );
 }
 
-const useStyles = (theme: any) => StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: theme.colors.background.main
-  },
-  loadingText: {
-    color: theme.colors.text.primary,
-    fontSize: theme.typography.fontSize.lg
-  },
-  content: {
-    flex: 1,
-    padding: theme.spacing.lg
-  },
-  timerContainer: {
-    backgroundColor: theme.colors.background.card,
-    padding: theme.spacing.lg,
-    borderTopLeftRadius: theme.borderRadius.lg,
-    borderTopRightRadius: theme.borderRadius.lg,
-    ...theme.shadows.lg
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: theme.spacing.lg
-  },
-  modalContent: {
-    backgroundColor: theme.colors.background.card ?? '#222',
-    borderRadius: theme.borderRadius.lg ?? 16,
-    padding: theme.spacing.lg ?? 24,
-    width: '90%',
-    maxWidth: 400,
-    alignItems: 'center',
-  },
-  modalTitle: {
-    fontSize: theme.typography.fontSize.xl ?? 22,
-    color: theme.colors.text.primary ?? '#fff',
-    textAlign: 'center',
-    marginBottom: theme.spacing.md ?? 16,
-  },
-});
+const useStyles = () => {
+  const { theme } = useTheme();
+
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background.main
+    },
+    loadingText: {
+      color: theme.colors.text.primary,
+      fontSize: theme.typography.fontSize.lg
+    },
+    content: {
+      flex: 1,
+      padding: theme.spacing.lg
+    },
+    timerContainer: {
+      backgroundColor: theme.colors.background.card,
+      padding: theme.spacing.lg,
+      borderTopLeftRadius: theme.borderRadius.lg,
+      borderTopRightRadius: theme.borderRadius.lg,
+      ...theme.shadows.lg
+    },
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: theme.colors.background.overlay,
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: theme.spacing.lg
+    },
+    modalContent: {
+      backgroundColor: theme.colors.background.card,
+      borderRadius: theme.borderRadius.lg,
+      padding: theme.spacing.lg,
+      width: '90%',
+      maxWidth: 400,
+      alignItems: 'center'
+    },
+    modalTitle: {
+      fontSize: theme.typography.fontSize.xl,
+      color: theme.colors.text.primary,
+      textAlign: 'center',
+      marginBottom: theme.spacing.md
+    }
+  });
+};
 
 export default WorkoutSessionScreen;

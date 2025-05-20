@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useTheme } from '@/app/hooks/useTheme';
 import Text from '@/app/components/ui/Text';
 import { useTranslation } from '@/app/hooks/useTranslation';
@@ -10,7 +10,7 @@ type ProgressBarProps = {
   label?: string;
 };
 
-export const ProgressBar = React.memo(({ current, total, label }: ProgressBarProps) => {
+const ProgressBar = React.memo(({ current, total, label }: ProgressBarProps) => {
   const { theme } = useTheme();
   const { t } = useTranslation();
   const styles = useStyles(theme);
@@ -22,7 +22,7 @@ export const ProgressBar = React.memo(({ current, total, label }: ProgressBarPro
         <View style={[styles.progressFill, { width: `${progress}%` }]} />
       </View>
       <Text variant="caption" style={styles.progressText}>
-        {current}/{total} {label || t('workout.exercises' as any)}
+        {current}/{total} {label || t('workout.exercises')}
       </Text>
     </View>
   );
@@ -48,4 +48,6 @@ const useStyles = (theme: any) => StyleSheet.create({
     color: theme.colors.text.secondary,
     textAlign: 'center'
   }
-}); 
+});
+
+export default ProgressBar; 

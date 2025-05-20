@@ -1,6 +1,6 @@
-import { Routine } from '@/app/types/routine';
+import { Routine } from '@/types/common';
 
-export const PREMADE_ROUTINES: Routine[] = [
+const PREMADE_ROUTINES: Routine[] = [
   {
     id: 'premade-1',
     title: 'Full Body',
@@ -9,19 +9,21 @@ export const PREMADE_ROUTINES: Routine[] = [
       {
         name: 'Squat',
         key: 'squat',
+        translationKey: 'squat',
         series: [
-          { weight: 0, reps: 12, rest: '90', type: 'warmUp', note: '' },
-          { weight: 0, reps: 10, rest: '90', type: 'workingSet', note: '' },
-          { weight: 0, reps: 8, rest: '90', type: 'workingSet', note: '' }
+          { weight: 0, reps: 12, rest: '90', type: 'warmUp', note: '', rpe: 0 },
+          { weight: 0, reps: 10, rest: '90', type: 'workingSet', note: '', rpe: 7 },
+          { weight: 0, reps: 8, rest: '90', type: 'workingSet', note: '', rpe: 7 }
         ]
       },
       {
         name: 'Développé Couché',
         key: 'bench-press',
+        translationKey: 'bench-press',
         series: [
-          { weight: 0, reps: 12, rest: '90', type: 'warmUp', note: '' },
-          { weight: 0, reps: 10, rest: '90', type: 'workingSet', note: '' },
-          { weight: 0, reps: 8, rest: '90', type: 'workingSet', note: '' }
+          { weight: 0, reps: 12, rest: '90', type: 'warmUp', note: '', rpe: 0 },
+          { weight: 0, reps: 10, rest: '90', type: 'workingSet', note: '', rpe: 7 },
+          { weight: 0, reps: 8, rest: '90', type: 'workingSet', note: '', rpe: 7 }
         ]
       }
     ],
@@ -35,22 +37,26 @@ export const PREMADE_ROUTINES: Routine[] = [
       {
         name: 'Développé Couché',
         key: 'bench-press',
+        translationKey: 'bench-press',
         series: [
-          { weight: 0, reps: 12, rest: '90', type: 'warmUp', note: '' },
-          { weight: 0, reps: 10, rest: '90', type: 'workingSet', note: '' },
-          { weight: 0, reps: 8, rest: '90', type: 'workingSet', note: '' }
+          { weight: 0, reps: 12, rest: '90', type: 'warmUp', note: '', rpe: 0 },
+          { weight: 0, reps: 10, rest: '90', type: 'workingSet', note: '', rpe: 7 },
+          { weight: 0, reps: 8, rest: '90', type: 'workingSet', note: '', rpe: 7 }
         ]
       },
       {
         name: 'Tractions',
         key: 'pull-ups',
+        translationKey: 'pull-ups',
         series: [
-          { weight: 0, reps: 8, rest: '90', type: 'workingSet', note: '' },
-          { weight: 0, reps: 8, rest: '90', type: 'workingSet', note: '' },
-          { weight: 0, reps: 8, rest: '90', type: 'workingSet', note: '' }
+          { weight: 0, reps: 8, rest: '90', type: 'workingSet', note: '', rpe: 7 },
+          { weight: 0, reps: 8, rest: '90', type: 'workingSet', note: '', rpe: 7 },
+          { weight: 0, reps: 8, rest: '90', type: 'workingSet', note: '', rpe: 7 }
         ]
       }
     ],
     createdAt: new Date().toISOString()
   }
-]; 
+];
+
+export default PREMADE_ROUTINES; 

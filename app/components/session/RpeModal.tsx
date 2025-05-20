@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useTheme } from '@/app/hooks/useTheme';
 import { useHaptics } from '@/src/hooks/useHaptics';
 import Text from '@/app/components/ui/Text';
@@ -15,17 +15,16 @@ type RpeModalProps = {
   onRpeChange: (value: string) => void;
 };
 
-export const RpeModal = React.memo(({
-  visible,
-  onClose,
-  onSave,
-  rpe,
-  onRpeChange
-}: RpeModalProps) => {
-  const { theme } = useTheme();
+const RpeModal = React.memo(({
+                               visible,
+                               onClose,
+                               onSave,
+                               rpe,
+                               onRpeChange
+                             }: RpeModalProps) => {
   const { t } = useTranslation();
   const haptics = useHaptics();
-  const styles = useStyles(theme);
+  const styles = useStyles();
 
   return (
     <Modal
@@ -35,7 +34,7 @@ export const RpeModal = React.memo(({
       showCloseButton={true}
     >
       <View style={styles.rpeContainer}>
-        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((value) => (
+        {Array.from({ length: 10 }, (_, i) => i + 1).map((value) => (
           <TouchableOpacity
             key={value}
             style={[
@@ -70,34 +69,40 @@ export const RpeModal = React.memo(({
   );
 });
 
-const useStyles = (theme: any) => StyleSheet.create({
-  rpeContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    gap: theme.spacing.sm,
-    marginBottom: theme.spacing.lg
-  },
-  rpeButton: {
-    width: 60,
-    height: 60,
-    borderRadius: theme.borderRadius.full,
-    backgroundColor: theme.colors.background.button,
-    justifyContent: 'center',
-    alignItems: 'center',
-    ...theme.shadows.sm
-  },
-  rpeButtonSelected: {
-    backgroundColor: theme.colors.primary
-  },
-  rpeButtonText: {
-    fontSize: theme.typography.fontSize.xl,
-    color: theme.colors.text.primary
-  },
-  rpeButtonTextSelected: {
-    color: theme.colors.text.primary
-  },
-  saveButton: {
-    backgroundColor: theme.colors.primary
-  }
-}); 
+const useStyles = () => {
+  const { theme } = useTheme();
+
+  return StyleSheet.create({
+    rpeContainer: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'center',
+      gap: theme.spacing.sm,
+      marginBottom: theme.spacing.lg
+    },
+    rpeButton: {
+      width: theme.layout.buttonSize.large,
+      height: theme.layout.buttonSize.large,
+      borderRadius: theme.borderRadius.full,
+      backgroundColor: theme.colors.background.button,
+      justifyContent: 'center',
+      alignItems: 'center',
+      ...theme.shadows.sm
+    },
+    rpeButtonSelected: {
+      backgroundColor: theme.colors.primary
+    },
+    rpeButtonText: {
+      fontSize: theme.typography.fontSize.xl,
+      color: theme.colors.text.primary
+    },
+    rpeButtonTextSelected: {
+      color: theme.colors.text.onPrimary
+    },
+    saveButton: {
+      backgroundColor: theme.colors.primary
+    }
+  });
+};
+
+export default RpeModal;

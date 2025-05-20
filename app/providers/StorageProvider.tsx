@@ -10,7 +10,7 @@ interface StorageContextType {
 const StorageContext = createContext<StorageContextType>({
   isInitialized: false,
   isInitializing: true,
-  error: null,
+  error: null
 });
 
 export const StorageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -28,9 +28,9 @@ export const StorageProvider: React.FC<{ children: ReactNode }> = ({ children })
         console.log('Service de stockage initialisé avec succès');
       } catch (err) {
         setError(
-          err instanceof Error ? err : new Error("Erreur lors de l'initialisation du stockage"),
+          err instanceof Error ? err : new Error('Erreur lors de l\'initialisation du stockage')
         );
-        console.error("Erreur lors de l'initialisation du service de stockage:", err);
+        console.error('Erreur lors de l\'initialisation du service de stockage:', err);
       } finally {
         setIsInitializing(false);
       }

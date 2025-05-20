@@ -1,13 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Dimensions, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
-import {
-  VictoryAxis,
-  VictoryChart,
-  VictoryLine,
-  VictoryScatter,
-  VictoryTheme,
-  VictoryTooltip,
-} from 'victory-native';
+import { VictoryAxis, VictoryChart, VictoryLine, VictoryScatter, VictoryTheme, VictoryTooltip } from 'victory-native';
 import { format, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useLocalSearchParams } from 'expo-router';
@@ -16,7 +9,6 @@ import { useTheme } from '@/app/hooks/useTheme';
 import Header from '@/app/components/layout/Header';
 import Text from '@/app/components/ui/Text';
 import calculations from '@/app/utils/calculations';
-import { TranslationKey } from '@/translations';
 import { ChartSkeleton, StatsCardSkeleton } from '@/app/components/ui/SkeletonComponents';
 import useWorkouts from '@/app/hooks/useWorkouts';
 
@@ -37,7 +29,7 @@ const useStyles = () => {
   return StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: theme.colors.background.main,
+      backgroundColor: theme.colors.background.main
     },
     header: {
       paddingTop: theme.spacing.xl * 2,
@@ -45,50 +37,50 @@ const useStyles = () => {
       paddingBottom: theme.spacing.lg,
       backgroundColor: theme.colors.background.card,
       flexDirection: 'row',
-      alignItems: 'center',
+      alignItems: 'center'
     },
     backButton: {
-      marginRight: theme.spacing.base,
+      marginRight: theme.spacing.base
     },
     title: {
       fontSize: theme.typography.fontSize['2xl'],
       fontFamily: theme.typography.fontFamily.bold,
-      color: theme.colors.text.primary,
+      color: theme.colors.text.primary
     },
     content: {
       flex: 1,
-      padding: theme.spacing.lg,
+      padding: theme.spacing.lg
     },
     filterSection: {
-      marginBottom: theme.spacing.base,
+      marginBottom: theme.spacing.base
     },
     filterLabel: {
       fontSize: theme.typography.fontSize.md,
       fontFamily: theme.typography.fontFamily.regular,
       color: theme.colors.text.primary,
-      marginBottom: theme.spacing.sm,
+      marginBottom: theme.spacing.sm
     },
     filterContainer: {
       flexDirection: 'row',
       justifyContent: 'flex-start',
-      marginTop: theme.spacing.xs,
+      marginTop: theme.spacing.xs
     },
     filterButton: {
       paddingVertical: theme.spacing.sm,
       paddingHorizontal: theme.spacing.base,
       borderRadius: theme.borderRadius.full,
       backgroundColor: theme.colors.background.button,
-      marginRight: theme.spacing.sm,
+      marginRight: theme.spacing.sm
     },
     filterButtonActive: {
-      backgroundColor: theme.colors.primary,
+      backgroundColor: theme.colors.primary
     },
     filterText: {
       color: theme.colors.text.secondary,
-      fontFamily: theme.typography.fontFamily.semiBold,
+      fontFamily: theme.typography.fontFamily.semiBold
     },
     filterTextActive: {
-      color: theme.colors.text.primary,
+      color: theme.colors.text.primary
     },
     chartTypeSelector: {
       flexDirection: 'row',
@@ -96,30 +88,30 @@ const useStyles = () => {
       marginBottom: theme.spacing.base,
       backgroundColor: theme.colors.background.button,
       borderRadius: theme.borderRadius.full,
-      padding: theme.spacing.xs,
+      padding: theme.spacing.xs
     },
     chartTypeButton: {
       paddingVertical: theme.spacing.sm,
       paddingHorizontal: theme.spacing.md,
-      borderRadius: theme.borderRadius.full,
+      borderRadius: theme.borderRadius.full
     },
     chartTypeButtonActive: {
-      backgroundColor: theme.colors.primary,
+      backgroundColor: theme.colors.primary
     },
     chartTypeText: {
       color: theme.colors.text.secondary,
       fontFamily: theme.typography.fontFamily.semiBold,
-      fontSize: theme.typography.fontSize.sm,
+      fontSize: theme.typography.fontSize.sm
     },
     chartTypeTextActive: {
-      color: theme.colors.text.primary,
+      color: theme.colors.text.primary
     },
     chartContainer: {
       backgroundColor: theme.colors.background.card,
       borderRadius: theme.borderRadius.lg,
       padding: theme.spacing.base,
       marginBottom: theme.spacing.lg,
-      overflow: 'hidden',
+      overflow: 'hidden'
     },
     addButton: {
       marginLeft: 'auto',
@@ -128,12 +120,12 @@ const useStyles = () => {
       borderRadius: theme.borderRadius.full,
       backgroundColor: theme.colors.background.button,
       justifyContent: 'center',
-      alignItems: 'center',
+      alignItems: 'center'
     },
     statsContainer: {
       flexDirection: 'row',
       justifyContent: 'space-between',
-      marginBottom: theme.spacing.lg,
+      marginBottom: theme.spacing.lg
     },
     statCard: {
       flex: 1,
@@ -141,17 +133,17 @@ const useStyles = () => {
       borderRadius: theme.borderRadius.lg,
       padding: theme.spacing.base,
       marginHorizontal: theme.spacing.xs,
-      alignItems: 'center',
+      alignItems: 'center'
     },
     statLabel: {
       fontSize: theme.typography.fontSize.sm,
       color: theme.colors.text.secondary,
-      marginBottom: theme.spacing.xs,
+      marginBottom: theme.spacing.xs
     },
     statValue: {
       fontSize: theme.typography.fontSize.xl,
       fontFamily: theme.typography.fontFamily.bold,
-      color: theme.colors.text.primary,
+      color: theme.colors.text.primary
     },
     chartTitle: {
       fontSize: theme.typography.fontSize.lg,
@@ -159,36 +151,36 @@ const useStyles = () => {
       color: theme.colors.text.primary,
       textAlign: 'center',
       marginBottom: theme.spacing.base,
-      paddingHorizontal: theme.spacing.base,
+      paddingHorizontal: theme.spacing.base
     },
     chartWrapper: {
       alignItems: 'center',
       justifyContent: 'center',
-      paddingHorizontal: theme.spacing.sm,
+      paddingHorizontal: theme.spacing.sm
     },
     noDataContainer: {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
-      padding: theme.spacing.lg,
+      padding: theme.spacing.lg
     },
     noDataText: {
       fontSize: theme.typography.fontSize.md,
       color: theme.colors.text.secondary,
-      textAlign: 'center',
+      textAlign: 'center'
     },
     loadingContainer: {
       height: 300,
       justifyContent: 'center',
       alignItems: 'center',
-      padding: theme.spacing.lg,
+      padding: theme.spacing.lg
     },
     loadingText: {
       marginTop: theme.spacing.base,
       fontSize: theme.typography.fontSize.md,
       color: theme.colors.text.secondary,
-      fontFamily: theme.typography.fontFamily.regular,
-    },
+      fontFamily: theme.typography.fontFamily.regular
+    }
   });
 };
 
@@ -215,7 +207,7 @@ const ExerciseDetails = () => {
     const repsDataArr: ExerciseData[] = [];
 
     const sortedWorkouts = [...filteredWorkouts].sort(
-      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
     );
 
     sortedWorkouts.forEach((workout) => {
@@ -225,12 +217,12 @@ const ExerciseDetails = () => {
           const date = new Date(workout.date);
           const estimated1RM = calculations.calculateEstimated1RM(
             workingSet.weight,
-            workingSet.reps,
+            workingSet.reps
           );
           const volume = calculations.calculateVolume(
             workingSet.weight,
             workingSet.reps,
-            workout.series.length,
+            workout.series.length
           );
           oneRMData.push({ x: date, y: estimated1RM });
           volumeDataArr.push({ x: date, y: volume });
@@ -255,10 +247,10 @@ const ExerciseDetails = () => {
   const volume =
     workingSet && latestWorkout
       ? calculations.calculateVolume(
-          workingSet.weight,
-          workingSet.reps,
-          latestWorkout.series.length,
-        )
+        workingSet.weight,
+        workingSet.reps,
+        latestWorkout.series.length
+      )
       : 0;
 
   // Fonction pour obtenir le domaine Y approprié
@@ -283,15 +275,15 @@ const ExerciseDetails = () => {
     switch (type) {
       case '1rm':
         return {
-          y: [Math.max(0, Math.floor(min - padding)), Math.ceil(max + padding)] as [number, number],
+          y: [Math.max(0, Math.floor(min - padding)), Math.ceil(max + padding)] as [number, number]
         };
       case 'volume':
         return {
-          y: [Math.max(0, Math.floor(min - padding)), Math.ceil(max + padding)] as [number, number],
+          y: [Math.max(0, Math.floor(min - padding)), Math.ceil(max + padding)] as [number, number]
         };
       case 'reps':
         return {
-          y: [Math.max(0, Math.floor(min - padding)), Math.ceil(max + padding)] as [number, number],
+          y: [Math.max(0, Math.floor(min - padding)), Math.ceil(max + padding)] as [number, number]
         };
     }
   };
@@ -498,14 +490,14 @@ const ExerciseDetails = () => {
           <TouchableOpacity
             style={[
               styles.chartTypeButton,
-              selectedChartType === '1rm' && styles.chartTypeButtonActive,
+              selectedChartType === '1rm' && styles.chartTypeButtonActive
             ]}
             onPress={() => setSelectedChartType('1rm')}
           >
             <Text
               style={[
                 styles.chartTypeText,
-                selectedChartType === '1rm' && styles.chartTypeTextActive,
+                selectedChartType === '1rm' && styles.chartTypeTextActive
               ]}
             >
               1RM
@@ -514,14 +506,14 @@ const ExerciseDetails = () => {
           <TouchableOpacity
             style={[
               styles.chartTypeButton,
-              selectedChartType === 'volume' && styles.chartTypeButtonActive,
+              selectedChartType === 'volume' && styles.chartTypeButtonActive
             ]}
             onPress={() => setSelectedChartType('volume')}
           >
             <Text
               style={[
                 styles.chartTypeText,
-                selectedChartType === 'volume' && styles.chartTypeTextActive,
+                selectedChartType === 'volume' && styles.chartTypeTextActive
               ]}
             >
               {t('stats.volume')}
@@ -530,14 +522,14 @@ const ExerciseDetails = () => {
           <TouchableOpacity
             style={[
               styles.chartTypeButton,
-              selectedChartType === 'reps' && styles.chartTypeButtonActive,
+              selectedChartType === 'reps' && styles.chartTypeButtonActive
             ]}
             onPress={() => setSelectedChartType('reps')}
           >
             <Text
               style={[
                 styles.chartTypeText,
-                selectedChartType === 'reps' && styles.chartTypeTextActive,
+                selectedChartType === 'reps' && styles.chartTypeTextActive
               ]}
             >
               {t('stats.repetitions')}
@@ -573,8 +565,8 @@ const ExerciseDetails = () => {
                           fontSize: theme.typography.fontSize.sm,
                           angle: -45,
                           textAnchor: 'end',
-                          padding: 5,
-                        },
+                          padding: 5
+                        }
                       }}
                     />
                     <VictoryAxis
@@ -586,8 +578,8 @@ const ExerciseDetails = () => {
                         tickLabels: {
                           fill: theme.colors.text.primary,
                           fontSize: theme.typography.fontSize.sm,
-                          padding: 5,
-                        },
+                          padding: 5
+                        }
                       }}
                     />
                     <VictoryLine
@@ -595,15 +587,15 @@ const ExerciseDetails = () => {
                       style={{
                         data: {
                           stroke: getChartColor(),
-                          strokeWidth: 3,
-                        },
+                          strokeWidth: 3
+                        }
                       }}
                     />
                     <VictoryScatter
                       data={filteredExerciseData}
                       size={5}
                       style={{
-                        data: { fill: getChartColor() },
+                        data: { fill: getChartColor() }
                       }}
                       labels={formatTooltip}
                       labelComponent={
@@ -611,13 +603,13 @@ const ExerciseDetails = () => {
                           style={{
                             fill: theme.colors.text.primary,
                             fontSize: theme.typography.fontSize.sm,
-                            fontFamily: theme.typography.fontFamily.regular,
+                            fontFamily: theme.typography.fontFamily.regular
                           }}
                           flyoutStyle={{
                             fill: theme.colors.background.card,
                             stroke: theme.colors.border.default,
                             strokeWidth: 1,
-                            padding: 8,
+                            padding: 8
                           }}
                           cornerRadius={theme.borderRadius.sm}
                           pointerLength={5}
@@ -650,8 +642,8 @@ const ExerciseDetails = () => {
                           fontSize: theme.typography.fontSize.sm,
                           angle: -45,
                           textAnchor: 'end',
-                          padding: 5,
-                        },
+                          padding: 5
+                        }
                       }}
                     />
                     <VictoryAxis
@@ -663,8 +655,8 @@ const ExerciseDetails = () => {
                         tickLabels: {
                           fill: theme.colors.text.primary,
                           fontSize: theme.typography.fontSize.sm,
-                          padding: 5,
-                        },
+                          padding: 5
+                        }
                       }}
                     />
                     <VictoryLine
@@ -672,15 +664,15 @@ const ExerciseDetails = () => {
                       style={{
                         data: {
                           stroke: getChartColor(),
-                          strokeWidth: 3,
-                        },
+                          strokeWidth: 3
+                        }
                       }}
                     />
                     <VictoryScatter
                       data={filteredVolumeData}
                       size={5}
                       style={{
-                        data: { fill: getChartColor() },
+                        data: { fill: getChartColor() }
                       }}
                       labels={formatTooltip}
                       labelComponent={
@@ -688,13 +680,13 @@ const ExerciseDetails = () => {
                           style={{
                             fill: theme.colors.text.primary,
                             fontSize: theme.typography.fontSize.sm,
-                            fontFamily: theme.typography.fontFamily.regular,
+                            fontFamily: theme.typography.fontFamily.regular
                           }}
                           flyoutStyle={{
                             fill: theme.colors.background.card,
                             stroke: theme.colors.border.default,
                             strokeWidth: 1,
-                            padding: 8,
+                            padding: 8
                           }}
                           cornerRadius={theme.borderRadius.sm}
                           pointerLength={5}
@@ -727,8 +719,8 @@ const ExerciseDetails = () => {
                           fontSize: theme.typography.fontSize.sm,
                           angle: -45,
                           textAnchor: 'end',
-                          padding: 5,
-                        },
+                          padding: 5
+                        }
                       }}
                     />
                     <VictoryAxis
@@ -740,8 +732,8 @@ const ExerciseDetails = () => {
                         tickLabels: {
                           fill: theme.colors.text.primary,
                           fontSize: theme.typography.fontSize.sm,
-                          padding: 5,
-                        },
+                          padding: 5
+                        }
                       }}
                     />
                     <VictoryLine
@@ -749,15 +741,15 @@ const ExerciseDetails = () => {
                       style={{
                         data: {
                           stroke: getChartColor(),
-                          strokeWidth: 3,
-                        },
+                          strokeWidth: 3
+                        }
                       }}
                     />
                     <VictoryScatter
                       data={filteredRepsData}
                       size={5}
                       style={{
-                        data: { fill: getChartColor() },
+                        data: { fill: getChartColor() }
                       }}
                       labels={formatTooltip}
                       labelComponent={
@@ -765,13 +757,13 @@ const ExerciseDetails = () => {
                           style={{
                             fill: theme.colors.text.primary,
                             fontSize: theme.typography.fontSize.sm,
-                            fontFamily: theme.typography.fontFamily.regular,
+                            fontFamily: theme.typography.fontFamily.regular
                           }}
                           flyoutStyle={{
                             fill: theme.colors.background.card,
                             stroke: theme.colors.border.default,
                             strokeWidth: 1,
-                            padding: 8,
+                            padding: 8
                           }}
                           cornerRadius={theme.borderRadius.sm}
                           pointerLength={5}

@@ -16,7 +16,13 @@
       "output": "single",
       "favicon": "./assets/images/favicon.png"
     },
-    "plugins": ["expo-router", "expo-font", "expo-secure-store", "expo-web-browser", "expo-audio"],
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "expo-secure-store",
+      "expo-web-browser",
+      "expo-audio"
+    ],
     "experiments": {
       "typedRoutes": true
     }

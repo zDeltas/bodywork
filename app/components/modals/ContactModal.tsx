@@ -142,16 +142,16 @@ const useStyles = () => {
 
   return StyleSheet.create({
     modalContent: {
-      padding: theme.spacing.lg,
+      padding: theme.spacing.lg
     },
     formGroup: {
-      marginBottom: theme.spacing.md,
+      marginBottom: theme.spacing.md
     },
     label: {
       fontSize: theme.typography.fontSize.base,
       color: theme.colors.text.primary,
       marginBottom: theme.spacing.xs,
-      fontFamily: theme.typography.fontFamily.semiBold,
+      fontFamily: theme.typography.fontFamily.semiBold
     },
     input: {
       backgroundColor: theme.colors.background.main,
@@ -161,7 +161,7 @@ const useStyles = () => {
       color: theme.colors.text.primary,
       borderWidth: 1,
       borderColor: theme.colors.border.default,
-      fontFamily: theme.typography.fontFamily.regular,
+      fontFamily: theme.typography.fontFamily.regular
     },
     textArea: {
       backgroundColor: theme.colors.background.main,
@@ -172,24 +172,24 @@ const useStyles = () => {
       borderWidth: 1,
       borderColor: theme.colors.border.default,
       fontFamily: theme.typography.fontFamily.regular,
-      minHeight: 100,
+      minHeight: 100
     },
     inputError: {
-      borderColor: theme.colors.error,
+      borderColor: theme.colors.error
     },
     errorText: {
       color: theme.colors.error,
       fontSize: theme.typography.fontSize.sm,
-      marginTop: theme.spacing.xs,
+      marginTop: theme.spacing.xs
     },
     modalButtons: {
       flexDirection: 'row',
       justifyContent: 'flex-end',
       gap: theme.spacing.md,
-      marginTop: theme.spacing.lg,
+      marginTop: theme.spacing.lg
     },
     modalButton: {
-      minWidth: 100,
-    },
+      minWidth: 100
+    }
   });
 };

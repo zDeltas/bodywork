@@ -22,7 +22,10 @@ export default {
     custom: 'Custom',
     inConstruction: 'Under Construction',
     featureComingSoon: 'This feature is coming soon!',
-    next: 'Next'
+    next: 'Next',
+    or: 'or',
+    exercises: 'exercises',
+    series: 'series'
   },
 
   // Settings screen
@@ -211,7 +214,7 @@ export default {
     goalDetails: 'Goal Details',
     currentWeightDescription: 'Current weight',
     targetWeightDescription: 'Target weight',
-    completedSeries: 'Completed series',
+    completedSeries: 'Completed series'
   },
 
   // Time periods
@@ -388,5 +391,32 @@ export default {
     addSeries: 'Add Series',
     usePreviousValues: 'Use Previous Values',
     optionalNote: 'Optional Note'
+  },
+
+  // Routines
+  routines: {
+    emptyState: {
+      title: 'No routines yet',
+      description: 'Create your first workout routine or choose from our suggestions',
+      createButton: 'Create my first routine',
+      suggestions: 'Suggestions'
+    },
+    item: {
+      new: 'New',
+      exercises: 'exercises',
+      exercise: 'exercise',
+      minutes: 'min',
+      hours: 'h',
+      series: 'series',
+      usages: 'uses',
+      usage: 'use',
+      lastUsed: 'Last used:',
+      createdOn: 'Created on:',
+      actions: 'Actions',
+      edit: 'Edit',
+      share: 'Share',
+      delete: 'Delete',
+      start: 'Start'
+    }
   }
 };

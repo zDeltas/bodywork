@@ -3,15 +3,7 @@
  * This file exports all theme-related files for easy importing
  */
 
-import darkTheme, {
-  borderRadius,
-  colors,
-  layout as themeLayout,
-  shadows,
-  spacing,
-  typography,
-  zIndex,
-} from './theme';
+import darkTheme, { borderRadius, colors, layout as themeLayout, shadows, spacing, typography, zIndex } from './theme';
 
 import lightTheme from './lightTheme';
 
@@ -43,11 +35,11 @@ export {
   components,
 
   // Theme hooks
-  useDynamicStyles,
+  useDynamicStyles
 };
 
 // For backward compatibility, export darkTheme as the default theme
 export default {
   ...darkTheme,
-  components,
+  components
 };

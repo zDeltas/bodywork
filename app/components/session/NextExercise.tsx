@@ -1,15 +1,15 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useTheme } from '@/app/hooks/useTheme';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import Text from '@/app/components/ui/Text';
-import { Exercise } from '@/app/types/routine';
+import { Exercise } from '@/types/common';
 
 type NextExerciseProps = {
   exercise: Exercise;
 };
 
-export const NextExercise = React.memo(({ exercise }: NextExerciseProps) => {
+const NextExercise = React.memo(({ exercise }: NextExerciseProps) => {
   const { theme } = useTheme();
   const { t } = useTranslation();
   const styles = useStyles(theme);
@@ -17,7 +17,7 @@ export const NextExercise = React.memo(({ exercise }: NextExerciseProps) => {
   return (
     <View style={styles.nextExerciseCard}>
       <Text variant="subheading" style={styles.nextExerciseTitle}>
-        {t('workout.nextExercise' as any)}
+        {t('workout.nextExercise')}
       </Text>
       <Text variant="heading" style={styles.nextExerciseName}>
         {exercise.name}
@@ -25,7 +25,7 @@ export const NextExercise = React.memo(({ exercise }: NextExerciseProps) => {
       {exercise.series[0] && (
         <View style={styles.nextExerciseDetails}>
           <Text variant="body" style={styles.nextExerciseDetail}>
-            {exercise.series[0].weight}kg × {exercise.series[0].reps} {t('workout.reps' as any)}
+            {exercise.series[0].weight}kg × {exercise.series[0].reps} {t('workout.reps')}
           </Text>
         </View>
       )}
@@ -55,4 +55,6 @@ const useStyles = (theme: any) => StyleSheet.create({
   nextExerciseDetail: {
     color: theme.colors.text.secondary
   }
-}); 
+});
+
+export default NextExercise; 

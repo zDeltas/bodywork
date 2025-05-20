@@ -1,25 +1,8 @@
 import React, { useCallback, useState } from 'react';
-import {
-  Modal,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Modal, Pressable, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import { router, useLocalSearchParams } from 'expo-router';
-import {
-  BarChart,
-  Calendar,
-  ChevronDown,
-  Gauge,
-  Layers,
-  Plus,
-  Weight,
-  X,
-} from 'lucide-react-native';
+import { BarChart, Calendar, ChevronDown, Gauge, Layers, Plus, Weight, X } from 'lucide-react-native';
 import { Calendar as RNCalendar } from 'react-native-calendars';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -27,12 +10,7 @@ import Text from '../../components/ui/Text';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
 import Header from '@/app/components/layout/Header';
-import {
-  Inter_400Regular,
-  Inter_600SemiBold,
-  Inter_700Bold,
-  useFonts,
-} from '@expo-google-fonts/inter';
+import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold, useFonts } from '@expo-google-fonts/inter';
 import ExerciseListModal from '@/app/components/exercises/ExerciseListModal';
 import { Series, SeriesType, Workout } from '@/types/common';
 import { WorkoutDateUtils } from '@/types/workout';
@@ -55,7 +33,7 @@ export default function NewWorkoutScreen() {
   const [fontsLoaded] = useFonts({
     'Inter-Regular': Inter_400Regular,
     'Inter-SemiBold': Inter_600SemiBold,
-    'Inter-Bold': Inter_700Bold,
+    'Inter-Bold': Inter_700Bold
   });
 
   const onLayoutRootView = useCallback(async () => {
@@ -80,12 +58,12 @@ export default function NewWorkoutScreen() {
       note: '',
       rpe: '',
       showRpeDropdown: false,
-      type: 'workingSet',
-    },
+      type: 'workingSet'
+    }
   ]);
   const params = useLocalSearchParams();
   const [selectedDate, setSelectedDate] = useState<string>(
-    (params.selectedDate as string) || WorkoutDateUtils.getDatePart(new Date().toISOString()),
+    (params.selectedDate as string) || WorkoutDateUtils.getDatePart(new Date().toISOString())
   );
   const [showCalendar, setShowCalendar] = useState<boolean>(false);
   const [showExerciseSelector, setShowExerciseSelector] = useState<boolean>(false);
@@ -96,7 +74,7 @@ export default function NewWorkoutScreen() {
       weight: parseFloat(s.weight) || 0,
       reps: parseInt(s.reps) || 0,
       rpe: s.type === 'warmUp' ? 0 : parseInt(s.rpe) || parseInt(rpe) || 7,
-      type: s.type || 'workingSet',
+      type: s.type || 'workingSet'
     }));
   };
 
@@ -126,13 +104,13 @@ export default function NewWorkoutScreen() {
         series: processedSeries,
         date: selectedDate
           ? WorkoutDateUtils.createISOString(selectedDate)
-          : new Date().toISOString(),
+          : new Date().toISOString()
       };
 
       await saveWorkoutToStorage(workout);
       router.push({
         pathname: '/(tabs)',
-        params: { refresh: 'true' },
+        params: { refresh: 'true' }
       });
     } catch (error) {
       console.error('Erreur lors de la sauvegarde:', error);
@@ -192,10 +170,10 @@ export default function NewWorkoutScreen() {
                   textDayHeaderFontFamily: theme.typography.fontFamily.regular,
                   textDayFontSize: theme.typography.fontSize.base,
                   textMonthFontSize: theme.typography.fontSize.lg,
-                  textDayHeaderFontSize: theme.typography.fontSize.md,
+                  textDayHeaderFontSize: theme.typography.fontSize.md
                 }}
                 markedDates={{
-                  [selectedDate]: { selected: true },
+                  [selectedDate]: { selected: true }
                 }}
                 onDayPress={(day: { dateString: string }) => {
                   setSelectedDate(day.dateString);
@@ -221,7 +199,8 @@ export default function NewWorkoutScreen() {
             setExerciseKey(selectedExerciseKey || selectedExercise);
             setShowExerciseSelector(false);
           }}
-          setIsCustomExercise={() => {}}
+          setIsCustomExercise={() => {
+          }}
         />
 
         <TouchableOpacity
@@ -274,7 +253,7 @@ export default function NewWorkoutScreen() {
                 <TouchableOpacity
                   style={[
                     styles.seriesTypeButton,
-                    item.type === 'warmUp' && styles.seriesTypeButtonSelected,
+                    item.type === 'warmUp' && styles.seriesTypeButtonSelected
                   ]}
                   onPress={() => {
                     const newSeries = [...series];
@@ -285,7 +264,7 @@ export default function NewWorkoutScreen() {
                   <Text
                     style={[
                       styles.seriesTypeButtonText,
-                      item.type === 'warmUp' && styles.seriesTypeButtonTextSelected,
+                      item.type === 'warmUp' && styles.seriesTypeButtonTextSelected
                     ]}
                   >
                     {t('workout.warmUp')}
@@ -298,7 +277,7 @@ export default function NewWorkoutScreen() {
                 <TouchableOpacity
                   style={[
                     styles.seriesTypeButton,
-                    item.type === 'workingSet' && styles.seriesTypeButtonSelected,
+                    item.type === 'workingSet' && styles.seriesTypeButtonSelected
                   ]}
                   onPress={() => {
                     const newSeries = [...series];
@@ -309,7 +288,7 @@ export default function NewWorkoutScreen() {
                   <Text
                     style={[
                       styles.seriesTypeButtonText,
-                      item.type === 'workingSet' && styles.seriesTypeButtonTextSelected,
+                      item.type === 'workingSet' && styles.seriesTypeButtonTextSelected
                     ]}
                   >
                     {t('workout.workingSet')}
@@ -397,14 +376,14 @@ export default function NewWorkoutScreen() {
                         key={value}
                         style={[
                           styles.rpeButtonModern,
-                          item.rpe === value.toString() && styles.rpeButtonModernSelected,
+                          item.rpe === value.toString() && styles.rpeButtonModernSelected
                         ]}
                         onPress={() => {
                           const rpeValue = value.toString();
                           const newSeries = [...series];
                           newSeries[index] = {
                             ...newSeries[index],
-                            rpe: rpeValue,
+                            rpe: rpeValue
                           };
                           setSeries(newSeries);
                         }}
@@ -413,7 +392,7 @@ export default function NewWorkoutScreen() {
                           variant="body"
                           style={[
                             styles.rpeButtonModernText,
-                            item.rpe === value.toString() && styles.rpeButtonModernTextSelected,
+                            item.rpe === value.toString() && styles.rpeButtonModernTextSelected
                           ]}
                         >
                           {value}
@@ -427,14 +406,14 @@ export default function NewWorkoutScreen() {
                         key={value}
                         style={[
                           styles.rpeButtonModern,
-                          item.rpe === value.toString() && styles.rpeButtonModernSelected,
+                          item.rpe === value.toString() && styles.rpeButtonModernSelected
                         ]}
                         onPress={() => {
                           const rpeValue = value.toString();
                           const newSeries = [...series];
                           newSeries[index] = {
                             ...newSeries[index],
-                            rpe: rpeValue,
+                            rpe: rpeValue
                           };
                           setSeries(newSeries);
                         }}
@@ -443,7 +422,7 @@ export default function NewWorkoutScreen() {
                           variant="body"
                           style={[
                             styles.rpeButtonModernText,
-                            item.rpe === value.toString() && styles.rpeButtonModernTextSelected,
+                            item.rpe === value.toString() && styles.rpeButtonModernTextSelected
                           ]}
                         >
                           {value}
@@ -486,7 +465,7 @@ export default function NewWorkoutScreen() {
                       reps: prevSeries.reps,
                       rpe: prevSeries.rpe,
                       type: prevSeries.type,
-                      showRpeDropdown: false,
+                      showRpeDropdown: false
                     };
                     setSeries(newSeries);
                   }}
@@ -509,8 +488,8 @@ export default function NewWorkoutScreen() {
                 ...series,
                 {
                   ...lastSeries,
-                  showRpeDropdown: false,
-                },
+                  showRpeDropdown: false
+                }
               ]);
             }}
           >
@@ -532,8 +511,8 @@ export default function NewWorkoutScreen() {
                   note: '',
                   rpe: '',
                   showRpeDropdown: false,
-                  type: 'workingSet',
-                },
+                  type: 'workingSet'
+                }
               ]);
             }}
           >
@@ -570,7 +549,7 @@ const useStyles = () => {
   return StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: theme.colors.background.main,
+      backgroundColor: theme.colors.background.main
     },
     header: {
       paddingTop: theme.spacing.xl * 1.5,
@@ -580,12 +559,12 @@ const useStyles = () => {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      ...theme.shadows.md,
+      ...theme.shadows.md
     },
     title: {
       fontSize: theme.typography.fontSize['3xl'],
       fontFamily: theme.typography.fontFamily.bold,
-      color: theme.colors.text.primary,
+      color: theme.colors.text.primary
     },
     closeButton: {
       width: 44,
@@ -594,14 +573,14 @@ const useStyles = () => {
       backgroundColor: theme.colors.background.button,
       justifyContent: 'center',
       alignItems: 'center',
-      ...theme.shadows.sm,
+      ...theme.shadows.sm
     },
     content: {
       flex: 1,
-      padding: theme.spacing.lg,
+      padding: theme.spacing.lg
     },
     customExerciseContainer: {
-      marginBottom: theme.spacing.xl,
+      marginBottom: theme.spacing.xl
     },
     input: {
       backgroundColor: theme.colors.background.card,
@@ -613,41 +592,41 @@ const useStyles = () => {
       ...theme.shadows.sm,
       fontSize: theme.typography.fontSize.base,
       borderWidth: 1,
-      borderColor: theme.colors.border.default,
+      borderColor: theme.colors.border.default
     },
     backButton: {
       marginTop: theme.spacing.md,
       paddingVertical: theme.spacing.sm,
       backgroundColor: theme.colors.primaryLight,
       borderRadius: theme.borderRadius.sm,
-      alignItems: 'center',
+      alignItems: 'center'
     },
     backButtonText: {
       color: theme.colors.primary,
       fontFamily: theme.typography.fontFamily.semiBold,
-      textAlign: 'center',
+      textAlign: 'center'
     },
     sectionTitleContainer: {
       flexDirection: 'row',
       alignItems: 'center',
-      marginBottom: theme.spacing.sm,
+      marginBottom: theme.spacing.sm
     },
     sectionTitleIcon: {
-      marginRight: theme.spacing.sm,
+      marginRight: theme.spacing.sm
     },
     sectionTitle: {
       fontSize: theme.typography.fontSize.xl,
       fontFamily: theme.typography.fontFamily.semiBold,
       color: theme.colors.text.primary,
       marginBottom: theme.spacing.base,
-      marginTop: theme.spacing.sm,
+      marginTop: theme.spacing.sm
     },
     seriesContainer: {
       backgroundColor: theme.colors.background.card,
       borderRadius: theme.borderRadius.lg,
       padding: theme.spacing.base,
       marginBottom: theme.spacing.lg,
-      ...theme.shadows.sm,
+      ...theme.shadows.sm
     },
     seriesHeader: {
       flexDirection: 'row',
@@ -656,16 +635,16 @@ const useStyles = () => {
       marginBottom: theme.spacing.base,
       borderBottomWidth: 1,
       borderBottomColor: theme.colors.border.default,
-      paddingBottom: theme.spacing.md,
+      paddingBottom: theme.spacing.md
     },
     seriesTitle: {
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.semiBold,
-      fontSize: theme.typography.fontSize.lg,
+      fontSize: theme.typography.fontSize.lg
     },
     seriesActions: {
       flexDirection: 'row',
-      gap: theme.spacing.md,
+      gap: theme.spacing.md
     },
     seriesActionButton: {
       width: 36,
@@ -674,21 +653,21 @@ const useStyles = () => {
       backgroundColor: theme.colors.background.button,
       justifyContent: 'center',
       alignItems: 'center',
-      ...theme.shadows.sm,
+      ...theme.shadows.sm
     },
     seriesTypeContainer: {
-      marginBottom: theme.spacing.base,
+      marginBottom: theme.spacing.base
     },
     seriesInputLabel: {
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.semiBold,
       fontSize: theme.typography.fontSize.base,
-      marginBottom: theme.spacing.sm,
+      marginBottom: theme.spacing.sm
     },
     seriesTypeButtonsContainer: {
       flexDirection: 'row',
       gap: theme.spacing.md,
-      marginBottom: theme.spacing.sm,
+      marginBottom: theme.spacing.sm
     },
     seriesTypeButton: {
       flex: 1,
@@ -696,36 +675,36 @@ const useStyles = () => {
       borderRadius: theme.borderRadius.lg,
       padding: theme.spacing.md,
       borderWidth: 1,
-      borderColor: theme.colors.border.default,
+      borderColor: theme.colors.border.default
     },
     seriesTypeButtonSelected: {
       backgroundColor: theme.colors.primaryLight,
-      borderColor: theme.colors.primaryBorder,
+      borderColor: theme.colors.primaryBorder
     },
     seriesTypeButtonText: {
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.semiBold,
       fontSize: theme.typography.fontSize.base,
       marginBottom: theme.spacing.xs,
-      textAlign: 'center',
+      textAlign: 'center'
     },
     seriesTypeButtonTextSelected: {
-      color: theme.colors.primary,
+      color: theme.colors.primary
     },
     seriesTypeDescription: {
       color: theme.colors.text.secondary,
       fontFamily: theme.typography.fontFamily.regular,
       fontSize: theme.typography.fontSize.sm,
-      textAlign: 'center',
+      textAlign: 'center'
     },
     row: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       gap: theme.spacing.sm,
-      marginBottom: theme.spacing.base,
+      marginBottom: theme.spacing.base
     },
     column: {
-      flex: 1,
+      flex: 1
     },
     compactInput: {
       backgroundColor: theme.colors.background.card,
@@ -739,19 +718,19 @@ const useStyles = () => {
       borderWidth: 1,
       borderColor: theme.colors.border.default,
       textAlign: 'center',
-      height: 44,
+      height: 44
     },
     disabledLabel: {
-      color: theme.colors.text.disabled,
+      color: theme.colors.text.disabled
     },
     disabledLabelNote: {
       color: theme.colors.text.disabled,
       fontFamily: theme.typography.fontFamily.regular,
-      fontSize: theme.typography.fontSize.sm,
+      fontSize: theme.typography.fontSize.sm
     },
     dropdownContainer: {
       position: 'relative',
-      zIndex: theme.zIndex.dropdown,
+      zIndex: theme.zIndex.dropdown
     },
     dropdownButton: {
       backgroundColor: theme.colors.background.card,
@@ -762,23 +741,23 @@ const useStyles = () => {
       borderColor: theme.colors.border.default,
       height: 44,
       alignItems: 'center',
-      justifyContent: 'center',
+      justifyContent: 'center'
     },
     disabledDropdown: {
-      opacity: 0.7,
+      opacity: 0.7
     },
     disabledDropdownButton: {
       backgroundColor: theme.colors.background.button,
-      borderColor: theme.colors.border.default,
+      borderColor: theme.colors.border.default
     },
     disabledDropdownButtonText: {
-      color: theme.colors.text.disabled,
+      color: theme.colors.text.disabled
     },
     dropdownButtonText: {
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.regular,
       fontSize: theme.typography.fontSize.md,
-      textAlign: 'center',
+      textAlign: 'center'
     },
     dropdownList: {
       position: 'absolute',
@@ -794,29 +773,29 @@ const useStyles = () => {
       borderColor: theme.colors.border.default,
       zIndex: 9999,
       elevation: 9999,
-      maxHeight: 400,
+      maxHeight: 400
     },
     dropdownScroll: {
-      maxHeight: 600,
+      maxHeight: 600
     },
     dropdownItem: {
       paddingVertical: theme.spacing.md,
       paddingHorizontal: theme.spacing.base,
-      borderRadius: theme.borderRadius.sm,
+      borderRadius: theme.borderRadius.sm
     },
     dropdownItemText: {
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.regular,
       fontSize: theme.typography.fontSize.base,
-      textAlign: 'center',
+      textAlign: 'center'
     },
     dropdownItemTextSelected: {
       color: theme.colors.primary,
-      fontFamily: theme.typography.fontFamily.semiBold,
+      fontFamily: theme.typography.fontFamily.semiBold
     },
     noteContainer: {
       marginTop: theme.spacing.sm,
-      marginBottom: theme.spacing.base,
+      marginBottom: theme.spacing.base
     },
     noteInput: {
       backgroundColor: theme.colors.background.card,
@@ -830,10 +809,10 @@ const useStyles = () => {
       borderWidth: 1,
       borderColor: theme.colors.border.default,
       minHeight: 80,
-      textAlignVertical: 'top',
+      textAlignVertical: 'top'
     },
     quickFillContainer: {
-      marginTop: theme.spacing.sm,
+      marginTop: theme.spacing.sm
     },
     quickFillButton: {
       backgroundColor: theme.colors.primaryLight,
@@ -842,12 +821,12 @@ const useStyles = () => {
       borderRadius: theme.borderRadius.base,
       alignItems: 'center',
       borderWidth: 1,
-      borderColor: theme.colors.primaryBorder,
+      borderColor: theme.colors.primaryBorder
     },
     quickFillButtonText: {
       color: theme.colors.primary,
       fontFamily: theme.typography.fontFamily.semiBold,
-      fontSize: theme.typography.fontSize.md,
+      fontSize: theme.typography.fontSize.md
     },
     addSeriesButton: {
       flexDirection: 'row',
@@ -859,28 +838,28 @@ const useStyles = () => {
       justifyContent: 'center',
       marginBottom: theme.spacing.xl,
       borderWidth: 1,
-      borderColor: theme.colors.border.default,
+      borderColor: theme.colors.border.default
     },
     addSeriesButtonText: {
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.regular,
-      fontSize: theme.typography.fontSize.base,
+      fontSize: theme.typography.fontSize.base
     },
     addButton: {
       backgroundColor: theme.colors.primary,
       paddingVertical: theme.spacing.lg,
       borderRadius: theme.borderRadius.base,
       alignItems: 'center',
-      marginTop: theme.spacing.sm,
+      marginTop: theme.spacing.sm
     },
     addButtonDisabled: {
       backgroundColor: theme.colors.background.button,
-      opacity: 0.5,
+      opacity: 0.5
     },
     addButtonText: {
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.semiBold,
-      fontSize: theme.typography.fontSize.lg,
+      fontSize: theme.typography.fontSize.lg
     },
     rpeButtonGrid: {
       flexDirection: 'row',
@@ -888,7 +867,7 @@ const useStyles = () => {
       gap: theme.spacing.xs,
       justifyContent: 'center',
       marginTop: theme.spacing.sm,
-      marginBottom: theme.spacing.base,
+      marginBottom: theme.spacing.base
     },
     rpeButton: {
       width: 36,
@@ -899,28 +878,28 @@ const useStyles = () => {
       justifyContent: 'center',
       margin: theme.spacing.xs,
       borderWidth: 1,
-      borderColor: theme.colors.border.default,
+      borderColor: theme.colors.border.default
     },
     rpeButtonSelected: {
       backgroundColor: theme.colors.primary,
-      borderColor: theme.colors.primary,
+      borderColor: theme.colors.primary
     },
     rpeButtonText: {
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.semiBold,
-      fontSize: theme.typography.fontSize.base,
+      fontSize: theme.typography.fontSize.base
     },
     rpeButtonTextSelected: {
-      color: theme.colors.background.main,
+      color: theme.colors.background.main
     },
     rpeSectionContainer: {
       marginTop: theme.spacing.base,
-      marginBottom: theme.spacing.base,
+      marginBottom: theme.spacing.base
     },
     rpeButtonRow: {
       flexDirection: 'row',
       justifyContent: 'center',
-      marginBottom: theme.spacing.xs,
+      marginBottom: theme.spacing.xs
     },
     rpeButtonModern: {
       width: 44,
@@ -937,7 +916,7 @@ const useStyles = () => {
       shadowOpacity: 0.08,
       shadowRadius: 4,
       elevation: 2,
-      transitionDuration: '150ms',
+      transitionDuration: '150ms'
     },
     rpeButtonModernSelected: {
       backgroundColor: theme.colors.primary,
@@ -945,21 +924,21 @@ const useStyles = () => {
       shadowColor: theme.colors.primary,
       shadowOpacity: 0.25,
       elevation: 6,
-      transform: [{ scale: 1.12 }],
+      transform: [{ scale: 1.12 }]
     },
     rpeButtonModernText: {
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.semiBold,
-      fontSize: theme.typography.fontSize.lg,
+      fontSize: theme.typography.fontSize.lg
     },
     rpeButtonModernTextSelected: {
-      color: theme.colors.background.main,
+      color: theme.colors.background.main
     },
     calendarContainer: {
       borderRadius: theme.borderRadius.lg,
       overflow: 'hidden',
       marginBottom: theme.spacing.lg,
-      ...theme.shadows.md,
+      ...theme.shadows.md
     },
     dateButton: {
       flexDirection: 'row',
@@ -968,37 +947,37 @@ const useStyles = () => {
       padding: theme.spacing.base,
       borderRadius: theme.borderRadius.lg,
       marginBottom: theme.spacing.lg,
-      ...theme.shadows.sm,
+      ...theme.shadows.sm
     },
     dateButtonIcon: {
-      marginRight: theme.spacing.sm,
+      marginRight: theme.spacing.sm
     },
     dateButtonText: {
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.semiBold,
-      fontSize: theme.typography.fontSize.base,
+      fontSize: theme.typography.fontSize.base
     },
     modalOverlay: {
       flex: 1,
       backgroundColor: 'rgba(0, 0, 0, 0.5)',
-      justifyContent: 'flex-end',
+      justifyContent: 'flex-end'
     },
     modalContent: {
       backgroundColor: theme.colors.background.card,
       borderTopLeftRadius: theme.borderRadius.lg,
       borderTopRightRadius: theme.borderRadius.lg,
       padding: theme.spacing.lg,
-      ...theme.shadows.lg,
+      ...theme.shadows.lg
     },
     modalHeader: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      marginBottom: theme.spacing.lg,
+      marginBottom: theme.spacing.lg
     },
     modalTitle: {
       textAlign: 'center',
-      marginBottom: theme.spacing.lg,
+      marginBottom: theme.spacing.lg
     },
     modalCloseButton: {
       width: 44,
@@ -1007,7 +986,7 @@ const useStyles = () => {
       backgroundColor: theme.colors.background.button,
       justifyContent: 'center',
       alignItems: 'center',
-      ...theme.shadows.sm,
+      ...theme.shadows.sm
     },
     exerciseButton: {
       flexDirection: 'row',
@@ -1016,13 +995,13 @@ const useStyles = () => {
       padding: theme.spacing.base,
       borderRadius: theme.borderRadius.lg,
       marginBottom: theme.spacing.lg,
-      ...theme.shadows.sm,
+      ...theme.shadows.sm
     },
     exerciseButtonText: {
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.semiBold,
       fontSize: theme.typography.fontSize.base,
-      marginRight: theme.spacing.sm,
+      marginRight: theme.spacing.sm
     },
     duplicateButton: {
       backgroundColor: theme.colors.background.card,
@@ -1033,12 +1012,12 @@ const useStyles = () => {
       justifyContent: 'center',
       marginBottom: theme.spacing.md,
       borderWidth: 1,
-      borderColor: theme.colors.border.default,
+      borderColor: theme.colors.border.default
     },
     duplicateButtonText: {
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.regular,
-      fontSize: theme.typography.fontSize.base,
-    },
+      fontSize: theme.typography.fontSize.base
+    }
   });
 };

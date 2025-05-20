@@ -26,7 +26,7 @@ export default function RootLayout() {
                   headerShown: false,
                   animation: getDefaultAnimation,
                   animationDuration: 300,
-                  contentStyle: { backgroundColor: 'transparent' },
+                  contentStyle: { backgroundColor: 'transparent' }
                 }}
               >
                 <Stack.Screen
@@ -34,7 +34,7 @@ export default function RootLayout() {
                   options={{
                     headerShown: false,
                     animation: getDefaultAnimation,
-                    animationDuration: 250,
+                    animationDuration: 250
                   }}
                 />
                 <Stack.Screen
@@ -42,7 +42,7 @@ export default function RootLayout() {
                   options={{
                     presentation: 'modal',
                     animation: getModalAnimation,
-                    animationDuration: 350,
+                    animationDuration: 350
                   }}
                 />
                 <Stack.Screen
@@ -50,7 +50,7 @@ export default function RootLayout() {
                   options={{
                     presentation: 'modal',
                     animation: getModalAnimation,
-                    animationDuration: 350,
+                    animationDuration: 350
                   }}
                 />
                 <Stack.Screen
@@ -58,35 +58,35 @@ export default function RootLayout() {
                   options={{
                     presentation: 'card',
                     animation: getSlideAnimation,
-                    animationDuration: 300,
+                    animationDuration: 300
                   }}
                 />
                 <Stack.Screen
                   name="screens/profile"
                   options={{
                     headerShown: false,
-                    animation: 'slide_from_right',
+                    animation: 'slide_from_right'
                   }}
                 />
                 <Stack.Screen
                   name="screens/workout/session"
                   options={{
                     headerShown: false,
-                    animation: 'slide_from_right',
+                    animation: 'slide_from_right'
                   }}
                 />
                 <Stack.Screen
                   name="screens/gamification"
                   options={{
                     headerShown: false,
-                    animation: 'slide_from_right',
+                    animation: 'slide_from_right'
                   }}
                 />
                 <Stack.Screen
                   name="screens/my-account"
                   options={{
                     headerShown: false,
-                    animation: 'slide_from_right',
+                    animation: 'slide_from_right'
                   }}
                 />
                 <Stack.Screen
@@ -94,14 +94,14 @@ export default function RootLayout() {
                   options={{
                     presentation: 'card',
                     animation: getSlideAnimation,
-                    animationDuration: 300,
+                    animationDuration: 300
                   }}
                 />
                 <Stack.Screen
                   name="+not-found"
                   options={{
                     animation: getDefaultAnimation,
-                    animationDuration: 200,
+                    animationDuration: 200
                   }}
                 />
               </Stack>

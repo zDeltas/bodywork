@@ -45,9 +45,9 @@ const Text = React.forwardRef<RNText, TextProps>((props, ref) => {
         getTextStyle(),
         {
           color: color || theme.colors.text.primary,
-          fontWeight: getFontWeight(),
+          fontWeight: getFontWeight()
         },
-        style,
+        style
       ]}
       {...rest}
     />
@@ -59,25 +59,25 @@ const styles = StyleSheet.create({
     fontSize: Platform.OS === 'ios' ? 24 : 22,
     lineHeight: Platform.OS === 'ios' ? 32 : 30,
     marginBottom: Platform.OS === 'ios' ? 8 : 6,
-    letterSpacing: Platform.OS === 'ios' ? -0.5 : 0,
+    letterSpacing: Platform.OS === 'ios' ? -0.5 : 0
   },
   subheading: {
     fontSize: Platform.OS === 'ios' ? 18 : 16,
     lineHeight: Platform.OS === 'ios' ? 24 : 22,
     marginBottom: Platform.OS === 'ios' ? 6 : 4,
-    letterSpacing: Platform.OS === 'ios' ? -0.3 : 0,
+    letterSpacing: Platform.OS === 'ios' ? -0.3 : 0
   },
   body: {
     fontSize: Platform.OS === 'ios' ? 16 : 14,
     lineHeight: Platform.OS === 'ios' ? 24 : 22,
-    letterSpacing: Platform.OS === 'ios' ? -0.2 : 0,
+    letterSpacing: Platform.OS === 'ios' ? -0.2 : 0
   },
   caption: {
     fontSize: Platform.OS === 'ios' ? 14 : 12,
     lineHeight: Platform.OS === 'ios' ? 20 : 18,
     color: '#666',
-    letterSpacing: Platform.OS === 'ios' ? -0.1 : 0,
-  },
+    letterSpacing: Platform.OS === 'ios' ? -0.1 : 0
+  }
 });
 
 export default Text;

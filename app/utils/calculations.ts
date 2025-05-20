@@ -8,7 +8,7 @@ const calculateVolume = (weight: number, reps: number, sets: number): number => 
 
 const calculations = {
   calculateEstimated1RM,
-  calculateVolume,
+  calculateVolume
 };
 
 export default calculations;

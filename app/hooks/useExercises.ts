@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import storageService, { StorageKeys } from '../services/storage';
+import { useCallback, useEffect, useState } from 'react';
+import storageService from '../services/storage';
 
 export function useExercises() {
   const [favoriteExercises, setFavoriteExercises] = useState<string[]>([]);
@@ -14,7 +14,7 @@ export function useExercises() {
         setLoading(true);
         const [favorites, recents] = await Promise.all([
           storageService.getFavoriteExercises(),
-          storageService.getRecentExercises(),
+          storageService.getRecentExercises()
         ]);
 
         setFavoriteExercises(favorites);
@@ -24,7 +24,7 @@ export function useExercises() {
         setError(
           err instanceof Error
             ? err
-            : new Error('Une erreur est survenue lors du chargement des exercices'),
+            : new Error('Une erreur est survenue lors du chargement des exercices')
         );
       } finally {
         setLoading(false);
@@ -44,7 +44,7 @@ export function useExercises() {
       setError(
         err instanceof Error
           ? err
-          : new Error("Une erreur est survenue lors de l'ajout aux favoris"),
+          : new Error('Une erreur est survenue lors de l\'ajout aux favoris')
       );
       return false;
     }
@@ -59,7 +59,7 @@ export function useExercises() {
       setError(
         err instanceof Error
           ? err
-          : new Error('Une erreur est survenue lors de la suppression des favoris'),
+          : new Error('Une erreur est survenue lors de la suppression des favoris')
       );
       return false;
     }
@@ -69,7 +69,7 @@ export function useExercises() {
     (exercise: string) => {
       return favoriteExercises.includes(exercise);
     },
-    [favoriteExercises],
+    [favoriteExercises]
   );
 
   const toggleFavorite = useCallback(
@@ -80,7 +80,7 @@ export function useExercises() {
         return addFavoriteExercise(exercise);
       }
     },
-    [isFavorite, addFavoriteExercise, removeFavoriteExercise],
+    [isFavorite, addFavoriteExercise, removeFavoriteExercise]
   );
 
   // Fonctions pour les exercices récents
@@ -93,7 +93,7 @@ export function useExercises() {
       setError(
         err instanceof Error
           ? err
-          : new Error("Une erreur est survenue lors de l'ajout aux récents"),
+          : new Error('Une erreur est survenue lors de l\'ajout aux récents')
       );
       return false;
     }
@@ -108,7 +108,7 @@ export function useExercises() {
     removeFavoriteExercise,
     isFavorite,
     toggleFavorite,
-    addRecentExercise,
+    addRecentExercise
   };
 }
 

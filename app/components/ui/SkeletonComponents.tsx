@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useTheme } from '@/app/hooks/useTheme';
 import Skeleton from './Skeleton';
 
@@ -62,32 +62,32 @@ const styles = StyleSheet.create({
   container: {
     padding: 16,
     borderRadius: 8,
-    marginBottom: 12,
+    marginBottom: 12
   },
   title: {
-    marginBottom: 8,
+    marginBottom: 8
   },
   subtitle: {
-    marginBottom: 12,
+    marginBottom: 12
   },
   statsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 8,
+    marginTop: 8
   },
   value: {
-    marginTop: 8,
+    marginTop: 8
   },
   chartContainer: {
-    marginTop: 16,
-  },
+    marginTop: 16
+  }
 });
 
 const SkeletonComponents = {
   WorkoutCardSkeleton,
   ExerciseCardSkeleton,
   StatsCardSkeleton,
-  ChartSkeleton,
+  ChartSkeleton
 };
 
 export default SkeletonComponents;

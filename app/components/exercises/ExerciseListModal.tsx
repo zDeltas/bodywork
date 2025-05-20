@@ -1,7 +1,6 @@
 import React from 'react';
-import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet } from 'react-native';
 import { useTheme } from '@/app/hooks/useTheme';
-import Text from '@/app/components/ui/Text';
 import ExerciseList from '@/app/components/exercises/ExerciseList';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import Modal from '@/app/components/ui/Modal';
@@ -17,14 +16,14 @@ interface ExerciseListModalProps {
 }
 
 export default function ExerciseListModal({
-  visible,
-  onClose,
-  selectedMuscle,
-  setSelectedMuscle,
-  exercise,
-  setExercise,
-  setIsCustomExercise
-}: ExerciseListModalProps) {
+                                            visible,
+                                            onClose,
+                                            selectedMuscle,
+                                            setSelectedMuscle,
+                                            exercise,
+                                            setExercise,
+                                            setIsCustomExercise
+                                          }: ExerciseListModalProps) {
   const { theme } = useTheme();
   const { t } = useTranslation();
   const styles = useStyles();
@@ -58,7 +57,7 @@ const useStyles = () => {
   return StyleSheet.create({
     modalOverlay: {
       justifyContent: 'flex-end',
-      padding: 0,
+      padding: 0
     },
     modalContent: {
       height: '80%',
@@ -66,7 +65,7 @@ const useStyles = () => {
       borderTopLeftRadius: theme.borderRadius.lg,
       borderTopRightRadius: theme.borderRadius.lg,
       borderBottomLeftRadius: 0,
-      borderBottomRightRadius: 0,
-    },
+      borderBottomRightRadius: 0
+    }
   });
 }; 

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import storageService, { StorageKeys } from '../services/storage';
 
 /**
@@ -39,13 +39,13 @@ export function useStorage<T>(key: StorageKeys, initialValue: T) {
         setError(null);
       } catch (err) {
         setError(
-          err instanceof Error ? err : new Error('Une erreur est survenue lors de la mise à jour'),
+          err instanceof Error ? err : new Error('Une erreur est survenue lors de la mise à jour')
         );
       } finally {
         setLoading(false);
       }
     },
-    [key],
+    [key]
   );
 
   // Fonction pour supprimer les données
@@ -57,7 +57,7 @@ export function useStorage<T>(key: StorageKeys, initialValue: T) {
       setError(null);
     } catch (err) {
       setError(
-        err instanceof Error ? err : new Error('Une erreur est survenue lors de la suppression'),
+        err instanceof Error ? err : new Error('Une erreur est survenue lors de la suppression')
       );
     } finally {
       setLoading(false);

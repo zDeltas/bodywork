@@ -6,7 +6,7 @@ import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
 import Text from '@/app/components/ui/Text';
 import { ExerciseCardSkeleton } from '@/app/components/ui/SkeletonComponents';
-import { Exercise } from '@/app/types/routine';
+import { Exercise } from '@/types/common';
 
 export type MuscleGroupKey =
   | 'chest'
@@ -25,7 +25,7 @@ export const muscleGroupKeys: MuscleGroupKey[] = [
   'shoulders',
   'biceps',
   'triceps',
-  'core',
+  'core'
 ];
 
 export const getMuscleGroups = (t: (key: string) => string) => {
@@ -38,50 +38,50 @@ export const predefinedExercisesByKey: Record<MuscleGroupKey, string[]> = {
     'exercise_chest_inclineBenchPress',
     'exercise_chest_declineBenchPress',
     'exercise_chest_dumbbellFlyes',
-    'exercise_chest_cableCrossover',
+    'exercise_chest_cableCrossover'
   ],
   back: [
     'exercise_back_pullUps',
     'exercise_back_latPulldown',
     'exercise_back_barbellRow',
     'exercise_back_dumbbellRow',
-    'exercise_back_tBarRow',
+    'exercise_back_tBarRow'
   ],
   legs: [
     'exercise_legs_squat',
     'exercise_legs_deadlift',
     'exercise_legs_legPress',
     'exercise_legs_lunges',
-    'exercise_legs_legExtension',
+    'exercise_legs_legExtension'
   ],
   shoulders: [
     'exercise_shoulders_militaryPress',
     'exercise_shoulders_lateralRaises',
     'exercise_shoulders_frontRaises',
     'exercise_shoulders_rearDeltFlyes',
-    'exercise_shoulders_shrugs',
+    'exercise_shoulders_shrugs'
   ],
   biceps: [
     'exercise_biceps_barbellCurl',
     'exercise_biceps_dumbbellCurl',
     'exercise_biceps_hammerCurl',
     'exercise_biceps_preacherCurl',
-    'exercise_biceps_concentrationCurl',
+    'exercise_biceps_concentrationCurl'
   ],
   triceps: [
     'exercise_triceps_cableExtension',
     'exercise_triceps_skullCrushers',
     'exercise_triceps_overheadExtension',
     'exercise_triceps_dips',
-    'exercise_triceps_closegripBenchPress',
+    'exercise_triceps_closegripBenchPress'
   ],
   core: [
     'exercise_core_plank',
     'exercise_core_russianTwist',
     'exercise_core_legRaises',
     'exercise_core_crunches',
-    'exercise_core_hangingKneeRaises',
-  ],
+    'exercise_core_hangingKneeRaises'
+  ]
 };
 
 export const getPredefinedExercises = (t: (key: string) => string) => {
@@ -93,7 +93,7 @@ export const getPredefinedExercises = (t: (key: string) => string) => {
       name: t(exerciseKey),
       key: exerciseKey,
       translationKey: exerciseKey,
-      series: [], // par défaut vide, à remplir lors de l'ajout à une routine
+      series: [] // par défaut vide, à remplir lors de l'ajout à une routine
     }));
   });
 
@@ -107,7 +107,7 @@ const muscleImagesByKey: Record<MuscleGroupKey, any> = {
   shoulders: require('../../../assets/images/muscles/shoulders.png'),
   biceps: require('../../../assets/images/muscles/biceps.png'),
   triceps: require('../../../assets/images/muscles/triceps.png'),
-  core: require('../../../assets/images/muscles/core.png'),
+  core: require('../../../assets/images/muscles/core.png')
 };
 
 interface ExerciseListProps {
@@ -122,15 +122,15 @@ interface ExerciseListProps {
 }
 
 export const ExerciseList: React.FC<ExerciseListProps> = ({
-  selectedMuscle,
-  setSelectedMuscle,
-  exercise,
-  setExercise,
-  setIsCustomExercise,
-  onExerciseSelect,
-  onMuscleSelect,
-  isLoading,
-}) => {
+                                                            selectedMuscle,
+                                                            setSelectedMuscle,
+                                                            exercise,
+                                                            setExercise,
+                                                            setIsCustomExercise,
+                                                            onExerciseSelect,
+                                                            onMuscleSelect,
+                                                            isLoading
+                                                          }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
   const styles = useStyles();
@@ -148,10 +148,10 @@ export const ExerciseList: React.FC<ExerciseListProps> = ({
       setExpandedMuscleGroups((prev) =>
         prev.includes(muscleGroup)
           ? prev.filter((group) => group !== muscleGroup)
-          : [...prev, muscleGroup],
+          : [...prev, muscleGroup]
       );
     },
-    [setExpandedMuscleGroups],
+    [setExpandedMuscleGroups]
   );
 
   // Handle search filtering
@@ -166,7 +166,7 @@ export const ExerciseList: React.FC<ExerciseListProps> = ({
 
     Object.entries(predefinedExercises).forEach(([muscleGroup, exercises]) => {
       const matchingExercises = exercises.filter((ex) =>
-        ex.name.toLowerCase().includes(query),
+        ex.name.toLowerCase().includes(query)
       );
 
       if (matchingExercises.length > 0) {
@@ -287,7 +287,7 @@ export const ExerciseList: React.FC<ExerciseListProps> = ({
                         <TouchableOpacity
                           style={[
                             styles.exerciseListItem,
-                            exercise === ex.name && styles.exerciseListItemSelected,
+                            exercise === ex.name && styles.exerciseListItemSelected
                           ]}
                           onPress={() => {
                             setExercise(ex.name, ex.translationKey);
@@ -338,7 +338,7 @@ const useStyles = () => {
 
   return StyleSheet.create({
     searchContainer: {
-      marginBottom: theme.spacing.lg,
+      marginBottom: theme.spacing.lg
     },
     searchInputContainer: {
       flexDirection: 'row',
@@ -346,63 +346,63 @@ const useStyles = () => {
       backgroundColor: theme.colors.background.input,
       borderRadius: theme.borderRadius.md,
       paddingHorizontal: theme.spacing.md,
-      paddingVertical: theme.spacing.sm,
+      paddingVertical: theme.spacing.sm
     },
     searchIcon: {
-      marginRight: theme.spacing.sm,
+      marginRight: theme.spacing.sm
     },
     searchInput: {
       color: theme.colors.text.primary,
       fontFamily: theme.typography.fontFamily.regular,
-      fontSize: theme.typography.fontSize.base,
+      fontSize: theme.typography.fontSize.base
     },
     collapsibleSection: {
       marginBottom: theme.spacing.sm,
       borderRadius: theme.borderRadius.lg,
       overflow: 'hidden',
-      backgroundColor: theme.colors.background.card,
+      backgroundColor: theme.colors.background.card
     },
     collapsibleHeader: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
       paddingHorizontal: theme.spacing.md,
-      paddingVertical: theme.spacing.md,
+      paddingVertical: theme.spacing.md
     },
     collapsibleHeaderSelected: {
-      backgroundColor: theme.colors.primaryLight,
+      backgroundColor: theme.colors.primaryLight
     },
     muscleButtonContent: {
       flexDirection: 'row',
-      alignItems: 'center',
+      alignItems: 'center'
     },
     muscleIcon: {
       marginRight: theme.spacing.sm,
-      borderRadius: 40,
+      borderRadius: 40
     },
     muscleButtonText: {
       fontFamily: theme.typography.fontFamily.semiBold,
       fontSize: theme.typography.fontSize.base,
-      color: theme.colors.primary,
+      color: theme.colors.primary
     },
     collapsibleContent: {
       paddingHorizontal: theme.spacing.md,
-      paddingBottom: theme.spacing.xs,
+      paddingBottom: theme.spacing.xs
     },
     exerciseListItem: {
       paddingVertical: theme.spacing.sm,
       paddingHorizontal: theme.spacing.sm,
       borderBottomWidth: 1,
       borderBottomColor: theme.colors.border.default,
-      marginLeft: theme.spacing.lg,
+      marginLeft: theme.spacing.lg
     },
     exerciseListItemSelected: {
       backgroundColor: theme.colors.primaryLight,
       borderRadius: theme.borderRadius.sm,
-      borderBottomColor: 'transparent',
+      borderBottomColor: 'transparent'
     },
     exerciseName: {
-      marginBottom: theme.spacing.xs,
+      marginBottom: theme.spacing.xs
     },
     customExerciseButton: {
       flexDirection: 'row',
@@ -410,17 +410,17 @@ const useStyles = () => {
       paddingVertical: theme.spacing.md,
       paddingHorizontal: theme.spacing.sm,
       marginTop: theme.spacing.xs,
-      marginLeft: theme.spacing.lg,
+      marginLeft: theme.spacing.lg
     },
     customExerciseButtonText: {
-      textAlign: 'center',
+      textAlign: 'center'
     },
     container: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      padding: theme.spacing.md,
-    },
+      padding: theme.spacing.md
+    }
   });
 };
 

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, StyleSheet, Animated, Easing } from 'react-native';
+import { Animated, Easing, StyleSheet, View } from 'react-native';
 import { useTheme } from '@/app/hooks/useTheme';
 
 interface SkeletonProps {
@@ -10,11 +10,11 @@ interface SkeletonProps {
 }
 
 const Skeleton: React.FC<SkeletonProps> = ({
-  width = '100%',
-  height = 20,
-  borderRadius = 4,
-  style,
-}) => {
+                                             width = '100%',
+                                             height = 20,
+                                             borderRadius = 4,
+                                             style
+                                           }) => {
   const { theme } = useTheme();
   const animatedValue = new Animated.Value(0);
 
@@ -24,8 +24,8 @@ const Skeleton: React.FC<SkeletonProps> = ({
         toValue: 1,
         duration: 1000,
         easing: Easing.linear,
-        useNativeDriver: true,
-      }),
+        useNativeDriver: true
+      })
     );
 
     animation.start();
@@ -37,7 +37,7 @@ const Skeleton: React.FC<SkeletonProps> = ({
 
   const translateX = animatedValue.interpolate({
     inputRange: [0, 1],
-    outputRange: ['-100%', '100%'],
+    outputRange: ['-100%', '100%']
   });
 
   return (
@@ -49,9 +49,9 @@ const Skeleton: React.FC<SkeletonProps> = ({
           height,
           borderRadius,
           backgroundColor: theme.colors.background.button,
-          overflow: 'hidden',
+          overflow: 'hidden'
         },
-        style,
+        style
       ]}
     >
       <Animated.View
@@ -59,8 +59,8 @@ const Skeleton: React.FC<SkeletonProps> = ({
           styles.shimmer,
           {
             backgroundColor: theme.colors.background.card,
-            transform: [{ translateX }],
-          },
+            transform: [{ translateX }]
+          }
         ]}
       />
     </View>
@@ -69,7 +69,7 @@ const Skeleton: React.FC<SkeletonProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    position: 'relative',
+    position: 'relative'
   },
   shimmer: {
     position: 'absolute',
@@ -77,8 +77,8 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    opacity: 0.3,
-  },
+    opacity: 0.3
+  }
 });
 
 export default Skeleton;

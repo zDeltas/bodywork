@@ -3,7 +3,7 @@ import fr from './fr';
 
 export const translations = {
   en,
-  fr,
+  fr
 };
 
 // Improved type for accessing nested translations

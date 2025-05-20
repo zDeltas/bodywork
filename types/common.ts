@@ -6,6 +6,33 @@ export interface Series {
   note: string;
   rpe: number;
   type: SeriesType;
+  rest?: string;
+}
+
+export interface Exercise {
+  name: string;
+  key: string;
+  translationKey: string;
+  series: Series[];
+}
+
+export interface Routine {
+  id: string;
+  title: string;
+  description: string;
+  exercises: Exercise[];
+  createdAt: string;
+  lastUsed?: string;
+  favorite?: boolean;
+  usageCount?: number;
+  totalTime?: number;
+}
+
+export interface RoutineStats {
+  totalExercises: number;
+  totalSeries: number;
+  estimatedTime: number;
+  isRecent: boolean;
 }
 
 export interface Workout {
@@ -14,6 +41,7 @@ export interface Workout {
   muscleGroup: string;
   series: Series[];
   date: string;
+  name?: string;
 }
 
 export interface Goal {
@@ -34,6 +62,17 @@ export interface StatsData {
     color: string;
     originalName: string;
   }[];
+}
+
+export interface SessionState {
+  currentExerciseIndex: number;
+  currentSeriesIndex: number;
+  isResting: boolean;
+  restTime: number;
+  routineFinished: boolean;
+  completedExercises: Workout[];
+  pendingSeries: { exerciseIdx: number; seriesIdx: number } | null;
+  rpe: string;
 }
 
 export type Period = '1m' | '3m' | '6m';

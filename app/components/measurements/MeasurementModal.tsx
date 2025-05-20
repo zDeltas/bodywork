@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useTheme } from '@/app/hooks/useTheme';
 import { useTranslation } from '@/app/hooks/useTranslation';
-import { BarChart3, Ruler } from 'lucide-react-native';
+import { BarChart3 } from 'lucide-react-native';
 import Modal from '@/app/components/ui/Modal';
 import { MeasurementTranslationKey } from '@/translations';
 
@@ -16,13 +16,13 @@ interface Props {
 }
 
 const MeasurementModal: React.FC<Props> = ({
-  open,
-  keyName,
-  value,
-  onClose,
-  onSave,
-  onShowHistory,
-}) => {
+                                             open,
+                                             keyName,
+                                             value,
+                                             onClose,
+                                             onSave,
+                                             onShowHistory
+                                           }) => {
   const { theme } = useTheme();
   const { t } = useTranslation();
   const [input, setInput] = useState(value > 0 ? value.toString() : '');
@@ -59,8 +59,8 @@ const MeasurementModal: React.FC<Props> = ({
               {
                 color: theme.colors.text.primary,
                 borderColor: theme.colors.border.default,
-                backgroundColor: theme.colors.background.input,
-              },
+                backgroundColor: theme.colors.background.input
+              }
             ]}
             value={input}
             onChangeText={handleInputChange}
@@ -102,11 +102,11 @@ const MeasurementModal: React.FC<Props> = ({
 
 const styles = StyleSheet.create({
   inputSection: {
-    padding: 24,
+    padding: 24
   },
   inputContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'center'
   },
   input: {
     flex: 1,
@@ -114,16 +114,16 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 14,
     fontSize: 24,
-    textAlign: 'center',
+    textAlign: 'center'
   },
   unit: {
     marginLeft: 12,
-    fontSize: 18,
+    fontSize: 18
   },
   buttonContainer: {
     flexDirection: 'row',
     borderTopWidth: 1,
-    borderTopColor: 'rgba(0,0,0,0.1)',
+    borderTopColor: 'rgba(0,0,0,0.1)'
   },
   historyButton: {
     flex: 1,
@@ -132,14 +132,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRightWidth: 1,
-    borderRightColor: 'rgba(0,0,0,0.1)',
+    borderRightColor: 'rgba(0,0,0,0.1)'
   },
   saveButton: {
     flex: 1,
     padding: 16,
     justifyContent: 'center',
-    alignItems: 'center',
-  },
+    alignItems: 'center'
+  }
 });
 
 export default MeasurementModal;

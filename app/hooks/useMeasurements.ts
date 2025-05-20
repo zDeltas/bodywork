@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { storageService } from '../services';
 import { MeasurementKey } from '@/app/components/measurements/MeasurementBodyMap';
 
@@ -20,8 +20,8 @@ const initialMeasurements: Measurement = {
     waist: 0,
     hips: 0,
     thighs: 0,
-    calves: 0,
-  },
+    calves: 0
+  }
 };
 
 // Fonction utilitaire pour regrouper les mesures par date
@@ -33,7 +33,7 @@ function groupMeasurementsByDate(stored: any[]): Measurement[] {
       byDate[date] = {
         date,
         weight: 0,
-        measurements: { ...initialMeasurements.measurements },
+        measurements: { ...initialMeasurements.measurements }
       };
     }
     if (m.type === 'weight') {
@@ -43,7 +43,7 @@ function groupMeasurementsByDate(stored: any[]): Measurement[] {
     }
   });
   return Object.values(byDate).sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   );
 }
 
@@ -89,7 +89,7 @@ export function useMeasurements() {
     setMeasurements((prev) => {
       const updated = {
         ...prev,
-        measurements: { ...prev.measurements, [key]: value },
+        measurements: { ...prev.measurements, [key]: value }
       };
       // Mise à jour locale immédiate
       setAllMeasurements((prevAll) => {
@@ -110,7 +110,7 @@ export function useMeasurements() {
           date: new Date(updated.date).toISOString(),
           type: key,
           value,
-          unit: 'cm',
+          unit: 'cm'
         })
         .then(async () => {
           const stored = await storageService.getMeasurements();
@@ -125,7 +125,7 @@ export function useMeasurements() {
     setMeasurements((prev) => {
       const updated = {
         ...prev,
-        weight: value,
+        weight: value
       };
       setAllMeasurements((prevAll) => {
         const idx = prevAll.findIndex((m) => m.date === updated.date);
@@ -144,7 +144,7 @@ export function useMeasurements() {
           date: new Date(updated.date).toISOString(),
           type: 'weight',
           value,
-          unit: 'kg',
+          unit: 'kg'
         })
         .then(async () => {
           const stored = await storageService.getMeasurements();
@@ -162,7 +162,7 @@ export function useMeasurements() {
         return found ? found : { ...initialMeasurements, date };
       });
     },
-    [allMeasurements],
+    [allMeasurements]
   );
 
   // Exposer les valeurs mémoïsées pour éviter les re-rendus inutiles
@@ -174,7 +174,7 @@ export function useMeasurements() {
       error,
       updateMeasurement,
       updateWeight,
-      setSelectedDate,
+      setSelectedDate
     }),
     [
       measurements,
@@ -183,8 +183,8 @@ export function useMeasurements() {
       error,
       updateMeasurement,
       updateWeight,
-      setSelectedDate,
-    ],
+      setSelectedDate
+    ]
   );
 
   return contextValue;

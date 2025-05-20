@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Goal, Workout, Series, StatsData } from '../types/common';
+import { Goal, Workout } from '../types/common';
 
 // Énumérations pour les clés de stockage
 export enum StorageKeys {
@@ -53,12 +53,12 @@ const defaultValues: StorageData = {
     weightUnit: 'kg',
     gender: 'male',
     language: 'fr',
-    theme: 'dark',
+    theme: 'dark'
   },
   [StorageKeys.FAVORITE_EXERCISES]: [],
   [StorageKeys.RECENT_EXERCISES]: [],
   [StorageKeys.STORAGE_VERSION]: CURRENT_STORAGE_VERSION,
-  [StorageKeys.ROUTINES]: [],
+  [StorageKeys.ROUTINES]: []
 };
 
 /**
@@ -80,7 +80,7 @@ class StorageService {
         await this.migrateStorage(version, CURRENT_STORAGE_VERSION);
       }
     } catch (error) {
-      console.error("Erreur lors de l'initialisation du stockage:", error);
+      console.error('Erreur lors de l\'initialisation du stockage:', error);
     }
   }
 
@@ -100,7 +100,7 @@ class StorageService {
         StorageKeys.GOALS,
         StorageKeys.MEASUREMENTS,
         StorageKeys.FAVORITE_EXERCISES,
-        StorageKeys.RECENT_EXERCISES,
+        StorageKeys.RECENT_EXERCISES
       ];
 
       // Supprimer les données
@@ -116,11 +116,11 @@ class StorageService {
         keysToReset.map(async (key) => {
           const value = await this.getItem(key);
           return Array.isArray(value) && value.length === 0;
-        }),
+        })
       );
 
       if (!allReset.every((reset) => reset)) {
-        throw new Error("Certaines données n'ont pas été correctement réinitialisées");
+        throw new Error('Certaines données n\'ont pas été correctement réinitialisées');
       }
 
       console.log('Toutes les données ont été réinitialisées avec succès');
@@ -175,24 +175,8 @@ class StorageService {
     try {
       await AsyncStorage.clear();
     } catch (error) {
-      console.error("Erreur lors de l'effacement du stockage:", error);
+      console.error('Erreur lors de l\'effacement du stockage:', error);
     }
-  }
-
-  /**
-   * Méthode pour migrer le stockage d'une version à une autre
-   */
-  private async migrateStorage(fromVersion: string, toVersion: string): Promise<void> {
-    console.log(`Migration du stockage de la version ${fromVersion} vers ${toVersion}`);
-
-    // Implémentez ici la logique de migration entre les versions
-    // Par exemple:
-    // if (fromVersion === '1.0' && toVersion === '1.1') {
-    //   // Migration spécifique de 1.0 à 1.1
-    // }
-
-    // Mettre à jour la version
-    await this.setItem(StorageKeys.STORAGE_VERSION, toVersion);
   }
 
   // Méthodes spécifiques pour les workouts
@@ -342,6 +326,22 @@ class StorageService {
     const routines = await this.getRoutines();
     const filteredRoutines = routines.filter((r) => r.id !== id);
     await this.setItem(StorageKeys.ROUTINES, filteredRoutines);
+  }
+
+  /**
+   * Méthode pour migrer le stockage d'une version à une autre
+   */
+  private async migrateStorage(fromVersion: string, toVersion: string): Promise<void> {
+    console.log(`Migration du stockage de la version ${fromVersion} vers ${toVersion}`);
+
+    // Implémentez ici la logique de migration entre les versions
+    // Par exemple:
+    // if (fromVersion === '1.0' && toVersion === '1.1') {
+    //   // Migration spécifique de 1.0 à 1.1
+    // }
+
+    // Mettre à jour la version
+    await this.setItem(StorageKeys.STORAGE_VERSION, toVersion);
   }
 }
 

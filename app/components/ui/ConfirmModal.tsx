@@ -18,16 +18,16 @@ interface ConfirmModalProps {
   variant?: 'danger' | 'warning' | 'info';
 }
 
-export const ConfirmModal: React.FC<ConfirmModalProps> = ({
-  visible,
-  onClose,
-  onConfirm,
-  title,
-  message,
-  confirmText,
-  cancelText,
-  variant = 'warning'
-}) => {
+const ConfirmModal: React.FC<ConfirmModalProps> = ({
+                                                     visible,
+                                                     onClose,
+                                                     onConfirm,
+                                                     title,
+                                                     message,
+                                                     confirmText,
+                                                     cancelText,
+                                                     variant = 'warning'
+                                                   }) => {
   const { theme } = useTheme();
   const { t } = useTranslation();
   const styles = useStyles(theme);
@@ -98,4 +98,6 @@ const useStyles = (theme: any) => StyleSheet.create({
   modalButton: {
     flex: 1
   }
-}); 
+});
+
+export default ConfirmModal; 

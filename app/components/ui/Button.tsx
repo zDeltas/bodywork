@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, ViewStyle, TextStyle } from 'react-native';
+import { Text, TextStyle, TouchableOpacity, ViewStyle } from 'react-native';
 import { useDynamicStyles } from '@/app/theme/dynamicComponents';
 
 type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'icon';
@@ -18,16 +18,16 @@ interface ButtonProps {
 }
 
 export const Button: React.FC<ButtonProps> = ({
-  onPress,
-  title,
-  variant = 'primary',
-  size = 'medium',
-  disabled = false,
-  style,
-  textStyle,
-  icon,
-  children,
-}) => {
+                                                onPress,
+                                                title,
+                                                variant = 'primary',
+                                                size = 'medium',
+                                                disabled = false,
+                                                style,
+                                                textStyle,
+                                                icon,
+                                                children
+                                              }) => {
   const { buttons } = useDynamicStyles();
 
   const getSizeStyles = (): ViewStyle => {
@@ -35,12 +35,12 @@ export const Button: React.FC<ButtonProps> = ({
       case 'small':
         return {
           paddingVertical: 8,
-          paddingHorizontal: 12,
+          paddingHorizontal: 12
         };
       case 'large':
         return {
           paddingVertical: 16,
-          paddingHorizontal: 24,
+          paddingHorizontal: 24
         };
       default:
         return {};

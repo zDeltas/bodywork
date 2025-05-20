@@ -2,15 +2,15 @@ module.exports = {
   extends: [
     'universe/native',
     'universe/shared/typescript-analysis',
-    'plugin:prettier/recommended',
+    'plugin:prettier/recommended'
   ],
   overrides: [
     {
       files: ['*.ts', '*.tsx', '*.d.ts'],
       parserOptions: {
-        project: './tsconfig.json',
-      },
-    },
+        project: './tsconfig.json'
+      }
+    }
   ],
   rules: {
     'react-hooks/rules-of-hooks': 'error',
@@ -37,9 +37,9 @@ module.exports = {
       {
         groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
         'newlines-between': 'always',
-        alphabetize: { order: 'asc', caseInsensitive: true },
-      },
-    ],
+        alphabetize: { order: 'asc', caseInsensitive: true }
+      }
+    ]
   },
-  plugins: ['prettier'],
+  plugins: ['prettier']
 };

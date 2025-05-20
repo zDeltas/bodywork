@@ -1,12 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import {
-  VictoryAxis,
-  VictoryChart,
-  VictoryLine,
-  VictoryScatter,
-  VictoryTheme,
-} from 'victory-native';
+import { VictoryAxis, VictoryChart, VictoryLine, VictoryScatter, VictoryTheme } from 'victory-native';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useTheme } from '@/app/hooks/useTheme';
@@ -14,7 +8,7 @@ import { useTranslation } from '@/app/hooks/useTranslation';
 import { MeasurementKey } from './MeasurementBodyMap';
 import { BarChart3, Clock } from 'lucide-react-native';
 import { WorkoutDateUtils } from '@/types/workout';
-import { StatsCardSkeleton, ChartSkeleton } from '@/app/components/ui/SkeletonComponents';
+import { ChartSkeleton, StatsCardSkeleton } from '@/app/components/ui/SkeletonComponents';
 
 type Measurement = {
   date: string;
@@ -31,13 +25,13 @@ const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({ measurements, i
   const { theme } = useTheme();
   const { t } = useTranslation();
   const [selectedMeasurement, setSelectedMeasurement] = useState<MeasurementKey | 'weight' | null>(
-    null,
+    null
   );
   const [historyModalVisible, setHistoryModalVisible] = useState(false);
 
   const sortedMeasurements = useMemo(() => {
     return [...measurements].sort(
-      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
     );
   }, [measurements]);
 
@@ -71,7 +65,7 @@ const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({ measurements, i
         .map((m) => ({
           x: new Date(m.date),
           y: m.weight,
-          date: m.date,
+          date: m.date
         }));
     } else {
       data = sortedMeasurements
@@ -79,7 +73,7 @@ const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({ measurements, i
         .map((m) => ({
           x: new Date(m.date),
           y: m.measurements[key],
-          date: m.date,
+          date: m.date
         }));
     }
 
@@ -94,20 +88,20 @@ const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({ measurements, i
         return {
           color: theme.colors.success,
           bgColor: theme.colors.success + '20',
-          symbol: '▲',
+          symbol: '▲'
         };
       case 'negative':
         return {
           color: theme.colors.error,
           bgColor: theme.colors.error + '20',
-          symbol: '▼',
+          symbol: '▼'
         };
       case 'neutral':
       default:
         return {
           color: theme.colors.text.secondary,
           bgColor: theme.colors.border.default + '40',
-          symbol: '•',
+          symbol: '•'
         };
     }
   };
@@ -123,7 +117,7 @@ const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({ measurements, i
       { key: 'waist' as MeasurementKey, label: t('measurements.waist') },
       { key: 'hips' as MeasurementKey, label: t('measurements.hips') },
       { key: 'thighs' as MeasurementKey, label: t('measurements.thighs') },
-      { key: 'calves' as MeasurementKey, label: t('measurements.calves') },
+      { key: 'calves' as MeasurementKey, label: t('measurements.calves') }
     ];
   };
 
@@ -183,12 +177,12 @@ const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({ measurements, i
     if (key === 'weight') {
       return {
         min: Math.max(min - padding, 0),
-        max: Math.min(max + padding, 200),
+        max: Math.min(max + padding, 200)
       };
     } else {
       return {
         min: Math.max(min - padding, 0),
-        max: Math.min(max + padding, 200),
+        max: Math.min(max + padding, 200)
       };
     }
   };
@@ -214,24 +208,24 @@ const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({ measurements, i
 
     return {
       value: Math.abs(diff),
-      status: isPositive ? ('positive' as const) : ('negative' as const),
+      status: isPositive ? ('positive' as const) : ('negative' as const)
     };
   };
 
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      paddingTop: 8,
+      paddingTop: 8
     },
     section: {
       marginBottom: theme.spacing.xl,
-      paddingHorizontal: theme.spacing.lg,
+      paddingHorizontal: theme.spacing.lg
     },
     cardGrid: {
       flexDirection: 'row',
       flexWrap: 'wrap',
       justifyContent: 'space-between',
-      padding: 12,
+      padding: 12
     },
     card: {
       width: '48%',
@@ -240,7 +234,7 @@ const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({ measurements, i
       padding: 0,
       marginBottom: 16,
       overflow: 'hidden',
-      ...theme.shadows.sm,
+      ...theme.shadows.sm
     },
     cardHeader: {
       flexDirection: 'row',
@@ -250,13 +244,13 @@ const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({ measurements, i
       paddingVertical: 10,
       backgroundColor: theme.colors.background.button + '30',
       borderTopLeftRadius: theme.borderRadius.lg,
-      borderTopRightRadius: theme.borderRadius.lg,
+      borderTopRightRadius: theme.borderRadius.lg
     },
     cardTitle: {
       fontSize: 14,
       fontWeight: 'bold',
       color: theme.colors.text.primary,
-      width: '70%',
+      width: '70%'
     },
     historyButton: {
       width: 26,
@@ -265,51 +259,51 @@ const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({ measurements, i
       backgroundColor: theme.colors.background.main,
       alignItems: 'center',
       justifyContent: 'center',
-      ...theme.shadows.sm,
+      ...theme.shadows.sm
     },
     cardDivider: {
       height: 1,
       backgroundColor: theme.colors.border.default,
       width: '100%',
-      opacity: 0.5,
+      opacity: 0.5
     },
     cardContent: {
-      padding: 12,
+      padding: 12
     },
     dataRow: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'flex-start',
-      marginBottom: 10,
+      marginBottom: 10
     },
     leftColumn: {
       flex: 0.5,
       alignItems: 'flex-start',
-      justifyContent: 'center',
+      justifyContent: 'center'
     },
     rightColumn: {
       flex: 0.5,
       alignItems: 'flex-end',
-      justifyContent: 'center',
+      justifyContent: 'center'
     },
     valueContainer: {
       alignItems: 'center',
-      marginBottom: 6,
+      marginBottom: 6
     },
     valueRow: {
       flexDirection: 'row',
-      alignItems: 'baseline',
+      alignItems: 'baseline'
     },
     value: {
       fontSize: 26,
       fontWeight: 'bold',
-      color: theme.colors.primary,
+      color: theme.colors.primary
     },
     unit: {
       fontSize: 14,
       color: theme.colors.text.secondary,
       marginLeft: 4,
-      fontWeight: '500',
+      fontWeight: '500'
     },
     dateRow: {
       flexDirection: 'row',
@@ -319,25 +313,25 @@ const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({ measurements, i
       backgroundColor: theme.colors.background.button + '40',
       paddingVertical: 3,
       paddingHorizontal: 6,
-      borderRadius: theme.borderRadius.sm,
+      borderRadius: theme.borderRadius.sm
     },
     dateLabel: {
       fontSize: 10,
       color: theme.colors.text.secondary,
-      marginLeft: 4,
+      marginLeft: 4
     },
     labelLastUpdate: {
       fontSize: 9,
       color: theme.colors.text.disabled,
       textAlign: 'center',
-      marginBottom: 4,
+      marginBottom: 4
     },
     chartWrapper: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
       marginTop: 5,
-      paddingHorizontal: 2,
+      paddingHorizontal: 2
     },
     trendIndicator: {
       width: 20,
@@ -346,46 +340,46 @@ const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({ measurements, i
       backgroundColor: theme.colors.background.button,
       alignItems: 'center',
       justifyContent: 'center',
-      ...theme.shadows.sm,
+      ...theme.shadows.sm
     },
     trendText: {
       fontSize: 12,
-      fontWeight: 'bold',
+      fontWeight: 'bold'
     },
     progressBadge: {
       paddingVertical: 2,
       paddingHorizontal: 6,
       borderRadius: theme.borderRadius.sm,
       marginTop: 2,
-      alignSelf: 'flex-end',
+      alignSelf: 'flex-end'
     },
     progressText: {
       fontSize: 12,
       textAlign: 'center',
-      fontWeight: '500',
+      fontWeight: '500'
     },
     progressSubText: {
       fontSize: 8,
       textAlign: 'center',
       color: theme.colors.text.secondary,
-      fontStyle: 'italic',
+      fontStyle: 'italic'
     },
     viewMore: {
       flexDirection: 'row',
       alignItems: 'center',
-      justifyContent: 'flex-end',
+      justifyContent: 'flex-end'
     },
     viewMoreText: {
       fontSize: 14,
       color: theme.colors.primary,
-      marginRight: 4,
+      marginRight: 4
     },
     modalOverlay: {
       flex: 1,
       backgroundColor: 'rgba(0,0,0,0.7)',
       justifyContent: 'center',
       alignItems: 'center',
-      padding: 16,
+      padding: 16
     },
     modalContent: {
       width: '90%',
@@ -394,24 +388,24 @@ const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({ measurements, i
       borderRadius: theme.borderRadius.lg,
       padding: 16,
       maxHeight: '80%',
-      ...theme.shadows.lg,
+      ...theme.shadows.lg
     },
     modalHeader: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      marginBottom: 16,
+      marginBottom: 16
     },
     modalTitle: {
       fontSize: 16,
       fontWeight: 'bold',
-      color: theme.colors.text.primary,
+      color: theme.colors.text.primary
     },
     modalDivider: {
       height: 1,
       backgroundColor: theme.colors.border.default,
       width: '100%',
-      marginVertical: 8,
+      marginVertical: 8
     },
     closeButton: {
       padding: 8,
@@ -420,56 +414,56 @@ const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({ measurements, i
       width: 32,
       height: 32,
       alignItems: 'center',
-      justifyContent: 'center',
+      justifyContent: 'center'
     },
     chartContainer: {
       height: 220,
       marginVertical: 8,
       width: '100%',
       alignItems: 'center',
-      justifyContent: 'center',
+      justifyContent: 'center'
     },
     progressContainer: {
       flexDirection: 'row',
       justifyContent: 'flex-end',
       alignItems: 'center',
-      marginBottom: 12,
+      marginBottom: 12
     },
     progressValue: {
       fontSize: 16,
       fontWeight: 'bold',
-      color: theme.colors.primary, // Default color, will be overridden in component
+      color: theme.colors.primary // Default color, will be overridden in component
     },
     progressLabel: {
       fontSize: 14,
       color: theme.colors.text.secondary,
-      marginLeft: 4,
+      marginLeft: 4
     },
     emptyState: {
       alignItems: 'center',
       justifyContent: 'center',
-      height: 200,
+      height: 200
     },
     emptyStateText: {
       color: theme.colors.text.secondary,
       fontSize: 16,
-      textAlign: 'center',
+      textAlign: 'center'
     },
     emptyCard: {
       alignItems: 'center',
       justifyContent: 'center',
-      height: 120,
+      height: 120
     },
     unitLabel: {
       fontSize: 14,
       color: theme.colors.text.secondary,
-      marginBottom: 8,
+      marginBottom: 8
     },
     progressBadgeText: {
       fontSize: 12,
       fontWeight: 'bold',
-      color: theme.colors.text.primary,
-    },
+      color: theme.colors.text.primary
+    }
   });
 
   if (isLoading) {
@@ -561,8 +555,8 @@ const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({ measurements, i
                   style={{
                     data: {
                       stroke: theme.colors.primary,
-                      strokeWidth: 2,
-                    },
+                      strokeWidth: 2
+                    }
                   }}
                   animate={{ duration: 300, easing: 'exp' }}
                   interpolation="monotoneX"
@@ -574,8 +568,8 @@ const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({ measurements, i
                     data: {
                       fill: theme.colors.background.card,
                       stroke: theme.colors.primary,
-                      strokeWidth: 1.5,
-                    },
+                      strokeWidth: 1.5
+                    }
                   }}
                 />
                 <VictoryAxis
@@ -583,7 +577,7 @@ const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({ measurements, i
                     axis: { stroke: 'transparent' },
                     ticks: { stroke: 'transparent' },
                     tickLabels: { fill: 'transparent' },
-                    grid: { stroke: 'transparent' },
+                    grid: { stroke: 'transparent' }
                   }}
                 />
                 <VictoryAxis
@@ -595,10 +589,10 @@ const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({ measurements, i
                     grid: {
                       stroke: theme.colors.border.default,
                       strokeDasharray: '2,2',
-                      strokeOpacity: 0.5,
+                      strokeOpacity: 0.5
                     },
                     ticks: { stroke: 'transparent' },
-                    tickLabels: { fill: 'transparent' },
+                    tickLabels: { fill: 'transparent' }
                   }}
                   tickCount={3}
                 />
@@ -686,7 +680,7 @@ const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({ measurements, i
                   <Text
                     style={{
                       ...styles.progressValue,
-                      color: progressColor,
+                      color: progressColor
                     }}
                   >
                     {progressData.status === 'positive' ? '+' : '-'}
@@ -717,8 +711,8 @@ const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({ measurements, i
                           fill: theme.colors.text.secondary,
                           fontSize: 7,
                           angle: -30,
-                          textAnchor: 'end',
-                        },
+                          textAnchor: 'end'
+                        }
                       }}
                     />
                     <VictoryAxis
@@ -729,8 +723,8 @@ const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({ measurements, i
                         ticks: { stroke: theme.colors.text.secondary, size: 3 },
                         tickLabels: {
                           fill: theme.colors.text.secondary,
-                          fontSize: 7,
-                        },
+                          fontSize: 7
+                        }
                       }}
                     />
                     <VictoryLine
@@ -738,8 +732,8 @@ const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({ measurements, i
                       style={{
                         data: {
                           stroke: theme.colors.primary,
-                          strokeWidth: 2,
-                        },
+                          strokeWidth: 2
+                        }
                       }}
                       interpolation="monotoneX"
                     />
@@ -750,8 +744,8 @@ const MeasurementHistory: React.FC<MeasurementHistoryProps> = ({ measurements, i
                         data: {
                           fill: theme.colors.background.card,
                           stroke: theme.colors.primary,
-                          strokeWidth: 2,
-                        },
+                          strokeWidth: 2
+                        }
                       }}
                     />
                   </VictoryChart>

@@ -70,6 +70,6 @@ export const useHaptics = (): HapticsHook => {
     impactHeavy,
     selection,
     isEnabled,
-    setEnabled,
+    setEnabled
   };
 }; 

@@ -1,11 +1,11 @@
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
-import storageService, { Settings, StorageKeys } from '../services/storage';
+import storageService, { Settings } from '../services/storage';
 
 const defaultSettings: Settings = {
   weightUnit: 'kg',
   gender: 'male',
   language: 'fr',
-  theme: 'dark',
+  theme: 'dark'
 };
 
 interface SettingsContextType {
@@ -16,8 +16,9 @@ interface SettingsContextType {
 
 const SettingsContext = createContext<SettingsContextType>({
   settings: defaultSettings,
-  updateSettings: async () => {},
-  isLoading: true,
+  updateSettings: async () => {
+  },
+  isLoading: true
 });
 
 export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {

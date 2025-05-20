@@ -29,7 +29,7 @@ export const useCSVExport = () => {
           1, // Each series is one set
           series.rpe || 'N/A',
           series.type,
-          `"${series.note?.replace(/"/g, '""') || ''}"`, // Escape quotes in notes
+          `"${series.note?.replace(/"/g, '""') || ''}"` // Escape quotes in notes
         ].join(',');
 
         csvContent += row + '\n';
@@ -63,7 +63,7 @@ export const useCSVExport = () => {
 
       // Write CSV content to the file
       await FileSystem.writeAsStringAsync(filePath, csvContent, {
-        encoding: FileSystem.EncodingType.UTF8,
+        encoding: FileSystem.EncodingType.UTF8
       });
 
       // Share the file
@@ -71,7 +71,7 @@ export const useCSVExport = () => {
         await Sharing.shareAsync(filePath, {
           mimeType: 'text/csv',
           dialogTitle: t('settings.exportToCSV'),
-          UTI: 'public.comma-separated-values-text',
+          UTI: 'public.comma-separated-values-text'
         });
 
         setIsExporting(false);
@@ -90,7 +90,7 @@ export const useCSVExport = () => {
 
   return {
     isExporting,
-    exportWorkoutsToCSV,
+    exportWorkoutsToCSV
   };
 };
 

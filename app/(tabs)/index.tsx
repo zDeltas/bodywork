@@ -8,7 +8,6 @@ import { Activity, Dumbbell, Layers, Plus, Repeat } from 'lucide-react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Header from '@/app/components/layout/Header';
 import { Workout, WorkoutDateUtils } from '@/types/workout';
-import { TranslationKey } from '@/translations';
 import { useWorkouts } from '@/app/hooks/useWorkouts';
 import FloatButtonAction from '@/app/components/ui/FloatButtonAction';
 
@@ -25,7 +24,7 @@ LocaleConfig.locales['fr'] = {
     'Septembre',
     'Octobre',
     'Novembre',
-    'Décembre',
+    'Décembre'
   ],
   monthNamesShort: [
     'Janv.',
@@ -39,11 +38,11 @@ LocaleConfig.locales['fr'] = {
     'Sept.',
     'Oct.',
     'Nov.',
-    'Déc.',
+    'Déc.'
   ],
   dayNames: ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'],
   dayNamesShort: ['Dim.', 'Lun.', 'Mar.', 'Mer.', 'Jeu.', 'Ven.', 'Sam.'],
-  today: "Aujourd'hui",
+  today: 'Aujourd\'hui'
 };
 
 LocaleConfig.locales['en'] = {
@@ -59,7 +58,7 @@ LocaleConfig.locales['en'] = {
     'September',
     'October',
     'November',
-    'December',
+    'December'
   ],
   monthNamesShort: [
     'Jan.',
@@ -73,11 +72,11 @@ LocaleConfig.locales['en'] = {
     'Sep.',
     'Oct.',
     'Nov.',
-    'Dec.',
+    'Dec.'
   ],
   dayNames: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
   dayNamesShort: ['Sun.', 'Mon.', 'Tue.', 'Wed.', 'Thu.', 'Fri.', 'Sat.'],
-  today: 'Today',
+  today: 'Today'
 };
 
 /**
@@ -102,7 +101,7 @@ interface MarkedDate {
 export default function WorkoutScreen() {
   const params = useLocalSearchParams();
   const [selectedDate, setSelectedDate] = useState<string>(
-    WorkoutDateUtils.getDatePart(new Date().toISOString()),
+    WorkoutDateUtils.getDatePart(new Date().toISOString())
   );
   const { t, language } = useTranslation();
   const { theme } = useTheme();
@@ -128,7 +127,7 @@ export default function WorkoutScreen() {
         weight: workingSet.weight || 0,
         reps: workingSet.reps || 0,
         sets: workingSetsCount || 0,
-        rpe: workingSet.rpe || 0,
+        rpe: workingSet.rpe || 0
       };
     }
 
@@ -136,7 +135,7 @@ export default function WorkoutScreen() {
       weight: 0,
       reps: 0,
       sets: 0,
-      rpe: 0,
+      rpe: 0
     };
   };
 
@@ -194,7 +193,7 @@ export default function WorkoutScreen() {
               textDayHeaderFontFamily: theme.typography.fontFamily.regular,
               textDayFontSize: theme.typography.fontSize.base,
               textMonthFontSize: theme.typography.fontSize.lg,
-              textDayHeaderFontSize: theme.typography.fontSize.md,
+              textDayHeaderFontSize: theme.typography.fontSize.md
             }}
             markedDates={markedDates}
             onDayPress={(day: { dateString: string }) => setSelectedDate(day.dateString)}
@@ -236,8 +235,8 @@ export default function WorkoutScreen() {
                               backgroundColor: isWarmUp
                                 ? theme.colors.text.disabled
                                 : theme.colors.primary,
-                              color: theme.colors.background.main,
-                            },
+                              color: theme.colors.background.main
+                            }
                           ]}
                         >
                           {isWarmUp ? t('workout.warmUpSeries') : t('workout.workingSeries')}
@@ -310,15 +309,15 @@ const useStyles = () => {
   return StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: theme.colors.background.main,
+      backgroundColor: theme.colors.background.main
     },
     content: {
-      flex: 1,
+      flex: 1
     },
     workoutCard: {
       padding: 10,
       borderBottomWidth: 1,
-      borderBottomColor: theme.colors.border.default,
+      borderBottomColor: theme.colors.border.default
     },
     workoutDetailsCard: {
       backgroundColor: theme.colors.background.card,
@@ -328,27 +327,27 @@ const useStyles = () => {
       marginBottom: theme.spacing.xs,
       flexDirection: 'column',
       alignItems: 'flex-start',
-      ...theme.shadows.sm,
+      ...theme.shadows.sm
     },
     workoutInfoRow: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
       width: '100%',
-      marginBottom: theme.spacing.sm,
+      marginBottom: theme.spacing.sm
     },
     workoutInfoItem: {
       flexDirection: 'row',
       alignItems: 'center',
-      marginRight: theme.spacing.lg,
+      marginRight: theme.spacing.lg
     },
     workoutInfoIcon: {
-      marginRight: theme.spacing.xs,
+      marginRight: theme.spacing.xs
     },
     workoutInfoValue: {
       fontFamily: theme.typography.fontFamily.semiBold,
       fontSize: theme.typography.fontSize.base,
-      color: theme.colors.text.primary,
+      color: theme.colors.text.primary
     },
     rpeBadge: {
       flexDirection: 'row',
@@ -356,19 +355,19 @@ const useStyles = () => {
       borderRadius: 16,
       paddingVertical: 2,
       paddingHorizontal: 10,
-      marginLeft: theme.spacing.sm,
+      marginLeft: theme.spacing.sm
     },
     rpeBadgeText: {
       color: theme.colors.background.main,
       fontFamily: theme.typography.fontFamily.bold,
       fontSize: theme.typography.fontSize.sm,
-      marginLeft: 4,
+      marginLeft: 4
     },
     rpeBadgeIcon: {
-      marginRight: 2,
+      marginRight: 2
     },
     workoutTypeBadgeContainer: {
-      marginBottom: theme.spacing.xs,
+      marginBottom: theme.spacing.xs
     },
     workoutTypeBadge: {
       fontFamily: theme.typography.fontFamily.semiBold,
@@ -377,44 +376,44 @@ const useStyles = () => {
       paddingHorizontal: 10,
       borderRadius: 12,
       overflow: 'hidden',
-      alignSelf: 'flex-start',
+      alignSelf: 'flex-start'
     },
     workoutNoteBox: {
       backgroundColor: theme.colors.background.card,
       borderRadius: theme.borderRadius.base,
       padding: theme.spacing.sm,
       marginTop: theme.spacing.xs,
-      alignSelf: 'stretch',
+      alignSelf: 'stretch'
     },
     workoutNoteText: {
       fontFamily: theme.typography.fontFamily.regular,
       color: theme.colors.text.secondary,
       fontSize: theme.typography.fontSize.sm,
-      fontStyle: 'italic',
+      fontStyle: 'italic'
     },
     workoutTitle: {
       fontFamily: theme.typography.fontFamily.bold,
       fontSize: theme.typography.fontSize.lg,
       color: theme.colors.text.primary,
-      marginBottom: theme.spacing.xs,
+      marginBottom: theme.spacing.xs
     },
     workoutDate: {
       fontFamily: theme.typography.fontFamily.regular,
       fontSize: theme.typography.fontSize.sm,
       color: theme.colors.text.secondary,
-      marginBottom: theme.spacing.sm,
+      marginBottom: theme.spacing.sm
     },
     noWorkoutContainer: {
       padding: theme.spacing.base,
       alignItems: 'center',
       justifyContent: 'center',
-      marginTop: theme.spacing.lg,
+      marginTop: theme.spacing.lg
     },
     noWorkoutText: {
       fontFamily: theme.typography.fontFamily.regular,
       fontSize: theme.typography.fontSize.base,
       color: theme.colors.text.secondary,
-      textAlign: 'center',
+      textAlign: 'center'
     },
     calendarContainer: {
       borderRadius: theme.borderRadius.lg,
@@ -423,7 +422,7 @@ const useStyles = () => {
       marginLeft: theme.spacing.sm,
       marginRight: theme.spacing.sm,
       marginBottom: theme.spacing.sm,
-      ...theme.shadows.md,
-    },
+      ...theme.shadows.md
+    }
   });
 };

@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useTheme } from '@/app/hooks/useTheme';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import Text from '@/app/components/ui/Text';
-import { Exercise, Series } from '@/app/types/routine';
+import { Exercise, Series } from '@/types/common';
+import { Clock, Dumbbell, Repeat, StickyNote } from 'lucide-react-native';
 
 type CurrentExerciseProps = {
   exercise: Exercise;
@@ -11,11 +12,11 @@ type CurrentExerciseProps = {
   currentSeriesIndex: number;
 };
 
-export const CurrentExercise = React.memo(({
-  exercise,
-  currentSeries,
-  currentSeriesIndex
-}: CurrentExerciseProps) => {
+const CurrentExercise = React.memo(({
+                                      exercise,
+                                      currentSeries,
+                                      currentSeriesIndex
+                                    }: CurrentExerciseProps) => {
   const { theme } = useTheme();
   const { t } = useTranslation();
   const styles = useStyles(theme);
@@ -26,24 +27,51 @@ export const CurrentExercise = React.memo(({
         {exercise.name}
       </Text>
       <View style={styles.seriesInfo}>
-        <View style={styles.seriesRow}>
-          <Text variant="body" style={styles.seriesLabel}>{t('workout.series' as any)}</Text>
-          <Text variant="heading" style={styles.seriesValue}>
-            {currentSeriesIndex + 1}/{exercise.series.length}
-          </Text>
+        <View style={styles.mainInfoContainer}>
+          <View style={styles.infoRow}>
+            <View style={styles.infoItem}>
+              <Repeat size={20} color={theme.colors.primary} style={styles.icon} />
+              <View>
+                <Text variant="body" style={styles.infoLabel}>{t('workout.series')}</Text>
+                <Text variant="heading" style={styles.infoValue}>
+                  {currentSeriesIndex + 1}/{exercise.series.length}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.infoItem}>
+              <Dumbbell size={20} color={theme.colors.primary} style={styles.icon} />
+              <View>
+                <Text variant="body" style={styles.infoLabel}>{t('workout.weight')}</Text>
+                <Text variant="heading" style={styles.infoValue}>{currentSeries.weight} kg</Text>
+              </View>
+            </View>
+          </View>
+          <View style={styles.infoRow}>
+            <View style={styles.infoItem}>
+              <Repeat size={20} color={theme.colors.primary} style={styles.icon} />
+              <View>
+                <Text variant="body" style={styles.infoLabel}>{t('workout.reps')}</Text>
+                <Text variant="heading" style={styles.infoValue}>{currentSeries.reps}</Text>
+              </View>
+            </View>
+            <View style={styles.infoItem}>
+              <Clock size={20} color={theme.colors.primary} style={styles.icon} />
+              <View>
+                <Text variant="body" style={styles.infoLabel}>{t('timer.restTime')}</Text>
+                <Text variant="heading" style={styles.infoValue}>{currentSeries.rest}</Text>
+              </View>
+            </View>
+          </View>
         </View>
-        <View style={styles.seriesRow}>
-          <Text variant="body" style={styles.seriesLabel}>{t('workout.weight' as any)}</Text>
-          <Text variant="heading" style={styles.seriesValue}>{currentSeries.weight} kg</Text>
-        </View>
-        <View style={styles.seriesRow}>
-          <Text variant="body" style={styles.seriesLabel}>{t('workout.reps' as any)}</Text>
-          <Text variant="heading" style={styles.seriesValue}>{currentSeries.reps}</Text>
-        </View>
-        <View style={styles.seriesRow}>
-          <Text variant="body" style={styles.seriesLabel}>{t('workout.rest' as any)}</Text>
-          <Text variant="heading" style={styles.seriesValue}>{currentSeries.rest}</Text>
-        </View>
+        {currentSeries.note && (
+          <View style={styles.noteContainer}>
+            <View style={styles.noteHeader}>
+              <StickyNote size={18} color={theme.colors.primary} style={styles.noteIcon} />
+              <Text variant="body" style={styles.noteLabel}>{t('common.note')}</Text>
+            </View>
+            <Text variant="body" style={styles.noteText}>{currentSeries.note}</Text>
+          </View>
+        )}
       </View>
     </View>
   );
@@ -59,20 +87,63 @@ const useStyles = (theme: any) => StyleSheet.create({
   },
   exerciseTitle: {
     marginBottom: theme.spacing.lg,
-    color: theme.colors.text.primary
+    color: theme.colors.text.primary,
+    fontSize: theme.typography.fontSize.xl
   },
   seriesInfo: {
+    gap: theme.spacing.lg
+  },
+  mainInfoContainer: {
     gap: theme.spacing.md
   },
-  seriesRow: {
+  infoRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center'
+    gap: theme.spacing.md
   },
-  seriesLabel: {
-    color: theme.colors.text.secondary
+  infoItem: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: theme.colors.background.input,
+    padding: theme.spacing.md,
+    borderRadius: theme.borderRadius.md,
+    gap: theme.spacing.sm
   },
-  seriesValue: {
-    color: theme.colors.text.primary
+  icon: {
+    marginRight: theme.spacing.xs
+  },
+  infoLabel: {
+    color: theme.colors.text.secondary,
+    fontSize: theme.typography.fontSize.sm
+  },
+  infoValue: {
+    color: theme.colors.text.primary,
+    fontSize: theme.typography.fontSize.lg
+  },
+  noteContainer: {
+    backgroundColor: theme.colors.background.input,
+    borderRadius: theme.borderRadius.md,
+    padding: theme.spacing.md
+  },
+  noteHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: theme.spacing.xs
+  },
+  noteIcon: {
+    marginRight: theme.spacing.xs
+  },
+  noteLabel: {
+    color: theme.colors.primary,
+    fontSize: theme.typography.fontSize.sm,
+    fontWeight: '600'
+  },
+  noteText: {
+    color: theme.colors.text.primary,
+    fontStyle: 'italic',
+    lineHeight: 20
   }
-}); 
+});
+
+export default CurrentExercise; 

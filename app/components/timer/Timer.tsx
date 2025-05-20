@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Platform, StyleSheet, Vibration, View, ViewStyle } from 'react-native';
+import { Platform, StyleSheet, Vibration, View } from 'react-native';
 import {
   Inter_400Regular as InterRegular,
   Inter_600SemiBold as InterSemiBold,
-  useFonts,
+  useFonts
 } from '@expo-google-fonts/inter';
 import { Minus, Pause, Play, Plus, RotateCcw } from 'lucide-react-native';
 import { useTranslation } from '@/app/hooks/useTranslation';
@@ -24,14 +24,14 @@ interface TimerProps {
 }
 
 export default function Timer({
-  initialTime = 60,
-  mode = 'timer',
-  onComplete,
-  sets = 1,
-  restTime = 60,
-  exerciseName = 'Exercise',
-  onSetsChange,
-}: TimerProps) {
+                                initialTime = 60,
+                                mode = 'timer',
+                                onComplete,
+                                sets = 1,
+                                restTime = 60,
+                                exerciseName = 'Exercise',
+                                onSetsChange
+                              }: TimerProps) {
   const { t } = useTranslation();
   const { theme } = useTheme();
   const haptics = useHaptics();
@@ -43,7 +43,7 @@ export default function Timer({
   const [isResting, setIsResting] = useState(false);
   const [fontsLoaded] = useFonts({
     'Inter-Regular': InterRegular,
-    'Inter-SemiBold': InterSemiBold,
+    'Inter-SemiBold': InterSemiBold
   });
 
   const handleWorkComplete = useCallback(() => {
@@ -86,7 +86,7 @@ export default function Timer({
       }
       haptics.impactLight();
     },
-    [currentSet, onSetsChange, haptics],
+    [currentSet, onSetsChange, haptics]
   );
 
   useEffect(() => {
@@ -161,8 +161,8 @@ export default function Timer({
           styles.content,
           {
             backgroundColor: isResting ? theme.colors.error : theme.colors.success,
-            borderRadius: 28,
-          },
+            borderRadius: 28
+          }
         ]}
       >
         <View style={styles.contentInner}>
@@ -212,7 +212,7 @@ export default function Timer({
           onPress={toggleTimer}
           style={{
             ...styles.button,
-            backgroundColor: isRunning ? theme.colors.error : theme.colors.success,
+            backgroundColor: isRunning ? theme.colors.error : theme.colors.success
           }}
         />
 
@@ -236,7 +236,7 @@ const useStyles = () => {
       justifyContent: 'center',
       alignItems: 'center',
       width: '100%',
-      gap: 24,
+      gap: 24
     },
     content: {
       width: '100%',
@@ -247,23 +247,23 @@ const useStyles = () => {
           shadowColor: '#000',
           shadowOffset: { width: 0, height: 4 },
           shadowOpacity: 0.15,
-          shadowRadius: 12,
+          shadowRadius: 12
         },
         android: {
-          elevation: 8,
-        },
-      }),
+          elevation: 8
+        }
+      })
     },
     contentInner: {
       alignItems: 'center',
-      gap: 12,
+      gap: 12
     },
     setsContainer: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
       gap: 12,
-      marginVertical: 4,
+      marginVertical: 4
     },
     setButton: {
       width: 28,
@@ -271,32 +271,32 @@ const useStyles = () => {
       borderRadius: 14,
       backgroundColor: 'rgba(255, 255, 255, 0.2)',
       justifyContent: 'center',
-      alignItems: 'center',
+      alignItems: 'center'
     },
     setInfo: {
       fontSize: Platform.OS === 'ios' ? 22 : 20,
       fontWeight: '600',
       opacity: 0.9,
       textAlign: 'center',
-      minWidth: 100,
+      minWidth: 100
     },
     time: {
       fontSize: Platform.OS === 'ios' ? 72 : 64,
       fontWeight: '700',
       textAlign: 'center',
       includeFontPadding: false,
-      lineHeight: Platform.OS === 'ios' ? 84 : 76,
+      lineHeight: Platform.OS === 'ios' ? 84 : 76
     },
     phaseText: {
       fontSize: Platform.OS === 'ios' ? 24 : 22,
       fontWeight: '600',
       textTransform: 'uppercase',
-      letterSpacing: 1,
+      letterSpacing: 1
     },
     controls: {
       flexDirection: 'row',
       justifyContent: 'center',
-      gap: 16,
+      gap: 16
     },
     button: {
       width: 56,
@@ -309,12 +309,12 @@ const useStyles = () => {
           shadowColor: '#000',
           shadowOffset: { width: 0, height: 2 },
           shadowOpacity: 0.15,
-          shadowRadius: 6,
+          shadowRadius: 6
         },
         android: {
-          elevation: 4,
-        },
-      }),
-    },
+          elevation: 4
+        }
+      })
+    }
   });
 };

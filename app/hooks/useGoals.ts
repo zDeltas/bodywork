@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Workout } from '@/types/common';
 import storageService, { StorageKeys } from '../services/storage';
 
@@ -33,7 +33,7 @@ export function useGoals(workouts: Workout[]) {
 
       return highestWeight || null;
     },
-    [workouts],
+    [workouts]
   );
 
   const suggestTargetWeight = useCallback((currentWeight: number): number | null => {
@@ -61,7 +61,7 @@ export function useGoals(workouts: Workout[]) {
           setError(
             err instanceof Error
               ? err
-              : new Error('Une erreur est survenue lors du chargement des goals'),
+              : new Error('Une erreur est survenue lors du chargement des goals')
           );
           setGoals([]);
         }
@@ -141,9 +141,9 @@ export function useGoals(workouts: Workout[]) {
       updateGoal,
       setGoals,
       getCurrentWeight,
-      suggestTargetWeight,
+      suggestTargetWeight
     }),
-    [goals, loading, error, addGoal, deleteGoal, updateGoal],
+    [goals, loading, error, addGoal, deleteGoal, updateGoal]
   );
 
   return contextValue;

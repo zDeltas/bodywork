@@ -7,7 +7,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useHaptics } from '@/src/hooks/useHaptics';
@@ -24,12 +24,12 @@ export default function ContactScreen() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    message: '',
+    message: ''
   });
   const [errors, setErrors] = useState({
     name: '',
     email: '',
-    message: '',
+    message: ''
   });
   const haptics = useHaptics();
 
@@ -37,7 +37,7 @@ export default function ContactScreen() {
     const newErrors = {
       name: '',
       email: '',
-      message: '',
+      message: ''
     };
     let isValid = true;
 
@@ -74,9 +74,9 @@ export default function ContactScreen() {
       const response = await fetch('/api/send-email', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(formData)
       });
 
       if (!response.ok) {
@@ -179,13 +179,13 @@ const useStyles = () => {
   return StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: theme.colors.background.main,
+      backgroundColor: theme.colors.background.main
     },
     content: {
-      flex: 1,
+      flex: 1
     },
     contentContainer: {
-      padding: theme.spacing.lg,
+      padding: theme.spacing.lg
     },
     formContainer: {
       backgroundColor: theme.colors.background.card,
@@ -193,16 +193,16 @@ const useStyles = () => {
       padding: theme.spacing.lg,
       borderWidth: 1,
       borderColor: theme.colors.border.default,
-      ...theme.shadows.md,
+      ...theme.shadows.md
     },
     inputGroup: {
-      marginBottom: theme.spacing.lg,
+      marginBottom: theme.spacing.lg
     },
     label: {
       fontSize: theme.typography.fontSize.base,
       color: theme.colors.text.primary,
       marginBottom: theme.spacing.sm,
-      fontFamily: theme.typography.fontFamily.regular,
+      fontFamily: theme.typography.fontFamily.regular
     },
     input: {
       backgroundColor: theme.colors.background.main,
@@ -212,20 +212,20 @@ const useStyles = () => {
       color: theme.colors.text.primary,
       borderWidth: 1,
       borderColor: theme.colors.border.default,
-      fontFamily: theme.typography.fontFamily.regular,
+      fontFamily: theme.typography.fontFamily.regular
     },
     messageInput: {
       height: 120,
-      paddingTop: theme.spacing.md,
+      paddingTop: theme.spacing.md
     },
     inputError: {
-      borderColor: theme.colors.error,
+      borderColor: theme.colors.error
     },
     errorText: {
       color: theme.colors.error,
       fontSize: theme.typography.fontSize.sm,
       marginTop: theme.spacing.xs,
-      fontFamily: theme.typography.fontFamily.regular,
+      fontFamily: theme.typography.fontFamily.regular
     },
     submitButton: {
       backgroundColor: theme.colors.primary,
@@ -233,15 +233,15 @@ const useStyles = () => {
       padding: theme.spacing.md,
       alignItems: 'center',
       justifyContent: 'center',
-      marginTop: theme.spacing.md,
+      marginTop: theme.spacing.md
     },
     submitButtonDisabled: {
-      opacity: 0.7,
+      opacity: 0.7
     },
     submitButtonText: {
       color: theme.colors.text.primary,
       fontSize: theme.typography.fontSize.base,
-      fontFamily: theme.typography.fontFamily.bold,
-    },
+      fontFamily: theme.typography.fontFamily.bold
+    }
   });
 };

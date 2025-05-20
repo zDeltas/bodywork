@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { ArrowRight, Plus } from 'lucide-react-native';
-import { Routine } from '@/app/types/routine';
+import { Routine } from '@/types/common';
 import Button from '@/app/components/ui/Button';
 import { useTheme } from '@/app/hooks/useTheme';
+import { useTranslation } from '@/app/hooks/useTranslation';
 
 type EmptyStateProps = {
   onCreateRoutine: () => void;
@@ -11,30 +12,31 @@ type EmptyStateProps = {
   premadeRoutines: Routine[];
 };
 
-export const EmptyState = React.memo(({
-  onCreateRoutine,
-  onAddPremadeRoutine,
-  premadeRoutines
-}: EmptyStateProps) => {
+const EmptyState = React.memo(({
+                                 onCreateRoutine,
+                                 onAddPremadeRoutine,
+                                 premadeRoutines
+                               }: EmptyStateProps) => {
   const { theme } = useTheme();
+  const { t } = useTranslation();
   const styles = useStyles(theme);
 
   return (
     <View style={styles.emptyContainer}>
-      <Text style={styles.emptyTitle}>Aucune routine pour l'instant</Text>
+      <Text style={styles.emptyTitle}>{t('routines.emptyState.title')}</Text>
       <Text style={styles.emptyText}>
-        Créez votre première routine d'entraînement ou choisissez parmi nos suggestions
+        {t('routines.emptyState.description')}
       </Text>
       <View style={styles.emptyActions}>
         <Button
-          title="Créer ma première routine"
+          title={t('routines.emptyState.createButton')}
           onPress={onCreateRoutine}
           style={styles.createButton}
           icon={<Plus size={20} color={theme.colors.background.main} />}
         />
-        <Text style={styles.emptyOrText}>ou</Text>
+        <Text style={styles.emptyOrText}>{t('common.or')}</Text>
         <View style={styles.premadeContainer}>
-          <Text style={styles.premadeTitle}>Suggestions</Text>
+          <Text style={styles.premadeTitle}>{t('routines.emptyState.suggestions')}</Text>
           {premadeRoutines.map((routine) => (
             <TouchableOpacity
               key={routine.id}
@@ -46,10 +48,10 @@ export const EmptyState = React.memo(({
                 <Text style={styles.premadeCardDescription}>{routine.description}</Text>
                 <View style={styles.premadeStats}>
                   <Text style={styles.premadeStat}>
-                    {routine.exercises.length} exercices
+                    {routine.exercises.length} {t('common.exercises')}
                   </Text>
                   <Text style={styles.premadeStat}>
-                    {routine.exercises.reduce((total, ex) => total + ex.series.length, 0)} séries
+                    {routine.exercises.reduce((total, ex) => total + ex.series.length, 0)} {t('common.series')}
                   </Text>
                 </View>
               </View>
@@ -136,4 +138,6 @@ const useStyles = (theme: any) => StyleSheet.create({
   createButton: {
     backgroundColor: theme.colors.primary
   }
-}); 
+});
+
+export default EmptyState; 

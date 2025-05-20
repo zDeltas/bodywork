@@ -1,12 +1,5 @@
 import React, { useState } from 'react';
-import {
-  Alert,
-  Linking,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Alert, Linking, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -47,7 +40,7 @@ const SettingItem = ({ icon, label, onPress, subLabel, variant = 'default' }: Se
       style={[
         styles.settingItem,
         variant === 'primary' && styles.settingItemPrimary,
-        variant === 'secondary' && styles.settingItemSecondary,
+        variant === 'secondary' && styles.settingItemSecondary
       ]}
       onPress={() => {
         haptics.impactLight();
@@ -62,7 +55,7 @@ const SettingItem = ({ icon, label, onPress, subLabel, variant = 'default' }: Se
               style={[
                 styles.settingLabel,
                 variant === 'primary' && styles.settingLabelPrimary,
-                variant === 'secondary' && styles.settingLabelSecondary,
+                variant === 'secondary' && styles.settingLabelSecondary
               ]}
             >
               {label}
@@ -74,7 +67,7 @@ const SettingItem = ({ icon, label, onPress, subLabel, variant = 'default' }: Se
             style={[
               styles.settingLabel,
               variant === 'primary' && styles.settingLabelPrimary,
-              variant === 'secondary' && styles.settingLabelSecondary,
+              variant === 'secondary' && styles.settingLabelSecondary
             ]}
           >
             {label}
@@ -212,29 +205,29 @@ const useStyles = () => {
   return StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: theme.colors.background.main,
+      backgroundColor: theme.colors.background.main
     },
     content: {
       flex: 1,
-      padding: theme.spacing.lg,
+      padding: theme.spacing.lg
     },
     contentContainer: {
-      paddingBottom: 100,
+      paddingBottom: 100
     },
     section: {
-      marginBottom: theme.spacing.xl,
+      marginBottom: theme.spacing.xl
     },
     sectionTitle: {
       fontSize: theme.typography.fontSize.lg,
       fontFamily: theme.typography.fontFamily.bold,
       color: theme.colors.primary,
-      marginBottom: theme.spacing.md,
+      marginBottom: theme.spacing.md
     },
     sectionDescription: {
       fontSize: theme.typography.fontSize.base,
       color: theme.colors.text.secondary,
       marginBottom: theme.spacing.lg,
-      fontFamily: theme.typography.fontFamily.regular,
+      fontFamily: theme.typography.fontFamily.regular
     },
     settingItem: {
       flexDirection: 'row',
@@ -242,48 +235,48 @@ const useStyles = () => {
       alignItems: 'center',
       paddingVertical: theme.spacing.md,
       borderBottomWidth: 1,
-      borderBottomColor: theme.colors.border.default,
+      borderBottomColor: theme.colors.border.default
     },
     settingItemPrimary: {
       backgroundColor: theme.colors.background.card,
       borderRadius: theme.borderRadius.md,
       marginBottom: theme.spacing.sm,
       borderBottomWidth: 0,
-      padding: theme.spacing.md,
+      padding: theme.spacing.md
     },
     settingItemSecondary: {
       backgroundColor: 'transparent',
-      borderBottomWidth: 0,
+      borderBottomWidth: 0
     },
     settingInfo: {
       flexDirection: 'row',
-      alignItems: 'center',
+      alignItems: 'center'
     },
     settingLabel: {
       fontSize: theme.typography.fontSize.base,
       color: theme.colors.text.primary,
       marginLeft: theme.spacing.md,
-      fontFamily: theme.typography.fontFamily.regular,
+      fontFamily: theme.typography.fontFamily.regular
     },
     settingLabelPrimary: {
       color: theme.colors.primary,
-      fontFamily: theme.typography.fontFamily.semiBold,
+      fontFamily: theme.typography.fontFamily.semiBold
     },
     settingLabelSecondary: {
-      color: theme.colors.text.secondary,
+      color: theme.colors.text.secondary
     },
     settingSubLabel: {
       fontSize: theme.typography.fontSize.sm,
       color: theme.colors.text.secondary,
       marginLeft: theme.spacing.md,
-      fontFamily: theme.typography.fontFamily.regular,
+      fontFamily: theme.typography.fontFamily.regular
     },
     modalOverlay: {
       flex: 1,
       backgroundColor: 'rgba(0, 0, 0, 0.5)',
       justifyContent: 'center',
       alignItems: 'center',
-      padding: theme.spacing.lg,
+      padding: theme.spacing.lg
     },
     modalContent: {
       backgroundColor: theme.colors.background.card,
@@ -291,27 +284,27 @@ const useStyles = () => {
       padding: theme.spacing.lg,
       width: '100%',
       maxWidth: 400,
-      alignItems: 'center',
+      alignItems: 'center'
     },
     modalTitle: {
       fontSize: theme.typography.fontSize.xl,
       fontFamily: theme.typography.fontFamily.bold,
       color: theme.colors.text.primary,
       marginBottom: theme.spacing.md,
-      textAlign: 'center',
+      textAlign: 'center'
     },
     modalMessage: {
       fontSize: theme.typography.fontSize.base,
       color: theme.colors.text.secondary,
       marginBottom: theme.spacing.xl,
-      textAlign: 'center',
+      textAlign: 'center'
     },
     modalButtons: {
       width: '100%',
       flexDirection: 'row',
       justifyContent: 'center',
       gap: theme.spacing.md,
-      marginTop: theme.spacing.md,
+      marginTop: theme.spacing.md
     },
     modalButton: {
       paddingVertical: theme.spacing.sm,
@@ -319,32 +312,32 @@ const useStyles = () => {
       borderRadius: theme.borderRadius.full,
       alignItems: 'center',
       justifyContent: 'center',
-      minWidth: 120,
+      minWidth: 120
     },
     modalButtonPrimary: {
-      backgroundColor: theme.colors.primary,
+      backgroundColor: theme.colors.primary
     },
     modalButtonSecondary: {
       backgroundColor: 'transparent',
       borderWidth: 1,
-      borderColor: theme.colors.border.default,
+      borderColor: theme.colors.border.default
     },
     modalButtonText: {
       fontSize: theme.typography.fontSize.base,
       fontFamily: theme.typography.fontFamily.regular,
-      color: theme.colors.text.primary,
+      color: theme.colors.text.primary
     },
     userInfo: {
       padding: theme.spacing.md,
       backgroundColor: theme.colors.background.card,
       borderRadius: theme.borderRadius.md,
-      marginBottom: theme.spacing.md,
+      marginBottom: theme.spacing.md
     },
     userEmail: {
       fontSize: theme.typography.fontSize.base,
       color: theme.colors.text.primary,
-      fontFamily: theme.typography.fontFamily.regular,
-    },
+      fontFamily: theme.typography.fontFamily.regular
+    }
   });
 };
 

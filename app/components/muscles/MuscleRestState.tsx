@@ -1,5 +1,5 @@
 import React from 'react';
-import { Animated, StyleSheet, Text, View } from 'react-native';
+import { Animated, StyleSheet, Text } from 'react-native';
 import MuscleMap from '@/app/components/muscles/MuscleMap';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
@@ -21,14 +21,14 @@ const MuscleRestState: React.FC<MuscleRestStateProps> = ({ fadeAnim, workouts })
       padding: theme.spacing.lg,
       marginHorizontal: theme.spacing.lg,
       marginBottom: theme.spacing.xl,
-      ...theme.shadows.sm,
+      ...theme.shadows.sm
     },
     chartTitle: {
       fontSize: theme.typography.fontSize.lg,
       fontFamily: theme.typography.fontFamily.bold,
       marginBottom: theme.spacing.lg,
-      color: theme.colors.text.primary,
-    },
+      color: theme.colors.text.primary
+    }
   });
 
   return (

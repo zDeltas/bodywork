@@ -10,6 +10,7 @@ import Header from '@/app/components/layout/Header';
 import { Workout, WorkoutDateUtils } from '@/types/workout';
 import { useWorkouts } from '@/app/hooks/useWorkouts';
 import FloatButtonAction from '@/app/components/ui/FloatButtonAction';
+import { TranslationKey } from '@/translations';
 
 LocaleConfig.locales['fr'] = {
   monthNames: [

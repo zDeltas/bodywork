@@ -37,13 +37,11 @@ const calculateStats = (routine: Routine): RoutineStats => {
       return seriesTotal + (minutes * 60 + seconds);
     }, 0);
   }, 0) / 60);
-  const isRecent = new Date(routine.createdAt).getTime() > Date.now() - 7 * 24 * 60 * 60 * 1000;
 
   return {
     totalExercises: routine.exercises.length,
     totalSeries,
-    estimatedTime,
-    isRecent
+    estimatedTime
   };
 };
 
@@ -113,11 +111,6 @@ const RoutineItem = React.memo(({
         <View style={styles.routineHeader}>
           <View style={styles.routineTitleContainer}>
             <Text style={styles.routineTitle}>{item.title}</Text>
-            {stats.isRecent && (
-              <View style={styles.newBadge}>
-                <Text style={styles.newBadgeText}>{t('routines.item.new')}</Text>
-              </View>
-            )}
           </View>
           <TouchableOpacity onPress={() => onToggleFavorite(item.id)}>
             <Star
@@ -219,24 +212,12 @@ const useStyles = (theme: any) => StyleSheet.create({
   },
   routineTitleContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8
+    alignItems: 'center'
   },
   routineTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     color: theme.colors.text.primary
-  },
-  newBadge: {
-    backgroundColor: theme.colors.primary,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 12
-  },
-  newBadgeText: {
-    color: theme.colors.background.main,
-    fontSize: 12,
-    fontWeight: '600'
   },
   routineDescription: {
     fontSize: 14,

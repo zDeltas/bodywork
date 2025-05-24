@@ -32,7 +32,6 @@ export interface RoutineStats {
   totalExercises: number;
   totalSeries: number;
   estimatedTime: number;
-  isRecent: boolean;
 }
 
 export interface Workout {

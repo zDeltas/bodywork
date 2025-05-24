@@ -189,7 +189,6 @@ export default function RoutinesListScreen() {
         <FloatButtonAction
           icon={<Plus size={24} color={theme.colors.background.main} />}
           onPress={handleCreateRoutine}
-          style={[styles.fabHidden]}
         />
       </View>
     </GestureHandlerRootView>
@@ -226,8 +225,4 @@ const useStyles = (theme: any) => StyleSheet.create({
   filterButtonActive: {
     backgroundColor: theme.colors.primary + '20'
   },
-  fabHidden: {
-    opacity: 0,
-    transform: [{ scale: 0 }]
-  }
-}); 
+});

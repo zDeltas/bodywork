@@ -290,6 +290,7 @@ export default {
     history: 'Historique',
     historyOf: 'Historique {part}',
     noData: 'Aucune donnée',
+    notEnoughData: 'Plus de données nécessaires pour le graphique',
     noHistoryData: 'Aucune donnée d\'historique disponible',
     noDataForSelection: 'Aucune donnée pour cette sélection',
     inputMode: 'Saisie',
@@ -398,11 +399,15 @@ export default {
 
   // Routines
   routines: {
+    title: 'Mes routines',
     emptyState: {
-      title: 'Aucune routine pour l\'instant',
-      description: 'Créez votre première routine d\'entraînement ou choisissez parmi nos suggestions',
-      createButton: 'Créer ma première routine',
-      suggestions: 'Suggestions'
+      title: 'Aucune routine',
+      description: 'Créez votre première routine d\'entraînement',
+      button: 'Créer une routine'
+    },
+    noFavorites: {
+      title: 'Aucun favori',
+      description: 'Vous avez des routines mais aucune n\'est marquée comme favorite',
     },
     item: {
       new: 'Nouveau',
@@ -414,12 +419,32 @@ export default {
       usages: 'utilisations',
       usage: 'utilisation',
       lastUsed: 'Dernière utilisation :',
-      createdOn: 'Créée le',
+      createdOn: 'Créée le :',
       actions: 'Actions',
       edit: 'Modifier',
       share: 'Partager',
       delete: 'Supprimer',
       start: 'Démarrer'
+    }
+  },
+
+  // Calendar
+  calendar: {
+    weekOf: 'Semaine du',
+    today: 'Aujourd\'hui',
+    months: {
+      0: 'Janvier',
+      1: 'Février',
+      2: 'Mars',
+      3: 'Avril',
+      4: 'Mai',
+      5: 'Juin',
+      6: 'Juillet',
+      7: 'Août',
+      8: 'Septembre',
+      9: 'Octobre',
+      10: 'Novembre',
+      11: 'Décembre'
     }
   }
 };

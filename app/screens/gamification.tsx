@@ -1,7 +1,7 @@
 import React from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
+import { Trophy } from 'lucide-react-native';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
 import Header from '@/app/components/layout/Header';
@@ -22,7 +22,7 @@ function GamificationScreen() {
       />
       <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
         <View style={styles.constructionContainer}>
-          <Ionicons name="trophy-outline" size={64} color={theme.colors.primary} />
+          <Trophy size={64} color={theme.colors.primary} />
           <Text style={styles.constructionTitle}>{t('common.inConstruction')}</Text>
           <Text style={styles.constructionText}>{t('common.featureComingSoon')}</Text>
         </View>

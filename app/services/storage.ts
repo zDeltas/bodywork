@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Goal, Workout } from '../types/common';
+import { Goal, Workout } from '@/types/common';
 
 // Énumérations pour les clés de stockage
 export enum StorageKeys {
@@ -100,7 +100,8 @@ class StorageService {
         StorageKeys.GOALS,
         StorageKeys.MEASUREMENTS,
         StorageKeys.FAVORITE_EXERCISES,
-        StorageKeys.RECENT_EXERCISES
+        StorageKeys.RECENT_EXERCISES,
+        StorageKeys.ROUTINES
       ];
 
       // Supprimer les données

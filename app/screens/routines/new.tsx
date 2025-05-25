@@ -454,7 +454,7 @@ export default function NewRoutineScreen() {
           }
           setShowTimerPicker(false);
         }}
-        modalTitle={t('workout.selectRestTime' as any)}
+        modalTitle={t('routine.selectRestTime')}
         hideHours
       />
     </Modal>
@@ -844,9 +844,13 @@ const useStyles = (theme: any) => StyleSheet.create({
     height: 48
   },
   secondaryButton: {
-    backgroundColor: theme.colors.background.button,
-    marginVertical: theme.spacing.sm,
-    height: 48
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.colors.background.card,
+    padding: theme.spacing.base,
+    borderRadius: theme.borderRadius.md,
+    marginTop: theme.spacing.base
   },
   modalBackButton: {
     width: 44,

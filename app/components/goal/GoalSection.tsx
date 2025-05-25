@@ -1,6 +1,6 @@
 import React from 'react';
 import { Alert, Animated, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Trash2, PlusCircle } from 'lucide-react-native';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
 import { useHaptics } from '@/src/hooks/useHaptics';
@@ -167,7 +167,7 @@ const GoalSection: React.FC<GoalSectionProps> = ({ fadeAnim }) => {
                     );
                   }}
                 >
-                  <Ionicons name="trash-outline" size={18} color={theme.colors.error} />
+                  <Trash2 size={18} color={theme.colors.error} />
                 </TouchableOpacity>
               </View>
             </View>
@@ -205,7 +205,7 @@ const GoalSection: React.FC<GoalSectionProps> = ({ fadeAnim }) => {
           router.push('/screens/goal/new');
         }}
       >
-        <Ionicons name="add-circle" size={20} color={theme.colors.primary} />
+        <PlusCircle size={20} color={theme.colors.primary} />
         <Text style={styles.addGoalText}>{t('goals.addGoal')}</Text>
       </TouchableOpacity>
     </Animated.View>

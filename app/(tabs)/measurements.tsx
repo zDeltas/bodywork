@@ -297,7 +297,17 @@ export default function MeasurementsScreen() {
   );
 
   const renderHistoryMode = () => (
-    <MeasurementHistory measurements={allMeasurements} isLoading={loading} />
+    <MeasurementHistory 
+      measurements={allMeasurements} 
+      isLoading={loading} 
+      onAddMeasurement={(key) => {
+        if (key === 'weight') {
+          openWeightModal();
+        } else {
+          openMeasurementModal(key);
+        }
+      }}
+    />
   );
 
   return (

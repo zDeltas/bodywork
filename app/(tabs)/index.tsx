@@ -1,84 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
-import { Activity, Dumbbell, Layers, Plus, Repeat } from 'lucide-react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Activity, CircleUser, Dumbbell, Layers, Plus, Repeat } from 'lucide-react-native';
 import Header from '@/app/components/layout/Header';
 import { Workout, WorkoutDateUtils } from '@/types/workout';
 import { useWorkouts } from '@/app/hooks/useWorkouts';
 import FloatButtonAction from '@/app/components/ui/FloatButtonAction';
+import WeeklyCalendar from '@/app/components/ui/WeeklyCalendar';
 import { TranslationKey } from '@/translations';
-
-LocaleConfig.locales['fr'] = {
-  monthNames: [
-    'Janvier',
-    'Février',
-    'Mars',
-    'Avril',
-    'Mai',
-    'Juin',
-    'Juillet',
-    'Août',
-    'Septembre',
-    'Octobre',
-    'Novembre',
-    'Décembre'
-  ],
-  monthNamesShort: [
-    'Janv.',
-    'Févr.',
-    'Mars',
-    'Avril',
-    'Mai',
-    'Juin',
-    'Juil.',
-    'Août',
-    'Sept.',
-    'Oct.',
-    'Nov.',
-    'Déc.'
-  ],
-  dayNames: ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'],
-  dayNamesShort: ['Dim.', 'Lun.', 'Mar.', 'Mer.', 'Jeu.', 'Ven.', 'Sam.'],
-  today: 'Aujourd\'hui'
-};
-
-LocaleConfig.locales['en'] = {
-  monthNames: [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December'
-  ],
-  monthNamesShort: [
-    'Jan.',
-    'Feb.',
-    'Mar.',
-    'Apr.',
-    'May',
-    'Jun.',
-    'Jul.',
-    'Aug.',
-    'Sep.',
-    'Oct.',
-    'Nov.',
-    'Dec.'
-  ],
-  dayNames: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-  dayNamesShort: ['Sun.', 'Mon.', 'Tue.', 'Wed.', 'Thu.', 'Fri.', 'Sat.'],
-  today: 'Today'
-};
 
 /**
  * Interface pour les informations d'une série de travail
@@ -146,9 +77,6 @@ export default function WorkoutScreen() {
   const markedDates = workouts.reduce<Record<string, MarkedDate>>((acc, workout) => {
     const date = WorkoutDateUtils.getDatePart(workout.date);
     acc[date] = { marked: true, dotColor: theme.colors.primary };
-    if (date === selectedDate) {
-      acc[date].selected = true;
-    }
     return acc;
   }, {});
 
@@ -165,42 +93,21 @@ export default function WorkoutScreen() {
       <Header
         title={t('common.appTitle')}
         rightComponent={
-          <TouchableOpacity onPress={() => router.push('/screens/profile')}>
-            <Ionicons name="person-outline" size={24} color={theme.colors.primary} />
-          </TouchableOpacity>
+          <View>
+            <TouchableOpacity onPress={() => router.push('/screens/profile')}>
+              <CircleUser size={24} color={theme.colors.primary} />
+            </TouchableOpacity>
+          </View>
         }
       />
+
       <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: 100 }}>
-        <View style={styles.calendarContainer}>
-          <Calendar
-            key={theme.colors.background.main}
-            theme={{
-              backgroundColor: theme.colors.background.card,
-              calendarBackground: theme.colors.background.card,
-              textSectionTitleColor: theme.colors.text.secondary,
-              textSectionTitleDisabledColor: theme.colors.border.default,
-              selectedDayBackgroundColor: theme.colors.primary,
-              selectedDayTextColor: theme.colors.text.primary,
-              todayTextColor: theme.colors.primary,
-              dayTextColor: theme.colors.text.primary,
-              textDisabledColor: theme.colors.text.disabled,
-              dotColor: theme.colors.primary,
-              selectedDotColor: theme.colors.text.primary,
-              arrowColor: theme.colors.primary,
-              monthTextColor: theme.colors.text.primary,
-              indicatorColor: theme.colors.primary,
-              textDayFontFamily: theme.typography.fontFamily.regular,
-              textMonthFontFamily: theme.typography.fontFamily.semiBold,
-              textDayHeaderFontFamily: theme.typography.fontFamily.regular,
-              textDayFontSize: theme.typography.fontSize.base,
-              textMonthFontSize: theme.typography.fontSize.lg,
-              textDayHeaderFontSize: theme.typography.fontSize.md
-            }}
-            markedDates={markedDates}
-            onDayPress={(day: { dateString: string }) => setSelectedDate(day.dateString)}
-            enableSwipeMonths={true}
-          />
-        </View>
+        <WeeklyCalendar
+          selectedDate={selectedDate}
+          onDateSelect={setSelectedDate}
+          markedDates={markedDates}
+        />
+        
         {loading ? (
           <View style={styles.noWorkoutContainer}>
             <Text style={styles.noWorkoutText}>{t('common.loading')}</Text>
@@ -415,15 +322,6 @@ const useStyles = () => {
       fontSize: theme.typography.fontSize.base,
       color: theme.colors.text.secondary,
       textAlign: 'center'
-    },
-    calendarContainer: {
-      borderRadius: theme.borderRadius.lg,
-      overflow: 'hidden',
-      marginTop: theme.spacing.sm,
-      marginLeft: theme.spacing.sm,
-      marginRight: theme.spacing.sm,
-      marginBottom: theme.spacing.sm,
-      ...theme.shadows.md
     }
   });
 };

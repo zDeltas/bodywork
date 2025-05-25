@@ -3835,11 +3835,10 @@ __metadata:
     react: "npm:19.0.0"
     react-dom: "npm:19.0.0"
     react-native: "npm:0.79.2"
-    react-native-background-timer: "npm:^2.4.1"
     react-native-body-highlighter: "npm:^3.1.3"
     react-native-calendars: "npm:^1.1312.0"
     react-native-curved-bottom-bar: "npm:^3.5.1"
-    react-native-gesture-handler: "npm:~2.24.0"
+    react-native-gesture-handler: "npm:^2.26.0"
     react-native-reanimated: "npm:~3.17.5"
     react-native-safe-area-context: "npm:5.4.0"
     react-native-screens: "npm:~4.10.0"
@@ -8832,15 +8831,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-background-timer@npm:^2.4.1":
-  version: 2.4.1
-  resolution: "react-native-background-timer@npm:2.4.1"
-  peerDependencies:
-    react-native: ">=0.47.0"
-  checksum: 10c0/beb0b45e138bdb0e0083ada6aa7c841f031670d655e915673cae11112788a219a232ed556a33e11253698f00045b71f40b5e31c88743825379b91f38125e03f7
-  languageName: node
-  linkType: hard
-
 "react-native-body-highlighter@npm:^3.1.3":
   version: 3.1.3
   resolution: "react-native-body-highlighter@npm:3.1.3"
@@ -8899,9 +8889,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-gesture-handler@npm:~2.24.0":
-  version: 2.24.0
-  resolution: "react-native-gesture-handler@npm:2.24.0"
+"react-native-gesture-handler@npm:^2.26.0":
+  version: 2.26.0
+  resolution: "react-native-gesture-handler@npm:2.26.0"
   dependencies:
     "@egjs/hammerjs": "npm:^2.0.17"
     hoist-non-react-statics: "npm:^3.3.0"
@@ -8909,7 +8899,7 @@ __metadata:
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 10c0/eb2c5cb53690ae5de1482370a156cbd775f6b3054540cd47310ec4712df83a280fe7b6259f372eec4c14a6d7f70ab18f1919a9fe63beaca9ceae126edbe32298
+  checksum: 10c0/43aee4f0aeb7be9e2e72a9abaeaff38104c188a44ffc1a5634940a851adca5f10ee3a8d1b4828eb654574d4d45aa0f0c2af5a7b4ed2e9bca4e76d0d932f13955
   languageName: node
   linkType: hard
 

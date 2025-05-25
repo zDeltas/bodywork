@@ -55,7 +55,14 @@ export default {
     resetData: 'Reset Data',
     resetDataConfirmation: 'Are you sure you want to reset all data? This action cannot be undone.',
     dataResetSuccess: 'All data has been successfully reset.',
-    errorResettingData: 'An error occurred while resetting the data.'
+    errorResettingData: 'An error occurred while resetting the data.',
+    routines: {
+      title: 'Routines',
+      deleteAll: 'Delete All Routines',
+      deleteAllConfirmation: 'Are you sure you want to delete all routines? This action cannot be undone.',
+      deleteAllSuccess: 'All routines have been successfully deleted.',
+      deleteAllError: 'An error occurred while deleting routines.'
+    }
   },
 
   // About section
@@ -396,11 +403,15 @@ export default {
 
   // Routines
   routines: {
+    title: 'My Routines',
     emptyState: {
       title: 'No routines yet',
-      description: 'Create your first workout routine or choose from our suggestions',
-      createButton: 'Create my first routine',
-      suggestions: 'Suggestions'
+      description: 'Create your first workout routine to get started',
+      button: 'Create routine'
+    },
+    noFavorites: {
+      title: 'No favorites',
+      description: 'You have routines but none are marked as favorites',
     },
     item: {
       new: 'New',
@@ -418,6 +429,26 @@ export default {
       share: 'Share',
       delete: 'Delete',
       start: 'Start'
+    }
+  },
+
+  // Calendar
+  calendar: {
+    weekOf: 'Week of',
+    today: 'Today',
+    months: {
+      0: 'January',
+      1: 'February',
+      2: 'March',
+      3: 'April',
+      4: 'May',
+      5: 'June',
+      6: 'July',
+      7: 'August',
+      8: 'September',
+      9: 'October',
+      10: 'November',
+      11: 'December'
     }
   }
 };

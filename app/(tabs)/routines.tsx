@@ -10,7 +10,9 @@ import { useHaptics } from '@/src/hooks/useHaptics';
 import { Routine } from '@/types/common';
 import RoutineItem from '@/app/components/routines/RoutineItem';
 import EmptyState from '@/app/components/routines/EmptyState';
-import PREMADE_ROUTINES from '@/app/data/premadeRoutines';
+import Header from '@/app/components/layout/Header';
+import { useTranslation } from '@/app/hooks/useTranslation';
+import { TranslationKey } from '@/translations';
 
 export default function RoutinesListScreen() {
   const [routines, setRoutines] = useState<Routine[]>([]);
@@ -19,6 +21,7 @@ export default function RoutinesListScreen() {
   const { theme } = useTheme();
   const styles = useStyles(theme);
   const haptics = useHaptics();
+  const { t } = useTranslation();
 
   useEffect(() => {
     loadRoutines();
@@ -139,16 +142,16 @@ export default function RoutinesListScreen() {
   };
 
   const filteredRoutines = routines.filter(routine => {
-    const matchesFavorite = !showFavoritesOnly || routine.favorite;
-    return matchesFavorite;
+    return !showFavoritesOnly || routine.favorite;
   });
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <View style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Mes routines</Text>
-          <View style={styles.headerActions}>
+        <Header
+          title={t('routines.title' as TranslationKey)}
+          showBackButton={false}
+          rightComponent={
             <TouchableOpacity
               style={[styles.filterButton, showFavoritesOnly && styles.filterButtonActive]}
               onPress={() => {
@@ -162,8 +165,8 @@ export default function RoutinesListScreen() {
                 fill={showFavoritesOnly ? theme.colors.primary : 'none'}
               />
             </TouchableOpacity>
-          </View>
-        </View>
+          }
+        />
 
         <FlatList
           data={filteredRoutines}
@@ -178,11 +181,11 @@ export default function RoutinesListScreen() {
             />
           )}
           keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.listContent}
           ListEmptyComponent={
             <EmptyState
               onCreateRoutine={handleCreateRoutine}
-              onAddPremadeRoutine={handleAddPremadeRoutine}
-              premadeRoutines={PREMADE_ROUTINES}
+              isFavoritesEmpty={showFavoritesOnly && routines.length > 0}
             />
           }
         />
@@ -198,24 +201,11 @@ export default function RoutinesListScreen() {
 const useStyles = (theme: any) => StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
     backgroundColor: theme.colors.background.main
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 16,
-    color: theme.colors.text.primary
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16
-  },
-  headerActions: {
-    flexDirection: 'row',
-    alignItems: 'center'
+  listContent: {
+    flexGrow: 1,
+    padding: 16
   },
   filterButton: {
     padding: 8,
@@ -224,5 +214,5 @@ const useStyles = (theme: any) => StyleSheet.create({
   },
   filterButtonActive: {
     backgroundColor: theme.colors.primary + '20'
-  },
+  }
 });

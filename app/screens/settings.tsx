@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ActivityIndicator, Alert, Linking, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
+import { User, ChevronRight, Scale, Languages, SunMoon, Download, Trash2, Linkedin, Mail } from 'lucide-react-native';
 import { BlurView } from 'expo-blur';
 import { useSettings } from '@/app/hooks/useSettings';
 import { useTranslation } from '@/app/hooks/useTranslation';
@@ -96,51 +96,51 @@ export default function SettingsScreen() {
 
             <View style={styles.settingItem}>
               <View style={styles.settingInfo}>
-                <Ionicons name="body-outline" size={24} color={theme.colors.primary} />
+                <User size={24} color={theme.colors.primary} />
                 <Text style={styles.settingLabel}>{t('settings.gender')}</Text>
               </View>
               <TouchableOpacity style={styles.settingControl} onPress={toggleGender}>
                 <Text style={styles.settingValue}>
                   {settings.gender === 'male' ? t('settings.male') : t('settings.female')}
                 </Text>
-                <Ionicons name="chevron-forward" size={20} color={theme.colors.text.secondary} />
+                <ChevronRight size={20} color={theme.colors.text.secondary} />
               </TouchableOpacity>
             </View>
 
             <View style={styles.settingItem}>
               <View style={styles.settingInfo}>
-                <Ionicons name="scale-outline" size={24} color={theme.colors.primary} />
+                <Scale size={24} color={theme.colors.primary} />
                 <Text style={styles.settingLabel}>{t('settings.weightUnit')}</Text>
               </View>
               <TouchableOpacity style={styles.settingControl} onPress={toggleWeightUnit}>
                 <Text style={styles.settingValue}>{settings.weightUnit.toUpperCase()}</Text>
-                <Ionicons name="chevron-forward" size={20} color={theme.colors.text.secondary} />
+                <ChevronRight size={20} color={theme.colors.text.secondary} />
               </TouchableOpacity>
             </View>
 
             <View style={styles.settingItem}>
               <View style={styles.settingInfo}>
-                <Ionicons name="language-outline" size={24} color={theme.colors.primary} />
+                <Languages size={24} color={theme.colors.primary} />
                 <Text style={styles.settingLabel}>{t('settings.language')}</Text>
               </View>
               <TouchableOpacity style={styles.settingControl} onPress={toggleLanguage}>
                 <Text style={styles.settingValue}>
                   {settings.language === 'en' ? t('settings.english') : t('settings.french')}
                 </Text>
-                <Ionicons name="chevron-forward" size={20} color={theme.colors.text.secondary} />
+                <ChevronRight size={20} color={theme.colors.text.secondary} />
               </TouchableOpacity>
             </View>
 
             <View style={styles.settingItem}>
               <View style={styles.settingInfo}>
-                <Ionicons name="contrast-outline" size={24} color={theme.colors.primary} />
+                <SunMoon size={24} color={theme.colors.primary} />
                 <Text style={styles.settingLabel}>{t('settings.theme')}</Text>
               </View>
               <TouchableOpacity style={styles.settingControl} onPress={toggleTheme}>
                 <Text style={styles.settingValue}>
                   {settings.theme === 'dark' ? t('settings.dark') : t('settings.light')}
                 </Text>
-                <Ionicons name="chevron-forward" size={20} color={theme.colors.text.secondary} />
+                <ChevronRight size={20} color={theme.colors.text.secondary} />
               </TouchableOpacity>
             </View>
           </View>
@@ -154,24 +154,24 @@ export default function SettingsScreen() {
               disabled={isExporting}
             >
               <View style={styles.settingInfo}>
-                <Ionicons name="download-outline" size={24} color={theme.colors.primary} />
+                <Download size={24} color={theme.colors.primary} />
                 <Text style={styles.settingLabel}>{t('settings.exportData')}</Text>
               </View>
               {isExporting ? (
                 <ActivityIndicator size="small" color={theme.colors.primary} />
               ) : (
-                <Ionicons name="chevron-forward" size={20} color={theme.colors.text.secondary} />
+                <ChevronRight size={20} color={theme.colors.text.secondary} />
               )}
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.settingItem} onPress={handleResetData}>
               <View style={styles.settingInfo}>
-                <Ionicons name="trash-outline" size={24} color={theme.colors.error} />
+                <Trash2 size={24} color={theme.colors.error} />
                 <Text style={[styles.settingLabel, { color: theme.colors.error }]}>
                   {t('settings.resetData')}
                 </Text>
               </View>
-              <Ionicons name="chevron-forward" size={20} color={theme.colors.text.secondary} />
+              <ChevronRight size={20} color={theme.colors.text.secondary} />
             </TouchableOpacity>
 
             {/*<TouchableOpacity*/}
@@ -190,14 +190,10 @@ export default function SettingsScreen() {
 
             <TouchableOpacity style={styles.settingItem} onPress={toggleAbout}>
               <View style={styles.settingInfo}>
-                <Ionicons
-                  name="information-circle-outline"
-                  size={24}
-                  color={theme.colors.primary}
-                />
+                <Mail size={24} color={theme.colors.primary} />
                 <Text style={styles.settingLabel}>{t('settings.about')}</Text>
               </View>
-              <Ionicons name="chevron-forward" size={20} color={theme.colors.text.secondary} />
+              <ChevronRight size={20} color={theme.colors.text.secondary} />
             </TouchableOpacity>
           </View>
 
@@ -218,7 +214,7 @@ export default function SettingsScreen() {
                     Linking.openURL('https://www.linkedin.com/in/damien-le-borgne-997b991a1/')
                   }
                 >
-                  <Ionicons name="logo-linkedin" size={20} color={theme.colors.primary} />
+                  <Linkedin size={20} color={theme.colors.primary} />
                   <Text style={styles.aboutLinkText}>Linkedin</Text>
                 </TouchableOpacity>
 

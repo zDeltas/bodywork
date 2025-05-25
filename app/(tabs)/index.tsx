@@ -4,8 +4,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
-import { Activity, Dumbbell, Layers, Plus, Repeat } from 'lucide-react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Activity, CircleUser, Dumbbell, Layers, Plus, Repeat } from 'lucide-react-native';
 import Header from '@/app/components/layout/Header';
 import { Workout, WorkoutDateUtils } from '@/types/workout';
 import { useWorkouts } from '@/app/hooks/useWorkouts';
@@ -165,11 +164,14 @@ export default function WorkoutScreen() {
       <Header
         title={t('common.appTitle')}
         rightComponent={
-          <TouchableOpacity onPress={() => router.push('/screens/profile')}>
-            <Ionicons name="person-outline" size={24} color={theme.colors.primary} />
-          </TouchableOpacity>
+          <View>
+            <TouchableOpacity onPress={() => router.push('/screens/profile')}>
+              <CircleUser size={24} color={theme.colors.primary} />
+            </TouchableOpacity>
+          </View>
         }
       />
+
       <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: 100 }}>
         <View style={styles.calendarContainer}>
           <Calendar

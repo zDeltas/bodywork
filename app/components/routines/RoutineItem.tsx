@@ -164,7 +164,7 @@ const RoutineItem = React.memo(({
       <Modal
         visible={showActionsModal}
         onClose={() => setShowActionsModal(false)}
-        title={t('routines.item.actions')}
+        title={item.title}
       >
         <View style={styles.modalActions}>
           <TouchableOpacity

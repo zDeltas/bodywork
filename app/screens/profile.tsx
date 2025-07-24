@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Alert, Linking, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
+import { User, Trophy, Instagram, Share2, Star, ChevronRight } from 'lucide-react-native';
 import { router } from 'expo-router';
 
 import { useTranslation } from '@/app/hooks/useTranslation';
@@ -12,7 +12,7 @@ import { useHaptics } from '@/src/hooks/useHaptics';
 import Modal from '@/app/components/ui/Modal';
 
 interface SettingItemProps {
-  icon: keyof typeof Ionicons.glyphMap;
+  icon: React.ReactNode;
   label: string;
   onPress: () => void;
   subLabel?: string;
@@ -23,17 +23,6 @@ const SettingItem = ({ icon, label, onPress, subLabel, variant = 'default' }: Se
   const { theme } = useTheme();
   const styles = useStyles();
   const haptics = useHaptics();
-
-  const getIconColor = () => {
-    switch (variant) {
-      case 'primary':
-        return theme.colors.primary;
-      case 'secondary':
-        return theme.colors.text.secondary;
-      default:
-        return theme.colors.primary;
-    }
-  };
 
   return (
     <TouchableOpacity
@@ -48,7 +37,7 @@ const SettingItem = ({ icon, label, onPress, subLabel, variant = 'default' }: Se
       }}
     >
       <View style={styles.settingInfo}>
-        <Ionicons name={icon} size={24} color={getIconColor()} />
+        {icon}
         {subLabel ? (
           <View>
             <Text
@@ -74,7 +63,7 @@ const SettingItem = ({ icon, label, onPress, subLabel, variant = 'default' }: Se
           </Text>
         )}
       </View>
-      <Ionicons name="chevron-forward" size={20} color={getIconColor()} />
+      <ChevronRight size={20} color={theme.colors.primary} />
     </TouchableOpacity>
   );
 };
@@ -119,7 +108,7 @@ function ProfileScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t('profile.account')}</Text>
           <SettingItem
-            icon="person-outline"
+            icon={<User size={24} color={theme.colors.primary} />}
             label={t('profile.myAccount')}
             onPress={() => router.push('/screens/my-account')}
           />
@@ -128,7 +117,7 @@ function ProfileScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t('profile.challenges.title')}</Text>
           <SettingItem
-            icon="trophy-outline"
+            icon={<Trophy size={24} color={theme.colors.primary} />}
             label={t('profile.challenges.title')}
             onPress={() => router.push('/screens/gamification')}
           />
@@ -137,20 +126,20 @@ function ProfileScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t('profile.social')}</Text>
           <SettingItem
-            icon="logo-instagram"
+            icon={<Instagram size={24} color={theme.colors.primary} />}
             label={t('profile.instagram')}
             subLabel={t('profile.instagramHandle')}
             onPress={() => setShowInstagramModal(true)}
           />
           <SettingItem
-            icon="share-social-outline"
+            icon={<Share2 size={24} color={theme.colors.primary} />}
             label={t('profile.share')}
             onPress={() => {
               /* TODO: Implement share functionality */
             }}
           />
           <SettingItem
-            icon="star-outline"
+            icon={<Star size={24} color={theme.colors.primary} />}
             label={t('profile.rate')}
             onPress={() => {
               /* TODO: Implement rating functionality */
@@ -161,7 +150,7 @@ function ProfileScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t('profile.settings')}</Text>
           <SettingItem
-            icon="settings-outline"
+            icon={<User size={24} color={theme.colors.primary} />}
             label={t('profile.appSettings')}
             onPress={() => router.push('/screens/settings')}
           />

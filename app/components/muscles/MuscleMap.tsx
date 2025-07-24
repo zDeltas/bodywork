@@ -39,13 +39,13 @@ const muscleSlugs: Record<string, Slug> = {
 };
 
 const muscleGroupToSlug: Record<string, Slug> = {
-  Chest: muscleSlugs.CHEST,
-  Back: muscleSlugs.UPPER_BACK,
-  Legs: muscleSlugs.QUADRICEPS,
-  Shoulders: muscleSlugs.DELTOIDS,
-  Biceps: muscleSlugs.BICEPS,
-  Triceps: muscleSlugs.TRICEPS,
-  Core: muscleSlugs.ABS
+  chest: muscleSlugs.CHEST,
+  back: muscleSlugs.UPPER_BACK,
+  legs: muscleSlugs.QUADRICEPS,
+  shoulders: muscleSlugs.DELTOIDS,
+  biceps: muscleSlugs.BICEPS,
+  triceps: muscleSlugs.TRICEPS,
+  core: muscleSlugs.ABS
 };
 
 export default function MuscleMap({ workouts }: MuscleMapProps) {
@@ -71,30 +71,44 @@ export default function MuscleMap({ workouts }: MuscleMapProps) {
   }));
 
   const getMuscleRestState = (muscleWorkouts: Workout[]) => {
-    if (muscleWorkouts.length === 0) return 3;
+    if (muscleWorkouts.length === 0) return -1;
 
-    const lastWorkout = muscleWorkouts[muscleWorkouts.length - 1];
-    const lastWorkoutDate = new Date(lastWorkout.date);
-    const hoursSinceLastWorkout = (Date.now() - lastWorkoutDate.getTime()) / (1000 * 60 * 60);
+    const lastWorkoutTime = muscleWorkouts.reduce((closest, workout) => {
+      const workoutDate = new Date(workout.date);
+      return workoutDate > closest ? workoutDate : closest;
+    }, new Date(0)).getTime();
+
+    const hoursSinceLastWorkout = (Date.now() - lastWorkoutTime) / (1000 * 60 * 60);
 
     if (hoursSinceLastWorkout < 24) return 1;
     if (hoursSinceLastWorkout < 72) return 2;
     return 3;
   };
 
-  const getExtendedBodyParts = (workouts: Workout[]): ExtendedBodyPart[] => {
-    return Object.entries(muscleGroupToSlug).map(([group, slug]) => ({
-      slug: slug as Slug,
-      restState: getMuscleRestState(workouts.filter((w) => w.muscleGroup === group))
-    }));
+  const getExtendedBodyParts = (workouts: Workout[]) => {
+    const bodyParts: any[] = [];
+    
+    Object.entries(muscleGroupToSlug).forEach(([group, slug]) => {
+      const muscleWorkouts = workouts.filter((w) => w.muscleGroup === group);
+      const restState = getMuscleRestState(muscleWorkouts);
+      
+      if (restState !== -1) {
+        bodyParts.push({
+          slug: slug as Slug,
+          intensity: restState
+        });
+      }
+    });
+
+    return bodyParts;
   };
 
   const bodyData = getExtendedBodyParts(workouts);
 
   const intensityColors = [
     theme.colors.error,
-    theme.colors.text.warning,
-    theme.colors.text.disabled
+    theme.colors.warning,
+    theme.colors.success
   ];
 
   return (

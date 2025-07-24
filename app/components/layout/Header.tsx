@@ -3,7 +3,7 @@ import { Platform, StatusBar, StyleSheet, Text, TouchableOpacity, useWindowDimen
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/app/hooks/useTheme';
 import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { ChevronLeft, ArrowLeft } from 'lucide-react-native';
 
 interface HeaderProps {
   title: string;
@@ -64,11 +64,11 @@ const Header: React.FC<HeaderProps> = ({
         <View style={headerStyles.leftContainer}>
           {showBackButton && (
             <TouchableOpacity onPress={handleBack} style={headerStyles.backButton}>
-              <Ionicons
-                name={Platform.OS === 'ios' ? 'chevron-back' : 'arrow-back'}
-                size={24}
-                color={theme.colors.text.primary}
-              />
+              {Platform.OS === 'ios' ? (
+                <ChevronLeft size={24} color={theme.colors.text.primary} />
+              ) : (
+                <ArrowLeft size={24} color={theme.colors.text.primary} />
+              )}
             </TouchableOpacity>
           )}
           {leftComponent}

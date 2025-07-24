@@ -114,7 +114,6 @@ const MuscleDistribution: React.FC<MuscleDistributionProps> = ({
     }
   });
 
-  // Vérifier si des données sont disponibles
   const hasData = muscleGroups && muscleGroups.length > 0;
 
   return (
@@ -174,7 +173,7 @@ const MuscleDistribution: React.FC<MuscleDistributionProps> = ({
             width={Dimensions.get('window').width - 40}
             height={300}
             innerRadius={70}
-            labelRadius={100}
+            labelRadius={120}
             style={{
               labels: {
                 fill: theme.colors.text.primary,
@@ -195,7 +194,7 @@ const MuscleDistribution: React.FC<MuscleDistributionProps> = ({
                   fontSize: theme.typography.fontSize.sm,
                   fontFamily: theme.typography.fontFamily.regular
                 }}
-                text={({ datum }) => `${datum.name}\n${datum.value}%`}
+                text={({ datum }) => datum.value > 5 ? `${datum.value}%` : ''}
               />
             }
           />

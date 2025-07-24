@@ -6,7 +6,7 @@ import { useTheme } from '@/app/hooks/useTheme';
 import Header from '@/app/components/layout/Header';
 import { router } from 'expo-router';
 import Text from '@/app/components/ui/Text';
-import { Ionicons } from '@expo/vector-icons';
+import { Wrench } from 'lucide-react-native';
 
 function MyAccountScreen() {
   const { t } = useTranslation();
@@ -19,7 +19,7 @@ function MyAccountScreen() {
 
       <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
         <View style={styles.constructionContainer}>
-          <Ionicons name="construct-outline" size={64} color={theme.colors.primary} />
+          <Wrench size={64} color={theme.colors.primary} />
           <Text style={styles.constructionTitle}>{t('common.inConstruction')}</Text>
           <Text style={styles.constructionText}>{t('common.featureComingSoon')}</Text>
         </View>

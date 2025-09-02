@@ -4,7 +4,7 @@ import { useTheme } from '@/app/hooks/useTheme';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import Text from '@/app/components/ui/Text';
 import { Exercise, Series } from '@/types/common';
-import { Clock, Dumbbell, Repeat, StickyNote } from 'lucide-react-native';
+import { Clock, Dumbbell, Repeat, StickyNote, Ruler } from 'lucide-react-native';
 
 type CurrentExerciseProps = {
   exercise: Exercise;
@@ -47,13 +47,34 @@ const CurrentExercise = React.memo(({
             </View>
           </View>
           <View style={styles.infoRow}>
-            <View style={styles.infoItem}>
-              <Repeat size={20} color={theme.colors.primary} style={styles.icon} />
-              <View>
-                <Text variant="body" style={styles.infoLabel}>{t('workout.reps')}</Text>
-                <Text variant="heading" style={styles.infoValue}>{currentSeries.reps}</Text>
+            {/* Conditional rendering based on unitType */}
+            {currentSeries.unitType === 'reps' ? (
+              <View style={styles.infoItem}>
+                <Repeat size={20} color={theme.colors.primary} style={styles.icon} />
+                <View>
+                  <Text variant="body" style={styles.infoLabel}>{t('workout.reps')}</Text>
+                  <Text variant="heading" style={styles.infoValue}>{currentSeries.reps}</Text>
+                </View>
               </View>
-            </View>
+            ) : currentSeries.unitType === 'time' ? (
+              <View style={styles.infoItem}>
+                <Clock size={20} color={theme.colors.primary} style={styles.icon} />
+                <View>
+                  <Text variant="body" style={styles.infoLabel}>{t('workout.duration')}</Text>
+                  <Text variant="heading" style={styles.infoValue}>
+                    {Math.floor((currentSeries.duration || 0) / 60)}:{((currentSeries.duration || 0) % 60).toString().padStart(2, '0')}
+                  </Text>
+                </View>
+              </View>
+            ) : (
+              <View style={styles.infoItem}>
+                <Ruler size={20} color={theme.colors.primary} style={styles.icon} />
+                <View>
+                  <Text variant="body" style={styles.infoLabel}>{t('workout.distance')}</Text>
+                  <Text variant="heading" style={styles.infoValue}>{currentSeries.distance} m</Text>
+                </View>
+              </View>
+            )}
             <View style={styles.infoItem}>
               <Clock size={20} color={theme.colors.primary} style={styles.icon} />
               <View>

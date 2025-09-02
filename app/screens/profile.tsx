@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Alert, Linking, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { User, Trophy, Instagram, Share2, Star, ChevronRight } from 'lucide-react-native';
+import { User, Trophy, Instagram, Share2, Star, ChevronRight, Ruler, ChartLine as LineChart } from 'lucide-react-native';
 import { router } from 'expo-router';
 
 import { useTranslation } from '@/app/hooks/useTranslation';
@@ -68,7 +68,9 @@ const SettingItem = ({ icon, label, onPress, subLabel, variant = 'default' }: Se
   );
 };
 
-function ProfileScreen() {
+type ProfileScreenProps = { showBackButton?: boolean };
+
+function ProfileScreen({ showBackButton = true }: ProfileScreenProps) {
   const { t } = useTranslation();
   const { theme } = useTheme();
   const styles = useStyles();
@@ -103,7 +105,7 @@ function ProfileScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header title={t('profile.title')} showBackButton={true} onBack={() => router.back()} />
+      <Header title={t('profile.title')} showBackButton={showBackButton} onBack={showBackButton ? () => router.back() : undefined} />
       <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t('profile.account')}</Text>
@@ -120,6 +122,22 @@ function ProfileScreen() {
             icon={<Trophy size={24} color={theme.colors.primary} />}
             label={t('profile.challenges.title')}
             onPress={() => router.push('/screens/gamification')}
+          />
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{t('profile.progress')}</Text>
+          <SettingItem
+            icon={<LineChart size={24} color={theme.colors.primary} />}
+            label={t('stats.title')}
+            variant="primary"
+            onPress={() => router.push('/screens/stats')}
+          />
+          <SettingItem
+            icon={<Ruler size={24} color={theme.colors.primary} />}
+            label={t('measurements.title')}
+            variant="primary"
+            onPress={() => router.push('/screens/measurements')}
           />
         </View>
 

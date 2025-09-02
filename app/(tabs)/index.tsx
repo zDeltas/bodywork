@@ -94,7 +94,7 @@ export default function WorkoutScreen() {
         title={t('common.appTitle')}
         rightComponent={
           <View>
-            <TouchableOpacity onPress={() => router.push('/screens/profile')}>
+            <TouchableOpacity onPress={() => router.push('/(tabs)/profile')}>
               <CircleUser size={24} color={theme.colors.primary} />
             </TouchableOpacity>
           </View>

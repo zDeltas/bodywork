@@ -5,7 +5,7 @@ import Text from '@/app/components/ui/Text';
 import Button from '@/app/components/ui/Button';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import ExerciseList from '@/app/components/exercises/ExerciseList';
-import { BarChart, ChevronDown, Edit2, Layers, Plus, TimerIcon, Weight, X } from 'lucide-react-native';
+import { BarChart, ChevronDown, Edit2, Layers, Plus, TimerIcon, Weight, X, Clock, Ruler } from 'lucide-react-native';
 import { useTheme } from '@/app/hooks/useTheme';
 import { storageService } from '@/app/services/storage';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -21,8 +21,11 @@ const initialRoutine = {
 
 // Structure pour chaque série
 interface RoutineSeries {
+  unitType: 'reps' | 'time' | 'distance';
   weight: string;
   reps: string;
+  duration: string; // in seconds
+  distance: string; // in meters
   note: string;
   rest: string;
   type: 'warmUp' | 'workingSet';
@@ -41,7 +44,7 @@ export default function EditRoutineScreen() {
   const [selectedMuscle, setSelectedMuscle] = useState('');
   const [selectedExercise, setSelectedExercise] = useState<{ name: string; key: string } | null>(null);
   const [series, setSeries] = useState<RoutineSeries[]>([
-    { weight: '', reps: '', note: '', rest: '', type: 'workingSet' }
+    { unitType: 'reps', weight: '', reps: '', duration: '', distance: '', note: '', rest: '', type: 'workingSet' }
   ]);
   const [showExerciseSelector, setShowExerciseSelector] = useState(false);
   const [showSeriesConfig, setShowSeriesConfig] = useState(false);
@@ -75,7 +78,7 @@ export default function EditRoutineScreen() {
   const openAddExercise = () => {
     setSelectedMuscle('');
     setSelectedExercise(null);
-    setSeries([{ weight: '', reps: '', note: '', rest: '', type: 'workingSet' }]);
+    setSeries([{ unitType: 'reps', weight: '', reps: '', duration: '', distance: '', note: '', rest: '', type: 'workingSet' }]);
     setEditingIndex(null);
     setShowExerciseSelector(true);
   };
@@ -86,8 +89,11 @@ export default function EditRoutineScreen() {
     setSelectedMuscle('');
     setSelectedExercise({ name: ex.name, key: ex.translationKey });
     setSeries(ex.series.map((s) => ({
+      unitType: s.unitType || 'reps', // Default to 'reps' for backward compatibility
       weight: s.weight.toString(),
-      reps: s.reps.toString(),
+      reps: s.reps ? s.reps.toString() : '',
+      duration: s.duration ? s.duration.toString() : '',
+      distance: s.distance ? s.distance.toString() : '',
       note: s.note,
       rest: s.rest ?? '',
       type: s.type
@@ -105,7 +111,7 @@ export default function EditRoutineScreen() {
   const addSeries = () => {
     setSeries((prev) => [
       ...prev,
-      { weight: '', reps: '', note: '', rest: '', type: 'workingSet' }
+      { unitType: 'reps', weight: '', reps: '', duration: '', distance: '', note: '', rest: '', type: 'workingSet' }
     ]);
   };
 
@@ -125,8 +131,11 @@ export default function EditRoutineScreen() {
   const saveExercise = () => {
     if (!selectedExercise) return;
     const formattedSeries: Series[] = series.map((s) => ({
+      unitType: s.unitType,
       weight: parseFloat(s.weight) || 0,
-      reps: parseInt(s.reps) || 0,
+      reps: s.unitType === 'reps' ? (parseInt(s.reps) || 0) : undefined,
+      duration: s.unitType === 'time' ? (parseInt(s.duration) || 0) : undefined,
+      distance: s.unitType === 'distance' ? (parseFloat(s.distance) || 0) : undefined,
       note: s.note,
       rest: s.rest,
       type: s.type,

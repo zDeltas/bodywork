@@ -487,7 +487,7 @@ export default function NewGoalScreen() {
       };
       await addGoal(newGoal);
       router.push({
-        pathname: '/(tabs)/stats',
+        pathname: '/screens/stats',
         params: { refresh: 'true' }
       });
     } catch (error) {

@@ -6,7 +6,7 @@ import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
 import Text from '@/app/components/ui/Text';
 import { ExerciseCardSkeleton } from '@/app/components/ui/SkeletonComponents';
-import { Exercise } from '@/types/common';
+import { Exercise, ExerciseUnit } from '@/types/common';
 
 export type MuscleGroupKey =
   | 'chest'
@@ -84,17 +84,38 @@ export const predefinedExercisesByKey: Record<MuscleGroupKey, string[]> = {
   ]
 };
 
+// Helper function to determine the unit type based on exercise key
+const getExerciseUnitType = (exerciseKey: string): ExerciseUnit => {
+  // Exercises that are measured in time
+  if (exerciseKey === 'exercise_core_plank') {
+    return 'time';
+  }
+
+  // Exercises that are measured in distance (none for now, but could be added later)
+  // if (exerciseKey === 'exercise_cardio_running') {
+  //   return 'distance';
+  // }
+
+  // Default to reps for all other exercises
+  return 'reps';
+};
+
 export const getPredefinedExercises = (t: (key: string) => string) => {
   const result: Record<string, Exercise[]> = {};
 
   muscleGroupKeys.forEach((key) => {
     // Translate both the muscle group key and each exercise name
-    result[t(`muscleGroups.${key}`)] = predefinedExercisesByKey[key].map((exerciseKey) => ({
-      name: t(exerciseKey),
-      key: exerciseKey,
-      translationKey: exerciseKey,
-      series: [] // par défaut vide, à remplir lors de l'ajout à une routine
-    }));
+    result[t(`muscleGroups.${key}`)] = predefinedExercisesByKey[key].map((exerciseKey) => {
+      // Determine the unit type for this exercise
+      const unitType = getExerciseUnitType(exerciseKey);
+
+      return {
+        name: t(exerciseKey),
+        key: exerciseKey,
+        translationKey: exerciseKey,
+        series: [] // par défaut vide, à remplir lors de l'ajout à une routine
+      };
+    });
   });
 
   return result;

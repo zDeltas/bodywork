@@ -129,8 +129,17 @@ export default {
     startWorkout: 'Commencer un entraînement',
     weight: 'Poids',
     reps: 'Répétitions',
+    duration: 'Durée',
+    distance: 'Distance',
     sets: 'Séries',
     rpe: 'RPE',
+
+    // Units
+    unitType: 'Type d\'unité',
+    seconds: 'secondes',
+    minutes: 'minutes',
+    meters: 'mètres',
+    kilometers: 'kilomètres',
     warmUpSeries: 'Séries d\'échauffement',
     workingSeries: 'Séries de travail',
     newWorkout: 'Nouvel entraînement',

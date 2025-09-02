@@ -83,6 +83,20 @@ export default function RootLayout() {
                   }}
                 />
                 <Stack.Screen
+                  name="screens/stats"
+                  options={{
+                    headerShown: false,
+                    animation: 'slide_from_right'
+                  }}
+                />
+                <Stack.Screen
+                  name="screens/measurements"
+                  options={{
+                    headerShown: false,
+                    animation: 'slide_from_right'
+                  }}
+                />
+                <Stack.Screen
                   name="screens/my-account"
                   options={{
                     headerShown: false,

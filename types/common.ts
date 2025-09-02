@@ -1,13 +1,26 @@
 export type SeriesType = 'warmUp' | 'workingSet';
+export type ExerciseUnit = 'reps' | 'time' | 'distance';
 
 export interface Series {
+  unitType: ExerciseUnit;
   weight: number;
-  reps: number;
+  reps?: number;
+  duration?: number; // in seconds
+  distance?: number; // in meters
   note: string;
   rpe: number;
   type: SeriesType;
   rest?: string;
 }
+
+// Default series for backward compatibility
+export const defaultSeries: Partial<Series> = {
+  unitType: 'reps',
+  weight: 0,
+  reps: 0,
+  duration: 0,
+  distance: 0
+};
 
 export interface Exercise {
   name: string;

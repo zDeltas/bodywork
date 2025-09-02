@@ -312,7 +312,7 @@ export default function MeasurementsScreen() {
 
   return (
     <View style={styles.container}>
-      <Header title={t('measurements.title')} showBackButton={false} />
+      <Header title={t('measurements.title')} showBackButton={true} onBack={() => router.back()} />
       {renderViewToggle()}
       <ScrollView style={styles.content}>
         {viewMode === 'input' ? renderInputMode() : renderHistoryMode()}

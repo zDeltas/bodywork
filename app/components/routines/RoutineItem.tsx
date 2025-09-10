@@ -13,7 +13,7 @@ import {
   Trash2,
   TrendingUp
 } from 'lucide-react-native';
-import { useHaptics } from '@/src/hooks/useHaptics';
+import useHaptics from '@/app/hooks/useHaptics';
 import { Routine, RoutineStats } from '@/types/common';
 import Modal from '@/app/components/ui/Modal';
 import { useTheme } from '@/app/hooks/useTheme';

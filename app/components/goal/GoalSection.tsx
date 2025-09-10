@@ -3,7 +3,7 @@ import { Alert, Animated, StyleSheet, Text, TouchableOpacity, View } from 'react
 import { Trash2, PlusCircle } from 'lucide-react-native';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
-import { useHaptics } from '@/src/hooks/useHaptics';
+import useHaptics from '@/app/hooks/useHaptics';
 import { router } from 'expo-router';
 import useGoals from '@/app/hooks/useGoals';
 import useWorkouts from '@/app/hooks/useWorkouts';

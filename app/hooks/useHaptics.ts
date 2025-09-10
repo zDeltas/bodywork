@@ -16,7 +16,7 @@ interface HapticsHook {
   setEnabled: (enabled: boolean) => Promise<void>;
 }
 
-export const useHaptics = (): HapticsHook => {
+const useHaptics = (): HapticsHook => {
   const lastHapticTime = useRef<number>(0);
 
   const isEnabled = useCallback(async (): Promise<boolean> => {
@@ -72,4 +72,6 @@ export const useHaptics = (): HapticsHook => {
     isEnabled,
     setEnabled
   };
-}; 
+};
+
+export default useHaptics;

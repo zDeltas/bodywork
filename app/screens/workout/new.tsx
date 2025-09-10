@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { Modal, Pressable, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import { router, useLocalSearchParams } from 'expo-router';
-import { BarChart, Calendar, ChevronDown, Gauge, Layers, Plus, Weight, X } from 'lucide-react-native';
+import { BarChart, Calendar, ChevronDown, Gauge, Layers, Plus, Weight, X, Clock, Ruler } from 'lucide-react-native';
 import { Calendar as RNCalendar } from 'react-native-calendars';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -12,22 +12,13 @@ import { useTheme } from '@/app/hooks/useTheme';
 import Header from '@/app/components/layout/Header';
 import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold, useFonts } from '@expo-google-fonts/inter';
 import ExerciseListModal from '@/app/components/exercises/ExerciseListModal';
-import { Series, SeriesType, Workout } from '@/types/common';
+import { Series, SeriesType, Workout, EditableSeries } from '@/types/common';
 import { WorkoutDateUtils } from '@/types/workout';
 import { MuscleGroupKey } from '@/app/components/exercises/ExerciseList';
 import { TranslationKey } from '@/translations';
 import { useWorkouts } from '@/app/hooks/useWorkouts';
 
 SplashScreen.preventAutoHideAsync();
-
-interface EditableSeries {
-  weight: string;
-  reps: string;
-  note: string;
-  rpe: string;
-  showRpeDropdown?: boolean;
-  type: SeriesType;
-}
 
 export default function NewWorkoutScreen() {
   const [fontsLoaded] = useFonts({
@@ -53,8 +44,11 @@ export default function NewWorkoutScreen() {
   const [rpe, setRpe] = useState<string>('');
   const [series, setSeries] = useState<EditableSeries[]>([
     {
+      unitType: 'reps',
       weight: '',
       reps: '',
+      duration: '',
+      distance: '',
       note: '',
       rpe: '',
       showRpeDropdown: false,
@@ -70,10 +64,13 @@ export default function NewWorkoutScreen() {
 
   const processSeries = (series: EditableSeries[], rpe: string): Series[] => {
     return series.map((s) => ({
-      ...s,
+      unitType: s.unitType || 'reps',
       weight: parseFloat(s.weight) || 0,
-      reps: parseInt(s.reps) || 0,
-      rpe: s.type === 'warmUp' ? 0 : parseInt(s.rpe) || parseInt(rpe) || 7,
+      reps: (s.unitType || 'reps') === 'reps' ? (parseInt(s.reps || '0') || 0) : undefined,
+      duration: s.unitType === 'time' ? (parseInt(s.duration || '0') || 0) : undefined,
+      distance: s.unitType === 'distance' ? (parseFloat(s.distance || '0') || 0) : undefined,
+      note: s.note,
+      rpe: s.type === 'warmUp' ? 0 : parseInt(s.rpe || rpe) || 7,
       type: s.type || 'workingSet'
     }));
   };
@@ -81,8 +78,13 @@ export default function NewWorkoutScreen() {
   const saveWorkout = async (): Promise<void> => {
     try {
       const validSeries = series.filter((s) => {
-        const hasWeightOrReps = parseFloat(s.weight) > 0 || parseInt(s.reps) > 0;
-        if (!hasWeightOrReps) return false;
+        const unit = s.unitType || 'reps';
+        const hasData =
+          parseFloat(s.weight) > 0 ||
+          (unit === 'reps' && parseInt(s.reps || '0') > 0) ||
+          (unit === 'time' && parseInt(s.duration || '0') > 0) ||
+          (unit === 'distance' && parseFloat(s.distance || '0') > 0);
+        if (!hasData) return false;
         if (s.type === 'warmUp') return true;
         return (
           (parseInt(s.rpe) >= 1 && parseInt(s.rpe) <= 10) ||
@@ -247,6 +249,76 @@ export default function NewWorkoutScreen() {
 
             <View style={styles.seriesTypeContainer}>
               <Text variant="body" style={styles.seriesInputLabel}>
+                {t('workout.unitType')}
+              </Text>
+              <View style={styles.seriesTypeButtonsContainer}>
+                <TouchableOpacity
+                  style={[
+                    styles.seriesTypeButton,
+                    (item.unitType || 'reps') === 'reps' && styles.seriesTypeButtonSelected
+                  ]}
+                  onPress={() => {
+                    const newSeries = [...series];
+                    newSeries[index] = { ...newSeries[index], unitType: 'reps' };
+                    setSeries(newSeries);
+                  }}
+                >
+                  <Text
+                    style={[
+                      styles.seriesTypeButtonText,
+                      (item.unitType || 'reps') === 'reps' && styles.seriesTypeButtonTextSelected
+                    ]}
+                  >
+                    {t('workout.reps')}
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[
+                    styles.seriesTypeButton,
+                    item.unitType === 'time' && styles.seriesTypeButtonSelected
+                  ]}
+                  onPress={() => {
+                    const newSeries = [...series];
+                    newSeries[index] = { ...newSeries[index], unitType: 'time' };
+                    setSeries(newSeries);
+                  }}
+                >
+                  <Text
+                    style={[
+                      styles.seriesTypeButtonText,
+                      item.unitType === 'time' && styles.seriesTypeButtonTextSelected
+                    ]}
+                  >
+                    {t('workout.duration')}
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[
+                    styles.seriesTypeButton,
+                    item.unitType === 'distance' && styles.seriesTypeButtonSelected
+                  ]}
+                  onPress={() => {
+                    const newSeries = [...series];
+                    newSeries[index] = { ...newSeries[index], unitType: 'distance' };
+                    setSeries(newSeries);
+                  }}
+                >
+                  <Text
+                    style={[
+                      styles.seriesTypeButtonText,
+                      item.unitType === 'distance' && styles.seriesTypeButtonTextSelected
+                    ]}
+                  >
+                    {t('workout.distance')}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <View style={styles.seriesTypeContainer}>
+              <Text variant="body" style={styles.seriesInputLabel}>
                 {t('workout.seriesType')}
               </Text>
               <View style={styles.seriesTypeButtonsContainer}>
@@ -321,30 +393,85 @@ export default function NewWorkoutScreen() {
                   keyboardType="numeric"
                 />
               </View>
-              <View style={styles.column}>
-                <View style={styles.sectionTitleContainer}>
-                  <BarChart
-                    color={theme.colors.primary}
-                    size={20}
-                    style={styles.sectionTitleIcon}
+              {/* Unit Type-specific input */}
+              {(item.unitType || 'reps') === 'reps' && (
+                <View style={styles.column}>
+                  <View style={styles.sectionTitleContainer}>
+                    <BarChart
+                      color={theme.colors.primary}
+                      size={20}
+                      style={styles.sectionTitleIcon}
+                    />
+                    <Text variant="body" style={styles.seriesInputLabel}>
+                      {t('workout.reps')}
+                    </Text>
+                  </View>
+                  <TextInput
+                    style={styles.compactInput}
+                    value={item.reps}
+                    onChangeText={(value) => {
+                      const newSeries = [...series];
+                      newSeries[index] = { ...newSeries[index], reps: value };
+                      setSeries(newSeries);
+                    }}
+                    placeholder="0"
+                    placeholderTextColor={theme.colors.text.secondary}
+                    keyboardType="numeric"
                   />
-                  <Text variant="body" style={styles.seriesInputLabel}>
-                    {t('workout.reps')}
-                  </Text>
                 </View>
-                <TextInput
-                  style={styles.compactInput}
-                  value={item.reps}
-                  onChangeText={(value) => {
-                    const newSeries = [...series];
-                    newSeries[index] = { ...newSeries[index], reps: value };
-                    setSeries(newSeries);
-                  }}
-                  placeholder="0"
-                  placeholderTextColor={theme.colors.text.secondary}
-                  keyboardType="numeric"
-                />
-              </View>
+              )}
+              {item.unitType === 'time' && (
+                <View style={styles.column}>
+                  <View style={styles.sectionTitleContainer}>
+                    <Clock
+                      color={theme.colors.primary}
+                      size={20}
+                      style={styles.sectionTitleIcon}
+                    />
+                    <Text variant="body" style={styles.seriesInputLabel}>
+                      {t('workout.duration')} ({t('workout.seconds')})
+                    </Text>
+                  </View>
+                  <TextInput
+                    style={styles.compactInput}
+                    value={item.duration}
+                    onChangeText={(value) => {
+                      const newSeries = [...series];
+                      newSeries[index] = { ...newSeries[index], duration: value };
+                      setSeries(newSeries);
+                    }}
+                    placeholder="0"
+                    placeholderTextColor={theme.colors.text.secondary}
+                    keyboardType="numeric"
+                  />
+                </View>
+              )}
+              {item.unitType === 'distance' && (
+                <View style={styles.column}>
+                  <View style={styles.sectionTitleContainer}>
+                    <Ruler
+                      color={theme.colors.primary}
+                      size={20}
+                      style={styles.sectionTitleIcon}
+                    />
+                    <Text variant="body" style={styles.seriesInputLabel}>
+                      {t('workout.distance')} ({t('workout.meters')})
+                    </Text>
+                  </View>
+                  <TextInput
+                    style={styles.compactInput}
+                    value={item.distance}
+                    onChangeText={(value) => {
+                      const newSeries = [...series];
+                      newSeries[index] = { ...newSeries[index], distance: value };
+                      setSeries(newSeries);
+                    }}
+                    placeholder="0"
+                    placeholderTextColor={theme.colors.text.secondary}
+                    keyboardType="numeric"
+                  />
+                </View>
+              )}
             </View>
 
             <View style={styles.rpeSectionContainer}>
@@ -463,6 +590,9 @@ export default function NewWorkoutScreen() {
                       ...newSeries[index],
                       weight: prevSeries.weight,
                       reps: prevSeries.reps,
+                      duration: prevSeries.duration,
+                      distance: prevSeries.distance,
+                      unitType: prevSeries.unitType || 'reps',
                       rpe: prevSeries.rpe,
                       type: prevSeries.type,
                       showRpeDropdown: false
@@ -488,6 +618,7 @@ export default function NewWorkoutScreen() {
                 ...series,
                 {
                   ...lastSeries,
+                  unitType: lastSeries.unitType || 'reps',
                   showRpeDropdown: false
                 }
               ]);

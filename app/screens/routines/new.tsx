@@ -18,7 +18,7 @@ import { useTheme } from '@/app/hooks/useTheme';
 import { storageService } from '@/app/services/storage';
 import { useRouter } from 'expo-router';
 import { TimerPickerModal } from 'react-native-timer-picker';
-import { Exercise, Series } from '@/types/common';
+import { Exercise, Series, EditableSeries } from '@/types/common';
 
 // Structure de base pour la routine en cours de création
 const initialRoutine = {
@@ -27,17 +27,7 @@ const initialRoutine = {
   exercises: [] // à remplir à l'étape 2
 };
 
-// Nouvelle structure pour chaque série (sans RPE)
-interface RoutineSeries {
-  unitType: 'reps' | 'time' | 'distance';
-  weight: string;
-  reps: string;
-  duration: string; // in seconds
-  distance: string; // in meters
-  note: string;
-  rest: string;
-  type: 'warmUp' | 'workingSet';
-}
+// Utilise le type de formulaire unifié
 
 export default function NewRoutineScreen() {
   const { t } = useTranslation();
@@ -50,7 +40,7 @@ export default function NewRoutineScreen() {
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [selectedMuscle, setSelectedMuscle] = useState('');
   const [selectedExercise, setSelectedExercise] = useState<{ name: string; key: string } | null>(null);
-  const [series, setSeries] = useState<RoutineSeries[]>([
+  const [series, setSeries] = useState<EditableSeries[]>([
     { unitType: 'reps', weight: '', reps: '', duration: '', distance: '', note: '', rest: '', type: 'workingSet' }
   ]);
   const [showExerciseSelector, setShowExerciseSelector] = useState(false);
@@ -80,7 +70,7 @@ export default function NewRoutineScreen() {
       duration: s.duration ? s.duration.toString() : '',
       distance: s.distance ? s.distance.toString() : '',
       note: s.note,
-      rest: s.rest,
+      rest: s.rest ?? '',
       type: s.type
     })));
     setEditingIndex(index);
@@ -91,13 +81,14 @@ export default function NewRoutineScreen() {
   const saveExercise = () => {
     if (!selectedExercise) return;
     const formattedSeries: Series[] = series.map((s) => ({
-      unitType: s.unitType,
+      unitType: s.unitType || 'reps',
       weight: parseFloat(s.weight) || 0,
-      reps: s.unitType === 'reps' ? (parseInt(s.reps) || 0) : undefined,
-      duration: s.unitType === 'time' ? (parseInt(s.duration) || 0) : undefined,
-      distance: s.unitType === 'distance' ? (parseFloat(s.distance) || 0) : undefined,
+      reps: (s.unitType || 'reps') === 'reps' ? (parseInt(s.reps || '0') || 0) : undefined,
+      duration: s.unitType === 'time' ? (parseInt(s.duration || '0') || 0) : undefined,
+      distance: s.unitType === 'distance' ? (parseFloat(s.distance || '0') || 0) : undefined,
       note: s.note,
-      rest: s.rest,
+      rest: s.rest ?? '',
+      rpe: s.type === 'warmUp' ? 0 : 7,
       type: s.type
     }));
     const newEx: Exercise = {
@@ -133,7 +124,7 @@ export default function NewRoutineScreen() {
   const removeSeries = (index: number) => {
     setSeries((prev) => prev.filter((_, i) => i !== index));
   };
-  const updateSeries = (index: number, field: keyof RoutineSeries, value: string) => {
+  const updateSeries = (index: number, field: keyof EditableSeries, value: string) => {
     setSeries((prev) => prev.map((s, i) => (i === index ? { ...s, [field]: value } : s)));
   };
   const setSeriesType = (index: number, type: 'warmUp' | 'workingSet') => {

@@ -11,7 +11,7 @@ export const INITIAL_SESSION_STATE: SessionState = {
   rpe: ''
 };
 
-export interface SessionContextType {
+export default interface SessionContextType {
   routine: Routine | null;
   sessionState: SessionState;
   setSessionState: (state: SessionState | ((prev: SessionState) => SessionState)) => void;

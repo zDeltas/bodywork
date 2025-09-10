@@ -8,7 +8,7 @@ import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
 import Header from '@/app/components/layout/Header';
 import Text from '@/app/components/ui/Text';
-import { useHaptics } from '@/src/hooks/useHaptics';
+import useHaptics from '@/app/hooks/useHaptics';
 import Modal from '@/app/components/ui/Modal';
 
 interface SettingItemProps {

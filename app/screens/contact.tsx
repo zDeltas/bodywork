@@ -10,7 +10,7 @@ import {
   View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useHaptics } from '@/src/hooks/useHaptics';
+import useHaptics from '@/app/hooks/useHaptics';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
 import Header from '@/app/components/layout/Header';

@@ -13,7 +13,19 @@ export interface Series {
   rest?: string;
 }
 
-// Default series for backward compatibility
+export interface EditableSeries {
+  unitType?: ExerciseUnit;
+  weight: string;
+  reps?: string;
+  duration?: string; // in seconds
+  distance?: string; // in meters
+  note: string;
+  rest?: string;
+  rpe?: string; // string in forms; converted to number when saving
+  showRpeDropdown?: boolean;
+  type: SeriesType;
+}
+
 export const defaultSeries: Partial<Series> = {
   unitType: 'reps',
   weight: 0,

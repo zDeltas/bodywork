@@ -184,10 +184,6 @@ export default {
     exerciseName: 'Nom de l\'exercice',
     enterExerciseName: 'Entrez le nom de l\'exercice',
     exercise: 'Exercice',
-    quick: 'Rapide',
-    standard: 'Standard',
-    long: 'Long',
-    veryLong: 'Très long',
     series: 'Séries'
   },
 

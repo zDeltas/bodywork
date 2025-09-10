@@ -168,10 +168,6 @@ export default {
     exerciseName: 'Exercise Name',
     enterExerciseName: 'Enter exercise name',
     exercise: 'Exercise',
-    quick: 'Quick',
-    standard: 'Standard',
-    long: 'Long',
-    veryLong: 'Very Long',
     series: 'Series'
   },
 

@@ -6,7 +6,7 @@ import { router } from 'expo-router';
 import { ChevronDown } from 'lucide-react-native';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import Animated, { FadeIn } from 'react-native-reanimated';
-import { useHaptics } from '@/src/hooks/useHaptics';
+import useHaptics from '@/app/hooks/useHaptics';
 import { useTheme } from '@/app/hooks/useTheme';
 import Header from '@/app/components/layout/Header';
 import Text from '@/app/components/ui/Text';

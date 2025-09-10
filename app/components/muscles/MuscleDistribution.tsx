@@ -3,7 +3,7 @@ import { Animated, Dimensions, StyleSheet, TouchableOpacity, View } from 'react-
 import { VictoryLabel, VictoryPie } from 'victory-native';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
-import { useHaptics } from '@/src/hooks/useHaptics';
+import useHaptics from '@/app/hooks/useHaptics';
 import Text from '@/app/components/ui/Text';
 
 interface MuscleGroupData {

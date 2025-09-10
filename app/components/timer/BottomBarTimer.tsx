@@ -3,7 +3,7 @@ import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Pause, Play } from 'lucide-react-native';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
-import { useHaptics } from '@/src/hooks/useHaptics';
+import useHaptics from '@/app/hooks/useHaptics';
 import Text from '@/app/components/ui/Text';
 import { Button } from '@/app/components/ui/Button';
 

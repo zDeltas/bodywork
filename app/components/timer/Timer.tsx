@@ -5,22 +5,22 @@ import {
   Inter_600SemiBold as InterSemiBold,
   useFonts
 } from '@expo-google-fonts/inter';
-import { Minus, Pause, Play, Plus, RotateCcw } from 'lucide-react-native';
+import { Pause, Play, RotateCcw } from 'lucide-react-native';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
-import { useHaptics } from '@/src/hooks/useHaptics';
+import useHaptics from '@/app/hooks/useHaptics';
 import Text from '@/app/components/ui/Text';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { Button } from '@/app/components/ui/Button';
+import Svg, { Circle } from 'react-native-svg';
 
 interface TimerProps {
-  initialTime?: number;
+  initialTime?: number; // work time seconds
   mode?: 'timer' | 'stopwatch';
   onComplete?: () => void;
   sets?: number;
   restTime?: number;
-  exerciseName?: string;
-  onSetsChange?: (sets: number) => void;
+  prepTime?: number;
 }
 
 export default function Timer({
@@ -29,104 +29,99 @@ export default function Timer({
                                 onComplete,
                                 sets = 1,
                                 restTime = 60,
-                                exerciseName = 'Exercise',
-                                onSetsChange
+                                prepTime = 10
                               }: TimerProps) {
   const { t } = useTranslation();
-  const { theme } = useTheme();
   const haptics = useHaptics();
   const styles = useStyles();
+  const { theme } = useTheme();
   const [workTime, setWorkTime] = useState(mode === 'timer' ? initialTime : 0);
   const [restTimeState, setRestTimeState] = useState(restTime);
+  const [prepTimeState, setPrepTimeState] = useState(prepTime);
   const [isRunning, setIsRunning] = useState(false);
   const [currentSet, setCurrentSet] = useState(1);
-  const [isResting, setIsResting] = useState(false);
+  const [phase, setPhase] = useState<'prep' | 'work' | 'rest'>('prep');
   const [fontsLoaded] = useFonts({
     'Inter-Regular': InterRegular,
     'Inter-SemiBold': InterSemiBold
   });
 
-  const handleWorkComplete = useCallback(() => {
-    if (currentSet < sets) {
-      if (Platform.OS === 'ios') {
-        haptics.success();
-      } else {
-        Vibration.vibrate([0, 500, 200, 500]);
-      }
-      setIsResting(true);
-      setRestTimeState(restTime);
-    } else {
-      setIsRunning(false);
-      onComplete?.();
-    }
-  }, [currentSet, sets, restTime, onComplete, haptics]);
-
-  const handleRestComplete = useCallback(() => {
+  const vibrateSuccess = useCallback(() => {
     if (Platform.OS === 'ios') {
       haptics.success();
     } else {
       Vibration.vibrate([0, 500, 200, 500]);
     }
-    setIsResting(false);
-    setCurrentSet((prev) => prev + 1);
+  }, [haptics]);
+
+  const handleWorkComplete = useCallback(() => {
+    vibrateSuccess();
+    setPhase('rest');
+    setRestTimeState(restTime);
+  }, [restTime, vibrateSuccess]);
+
+  const handleRestComplete = useCallback(() => {
+    vibrateSuccess();
     if (currentSet < sets) {
+      setCurrentSet((prev) => prev + 1);
+      setPhase('work');
       setWorkTime(initialTime);
     } else {
       setIsRunning(false);
-      onComplete?.();
+      setPhase('prep');
     }
-  }, [currentSet, sets, initialTime, onComplete, haptics]);
-
-  const handleSetChange = useCallback(
-    (newSets: number) => {
-      const updatedSets = Math.max(1, newSets);
-      onSetsChange?.(updatedSets);
-      if (currentSet > updatedSets) {
-        setCurrentSet(updatedSets);
-      }
-      haptics.impactLight();
-    },
-    [currentSet, onSetsChange, haptics]
-  );
+  }, [currentSet, sets, initialTime, onComplete, vibrateSuccess]);
 
   useEffect(() => {
     if (!isRunning) {
       setWorkTime(mode === 'timer' ? initialTime : 0);
       setRestTimeState(restTime);
+      setPrepTimeState(prepTime);
+      setPhase('prep');
     }
-  }, [initialTime, restTime, isRunning, mode]);
+  }, [initialTime, restTime, prepTime, mode]);
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
 
     if (isRunning) {
       interval = setInterval(() => {
-        if (isResting) {
-          setRestTimeState((prev) => {
+        if (mode === 'stopwatch') {
+          setWorkTime((prev) => prev + 1);
+          return;
+        }
+
+        if (phase === 'prep') {
+          setPrepTimeState((prev) => {
             if (prev <= 1) {
-              handleRestComplete();
-              return restTime;
+              vibrateSuccess();
+              setPhase('work');
+              return prepTime; // reset for potential next start
             }
             return prev - 1;
           });
-        } else {
-          if (mode === 'timer') {
-            setWorkTime((prev) => {
-              if (prev <= 1) {
-                handleWorkComplete();
-                return initialTime;
-              }
-              return prev - 1;
-            });
-          } else {
-            setWorkTime((prev) => prev + 1);
-          }
+        } else if (phase === 'work') {
+          setWorkTime((prev) => {
+            if (prev <= 1) {
+              handleWorkComplete();
+              return initialTime; // reset work time for next work phase
+            }
+            return prev - 1;
+          });
+        } else if (phase === 'rest') {
+          setRestTimeState((prev) => {
+            if (prev <= 1) {
+              handleRestComplete();
+              return restTime; // reset rest for next rest phase
+            }
+            return prev - 1;
+          });
         }
       }, 1000);
     }
 
     return () => clearInterval(interval);
-  }, [isRunning, isResting, mode, handleWorkComplete, handleRestComplete, initialTime, restTime]);
+  }, [isRunning, mode, phase, handleWorkComplete, handleRestComplete, initialTime, restTime, prepTime, vibrateSuccess]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -141,88 +136,111 @@ export default function Timer({
 
   const resetTimer = useCallback(() => {
     setIsRunning(false);
-    setIsResting(false);
     setCurrentSet(1);
+    setPhase('prep');
     setWorkTime(mode === 'timer' ? initialTime : 0);
     setRestTimeState(restTime);
+    setPrepTimeState(prepTime);
     haptics.impactMedium();
-  }, [initialTime, restTime, mode, haptics]);
+  }, [initialTime, restTime, prepTime, mode, haptics]);
 
   if (!fontsLoaded) {
     return null;
   }
 
+  const phaseLabel = phase === 'prep' ? 'Préparation' : phase === 'work' ? 'Travail' : 'Repos';
+  const phaseColors = {
+    prep: theme.colors.warning,
+    work: theme.colors.primary,
+    rest: theme.colors.info
+  } as const;
+  const currentPhaseTotal = mode === 'stopwatch' ? 0 : (phase === 'prep' ? prepTime : phase === 'work' ? initialTime : restTime);
+  const currentPhaseRemaining = mode === 'stopwatch' ? workTime : (phase === 'prep' ? prepTimeState : phase === 'work' ? workTime : restTimeState);
+  const size = 260;
+  const stroke = 14;
+  const radius = (size - stroke) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const progress = currentPhaseTotal > 0 ? currentPhaseRemaining / currentPhaseTotal : 0;
+  const dashOffset = circumference * (1 - Math.min(Math.max(progress, 0), 1));
+
+  const computeTotalRemaining = () => {
+    if (mode === 'stopwatch') return 0;
+
+    const futureSets = Math.max(sets - currentSet, 0);
+
+    const pre =
+      phase === 'prep'
+        ? prepTimeState + initialTime + restTime
+        : phase === 'work'
+          ? workTime + restTime
+          : restTimeState;
+
+    return pre + futureSets * (initialTime + restTime);
+  };
+  const totalRemaining = computeTotalRemaining();
+
+  const getNextPhase = () => {
+    if (mode === 'stopwatch') return null;
+    if (phase === 'prep') return { name: 'Travail', duration: initialTime };
+    if (phase === 'work') return { name: 'Repos', duration: restTime };
+    if (currentSet < sets) return { name: 'Travail', duration: initialTime };
+    return { name: 'Terminé', duration: 0 };
+  };
+  const nextPhase = getNextPhase();
+
+  const titleLabel: string = mode === 'timer' ? t('timer.title') : t('timer.stopwatch');
+
   return (
     <View style={styles.container}>
-      <Animated.View
-        entering={FadeIn.duration(300)}
-        exiting={FadeOut.duration(300)}
-        style={[
-          styles.content,
-          {
-            backgroundColor: isResting ? theme.colors.error : theme.colors.success,
-            borderRadius: 28
-          }
-        ]}
-      >
-        <View style={styles.contentInner}>
-          <Text style={[styles.phaseText, { color: theme.colors.background.main }]}>
-            {isResting ? 'REST' : 'WORK'}
-          </Text>
+      <Animated.View entering={FadeIn.duration(300)} exiting={FadeOut.duration(300)} style={styles.content}>
+        <View style={styles.topRow}>
+          <Text style={[styles.headerTitle, { color: theme.colors.text.primary }]}>{titleLabel}</Text>
+          {mode === 'timer' && (
+            <Text style={[styles.globalTime, { color: theme.colors.text.secondary }]}>Total {formatTime(totalRemaining)}</Text>
+          )}
+          <Button variant="icon" onPress={resetTimer} style={styles.resetBtn}
+                  icon={<RotateCcw size={18} color={theme.colors.text.onPrimary} />} />
+        </View>
 
-          <View style={styles.setsContainer}>
-            <Button
-              variant="icon"
-              icon={<Minus size={16} color={theme.colors.background.main} />}
-              onPress={() => setCurrentSet((prev) => Math.max(1, prev - 1))}
-              disabled={currentSet <= 1}
-              style={{ ...styles.setButton, opacity: currentSet <= 1 ? 0.5 : 1 }}
+        <View style={styles.ringContainer}>
+          <Svg width={size} height={size}>
+            <Circle cx={size / 2} cy={size / 2} r={radius} stroke={theme.colors.background.button} strokeWidth={stroke} fill="none" />
+            <Circle
+              cx={size / 2}
+              cy={size / 2}
+              r={radius}
+              stroke={phaseColors[phase]}
+              strokeWidth={stroke}
+              fill="none"
+              strokeDasharray={`${circumference} ${circumference}`}
+              strokeDashoffset={dashOffset}
+              strokeLinecap="round"
+              rotation="-90"
+              originX={size / 2}
+              originY={size / 2}
             />
-
-            <Text style={[styles.setInfo, { color: theme.colors.background.main }]}>
-              {typeof t('timer.series') === 'string' ? String(t('timer.series')) : 'Series'}{' '}
-              {currentSet}/{sets}
-            </Text>
-
-            <Button
-              variant="icon"
-              icon={<Plus size={16} color={theme.colors.background.main} />}
-              onPress={() => setCurrentSet((prev) => Math.min(sets, prev + 1))}
-              disabled={currentSet >= sets}
-              style={{ ...styles.setButton, opacity: currentSet >= sets ? 0.5 : 1 }}
-            />
+          </Svg>
+          <View style={styles.centerContent}>
+            <Text style={[styles.time, { color: theme.colors.text.primary }]}>{formatTime(currentPhaseRemaining)}</Text>
+            <Text style={[styles.phaseText, { color: theme.colors.text.secondary }]}>{phaseLabel}</Text>
           </View>
+        </View>
 
-          <Text style={[styles.time, { color: theme.colors.background.main }]}>
-            {formatTime(isResting ? restTimeState : workTime)}
-          </Text>
+        {nextPhase && nextPhase.duration > 0 && (
+          <Text style={[styles.nextText, { color: theme.colors.text.secondary }]}>Prochaine phase
+            : {nextPhase.name} · {formatTime(nextPhase.duration)}</Text>
+        )}
+
+        <View style={styles.bottomRow}>
+          {mode === 'timer' && <Text style={[styles.setInfo, { color: theme.colors.text.secondary }]}>Série {phase === 'prep' ? 1 : currentSet} / {sets}</Text>}
+          <Button
+            variant="primary"
+            icon={isRunning ? <Pause size={28} color={theme.colors.text.onPrimary} /> : <Play size={28} color={theme.colors.text.onPrimary} />}
+            onPress={toggleTimer}
+            style={styles.bigActionButton}
+          />
         </View>
       </Animated.View>
-
-      <View style={styles.controls}>
-        <Button
-          variant="primary"
-          icon={
-            isRunning ? (
-              <Pause size={24} color={theme.colors.background.main} />
-            ) : (
-              <Play size={24} color={theme.colors.background.main} />
-            )
-          }
-          onPress={toggleTimer}
-          style={{
-            ...styles.button,
-            backgroundColor: isRunning ? theme.colors.error : theme.colors.success
-          }}
-        />
-
-        <Button
-          variant="primary"
-          icon={<RotateCcw size={24} color={theme.colors.background.main} />}
-          onPress={resetTimer}
-          style={{ ...styles.button, backgroundColor: theme.colors.background.button }}
-        />
-      </View>
     </View>
   );
 }
@@ -240,45 +258,88 @@ const useStyles = () => {
     },
     content: {
       width: '100%',
-      paddingVertical: 32,
+      paddingVertical: 24,
       paddingHorizontal: 20,
+      backgroundColor: theme.colors.background.card,
+      borderRadius: 24,
       ...Platform.select({
         ios: {
           shadowColor: '#000',
           shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.15,
-          shadowRadius: 12
+          shadowOpacity: 0.25,
+          shadowRadius: 16
         },
         android: {
           elevation: 8
         }
       })
     },
-    contentInner: {
-      alignItems: 'center',
-      gap: 12
-    },
-    setsContainer: {
+    topRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      justifyContent: 'center',
-      gap: 12,
-      marginVertical: 4
+      justifyContent: 'space-between',
+      marginBottom: 8
     },
-    setButton: {
-      width: 28,
-      height: 28,
-      borderRadius: 14,
-      backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    headerTitle: {
+      fontSize: Platform.OS === 'ios' ? 20 : 18,
+      fontWeight: '700'
+    },
+    globalTime: {
+      fontSize: 14,
+      fontWeight: '600'
+    },
+    resetBtn: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      backgroundColor: theme.colors.primary,
       justifyContent: 'center',
       alignItems: 'center'
     },
+    ringContainer: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginVertical: 8
+    },
+    centerContent: {
+      position: 'absolute',
+      alignItems: 'center',
+      justifyContent: 'center'
+    },
+    nextText: {
+      marginTop: 8,
+      textAlign: 'center'
+    },
+    bottomRow: {
+      marginTop: 12,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between'
+    },
+    bigActionButton: {
+      width: 72,
+      height: 72,
+      borderRadius: 36,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: theme.colors.primary,
+      ...Platform.select({
+        ios: {
+          shadowColor: theme.colors.primary,
+          shadowOffset: { width: 0, height: 6 },
+          shadowOpacity: 0.35,
+          shadowRadius: 12
+        },
+        android: {
+          elevation: 10
+        }
+      })
+    },
     setInfo: {
-      fontSize: Platform.OS === 'ios' ? 22 : 20,
+      fontSize: Platform.OS === 'ios' ? 18 : 16,
       fontWeight: '600',
       opacity: 0.9,
-      textAlign: 'center',
-      minWidth: 100
+      textAlign: 'center'
     },
     time: {
       fontSize: Platform.OS === 'ios' ? 72 : 64,
@@ -288,33 +349,11 @@ const useStyles = () => {
       lineHeight: Platform.OS === 'ios' ? 84 : 76
     },
     phaseText: {
-      fontSize: Platform.OS === 'ios' ? 24 : 22,
+      fontSize: Platform.OS === 'ios' ? 18 : 16,
       fontWeight: '600',
-      textTransform: 'uppercase',
-      letterSpacing: 1
-    },
-    controls: {
-      flexDirection: 'row',
-      justifyContent: 'center',
-      gap: 16
-    },
-    button: {
-      width: 56,
-      height: 56,
-      borderRadius: 28,
-      justifyContent: 'center',
-      alignItems: 'center',
-      ...Platform.select({
-        ios: {
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.15,
-          shadowRadius: 6
-        },
-        android: {
-          elevation: 4
-        }
-      })
+      textTransform: 'none',
+      letterSpacing: 0.5,
+      marginTop: 4
     }
   });
 };

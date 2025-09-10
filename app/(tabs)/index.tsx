@@ -3,7 +3,7 @@ import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-nati
 import { router, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
-import { Activity, CircleUser, Dumbbell, Layers, Plus, Repeat } from 'lucide-react-native';
+import { Activity, CircleUser, Dumbbell, Layers, LineChart, Plus, Repeat } from 'lucide-react-native';
 import Header from '@/app/components/layout/Header';
 import { Workout, WorkoutDateUtils } from '@/types/workout';
 import { useWorkouts } from '@/app/hooks/useWorkouts';
@@ -94,8 +94,8 @@ export default function WorkoutScreen() {
         title={t('common.appTitle')}
         rightComponent={
           <View>
-            <TouchableOpacity onPress={() => router.push('/(tabs)/profile')}>
-              <CircleUser size={24} color={theme.colors.primary} />
+            <TouchableOpacity onPress={() => router.push('/screens/stats')}>
+              <LineChart size={24} color={theme.colors.primary} />
             </TouchableOpacity>
           </View>
         }

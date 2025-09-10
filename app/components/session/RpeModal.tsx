@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useTheme } from '@/app/hooks/useTheme';
-import { useHaptics } from '@/src/hooks/useHaptics';
+import useHaptics from '@/app/hooks/useHaptics';
 import Text from '@/app/components/ui/Text';
 import Modal from '@/app/components/ui/Modal';
 import { Button } from '@/app/components/ui/Button';

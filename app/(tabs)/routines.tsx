@@ -6,7 +6,7 @@ import { useTheme } from '@/app/hooks/useTheme';
 import { Plus, Star } from 'lucide-react-native';
 import FloatButtonAction from '@/app/components/ui/FloatButtonAction';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { useHaptics } from '@/src/hooks/useHaptics';
+import useHaptics from '@/app/hooks/useHaptics';
 import { Routine } from '@/types/common';
 import RoutineItem from '@/app/components/routines/RoutineItem';
 import EmptyState from '@/app/components/routines/EmptyState';

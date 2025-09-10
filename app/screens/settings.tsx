@@ -13,7 +13,7 @@ import Text from '@/app/components/ui/Text';
 import { TranslationKey } from '@/translations';
 import { StatsCardSkeleton } from '@/app/components/ui/SkeletonComponents';
 import { storageService } from '@/app/services';
-import { useHaptics } from '@/src/hooks/useHaptics';
+import useHaptics from '@/app/hooks/useHaptics';
 
 export default function SettingsScreen() {
   const { settings, updateSettings, isLoading } = useSettings();

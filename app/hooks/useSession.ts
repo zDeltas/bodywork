@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
 import { router } from 'expo-router';
-import { useHaptics } from '@/src/hooks/useHaptics';
+import useHaptics from '@/app/hooks/useHaptics';
 import storageService from '@/app/services/storage';
 import { Exercise, Routine, SessionState, Workout } from '@/types/common';
 import { INITIAL_SESSION_STATE, SessionContextType } from '../types/session';
 
-export const useSession = (routineId: string): SessionContextType => {
+const useSession = (routineId: string): SessionContextType => {
   const haptics = useHaptics();
   const [routine, setRoutine] = useState<Routine | null>(null);
   const [sessionState, setSessionState] = useState<SessionState>(INITIAL_SESSION_STATE);
@@ -139,4 +139,6 @@ export const useSession = (routineId: string): SessionContextType => {
     handleCancel,
     handleFinishWorkout
   };
-}; 
+};
+
+export default useSession;

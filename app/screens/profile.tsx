@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Alert, Linking, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { User, Trophy, Instagram, Share2, Star, ChevronRight, Ruler, ChartLine as LineChart } from 'lucide-react-native';
+import { User, Trophy, Instagram, Share2, Star, ChevronRight, Ruler, ChartLine as LineChart, Image as ImageIcon } from 'lucide-react-native';
 import { router } from 'expo-router';
 
 import { useTranslation } from '@/app/hooks/useTranslation';
@@ -103,44 +103,72 @@ function ProfileScreen({ showBackButton = true }: ProfileScreenProps) {
     // ... rest of the code ...
   };
 
+  // UI texts
+  const challengesMotivation = 'Lance-toi et relève de nouveaux défis !';
+  const pseudo = 'Mon compte';
+
   return (
     <SafeAreaView style={styles.container}>
       <Header title={t('profile.title')} showBackButton={showBackButton} onBack={showBackButton ? () => router.back() : undefined} />
       <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('profile.account')}</Text>
           <SettingItem
-            icon={<User size={24} color={theme.colors.primary} />}
-            label={t('profile.myAccount')}
+            icon={
+              <View style={styles.avatar}>
+                <ImageIcon size={20} color={theme.colors.primary} />
+              </View>
+            }
+            label={pseudo}
+            subLabel={t('profile.auth.notSignedIn')}
             onPress={() => router.push('/screens/my-account')}
-          />
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('profile.challenges.title')}</Text>
-          <SettingItem
-            icon={<Trophy size={24} color={theme.colors.primary} />}
-            label={t('profile.challenges.title')}
-            onPress={() => router.push('/screens/gamification')}
-          />
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('profile.progress')}</Text>
-          <SettingItem
-            icon={<LineChart size={24} color={theme.colors.primary} />}
-            label={t('stats.title')}
             variant="primary"
+          />
+        </View>
+
+        <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel="Défis"
+          style={styles.cardHero}
+          onPress={() => router.push('/screens/gamification')}
+        >
+          <View style={styles.cardHeader}>
+            <View style={styles.cardIconWrap}>
+              <Trophy size={22} color={theme.colors.primary} />
+            </View>
+            <Text style={styles.cardTitle}>Défis</Text>
+          </View>
+          <Text style={styles.cardSubtitle}>{challengesMotivation}</Text>
+        </TouchableOpacity>
+
+        <View style={[styles.section, styles.quickActions]}>
+          <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel={t('stats.title')}
+            style={styles.quickButton}
             onPress={() => router.push('/screens/stats')}
-          />
-          <SettingItem
-            icon={<Ruler size={24} color={theme.colors.primary} />}
-            label={t('measurements.title')}
-            variant="primary"
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <LineChart size={20} color={theme.colors.primary} />
+              <Text style={styles.quickButtonText}>{t('stats.title')}</Text>
+            </View>
+            <ChevronRight size={18} color={theme.colors.primary} />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel={t('measurements.title')}
+            style={styles.quickButton}
             onPress={() => router.push('/screens/measurements')}
-          />
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Ruler size={20} color={theme.colors.primary} />
+              <Text style={styles.quickButtonText}>{t('measurements.title')}</Text>
+            </View>
+            <ChevronRight size={18} color={theme.colors.primary} />
+          </TouchableOpacity>
         </View>
 
+        {/* Social list */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t('profile.social')}</Text>
           <SettingItem
@@ -221,8 +249,80 @@ const useStyles = () => {
     contentContainer: {
       paddingBottom: 100
     },
+    topRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'stretch',
+      marginBottom: theme.spacing.xl
+    },
+    cardHero: {
+      width: '100%',
+      minHeight: 160,
+      backgroundColor: theme.colors.background.card,
+      borderRadius: theme.borderRadius.lg,
+      padding: theme.spacing.md,
+      ...theme.shadows.sm,
+      marginBottom: theme.spacing.xl
+    },
+    cardHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: theme.spacing.sm
+    },
+    cardIconWrap: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      backgroundColor: theme.colors.background.main,
+      alignItems: 'center',
+      justifyContent: 'center'
+    },
+    cardTitle: {
+      marginLeft: theme.spacing.sm,
+      fontFamily: theme.typography.fontFamily.semiBold,
+      fontSize: theme.typography.fontSize.base,
+      color: theme.colors.text.primary
+    },
+    cardSubtitle: {
+      color: theme.colors.text.secondary,
+      fontSize: theme.typography.fontSize.sm
+    },
+    accountRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: theme.spacing.sm
+    },
+    avatar: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: theme.colors.background.main,
+      alignItems: 'center',
+      justifyContent: 'center'
+    },
     section: {
       marginBottom: theme.spacing.xl
+    },
+    quickActions: {
+      flexDirection: 'row',
+      justifyContent: 'space-between'
+    },
+    quickButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      width: '48%',
+      paddingVertical: theme.spacing.md,
+      paddingHorizontal: theme.spacing.md,
+      backgroundColor: theme.colors.background.card,
+      borderRadius: theme.borderRadius.lg,
+      ...theme.shadows.sm
+    },
+    quickButtonText: {
+      marginLeft: theme.spacing.sm,
+      color: theme.colors.text.primary,
+      fontFamily: theme.typography.fontFamily.semiBold,
+      fontSize: theme.typography.fontSize.base
     },
     sectionTitle: {
       fontSize: theme.typography.fontSize.lg,

@@ -17,7 +17,6 @@ import useGoals from '@/app/hooks/useGoals';
 import useExercises from '@/app/hooks/useExercises';
 import { ChartSkeleton } from '@/app/components/ui/SkeletonComponents';
 
-
 type Period = '1m' | '3m' | '6m';
 
 export default function StatsScreen() {

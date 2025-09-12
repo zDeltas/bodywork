@@ -13,6 +13,7 @@ import Text from '@/app/components/ui/Text';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { Button } from '@/app/components/ui/Button';
 import Svg, { Circle } from 'react-native-svg';
+import { useAudioPlayer, setAudioModeAsync } from 'expo-audio';
 
 interface TimerProps {
   initialTime?: number; // work time seconds
@@ -45,6 +46,37 @@ export default function Timer({
     'Inter-Regular': InterRegular,
     'Inter-SemiBold': InterSemiBold
   });
+  const countdownPlayer = useAudioPlayer(require('@/assets/sounds/countdown.mp3'));
+  const transitionPlayer = useAudioPlayer(require('@/assets/sounds/transition.mp3'));
+
+  // Ensure audio plays even in iOS silent mode
+  useEffect(() => {
+    setAudioModeAsync({ playsInSilentMode: true }).catch(() => {});
+  }, []);
+
+  const playCountdownSound = useCallback(async () => {
+    try {
+      if (countdownPlayer?.playing) {
+        countdownPlayer.pause();
+      }
+      await countdownPlayer.seekTo(0);
+      countdownPlayer.play();
+    } catch (error) {
+      console.warn('Erreur lors de la lecture du son countdown:', error);
+    }
+  }, [countdownPlayer]);
+
+  const playTransitionSound = useCallback(async () => {
+    try {
+      if (transitionPlayer?.playing) {
+        transitionPlayer.pause();
+      }
+      await transitionPlayer.seekTo(0);
+      transitionPlayer.play();
+    } catch (error) {
+      console.warn('Erreur lors de la lecture du son transition:', error);
+    }
+  }, [transitionPlayer]);
 
   const vibrateSuccess = useCallback(() => {
     if (Platform.OS === 'ios') {
@@ -93,26 +125,44 @@ export default function Timer({
 
         if (phase === 'prep') {
           setPrepTimeState((prev) => {
+            if (prev <= 4 && prev >= 2) {
+              playCountdownSound();
+            }
+            if (prev === 1) {
+              playTransitionSound();
+            }
             if (prev <= 1) {
               vibrateSuccess();
               setPhase('work');
-              return prepTime; // reset for potential next start
+              return prepTime;
             }
             return prev - 1;
           });
         } else if (phase === 'work') {
           setWorkTime((prev) => {
+            if (prev <= 4 && prev >= 2) {
+              playCountdownSound();
+            }
+            if (prev === 1) {
+              playTransitionSound();
+            }
             if (prev <= 1) {
               handleWorkComplete();
-              return initialTime; // reset work time for next work phase
+              return initialTime;
             }
             return prev - 1;
           });
         } else if (phase === 'rest') {
           setRestTimeState((prev) => {
+            if (prev <= 4 && prev >= 2) {
+              playCountdownSound();
+            }
+            if (prev === 1) {
+              playTransitionSound();
+            }
             if (prev <= 1) {
               handleRestComplete();
-              return restTime; // reset rest for next rest phase
+              return restTime;
             }
             return prev - 1;
           });
@@ -121,7 +171,7 @@ export default function Timer({
     }
 
     return () => clearInterval(interval);
-  }, [isRunning, mode, phase, handleWorkComplete, handleRestComplete, initialTime, restTime, prepTime, vibrateSuccess]);
+  }, [isRunning, mode, phase, handleWorkComplete, handleRestComplete, initialTime, restTime, prepTime, vibrateSuccess, playCountdownSound, playTransitionSound]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -196,7 +246,8 @@ export default function Timer({
         <View style={styles.topRow}>
           <Text style={[styles.headerTitle, { color: theme.colors.text.primary }]}>{titleLabel}</Text>
           {mode === 'timer' && (
-            <Text style={[styles.globalTime, { color: theme.colors.text.secondary }]}>Total {formatTime(totalRemaining)}</Text>
+            <Text
+              style={[styles.globalTime, { color: theme.colors.text.secondary }]}>Total {formatTime(totalRemaining)}</Text>
           )}
           <Button variant="icon" onPress={resetTimer} style={styles.resetBtn}
                   icon={<RotateCcw size={18} color={theme.colors.text.onPrimary} />} />
@@ -204,7 +255,8 @@ export default function Timer({
 
         <View style={styles.ringContainer}>
           <Svg width={size} height={size}>
-            <Circle cx={size / 2} cy={size / 2} r={radius} stroke={theme.colors.background.button} strokeWidth={stroke} fill="none" />
+            <Circle cx={size / 2} cy={size / 2} r={radius} stroke={theme.colors.background.button} strokeWidth={stroke}
+                    fill="none" />
             <Circle
               cx={size / 2}
               cy={size / 2}
@@ -232,10 +284,12 @@ export default function Timer({
         )}
 
         <View style={styles.bottomRow}>
-          {mode === 'timer' && <Text style={[styles.setInfo, { color: theme.colors.text.secondary }]}>Série {phase === 'prep' ? 1 : currentSet} / {sets}</Text>}
+          {mode === 'timer' && <Text
+            style={[styles.setInfo, { color: theme.colors.text.secondary }]}>Série {phase === 'prep' ? 1 : currentSet} / {sets}</Text>}
           <Button
             variant="primary"
-            icon={isRunning ? <Pause size={28} color={theme.colors.text.onPrimary} /> : <Play size={28} color={theme.colors.text.onPrimary} />}
+            icon={isRunning ? <Pause size={28} color={theme.colors.text.onPrimary} /> :
+              <Play size={28} color={theme.colors.text.onPrimary} />}
             onPress={toggleTimer}
             style={styles.bigActionButton}
           />

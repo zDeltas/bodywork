@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Modal,
   ScrollView,
   StyleSheet,
   TextInput,
-  TextInput as RNTextInput,
   TouchableOpacity,
   View
 } from 'react-native';
@@ -12,13 +11,14 @@ import Header from '@/app/components/layout/Header';
 import Text from '@/app/components/ui/Text';
 import Button from '@/app/components/ui/Button';
 import { useTranslation } from '@/app/hooks/useTranslation';
-import ExerciseList from '@/app/components/exercises/ExerciseList';
-import { BarChart, ChevronDown, Edit2, Layers, Plus, TimerIcon, Weight, X, Clock, Ruler } from 'lucide-react-native';
+import ExerciseSelectionModal from '@/app/components/exercises/ExerciseSelectionModal';
+import { BarChart, ChevronDown, Clock, Edit2, Layers, Plus, Ruler, TimerIcon, Weight, X } from 'lucide-react-native';
 import { useTheme } from '@/app/hooks/useTheme';
 import { storageService } from '@/app/services/storage';
 import { useRouter } from 'expo-router';
+import { formatSeries, getValidSeries } from '../../utils/seriesUtils';
 import { TimerPickerModal } from 'react-native-timer-picker';
-import { Exercise, Series, EditableSeries } from '@/types/common';
+import { EditableSeries, Exercise, Series } from '@/types/common';
 
 // Structure de base pour la routine en cours de création
 const initialRoutine = {
@@ -38,8 +38,8 @@ export default function NewRoutineScreen() {
   const [step, setStep] = useState(1);
   const [routine, setRoutine] = useState(initialRoutine);
   const [exercises, setExercises] = useState<Exercise[]>([]);
-  const [selectedMuscle, setSelectedMuscle] = useState('');
-  const [selectedExercise, setSelectedExercise] = useState<{ name: string; key: string } | null>(null);
+  const [exerciseName, setExerciseName] = useState<string>('');
+  const [exerciseKey, setExerciseKey] = useState<string>('');
   const [series, setSeries] = useState<EditableSeries[]>([
     { unitType: 'reps', weight: '', reps: '', duration: '', distance: '', note: '', rest: '', type: 'workingSet' }
   ]);
@@ -49,28 +49,50 @@ export default function NewRoutineScreen() {
   const [showTimerPicker, setShowTimerPicker] = useState(false);
   const [currentSeriesIndex, setCurrentSeriesIndex] = useState<number | null>(null);
 
+  const applyExerciseSelection = React.useCallback((name: string, key: string) => {
+    setExerciseName(name);
+    setExerciseKey(key);
+  }, []);
+
+
+  // Ouvrir la configuration des séries quand un exercice est sélectionné
+  useEffect(() => {
+    if (exerciseKey) {
+      setShowSeriesConfig(true);
+    }
+  }, [exerciseKey]);
+
   // Ouvre la modale pour ajouter un nouvel exercice
   const openAddExercise = () => {
-    setSelectedMuscle('');
-    setSelectedExercise(null);
-    setSeries([{ unitType: 'reps', weight: '', reps: '', duration: '', distance: '', note: '', rest: '', type: 'workingSet' }]);
+    setExerciseName('');
+    setExerciseKey('');
+    setSeries([{
+      unitType: 'reps',
+      weight: '',
+      reps: '',
+      duration: '',
+      distance: '',
+      note: '',
+      rest: '',
+      type: 'workingSet'
+    }]);
     setEditingIndex(null);
-    setShowExerciseSelector(true);
+    setShowSeriesConfig(true);
   };
 
   // Ouvre la modale pour éditer un exercice existant
   const openEditExercise = (index: number) => {
     const ex = exercises[index];
-    setSelectedMuscle('');
-    setSelectedExercise({ name: ex.name, key: ex.translationKey });
+    setExerciseName(ex.name);
+    setExerciseKey(ex.translationKey);
     setSeries(ex.series.map((s) => ({
-      unitType: s.unitType || 'reps', // Default to 'reps' for backward compatibility
-      weight: s.weight.toString(),
-      reps: s.reps ? s.reps.toString() : '',
-      duration: s.duration ? s.duration.toString() : '',
-      distance: s.distance ? s.distance.toString() : '',
-      note: s.note,
-      rest: s.rest ?? '',
+      unitType: s.unitType,
+      weight: s.weight?.toString() || '',
+      reps: s.reps?.toString() || '',
+      duration: s.duration?.toString() || '',
+      distance: s.distance?.toString() || '',
+      note: s.note || '',
+      rest: s.rest || '',
       type: s.type
     })));
     setEditingIndex(index);
@@ -79,22 +101,15 @@ export default function NewRoutineScreen() {
 
   // Ajoute ou met à jour un exercice dans la routine
   const saveExercise = () => {
-    if (!selectedExercise) return;
-    const formattedSeries: Series[] = series.map((s) => ({
-      unitType: s.unitType || 'reps',
-      weight: parseFloat(s.weight) || 0,
-      reps: (s.unitType || 'reps') === 'reps' ? (parseInt(s.reps || '0') || 0) : undefined,
-      duration: s.unitType === 'time' ? (parseInt(s.duration || '0') || 0) : undefined,
-      distance: s.unitType === 'distance' ? (parseFloat(s.distance || '0') || 0) : undefined,
-      note: s.note,
-      rest: s.rest ?? '',
-      rpe: s.type === 'warmUp' ? 0 : 7,
-      type: s.type
-    }));
+    if (!exerciseKey || !exerciseName) return;
+    const validSeries = getValidSeries(series);
+    if (validSeries.length === 0) return;
+
+    const formattedSeries: Series[] = formatSeries(validSeries, '7');
     const newEx: Exercise = {
-      name: selectedExercise.name,
-      key: `${selectedExercise.key}_${Date.now()}`,
-      translationKey: selectedExercise.key,
+      name: exerciseName,
+      key: `${exerciseKey}_${Date.now()}`,
+      translationKey: exerciseKey,
       series: formattedSeries
     };
     setExercises((prev) => {
@@ -146,40 +161,16 @@ export default function NewRoutineScreen() {
 
   // Modale de sélection d'exercice
   const renderExerciseSelectorModal = () => (
-    <Modal
+    <ExerciseSelectionModal
       visible={showExerciseSelector}
-      transparent={true}
-      animationType="slide"
-      onRequestClose={() => setShowExerciseSelector(false)}
-    >
-      <View style={styles.modalOverlay}>
-        <View style={[styles.modalContent, { height: '80%' }]}>
-          <View style={styles.modalHeader}>
-            <Text variant="heading" style={styles.modalTitle}>
-              {t('stats.selectExercise')}
-            </Text>
-            <TouchableOpacity
-              style={styles.modalCloseButton}
-              onPress={() => setShowExerciseSelector(false)}
-            >
-              <X color={theme.colors.text.primary} size={24} />
-            </TouchableOpacity>
-          </View>
-          <ScrollView style={{ flex: 1 }}>
-            <ExerciseList
-              selectedMuscle={selectedMuscle}
-              setSelectedMuscle={setSelectedMuscle}
-              exercise={selectedExercise?.name || ''}
-              setExercise={(name, key) => {
-                setSelectedExercise({ name, key: key || name });
-                setShowExerciseSelector(false);
-                setShowSeriesConfig(true);
-              }}
-            />
-          </ScrollView>
-        </View>
-      </View>
-    </Modal>
+      onClose={() => setShowExerciseSelector(false)}
+      onExerciseSelect={(exercise) => {
+        applyExerciseSelection(exercise.name, exercise.key);
+        setShowExerciseSelector(false);
+      }}
+      selectedExercise={exerciseName}
+      title={t('exerciseSelection.title')}
+    />
   );
 
   // Étape 2 : gestion des exercices de la routine
@@ -263,7 +254,7 @@ export default function NewRoutineScreen() {
       onRequestClose={() => setShowSeriesConfig(false)}
     >
       <View style={styles.modalOverlay}>
-        <View style={[styles.modalContent, { height: '80%' }]}>
+        <View style={[styles.modalContent]}>
           <View style={styles.modalHeader}>
             <Text variant="heading">{t('routine.configureSeries')}</Text>
             <TouchableOpacity onPress={() => setShowSeriesConfig(false)}>
@@ -280,9 +271,9 @@ export default function NewRoutineScreen() {
           >
             <Text
               variant="body"
-              style={[styles.exerciseButtonText, !selectedExercise?.name && { color: theme.colors.text.secondary }]}
+              style={[styles.exerciseButtonText, !exerciseName && { color: theme.colors.text.secondary }]}
             >
-              {selectedExercise?.name || t('stats.selectExercise')}
+              {exerciseName || t('stats.selectExercise')}
             </Text>
             <ChevronDown color={theme.colors.text.secondary} size={20} />
           </TouchableOpacity>
@@ -573,7 +564,7 @@ export default function NewRoutineScreen() {
   const renderStep1 = () => (
     <>
       <Text variant="subheading" style={styles.label}>{t('routine.title')}</Text>
-      <RNTextInput
+      <TextInput
         style={styles.input}
         placeholder={t('routine.titlePlaceholder')}
         value={routine.title}
@@ -581,7 +572,7 @@ export default function NewRoutineScreen() {
         placeholderTextColor={theme.colors.text.secondary}
       />
       <Text variant="subheading" style={styles.label}>{t('routine.description')}</Text>
-      <RNTextInput
+      <TextInput
         style={[styles.input, styles.textArea]}
         placeholder={t('routine.descriptionPlaceholder')}
         value={routine.description}
@@ -845,10 +836,12 @@ const useStyles = (theme: any) => StyleSheet.create({
     justifyContent: 'flex-end'
   },
   modalContent: {
+    flex: 1,
     backgroundColor: theme.colors.background.card,
     borderTopLeftRadius: theme.borderRadius.lg,
     borderTopRightRadius: theme.borderRadius.lg,
     padding: theme.spacing.lg,
+    marginTop: theme.spacing.xs,
     ...theme.shadows.lg
   },
   modalHeader: {

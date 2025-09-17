@@ -10,11 +10,11 @@ import useHaptics from '@/app/hooks/useHaptics';
 import { useTheme } from '@/app/hooks/useTheme';
 import Header from '@/app/components/layout/Header';
 import Text from '@/app/components/ui/Text';
-import { ExerciseList, getPredefinedExercises } from '@/app/components/exercises/ExerciseList';
+import { getPredefinedExercises } from '@/app/components/exercises';
+import ExerciseSelectionModal from '@/app/components/exercises/ExerciseSelectionModal';
 import { Button } from '@/app/components/ui/Button';
 import useGoals from '@/app/hooks/useGoals';
 import useWorkouts from '@/app/hooks/useWorkouts';
-import Modal from '@/app/components/ui/Modal';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -346,7 +346,6 @@ export default function NewGoalScreen() {
   const [isLoadingLastWorkout, setIsLoadingLastWorkout] = useState(false);
   const [hasPreviousWorkouts, setHasPreviousWorkouts] = useState(false);
   const [highestWeight, setHighestWeight] = useState<number | null>(null);
-  const [selectedMuscleGroup, setSelectedMuscleGroup] = useState<string>('');
   const [isExerciseModalVisible, setIsExerciseModalVisible] = useState(false);
 
   const [fontsLoaded] = useFonts({
@@ -366,19 +365,6 @@ export default function NewGoalScreen() {
   const { addGoal, getCurrentWeight, suggestTargetWeight } = useGoals(workouts);
   const haptics = useHaptics();
 
-  // Charger les options d'exercice à partir des workouts et des exercices prédéfinis
-  useEffect(() => {
-    const predefinedExercises = Object.values(
-      getPredefinedExercises(t as (key: string) => string)
-    ).flat();
-    const workoutExercises = workouts.map((w) => w.exercise);
-    const uniqueExercises = Array.from(new Set([...workoutExercises, ...predefinedExercises]));
-
-    // Ne mettre à jour que si les exercices ont changé
-    if (JSON.stringify(uniqueExercises) !== JSON.stringify(exerciseOptions)) {
-      setExerciseOptions(uniqueExercises as string[]);
-    }
-  }, [workouts, t, exerciseOptions]);
 
   // Vérifier s'il y a des workouts précédents pour l'exercice sélectionné
   useEffect(() => {
@@ -411,15 +397,15 @@ export default function NewGoalScreen() {
   }, [newGoalCurrent, suggestTargetWeight, suggestedTarget]);
 
   const handleExerciseSelect = useCallback(
-    (exercise: string, exerciseKey?: string) => {
+    (exercise: any) => {
       haptics.impactLight();
-      setIsExerciseModalVisible(false);
-      setNewGoalExercise(exercise);
-      setNewGoalExerciseKey(exerciseKey || exercise);
-      const weight = getCurrentWeight(exerciseKey || exercise);
+      setNewGoalExercise(exercise.name);
+      setNewGoalExerciseKey(exercise.key);
+      const weight = getCurrentWeight(exercise.key);
       if (weight) {
         setNewGoalCurrent(weight.toString());
       }
+      setIsExerciseModalVisible(false);
     },
     [getCurrentWeight, haptics]
   );
@@ -495,9 +481,6 @@ export default function NewGoalScreen() {
     }
   };
 
-  const handleMuscleGroupSelect = (muscleGroup: string) => {
-    setSelectedMuscleGroup(muscleGroup);
-  };
 
   if (!fontsLoaded) {
     return null;
@@ -605,19 +588,21 @@ export default function NewGoalScreen() {
         </Animated.View>
       </ScrollView>
 
-      <Modal
+      <ExerciseSelectionModal
         visible={isExerciseModalVisible}
         onClose={handleCloseExerciseModal}
+        onExerciseSelect={(exercise) => {
+          setNewGoalExercise(exercise.name);
+          setNewGoalExerciseKey(exercise.key);
+          const weight = getCurrentWeight(exercise.key);
+          if (weight) {
+            setNewGoalCurrent(weight.toString());
+          }
+          handleCloseExerciseModal();
+        }}
+        selectedExercise={newGoalExercise}
         title={t('goals.selectExerciseForGoal')}
-        showCloseButton={true}
-      >
-        <ExerciseList
-          exercise={newGoalExercise}
-          setExercise={handleExerciseSelect}
-          selectedMuscle={selectedMuscleGroup}
-          setSelectedMuscle={handleMuscleGroupSelect}
-        />
-      </Modal>
+      />
     </View>
   );
 }

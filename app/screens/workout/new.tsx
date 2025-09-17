@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { Modal, Pressable, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -11,10 +11,11 @@ import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
 import Header from '@/app/components/layout/Header';
 import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold, useFonts } from '@expo-google-fonts/inter';
-import ExerciseListModal from '@/app/components/exercises/ExerciseListModal';
+import ExerciseSelectionModal from '@/app/components/exercises/ExerciseSelectionModal';
 import { Series, SeriesType, Workout, EditableSeries } from '@/types/common';
 import { WorkoutDateUtils } from '@/types/workout';
-import { MuscleGroupKey } from '@/app/components/exercises/ExerciseList';
+import { predefinedExercises } from '@/app/components/exercises';
+import { formatSeries, getValidSeries } from '../../utils/seriesUtils';
 import { TranslationKey } from '@/translations';
 import { useWorkouts } from '@/app/hooks/useWorkouts';
 
@@ -37,9 +38,7 @@ export default function NewWorkoutScreen() {
   const { theme } = useTheme();
   const styles = useStyles();
   const { workouts, saveWorkout: saveWorkoutToStorage } = useWorkouts();
-  const [selectedMuscle, setSelectedMuscle] = useState<string>('');
-  const [selectedMuscleKey, setSelectedMuscleKey] = useState<MuscleGroupKey | string>('');
-  const [exercise, setExercise] = useState<string>('');
+  const [exerciseName, setExerciseName] = useState<string>('');
   const [exerciseKey, setExerciseKey] = useState<string>('');
   const [rpe, setRpe] = useState<string>('');
   const [series, setSeries] = useState<EditableSeries[]>([
@@ -62,47 +61,26 @@ export default function NewWorkoutScreen() {
   const [showCalendar, setShowCalendar] = useState<boolean>(false);
   const [showExerciseSelector, setShowExerciseSelector] = useState<boolean>(false);
 
-  const processSeries = (series: EditableSeries[], rpe: string): Series[] => {
-    return series.map((s) => ({
-      unitType: s.unitType || 'reps',
-      weight: parseFloat(s.weight) || 0,
-      reps: (s.unitType || 'reps') === 'reps' ? (parseInt(s.reps || '0') || 0) : undefined,
-      duration: s.unitType === 'time' ? (parseInt(s.duration || '0') || 0) : undefined,
-      distance: s.unitType === 'distance' ? (parseFloat(s.distance || '0') || 0) : undefined,
-      note: s.note,
-      rpe: s.type === 'warmUp' ? 0 : parseInt(s.rpe || rpe) || 7,
-      type: s.type || 'workingSet'
-    }));
-  };
+  const applyExerciseSelection = useCallback((name: string, key: string) => {
+    setExerciseName(name);
+    setExerciseKey(key);
+  }, []);
 
   const saveWorkout = async (): Promise<void> => {
     try {
-      const validSeries = series.filter((s) => {
-        const unit = s.unitType || 'reps';
-        const hasData =
-          parseFloat(s.weight) > 0 ||
-          (unit === 'reps' && parseInt(s.reps || '0') > 0) ||
-          (unit === 'time' && parseInt(s.duration || '0') > 0) ||
-          (unit === 'distance' && parseFloat(s.distance || '0') > 0);
-        if (!hasData) return false;
-        if (s.type === 'warmUp') return true;
-        return (
-          (parseInt(s.rpe) >= 1 && parseInt(s.rpe) <= 10) ||
-          (parseInt(rpe) >= 1 && parseInt(rpe) <= 10)
-        );
-      });
+      const validSeries = getValidSeries(series);
 
       if (validSeries.length === 0) {
         console.error('No valid series to save');
         return;
       }
 
-      const processedSeries: Series[] = processSeries(validSeries, rpe);
+      const processedSeries: Series[] = formatSeries(validSeries, rpe);
 
       const workout: Workout = {
         id: Date.now().toString(),
-        muscleGroup: selectedMuscleKey,
-        exercise: exerciseKey,
+        muscleGroup: exerciseKey ? (predefinedExercises.find(e => e.key === exerciseKey)?.primaryMuscle || '') : '',
+        exercise: exerciseKey || '',
         series: processedSeries,
         date: selectedDate
           ? WorkoutDateUtils.createISOString(selectedDate)
@@ -187,22 +165,15 @@ export default function NewWorkoutScreen() {
           </View>
         </Modal>
 
-        <ExerciseListModal
+        <ExerciseSelectionModal
           visible={showExerciseSelector}
           onClose={() => setShowExerciseSelector(false)}
-          selectedMuscle={selectedMuscle}
-          setSelectedMuscle={(muscleGroup: string, muscleKey?: string) => {
-            setSelectedMuscle(muscleGroup);
-            setSelectedMuscleKey(muscleKey || muscleGroup);
-          }}
-          exercise={exercise}
-          setExercise={(selectedExercise, selectedExerciseKey) => {
-            setExercise(selectedExercise);
-            setExerciseKey(selectedExerciseKey || selectedExercise);
+          onExerciseSelect={(selectedExercise) => {
+            applyExerciseSelection(selectedExercise.name, selectedExercise.key);
             setShowExerciseSelector(false);
           }}
-          setIsCustomExercise={() => {
-          }}
+          selectedExercise={exerciseName}
+          title={t('exerciseSelection.title')}
         />
 
         <TouchableOpacity
@@ -211,9 +182,9 @@ export default function NewWorkoutScreen() {
         >
           <Text
             variant="body"
-            style={[styles.exerciseButtonText, !exercise && { color: theme.colors.text.secondary }]}
+            style={[styles.exerciseButtonText, !exerciseName && { color: theme.colors.text.secondary }]}
           >
-            {exercise ? t(exerciseKey as TranslationKey) : t('stats.selectExercise')}
+            {exerciseName ? t(exerciseKey as TranslationKey) : t('stats.selectExercise')}
           </Text>
           <ChevronDown color={theme.colors.text.secondary} size={20} />
         </TouchableOpacity>
@@ -660,9 +631,9 @@ export default function NewWorkoutScreen() {
 
         {!isAnyRpeDropdownOpen && (
           <TouchableOpacity
-            style={[styles.addButton, (!exercise || !selectedMuscle) && styles.addButtonDisabled]}
+            style={[styles.addButton, !exerciseName && styles.addButtonDisabled]}
             onPress={saveWorkout}
-            disabled={!exercise || !selectedMuscle}
+            disabled={!exerciseName}
           >
             <Text variant="body" style={styles.addButtonText}>
               {t('workout.addExercise')}
@@ -705,6 +676,30 @@ const useStyles = () => {
       justifyContent: 'center',
       alignItems: 'center',
       ...theme.shadows.sm
+    },
+    modalContainer: {
+      flex: 1,
+      backgroundColor: theme.colors.background.main
+    },
+    modalHeaderWorkout: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingTop: theme.spacing.xl * 1.5,
+      paddingHorizontal: theme.spacing.lg,
+      paddingBottom: theme.spacing.lg,
+      backgroundColor: theme.colors.background.card,
+      ...theme.shadows.md
+    },
+    modalTitleWorkout: {
+      flex: 1,
+      textAlign: 'center',
+      fontSize: theme.typography.fontSize.xl,
+      fontFamily: theme.typography.fontFamily.bold,
+      color: theme.colors.text.primary
+    },
+    modalHeaderRight: {
+      width: 44
     },
     content: {
       flex: 1,

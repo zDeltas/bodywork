@@ -1,50 +1,58 @@
 import React from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
 import { useTheme } from '@/app/hooks/useTheme';
-import ExerciseList from '@/app/components/exercises/ExerciseList';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import Modal from '@/app/components/ui/Modal';
+import UnifiedExerciseList from '@/app/components/exercises/UnifiedExerciseList';
+import { Exercise } from '@/types/common';
 
 interface ExerciseListModalProps {
   visible: boolean;
   onClose: () => void;
   selectedMuscle: string;
-  setSelectedMuscle: (muscleGroup: string, muscleKey?: string) => void;
-  exercise: string;
-  setExercise: (selectedExercise: string, selectedExerciseKey?: string) => void;
-  setIsCustomExercise: () => void;
+  onMuscleSelect: (muscleGroup: string, muscleKey?: string) => void;
+  selectedExercise: string;
+  onExerciseSelect: (exercise: Exercise) => void;
+  title?: string;
 }
 
 export default function ExerciseListModal({
-                                            visible,
-                                            onClose,
-                                            selectedMuscle,
-                                            setSelectedMuscle,
-                                            exercise,
-                                            setExercise,
-                                            setIsCustomExercise
-                                          }: ExerciseListModalProps) {
+  visible,
+  onClose,
+  selectedMuscle,
+  onMuscleSelect,
+  selectedExercise,
+  onExerciseSelect,
+  title
+}: ExerciseListModalProps) {
   const { theme } = useTheme();
   const { t } = useTranslation();
   const styles = useStyles();
+
+  const modalTitle = title || t('stats.selectExercise');
 
   return (
     <Modal
       visible={visible}
       onClose={onClose}
-      title={t('stats.selectExercise')}
-      showCloseButton={true}
+      title={modalTitle}
+      showCloseButton
       animationType="slide"
       style={styles.modalOverlay}
       contentStyle={styles.modalContent}
     >
-      <ScrollView style={{ flex: 1 }}>
-        <ExerciseList
+      <ScrollView style={styles.scrollView}>
+        <UnifiedExerciseList
+          mode="modal"
+          viewMode="collapsible"
           selectedMuscle={selectedMuscle}
-          setSelectedMuscle={setSelectedMuscle}
-          exercise={exercise}
-          setExercise={setExercise}
-          setIsCustomExercise={setIsCustomExercise}
+          onMuscleSelect={onMuscleSelect}
+          selectedExercise={selectedExercise}
+          onExerciseSelect={onExerciseSelect}
+          showSearch
+          showViewModeToggle={false}
+          showAddButton={false}
+          showFavorites={false}
         />
       </ScrollView>
     </Modal>
@@ -66,6 +74,9 @@ const useStyles = () => {
       borderTopRightRadius: theme.borderRadius.lg,
       borderBottomLeftRadius: 0,
       borderBottomRightRadius: 0
+    },
+    scrollView: {
+      flex: 1
     }
   });
 }; 

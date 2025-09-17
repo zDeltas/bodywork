@@ -7,7 +7,7 @@ import { router } from 'expo-router';
 import { useTheme } from '@/app/hooks/useTheme';
 import KpiMotivation from '@/app/components/stats/KpiMotivation';
 import { Workout } from '@/types/common';
-import StatsExerciseList from '@/app/components/stats/StatsExerciseList';
+import { InteractiveMuscleMap, MuscleGroupKey, UnifiedExerciseList } from '@/app/components/exercises';
 import StatsGoals from '@/app/components/stats/StatsGoals';
 import StatsMuscleDistribution from '@/app/components/stats/StatsMuscleDistribution';
 import MuscleRestState from '@/app/components/muscles/MuscleRestState';
@@ -26,8 +26,9 @@ export default function StatsScreen() {
 
   // State
   const [selectedPeriod, setSelectedPeriod] = useState<Period>('1m');
-  const [selectedMuscle, setSelectedMuscle] = useState<string>('');
+  const [selectedMuscle, setSelectedMuscle] = useState<MuscleGroupKey | undefined>();
   const [selectedExercise, setSelectedExercise] = useState<string>('');
+  const [showExerciseList, setShowExerciseList] = useState(false);
 
   // Fonts
   const [fontsLoaded] = useFonts({
@@ -63,12 +64,21 @@ export default function StatsScreen() {
     }
   }, [fontsLoaded]);
 
-  const handleMuscleSelect = useCallback((muscleGroup: string) => {
+  const handleMuscleSelect = useCallback((muscleGroup: MuscleGroupKey) => {
     setSelectedMuscle(muscleGroup);
+    setShowExerciseList(true);
     if (scrollViewRef.current) {
       scrollViewRef.current.scrollTo({ y: 400, animated: true });
     }
   }, []);
+
+  const handleExerciseSelect = useCallback((exercise: any) => {
+    setSelectedExercise(exercise.key);
+    router.push({
+      pathname: '/screens/ExerciseDetails',
+      params: { exercise: exercise.key }
+    });
+  }, [router]);
 
   if (!fontsLoaded) {
     return null;
@@ -94,20 +104,25 @@ export default function StatsScreen() {
           totalWorkouts={statsData.workouts.length}
         />
 
-        <StatsExerciseList
-          selectedMuscle={selectedMuscle}
-          setSelectedMuscle={setSelectedMuscle}
-          selectedExercise={selectedExercise}
-          setSelectedExercise={setSelectedExercise}
-          exerciseOptions={[]}
-          onExerciseSelect={(exercise, exerciseKey) => {
-            router.push({
-              pathname: '/screens/ExerciseDetails',
-              params: { exercise: exerciseKey }
-            });
-          }}
+        <InteractiveMuscleMap
           onMuscleSelect={handleMuscleSelect}
+          selectedMuscle={selectedMuscle}
         />
+
+        {showExerciseList && selectedMuscle && (
+          <UnifiedExerciseList
+            mode="inline"
+            viewMode="grid"
+            selectedMuscle={selectedMuscle}
+            onMuscleSelect={(muscleGroup: string) => handleMuscleSelect(muscleGroup as MuscleGroupKey)}
+            selectedExercise={selectedExercise}
+            onExerciseSelect={handleExerciseSelect}
+            showSearch={true}
+            showViewModeToggle={false}
+            showAddButton={false}
+            showFavorites={false}
+          />
+        )}
 
         <View ref={graphsSectionRef}>
           <StatsGoals fadeAnim={fadeAnim} />

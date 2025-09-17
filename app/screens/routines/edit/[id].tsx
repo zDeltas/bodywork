@@ -4,7 +4,7 @@ import Header from '@/app/components/layout/Header';
 import Text from '@/app/components/ui/Text';
 import Button from '@/app/components/ui/Button';
 import { useTranslation } from '@/app/hooks/useTranslation';
-import ExerciseList from '@/app/components/exercises/ExerciseList';
+import { UnifiedExerciseList } from '@/app/components/exercises';
 import { BarChart, ChevronDown, Edit2, Layers, Plus, TimerIcon, Weight, X, Clock, Ruler } from 'lucide-react-native';
 import { useTheme } from '@/app/hooks/useTheme';
 import { storageService } from '@/app/services/storage';
@@ -318,15 +318,20 @@ export default function EditRoutineScreen() {
               </TouchableOpacity>
               <Text variant="heading">{t('workout.customExercise')}</Text>
             </View>
-            <ExerciseList
+            <UnifiedExerciseList
+              mode="modal"
+              viewMode="collapsible"
               selectedMuscle={selectedMuscle}
-              setSelectedMuscle={setSelectedMuscle}
-              exercise={selectedExercise?.name || ''}
-              setExercise={(name, key) => {
-                setSelectedExercise({ name, key: key || '' });
-                setShowExerciseSelector(false);
+              onMuscleSelect={setSelectedMuscle}
+              selectedExercise={selectedExercise?.name || ''}
+              onExerciseSelect={(exercise) => {
+                setSelectedExercise({ name: exercise.name, key: exercise.key });
                 setShowSeriesConfig(true);
               }}
+              showSearch={true}
+              showViewModeToggle={false}
+              showAddButton={false}
+              showFavorites={false}
             />
           </View>
         </View>

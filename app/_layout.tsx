@@ -112,6 +112,22 @@ export default function RootLayout() {
                   }}
                 />
                 <Stack.Screen
+                  name="screens/exercise-selection"
+                  options={{
+                    presentation: 'modal',
+                    animation: getModalAnimation,
+                    animationDuration: 350
+                  }}
+                />
+                <Stack.Screen
+                  name="screens/exercise-list"
+                  options={{
+                    presentation: 'card',
+                    animation: getSlideAnimation,
+                    animationDuration: 300
+                  }}
+                />
+                <Stack.Screen
                   name="+not-found"
                   options={{
                     animation: getDefaultAnimation,

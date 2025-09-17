@@ -260,7 +260,15 @@ export default {
     core: 'Core',
     cardio: 'Cardio',
     other: 'Other',
-    exercise: 'Exercise'
+    exercise: 'Exercise',
+    obliques: 'Obliques',
+    forearms: 'Forearms',
+    abductors: 'Abductors',
+    adductors: 'Adductors',
+    quadriceps: 'Quadriceps',
+    trapezius: 'Trapezius',
+    hamstrings: 'Hamstrings',
+    calves: 'Calves'
   },
 
   // Measurements screen
@@ -341,6 +349,60 @@ export default {
   exercise_core_legRaises: 'Leg Raises',
   exercise_core_crunches: 'Crunches',
   exercise_core_hangingKneeRaises: 'Hanging Knee Raises',
+  exercise_core_sidePlank: 'Side Plank',
+  exercise_core_obliqueCrunches: 'Oblique Crunches',
+  exercise_core_woodChops: 'Wood Chops',
+
+  // Exercise names - Obliques
+  exercise_obliques_russianTwist: 'Russian Twist',
+  exercise_obliques_sidePlank: 'Side Plank',
+  exercise_obliques_obliqueCrunches: 'Oblique Crunches',
+  exercise_obliques_woodChops: 'Wood Chops',
+
+  // Exercise names - Forearms
+  exercise_forearms_wristCurls: 'Wrist Curls',
+  exercise_forearms_reverseCurls: 'Reverse Curls',
+  exercise_forearms_farmerWalk: 'Farmer Walk',
+  exercise_forearms_gripTraining: 'Grip Training',
+
+  // Exercise names - Abductors
+  exercise_legs_sideLunges: 'Side Lunges',
+  exercise_legs_clamshells: 'Clamshells',
+  exercise_legs_hipAbduction: 'Hip Abduction',
+  exercise_legs_lateralWalks: 'Lateral Walks',
+
+  // Exercise names - Adductors
+  exercise_legs_sumoSquats: 'Sumo Squats',
+  exercise_legs_hipAdduction: 'Hip Adduction',
+  exercise_legs_innerThighLifts: 'Inner Thigh Lifts',
+  exercise_legs_adductorMachine: 'Adductor Machine',
+
+  // Exercise names - Quadriceps
+  exercise_legs_frontSquat: 'Front Squat',
+  exercise_legs_bulgarianSplitSquat: 'Bulgarian Split Squat',
+
+  // Exercise names - Trapezius
+  exercise_back_uprightRow: 'Upright Row',
+  exercise_back_facePulls: 'Face Pulls',
+
+  // Exercise names - Hamstrings
+  exercise_legs_legCurls: 'Leg Curls',
+  exercise_legs_romanianDeadlift: 'Romanian Deadlift',
+  exercise_legs_goodMornings: 'Good Mornings',
+  exercise_legs_gluteHamRaises: 'Glute Ham Raises',
+
+  // Exercise names - Calves
+  exercise_legs_jumpingJacks: 'Jumping jacks',
+  exercise_legs_calfRaises: 'Calf Raises',
+  exercise_legs_seatedCalfRaises: 'Seated Calf Raises',
+  exercise_legs_boxJumps: 'Box Jumps',
+
+  // Exercise names - Cardio
+  exercise_cardio_running: 'Running',
+  exercise_cardio_cycling: 'Cycling',
+  exercise_cardio_rowing: 'Rowing',
+  exercise_cardio_jumpingJacks: 'Jumping Jacks',
+  exercise_cardio_burpees: 'Burpees',
 
   // Profile screen
   profile: {
@@ -455,5 +517,26 @@ export default {
       10: 'November',
       11: 'December'
     }
+  },
+
+  // Exercise Selection
+  exerciseSelection: {
+    title: 'Select Exercise',
+    searchPlaceholder: 'Search exercises...',
+    selectByMuscle: 'Select by Muscle Group',
+    rotate: 'Rotate',
+    quickAccess: 'Quick Access',
+    exercises: 'exercises'
+  },
+
+  // Exercise List
+  exerciseList: {
+    exercisesFor: 'Exercises for',
+    searchResults: 'Search Results',
+    allExercises: 'All Exercises',
+    searchPlaceholder: 'Search exercises...',
+    clearAll: 'Clear All',
+    noExercisesFound: 'No exercises found',
+    addCustomExercise: 'Add Custom Exercise'
   }
 };

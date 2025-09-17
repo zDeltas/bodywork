@@ -140,7 +140,7 @@ const useStats = (selectedPeriod: Period) => {
     [t]
   );
 
-  const getMuscleDistribution = (workouts: Workout[]): MuscleDistributionData[] => {
+  const getMuscleDistribution = useCallback((workouts: Workout[]): MuscleDistributionData[] => {
     const muscleGroups: Record<string, number> = {};
 
     workouts.forEach((workout) => {
@@ -164,7 +164,7 @@ const useStats = (selectedPeriod: Period) => {
         originalName: name
       }))
       .sort((a, b) => b.value - a.value);
-  };
+  }, [t]);
 
   useEffect(() => {
     const loadWorkouts = async () => {

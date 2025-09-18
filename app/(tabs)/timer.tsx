@@ -3,8 +3,7 @@ import { Platform, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-
 import * as SplashScreen from 'expo-splash-screen';
 import { Clock, Minus, Plus, Settings, Timer as TimerIcon } from 'lucide-react-native';
 import { useTranslation } from '@/app/hooks/useTranslation';
-import { TimerPickerModal } from 'react-native-timer-picker';
-import { LinearGradient } from 'expo-linear-gradient';
+import TimerPickerModal from '@/app/components/timer/TimerPickerModal';
 import { useTheme } from '@/app/hooks/useTheme';
 import Text from '../components/ui/Text';
 import Header from '@/app/components/layout/Header';
@@ -42,7 +41,6 @@ function TimerScreen() {
     const totalSeconds =
       pickedDuration.hours * 3600 + pickedDuration.minutes * 60 + pickedDuration.seconds;
     setSelectedTime(totalSeconds);
-    setShowCustomTimeModal(false);
   };
 
   const handleCustomRestTimeSave = (pickedDuration: {
@@ -53,7 +51,6 @@ function TimerScreen() {
     const totalSeconds =
       pickedDuration.hours * 3600 + pickedDuration.minutes * 60 + pickedDuration.seconds;
     setSelectedRestTime(totalSeconds);
-    setShowCustomRestTimeModal(false);
   };
 
   const handleCustomPrepTimeSave = (pickedDuration: {
@@ -64,7 +61,6 @@ function TimerScreen() {
     const totalSeconds =
       pickedDuration.hours * 3600 + pickedDuration.minutes * 60 + pickedDuration.seconds;
     setSelectedPrepTime(totalSeconds);
-    setShowCustomPrepTimeModal(false);
   };
 
   return (
@@ -167,131 +163,23 @@ function TimerScreen() {
 
       <TimerPickerModal
         visible={showCustomTimeModal}
-        setIsVisible={setShowCustomTimeModal}
-        onCancel={() => setShowCustomTimeModal(false)}
+        onClose={() => setShowCustomTimeModal(false)}
         onConfirm={handleCustomTimeSave}
-        cancelButtonText={String(t('common.cancel'))}
-        confirmButtonText={String(t('common.save'))}
-        closeOnOverlayPress={true}
         modalTitle={String(t('timer.workTime'))}
-        styles={{
-          backgroundColor: theme.colors.background.card,
-          pickerContainer: {
-            backgroundColor: theme.colors.background.card
-          },
-          pickerItem: {
-            color: theme.colors.text.primary,
-            fontSize: theme.typography.fontSize['3xl']
-          },
-          pickerLabel: {
-            color: theme.colors.text.primary,
-            fontSize: theme.typography.fontSize.xl,
-            right: -20
-          },
-          theme: 'dark',
-          pickerLabelContainer: {
-            width: 60
-          },
-          pickerItemContainer: {
-            width: 150
-          },
-          confirmButton: {
-            backgroundColor: theme.colors.primary,
-            borderColor: theme.colors.primary
-          }
-        }}
-        hideHours={true}
-        padWithNItems={1}
-        minuteLabel="min"
-        secondLabel="sec"
-        LinearGradient={LinearGradient}
-        Haptics={haptics}
       />
 
       <TimerPickerModal
         visible={showCustomRestTimeModal}
-        setIsVisible={setShowCustomRestTimeModal}
-        onCancel={() => setShowCustomRestTimeModal(false)}
+        onClose={() => setShowCustomRestTimeModal(false)}
         onConfirm={handleCustomRestTimeSave}
-        cancelButtonText={String(t('common.cancel'))}
-        confirmButtonText={String(t('common.save'))}
-        closeOnOverlayPress={true}
         modalTitle={String(t('timer.restTime'))}
-        styles={{
-          backgroundColor: theme.colors.background.card,
-          pickerContainer: {
-            backgroundColor: theme.colors.background.card
-          },
-          pickerItem: {
-            color: theme.colors.text.primary,
-            fontSize: theme.typography.fontSize['3xl']
-          },
-          pickerLabel: {
-            color: theme.colors.text.primary,
-            fontSize: theme.typography.fontSize.xl,
-            right: -20
-          },
-          theme: 'dark',
-          pickerLabelContainer: {
-            width: 60
-          },
-          pickerItemContainer: {
-            width: 150
-          },
-          confirmButton: {
-            backgroundColor: theme.colors.primary,
-            borderColor: theme.colors.primary
-          }
-        }}
-        hideHours={true}
-        padWithNItems={1}
-        minuteLabel="min"
-        secondLabel="sec"
-        LinearGradient={LinearGradient}
-        Haptics={haptics}
       />
 
       <TimerPickerModal
         visible={showCustomPrepTimeModal}
-        setIsVisible={setShowCustomPrepTimeModal}
-        onCancel={() => setShowCustomPrepTimeModal(false)}
+        onClose={() => setShowCustomPrepTimeModal(false)}
         onConfirm={handleCustomPrepTimeSave}
-        cancelButtonText={String(t('common.cancel'))}
-        confirmButtonText={String(t('common.save'))}
-        closeOnOverlayPress={true}
         modalTitle={'Préparation'}
-        styles={{
-          backgroundColor: theme.colors.background.card,
-          pickerContainer: {
-            backgroundColor: theme.colors.background.card
-          },
-          pickerItem: {
-            color: theme.colors.text.primary,
-            fontSize: theme.typography.fontSize['3xl']
-          },
-          pickerLabel: {
-            color: theme.colors.text.primary,
-            fontSize: theme.typography.fontSize.xl,
-            right: -20
-          },
-          theme: 'dark',
-          pickerLabelContainer: {
-            width: 60
-          },
-          pickerItemContainer: {
-            width: 150
-          },
-          confirmButton: {
-            backgroundColor: theme.colors.primary,
-            borderColor: theme.colors.primary
-          }
-        }}
-        hideHours={true}
-        padWithNItems={1}
-        minuteLabel="min"
-        secondLabel="sec"
-        LinearGradient={LinearGradient}
-        Haptics={haptics}
       />
     </View>
   );

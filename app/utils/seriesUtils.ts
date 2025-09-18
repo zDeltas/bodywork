@@ -10,7 +10,7 @@ export const formatSeries = (series: EditableSeries[], defaultRpe: string = '7')
   return series.map((s) => ({
     unitType: s.unitType || 'reps',
     weight: parseFloat(s.weight) || 0,
-    reps: (s.unitType || 'reps') === 'reps' ? (parseInt(s.reps || '0') || 0) : undefined,
+    reps: (s.unitType === 'reps' || s.unitType === 'repsAndWeight') ? (parseInt(s.reps || '0') || 0) : undefined,
     duration: s.unitType === 'time' ? (parseInt(s.duration || '0') || 0) : undefined,
     distance: s.unitType === 'distance' ? (parseFloat(s.distance || '0') || 0) : undefined,
     note: s.note,
@@ -29,7 +29,7 @@ export const isValidSeries = (series: EditableSeries): boolean => {
   const unit = series.unitType || 'reps';
   return (
     parseFloat(series.weight) > 0 ||
-    (unit === 'reps' && parseInt(series.reps || '0') > 0) ||
+    ((unit === 'reps' || unit === 'repsAndWeight') && parseInt(series.reps || '0') > 0) ||
     (unit === 'time' && parseInt(series.duration || '0') > 0) ||
     (unit === 'distance' && parseFloat(series.distance || '0') > 0)
   );

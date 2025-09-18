@@ -64,7 +64,7 @@ export default function RoutinesListScreen() {
   const handleEditRoutine = (routineId: string) => {
     haptics.impactLight();
     router.push({
-      pathname: '/screens/routines/edit/[id]',
+      pathname: '/screens/routines/new',
       params: { id: routineId }
     });
   };

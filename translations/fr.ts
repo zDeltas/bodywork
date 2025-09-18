@@ -14,6 +14,7 @@ export default {
     cancel: 'Annuler',
     reset: 'Réinitialiser',
     save: 'Enregistrer',
+    update: 'Mettre à jour',
     delete: 'Supprimer',
     ok: 'OK',
     use: 'Utiliser',
@@ -136,6 +137,7 @@ export default {
 
     // Units
     unitType: 'Type d\'unité',
+    repsAndWeight: 'Rép. et charge',
     seconds: 'secondes',
     minutes: 'minutes',
     meters: 'mètres',
@@ -443,6 +445,7 @@ export default {
   // Routine screen
   routine: {
     createTitle: 'Nouvelle routine',
+    editTitle: 'Modifier la routine',
     title: 'Titre',
     titlePlaceholder: 'Entrez le titre de la routine',
     description: 'Description',
@@ -452,6 +455,7 @@ export default {
     noExerciseSelected: 'Aucun exercice sélectionné',
     addExerciseToStart: 'Ajoutez un exercice pour commencer',
     saved: 'Routine enregistrée !',
+    updated: 'Routine mise à jour !',
     configureSeries: 'Configurer les séries',
     seriesType: 'Type de série',
     warmUp: 'Échauffement',
@@ -461,7 +465,10 @@ export default {
     selectRestTime: 'Sélectionner le temps de repos',
     addSeries: 'Ajouter une série',
     usePreviousValues: 'Utiliser les valeurs précédentes',
-    optionalNote: 'Note optionnelle'
+    optionalNote: 'Note optionnelle',
+    selectDuration: 'Sélectionner la durée',
+    withLoad: 'Avec charge',
+    seriesLabel: 'Série'
   },
 
   // Routines

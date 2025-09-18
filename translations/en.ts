@@ -121,6 +121,7 @@ export default {
 
     // Units
     unitType: 'Unit Type',
+    repsAndWeight: 'Reps & Weight',
     seconds: 'seconds',
     minutes: 'minutes',
     meters: 'meters',
@@ -465,7 +466,10 @@ export default {
     selectRestTime: 'Select Rest Time',
     addSeries: 'Add Series',
     usePreviousValues: 'Use Previous Values',
-    optionalNote: 'Optional Note'
+    optionalNote: 'Optional Note',
+    selectDuration: 'Select duration',
+    withLoad: 'With load',
+    seriesLabel: 'Set'
   },
 
   // Routines

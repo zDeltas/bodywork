@@ -1,5 +1,5 @@
 export type SeriesType = 'warmUp' | 'workingSet';
-export type ExerciseUnit = 'reps' | 'time' | 'distance';
+export type ExerciseUnit = 'repsAndWeight' | 'reps' | 'time' | 'distance';
 
 export interface Series {
   unitType: ExerciseUnit;
@@ -27,7 +27,7 @@ export interface EditableSeries {
 }
 
 export const defaultSeries: Partial<Series> = {
-  unitType: 'reps',
+  unitType: 'repsAndWeight',
   weight: 0,
   reps: 0,
   duration: 0,
@@ -39,6 +39,7 @@ export interface Exercise {
   key: string;
   translationKey: string;
   series: Series[];
+  note?: string;
 }
 
 export interface Routine {

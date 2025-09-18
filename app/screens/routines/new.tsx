@@ -1,166 +1,149 @@
-import React, { useEffect, useState } from 'react';
-import {
-  Modal,
-  ScrollView,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  View
-} from 'react-native';
+import React, { useCallback, useMemo, useState, useEffect } from 'react';
+import { ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import Header from '@/app/components/layout/Header';
 import Text from '@/app/components/ui/Text';
 import Button from '@/app/components/ui/Button';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import ExerciseSelectionModal from '@/app/components/exercises/ExerciseSelectionModal';
-import { BarChart, ChevronDown, Clock, Edit2, Layers, Plus, Ruler, TimerIcon, Weight, X } from 'lucide-react-native';
+import { Layers, Plus } from 'lucide-react-native';
 import { useTheme } from '@/app/hooks/useTheme';
 import { storageService } from '@/app/services/storage';
-import { useRouter } from 'expo-router';
-import { formatSeries, getValidSeries } from '../../utils/seriesUtils';
-import { TimerPickerModal } from 'react-native-timer-picker';
-import { EditableSeries, Exercise, Series } from '@/types/common';
+import { useRouter, useLocalSearchParams } from 'expo-router';
+import { getValidSeries } from '../../utils/seriesUtils';
+import { useRoutineForm } from '@/app/hooks/useRoutineForm';
+import { generateRoutineId, isRoutineComplete } from '@/app/utils/routineUtils';
 
-// Structure de base pour la routine en cours de création
-const initialRoutine = {
-  title: '',
-  description: '',
-  exercises: [] // à remplir à l'étape 2
-};
+import SeriesConfigModal from '@/app/components/routine/SeriesConfigModal';
+import RoutineExerciseCard from '@/app/components/routine/RoutineExerciseCard';
 
-// Utilise le type de formulaire unifié
-
-export default function NewRoutineScreen() {
+function NewRoutineScreen() {
   const { t } = useTranslation();
   const { theme } = useTheme();
   const styles = useStyles(theme);
   const router = useRouter();
+  const { id } = useLocalSearchParams();
 
   const [step, setStep] = useState(1);
-  const [routine, setRoutine] = useState(initialRoutine);
-  const [exercises, setExercises] = useState<Exercise[]>([]);
-  const [exerciseName, setExerciseName] = useState<string>('');
-  const [exerciseKey, setExerciseKey] = useState<string>('');
-  const [series, setSeries] = useState<EditableSeries[]>([
-    { unitType: 'reps', weight: '', reps: '', duration: '', distance: '', note: '', rest: '', type: 'workingSet' }
-  ]);
   const [showExerciseSelector, setShowExerciseSelector] = useState(false);
   const [showSeriesConfig, setShowSeriesConfig] = useState(false);
-  const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [showTimerPicker, setShowTimerPicker] = useState(false);
-  const [currentSeriesIndex, setCurrentSeriesIndex] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // Détermine si on est en mode édition
+  const isEditMode = Boolean(id);
 
-  const applyExerciseSelection = React.useCallback((name: string, key: string) => {
+  const {
+    routine,
+    exercises,
+    exerciseName,
+    exerciseKey,
+    exerciseNote,
+    series,
+    globalUnitType,
+    globalSeriesType,
+    withLoad,
+    globalRest,
+    setRoutine,
+    setExerciseName,
+    setExerciseKey,
+    setExerciseNote,
+    setWithLoad,
+    addSeries,
+    removeSeries,
+    copySeries,
+    updateSeries,
+    resetExerciseForm,
+    loadExerciseForEdit,
+    saveExercise,
+    removeExercise,
+    loadRoutine,
+    updateGlobalSeriesType,
+    updateGlobalUnitType,
+    updateGlobalRest
+  } = useRoutineForm();
+
+  // Charger la routine existante en mode édition
+  useEffect(() => {
+    if (isEditMode && id) {
+      const loadExistingRoutine = async () => {
+        setIsLoading(true);
+        try {
+          const success = await loadRoutine(id as string);
+          if (!success) {
+            alert(t('common.error'));
+            router.back();
+          }
+        } catch (error) {
+          console.error('Error loading routine:', error);
+          alert(t('common.error'));
+          router.back();
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      loadExistingRoutine();
+    }
+  }, [isEditMode, id]);
+
+  const applyExerciseSelection = useCallback((name: string, key: string) => {
     setExerciseName(name);
     setExerciseKey(key);
+    setShowSeriesConfig(true);
+  }, [setExerciseName, setExerciseKey]);
+
+  const openAddExercise = useCallback(() => {
+    resetExerciseForm();
+    setShowExerciseSelector(true);
+  }, [resetExerciseForm]);
+
+  const openEditExercise = useCallback((index: number) => {
+    loadExerciseForEdit(index);
+    setShowSeriesConfig(true);
+  }, [loadExerciseForEdit]);
+
+  const handleSaveExercise = useCallback(() => {
+    if (saveExercise()) {
+      setShowSeriesConfig(false);
+    }
+  }, [saveExercise]);
+
+  const handleExerciseSelect = useCallback(() => {
+    setShowSeriesConfig(false);
+    setShowExerciseSelector(true);
   }, []);
 
-
-  // Ouvrir la configuration des séries quand un exercice est sélectionné
-  useEffect(() => {
-    if (exerciseKey) {
-      setShowSeriesConfig(true);
-    }
-  }, [exerciseKey]);
-
-  // Ouvre la modale pour ajouter un nouvel exercice
-  const openAddExercise = () => {
-    setExerciseName('');
-    setExerciseKey('');
-    setSeries([{
-      unitType: 'reps',
-      weight: '',
-      reps: '',
-      duration: '',
-      distance: '',
-      note: '',
-      rest: '',
-      type: 'workingSet'
-    }]);
-    setEditingIndex(null);
-    setShowSeriesConfig(true);
-  };
-
-  // Ouvre la modale pour éditer un exercice existant
-  const openEditExercise = (index: number) => {
-    const ex = exercises[index];
-    setExerciseName(ex.name);
-    setExerciseKey(ex.translationKey);
-    setSeries(ex.series.map((s) => ({
-      unitType: s.unitType,
-      weight: s.weight?.toString() || '',
-      reps: s.reps?.toString() || '',
-      duration: s.duration?.toString() || '',
-      distance: s.distance?.toString() || '',
-      note: s.note || '',
-      rest: s.rest || '',
-      type: s.type
-    })));
-    setEditingIndex(index);
-    setShowSeriesConfig(true);
-  };
-
-  // Ajoute ou met à jour un exercice dans la routine
-  const saveExercise = () => {
-    if (!exerciseKey || !exerciseName) return;
-    const validSeries = getValidSeries(series);
-    if (validSeries.length === 0) return;
-
-    const formattedSeries: Series[] = formatSeries(validSeries, '7');
-    const newEx: Exercise = {
-      name: exerciseName,
-      key: `${exerciseKey}_${Date.now()}`,
-      translationKey: exerciseKey,
-      series: formattedSeries
-    };
-    setExercises((prev) => {
-      if (editingIndex !== null) {
-        const copy = [...prev];
-        copy[editingIndex] = newEx;
-        return copy;
-      } else {
-        return [...prev, newEx];
+  const handleSaveRoutine = useCallback(async () => {
+    try {
+      if (!isRoutineComplete(routine.title, exercises.length)) {
+        alert(t('common.error'));
+        return;
       }
-    });
-    setShowSeriesConfig(false);
-  };
 
-  // Supprime un exercice de la routine
-  const removeExercise = (index: number) => {
-    setExercises((prev) => prev.filter((_, i) => i !== index));
-  };
+      const routineToSave = {
+        id: isEditMode ? (id as string) : generateRoutineId(),
+        title: routine.title.trim(),
+        description: routine.description.trim(),
+        exercises: exercises,
+        createdAt: new Date().toISOString()
+      };
 
-  // Ajout/suppression de séries
-  const addSeries = () => {
-    setSeries((prev) => [
-      ...prev,
-      { unitType: 'reps', weight: '', reps: '', duration: '', distance: '', note: '', rest: '', type: 'workingSet' }
-    ]);
-  };
-  const removeSeries = (index: number) => {
-    setSeries((prev) => prev.filter((_, i) => i !== index));
-  };
-  const updateSeries = (index: number, field: keyof EditableSeries, value: string) => {
-    setSeries((prev) => prev.map((s, i) => (i === index ? { ...s, [field]: value } : s)));
-  };
-  const setSeriesType = (index: number, type: 'warmUp' | 'workingSet') => {
-    setSeries((prev) => prev.map((s, i) => (i === index ? { ...s, type } : s)));
-  };
+      await storageService.saveRoutine(routineToSave);
+      alert(isEditMode ? t('routine.updated') : t('routine.saved'));
+      router.push('/(tabs)/routines');
+    } catch (error) {
+      console.error('Error saving routine:', error);
+      alert(t('common.error'));
+    }
+  }, [routine, exercises, t, router]);
 
-  // Fonction pour formater le temps de repos
-  const formatRestTime = (minutes: number, seconds: number) => {
-    if (minutes === 0 && seconds === 0) return '';
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-  };
+  const canSave = useMemo(() => {
+    return getValidSeries(series).length > 0;
+  }, [series]);
 
-  // Fonction pour parser le temps de repos
-  const parseRestTime = (rest: string) => {
-    if (!rest) return { minutes: 0, seconds: 0 };
-    const [minutes, seconds] = rest.split(':').map(Number);
-    return { minutes, seconds };
-  };
+  const isRoutineSaveReady = useMemo(() => {
+    return isRoutineComplete(routine.title, exercises.length);
+  }, [routine.title, exercises.length]);
 
-  // Modale de sélection d'exercice
-  const renderExerciseSelectorModal = () => (
+  const renderExerciseSelectorModal = useMemo(() => (
     <ExerciseSelectionModal
       visible={showExerciseSelector}
       onClose={() => setShowExerciseSelector(false)}
@@ -171,10 +154,9 @@ export default function NewRoutineScreen() {
       selectedExercise={exerciseName}
       title={t('exerciseSelection.title')}
     />
-  );
+  ), [showExerciseSelector, exerciseName, applyExerciseSelection, t]);
 
-  // Étape 2 : gestion des exercices de la routine
-  const renderStep2 = () => (
+  const renderStep2 = useMemo(() => (
     <View style={{ flex: 1 }}>
       <View style={styles.sectionTitleContainer}>
         <Layers color={theme.colors.primary} size={24} style={styles.sectionTitleIcon} />
@@ -196,32 +178,12 @@ export default function NewRoutineScreen() {
 
       <ScrollView style={{ flex: 1 }}>
         {exercises.map((ex, idx) => (
-          <View key={ex.key} style={styles.exerciseCard}>
-            <View style={styles.exerciseCardContent}>
-              <View style={styles.exerciseInfo}>
-                <Text variant="subheading" style={styles.exerciseName}>
-                  {ex.name}
-                </Text>
-                <Text variant="caption" style={styles.exerciseDetails}>
-                  {t('workout.series')}: {ex.series.length}
-                </Text>
-              </View>
-              <View style={styles.exerciseActions}>
-                <TouchableOpacity
-                  style={styles.exerciseActionButton}
-                  onPress={() => openEditExercise(idx)}
-                >
-                  <Edit2 size={18} color={theme.colors.text.secondary} />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.exerciseActionButton}
-                  onPress={() => removeExercise(idx)}
-                >
-                  <X size={18} color={theme.colors.text.secondary} />
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
+          <RoutineExerciseCard
+            key={ex.key}
+            exercise={ex}
+            onEdit={() => openEditExercise(idx)}
+            onRemove={() => removeExercise(idx)}
+          />
         ))}
       </ScrollView>
 
@@ -233,335 +195,72 @@ export default function NewRoutineScreen() {
           icon={<Plus size={20} color={theme.colors.text.primary} style={styles.buttonIcon} />}
         />
         <Button
-          title={t('common.save')}
+          title={isEditMode ? t('common.update') : t('common.save')}
           onPress={handleSaveRoutine}
           style={styles.primaryButton}
-          disabled={exercises.length === 0 || !routine.title.trim()}
+          disabled={!isRoutineSaveReady}
         />
       </View>
 
-      {renderExerciseSelectorModal()}
-      {renderSeriesConfigModal()}
-    </View>
-  );
-
-  // Modale de configuration des séries
-  const renderSeriesConfigModal = () => (
-    <Modal
-      visible={showSeriesConfig}
-      transparent={true}
-      animationType="slide"
-      onRequestClose={() => setShowSeriesConfig(false)}
-    >
-      <View style={styles.modalOverlay}>
-        <View style={[styles.modalContent]}>
-          <View style={styles.modalHeader}>
-            <Text variant="heading">{t('routine.configureSeries')}</Text>
-            <TouchableOpacity onPress={() => setShowSeriesConfig(false)}>
-              <X size={24} color={theme.colors.text.primary} />
-            </TouchableOpacity>
-          </View>
-
-          <TouchableOpacity
-            style={styles.exerciseButton}
-            onPress={() => {
-              setShowSeriesConfig(false);
-              setShowExerciseSelector(true);
-            }}
-          >
-            <Text
-              variant="body"
-              style={[styles.exerciseButtonText, !exerciseName && { color: theme.colors.text.secondary }]}
-            >
-              {exerciseName || t('stats.selectExercise')}
-            </Text>
-            <ChevronDown color={theme.colors.text.secondary} size={20} />
-          </TouchableOpacity>
-
-          <ScrollView style={{ flex: 1 }}>
-            {series.map((item, index) => (
-              <View key={index} style={styles.seriesContainer}>
-                <View style={styles.seriesHeader}>
-                  <Text variant="subheading" style={styles.seriesTitle}>
-                    {t('workout.series')} {index + 1}
-                  </Text>
-                  <View style={styles.seriesActions}>
-                    {index > 0 && (
-                      <TouchableOpacity
-                        style={styles.seriesActionButton}
-                        onPress={() => removeSeries(index)}
-                      >
-                        <X color={theme.colors.text.primary} size={18} />
-                      </TouchableOpacity>
-                    )}
-                  </View>
-                </View>
-
-                <View style={styles.seriesTypeContainer}>
-                  <Text variant="body" style={styles.seriesInputLabel}>
-                    {t('workout.seriesType')}
-                  </Text>
-                  <View style={styles.seriesTypeButtonsContainer}>
-                    <TouchableOpacity
-                      style={[
-                        styles.seriesTypeButton,
-                        item.type === 'warmUp' && styles.seriesTypeButtonSelected
-                      ]}
-                      onPress={() => setSeriesType(index, 'warmUp')}
-                    >
-                      <Text
-                        style={[
-                          styles.seriesTypeButtonText,
-                          item.type === 'warmUp' && styles.seriesTypeButtonTextSelected
-                        ]}
-                      >
-                        {t('workout.warmUp')}
-                      </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={[
-                        styles.seriesTypeButton,
-                        item.type === 'workingSet' && styles.seriesTypeButtonSelected
-                      ]}
-                      onPress={() => setSeriesType(index, 'workingSet')}
-                    >
-                      <Text
-                        style={[
-                          styles.seriesTypeButtonText,
-                          item.type === 'workingSet' && styles.seriesTypeButtonTextSelected
-                        ]}
-                      >
-                        {t('workout.workingSet')}
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-
-                {/* Unit Type Selector */}
-                <View style={styles.seriesTypeContainer}>
-                  <Text variant="body" style={styles.seriesInputLabel}>
-                    {t('workout.unitType')}
-                  </Text>
-                  <View style={styles.seriesTypeButtonsContainer}>
-                    <TouchableOpacity
-                      style={[
-                        styles.seriesTypeButton,
-                        item.unitType === 'reps' && styles.seriesTypeButtonSelected
-                      ]}
-                      onPress={() => updateSeries(index, 'unitType', 'reps')}
-                    >
-                      <Text
-                        style={[
-                          styles.seriesTypeButtonText,
-                          item.unitType === 'reps' && styles.seriesTypeButtonTextSelected
-                        ]}
-                      >
-                        {t('workout.reps')}
-                      </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={[
-                        styles.seriesTypeButton,
-                        item.unitType === 'time' && styles.seriesTypeButtonSelected
-                      ]}
-                      onPress={() => updateSeries(index, 'unitType', 'time')}
-                    >
-                      <Text
-                        style={[
-                          styles.seriesTypeButtonText,
-                          item.unitType === 'time' && styles.seriesTypeButtonTextSelected
-                        ]}
-                      >
-                        {t('workout.duration')}
-                      </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={[
-                        styles.seriesTypeButton,
-                        item.unitType === 'distance' && styles.seriesTypeButtonSelected
-                      ]}
-                      onPress={() => updateSeries(index, 'unitType', 'distance')}
-                    >
-                      <Text
-                        style={[
-                          styles.seriesTypeButtonText,
-                          item.unitType === 'distance' && styles.seriesTypeButtonTextSelected
-                        ]}
-                      >
-                        {t('workout.distance')}
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-
-                <View style={[styles.row]}>
-                  <View style={styles.column}>
-                    <View style={styles.sectionTitleContainer}>
-                      <Weight color={theme.colors.primary} size={20} style={styles.sectionTitleIcon} />
-                      <Text variant="body" style={styles.seriesInputLabel}>
-                        {t('workout.weightKg')}
-                      </Text>
-                    </View>
-                    <TextInput
-                      style={styles.compactInput}
-                      value={item.weight}
-                      onChangeText={(value) => updateSeries(index, 'weight', value)}
-                      placeholder="0"
-                      placeholderTextColor={theme.colors.text.secondary}
-                      keyboardType="numeric"
-                    />
-                  </View>
-
-                  {/* Conditional rendering based on unitType */}
-                  {item.unitType === 'reps' && (
-                    <View style={styles.column}>
-                      <View style={styles.sectionTitleContainer}>
-                        <BarChart
-                          color={theme.colors.primary}
-                          size={20}
-                          style={styles.sectionTitleIcon}
-                        />
-                        <Text variant="body" style={styles.seriesInputLabel}>
-                          {t('workout.reps')}
-                        </Text>
-                      </View>
-                      <TextInput
-                        style={styles.compactInput}
-                        value={item.reps}
-                        onChangeText={(value) => updateSeries(index, 'reps', value)}
-                        placeholder="0"
-                        placeholderTextColor={theme.colors.text.secondary}
-                        keyboardType="numeric"
-                      />
-                    </View>
-                  )}
-
-                  {item.unitType === 'time' && (
-                    <View style={styles.column}>
-                      <View style={styles.sectionTitleContainer}>
-                        <Clock
-                          color={theme.colors.primary}
-                          size={20}
-                          style={styles.sectionTitleIcon}
-                        />
-                        <Text variant="body" style={styles.seriesInputLabel}>
-                          {t('workout.duration')} ({t('workout.seconds')})
-                        </Text>
-                      </View>
-                      <TextInput
-                        style={styles.compactInput}
-                        value={item.duration}
-                        onChangeText={(value) => updateSeries(index, 'duration', value)}
-                        placeholder="0"
-                        placeholderTextColor={theme.colors.text.secondary}
-                        keyboardType="numeric"
-                      />
-                    </View>
-                  )}
-
-                  {item.unitType === 'distance' && (
-                    <View style={styles.column}>
-                      <View style={styles.sectionTitleContainer}>
-                        <Ruler
-                          color={theme.colors.primary}
-                          size={20}
-                          style={styles.sectionTitleIcon}
-                        />
-                        <Text variant="body" style={styles.seriesInputLabel}>
-                          {t('workout.distance')} ({t('workout.meters')})
-                        </Text>
-                      </View>
-                      <TextInput
-                        style={styles.compactInput}
-                        value={item.distance}
-                        onChangeText={(value) => updateSeries(index, 'distance', value)}
-                        placeholder="0"
-                        placeholderTextColor={theme.colors.text.secondary}
-                        keyboardType="numeric"
-                      />
-                    </View>
-                  )}
-                </View>
-
-                <View style={styles.row}>
-                  <View style={styles.column}>
-
-                    <View style={styles.sectionTitleContainer}>
-                      <TimerIcon color={theme.colors.primary} size={20} style={styles.sectionTitleIcon} />
-                      <Text variant="body" style={styles.seriesInputLabel}>
-                        {t('timer.restTime')}
-                      </Text>
-                    </View>
-                    <TouchableOpacity
-                      style={styles.compactInput}
-                      onPress={() => {
-                        setCurrentSeriesIndex(index);
-                        setShowTimerPicker(true);
-                      }}
-                    >
-                      <Text style={styles.restTimeText}>
-                        {item.rest || '0:00'}
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-
-                <View style={styles.noteContainer}>
-                  <Text variant="body" style={styles.seriesInputLabel}>
-                    {t('common.note')}
-                  </Text>
-                  <TextInput
-                    style={styles.noteInput}
-                    value={item.note}
-                    onChangeText={(value) => updateSeries(index, 'note', value)}
-                    placeholder={t('workout.optionalNote')}
-                    placeholderTextColor={theme.colors.text.secondary}
-                    multiline
-                  />
-                </View>
-              </View>
-            ))}
-
-            <TouchableOpacity
-              style={styles.addSeriesButton}
-              onPress={addSeries}
-            >
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Plus size={20} color={theme.colors.text.primary} />
-                <Text style={styles.addSeriesText}>{t('workout.addSeries')}</Text>
-              </View>
-            </TouchableOpacity>
-
-            <Button
-              onPress={saveExercise}
-              style={styles.saveButton}
-            >
-              <Text style={{ color: theme.colors.text.primary }}>{t('common.save')}</Text>
-            </Button>
-          </ScrollView>
-        </View>
-      </View>
-
-      <TimerPickerModal
-        visible={showTimerPicker}
-        setIsVisible={setShowTimerPicker}
-        onConfirm={({ minutes, seconds }) => {
-          if (currentSeriesIndex !== null) {
-            updateSeries(currentSeriesIndex, 'rest', formatRestTime(minutes, seconds));
-          }
-          setShowTimerPicker(false);
-        }}
-        modalTitle={t('routine.selectRestTime')}
-        hideHours
+      {renderExerciseSelectorModal}
+      <SeriesConfigModal
+        visible={showSeriesConfig}
+        exerciseName={exerciseName}
+        series={series}
+        globalUnitType={globalUnitType}
+        globalSeriesType={globalSeriesType}
+        withLoad={withLoad}
+        globalRest={globalRest}
+        exerciseNote={exerciseNote}
+        onClose={() => setShowSeriesConfig(false)}
+        onExerciseSelect={handleExerciseSelect}
+        onSeriesAdd={addSeries}
+        onSeriesRemove={removeSeries}
+        onSeriesCopy={copySeries}
+        onSeriesUpdate={updateSeries}
+        onGlobalUnitTypeChange={updateGlobalUnitType}
+        onGlobalSeriesTypeChange={updateGlobalSeriesType}
+        onWithLoadToggle={() => setWithLoad(!withLoad)}
+        onGlobalRestChange={updateGlobalRest}
+        onExerciseNoteChange={setExerciseNote}
+        onSave={handleSaveExercise}
+        canSave={canSave}
       />
-    </Modal>
-  );
+    </View>
+  ), [
+    t,
+    theme.colors.primary,
+    exercises,
+    renderExerciseSelectorModal,
+    showSeriesConfig,
+    exerciseName,
+    series,
+    globalUnitType,
+    globalSeriesType,
+    withLoad,
+    globalRest,
+    exerciseNote,
+    openEditExercise,
+    removeExercise,
+    openAddExercise,
+    handleSaveRoutine,
+    isRoutineSaveReady,
+    setShowSeriesConfig,
+    handleExerciseSelect,
+    addSeries,
+    removeSeries,
+    copySeries,
+    updateSeries,
+    updateGlobalUnitType,
+    updateGlobalSeriesType,
+    setWithLoad,
+    updateGlobalRest,
+    setExerciseNote,
+    handleSaveExercise,
+    canSave
+  ]);
 
-  // Étape 1 : titre & description
-  const renderStep1 = () => (
+  const renderStep1 = useMemo(() => (
     <>
       <Text variant="subheading" style={styles.label}>{t('routine.title')}</Text>
       <TextInput
@@ -588,46 +287,33 @@ export default function NewRoutineScreen() {
         style={styles.button}
       />
     </>
-  );
+  ), [routine.title, routine.description, t, theme.colors.text.secondary, styles, setRoutine]);
 
-  const handleSaveRoutine = async () => {
-    try {
-      if (!routine.title.trim()) {
-        alert(t('common.error'));
-        return;
-      }
-
-      if (exercises.length === 0) {
-        alert(t('routine.noExerciseSelected'));
-        return;
-      }
-
-      const routineToSave = {
-        id: `routine_${Date.now()}_${Math.random().toString(36)}`,
-        title: routine.title.trim(),
-        description: routine.description.trim(),
-        exercises: exercises,
-        createdAt: new Date().toISOString()
-      };
-
-      await storageService.saveRoutine(routineToSave);
-      alert(t('routine.saved'));
-      router.push('/(tabs)/routines');
-    } catch (error) {
-      console.error('Error saving routine:', error);
-      alert(t('common.error'));
-    }
-  };
+  if (isLoading) {
+    return (
+      <View style={styles.container}>
+        <Header
+          title={isEditMode ? t('routine.editTitle') : t('routine.createTitle')}
+          showBackButton
+        />
+        <View style={[styles.content, { justifyContent: 'center', alignItems: 'center' }]}>
+          <Text variant="body" style={{ color: theme.colors.text.secondary }}>
+            {t('common.loading')}
+          </Text>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
       <Header
-        title={t('routine.createTitle')}
+        title={isEditMode ? t('routine.editTitle') : t('routine.createTitle')}
         showBackButton
       />
       <View style={styles.content}>
-        {step === 1 && renderStep1()}
-        {step === 2 && renderStep2()}
+        {step === 1 && renderStep1}
+        {step === 2 && renderStep2}
       </View>
     </View>
   );
@@ -657,148 +343,10 @@ const useStyles = (theme: any) => StyleSheet.create({
   button: {
     marginVertical: theme.spacing.sm
   },
-  selectedExercise: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: theme.colors.background.card,
-    borderRadius: theme.borderRadius.lg,
-    padding: theme.spacing.base,
-    marginBottom: theme.spacing.md,
-    ...theme.shadows.sm
-  },
-  exerciseConfigCard: {
-    backgroundColor: theme.colors.background.card,
-    borderRadius: theme.borderRadius.lg,
-    padding: theme.spacing.base,
-    marginBottom: theme.spacing.lg,
-    ...theme.shadows.sm
-  },
-  seriesContainer: {
-    backgroundColor: theme.colors.background.card,
-    borderRadius: theme.borderRadius.lg,
-    padding: theme.spacing.base,
-    marginBottom: theme.spacing.lg
-  },
-  seriesHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: theme.spacing.base,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border.default,
-    paddingBottom: theme.spacing.md
-  },
-  seriesTitleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    width: '100%',
-    marginBottom: theme.spacing.sm
-  },
-  seriesTitle: {
-    fontSize: theme.typography.fontSize.lg,
-    fontWeight: 'bold',
-    color: theme.colors.text.primary
-  },
-  seriesTypeWrapper: {
-    alignItems: 'flex-end'
-  },
-  seriesTypeLabel: {
-    fontSize: theme.typography.fontSize.sm,
-    color: theme.colors.text.secondary,
-    marginBottom: theme.spacing.xs
-  },
-  seriesTypeContainer: {
-    marginBottom: theme.spacing.base
-  },
-  seriesTypeButtonsContainer: {
-    flexDirection: 'row',
-    gap: theme.spacing.md,
-    marginBottom: theme.spacing.sm
-  },
-  seriesTypeButton: {
-    flex: 1,
-    backgroundColor: theme.colors.background.card,
-    borderRadius: theme.borderRadius.lg,
-    padding: theme.spacing.md,
-    borderWidth: 1,
-    borderColor: theme.colors.border.default
-  },
-  seriesTypeButtonSelected: {
-    backgroundColor: theme.colors.primaryLight,
-    borderColor: theme.colors.primaryBorder
-  },
-  seriesTypeButtonText: {
-    color: theme.colors.text.primary,
-    fontFamily: theme.typography.fontFamily.semiBold,
-    fontSize: theme.typography.fontSize.base,
-    marginBottom: theme.spacing.xs,
-    textAlign: 'center'
-  },
-  seriesTypeButtonTextSelected: {
-    color: theme.colors.primary
-  },
-  row: {
-    flexDirection: 'row',
-    gap: theme.spacing.sm
-  },
-  column: {
-    flex: 1
-  },
-  compactInput: {
-    backgroundColor: theme.colors.background.card,
-    borderRadius: theme.borderRadius.md,
-    padding: theme.spacing.sm,
-    color: theme.colors.text.primary,
-    fontFamily: theme.typography.fontFamily.regular,
-    marginBottom: theme.spacing.base,
-    ...theme.shadows.sm,
-    fontSize: theme.typography.fontSize.md,
-    borderWidth: 1,
-    borderColor: theme.colors.border.default,
-    textAlign: 'center',
-    height: 44
-  },
-  noteContainer: {
-    marginTop: theme.spacing.sm,
-    marginBottom: theme.spacing.base
-  },
-  noteInput: {
-    backgroundColor: theme.colors.background.card,
-    borderRadius: theme.borderRadius.base,
-    padding: theme.spacing.base,
-    color: theme.colors.text.primary,
-    fontFamily: theme.typography.fontFamily.regular,
-    marginBottom: theme.spacing.base,
-    ...theme.shadows.sm,
-    fontSize: theme.typography.fontSize.base,
-    borderWidth: 1,
-    borderColor: theme.colors.border.default,
-    minHeight: 80,
-    textAlignVertical: 'top'
-  },
-  addSeriesButton: {
-    marginTop: theme.spacing.base,
-    padding: theme.spacing.base,
-    backgroundColor: theme.colors.primary,
-    borderRadius: theme.borderRadius.md,
-    alignItems: 'center'
-  },
-  addSeriesText: {
-    fontSize: theme.typography.fontSize.base,
-    fontWeight: 'bold',
-    color: theme.colors.text.primary,
-    marginLeft: theme.spacing.sm
-  },
-  modalContainer: {
-    flex: 1,
-    backgroundColor: theme.colors.background.main
-  },
   sectionTitleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: theme.spacing.lg
+    marginBottom: theme.spacing.sm
   },
   sectionTitleIcon: {
     marginRight: theme.spacing.sm
@@ -807,80 +355,6 @@ const useStyles = (theme: any) => StyleSheet.create({
     fontSize: theme.typography.fontSize.xl,
     fontFamily: theme.typography.fontFamily.semiBold,
     color: theme.colors.text.primary
-  },
-  seriesActionButton: {
-    padding: theme.spacing.sm,
-    borderWidth: 1,
-    borderColor: theme.colors.border.default,
-    borderRadius: theme.borderRadius.full,
-    backgroundColor: theme.colors.background.button
-  },
-  exerciseButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: theme.colors.background.card,
-    padding: theme.spacing.base,
-    borderRadius: theme.borderRadius.lg,
-    marginBottom: theme.spacing.lg,
-    ...theme.shadows.sm
-  },
-  exerciseButtonText: {
-    flex: 1,
-    fontSize: theme.typography.fontSize.base,
-    fontFamily: theme.typography.fontFamily.semiBold,
-    color: theme.colors.text.primary
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-end'
-  },
-  modalContent: {
-    flex: 1,
-    backgroundColor: theme.colors.background.card,
-    borderTopLeftRadius: theme.borderRadius.lg,
-    borderTopRightRadius: theme.borderRadius.lg,
-    padding: theme.spacing.lg,
-    marginTop: theme.spacing.xs,
-    ...theme.shadows.lg
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: theme.spacing.lg
-  },
-  modalTitle: {
-    textAlign: 'center',
-    marginBottom: theme.spacing.lg
-  },
-  modalCloseButton: {
-    width: 44,
-    height: 44,
-    borderRadius: theme.borderRadius.full,
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  restTimeText: {
-    color: theme.colors.text.primary,
-    fontFamily: theme.typography.fontFamily.regular,
-    fontSize: theme.typography.fontSize.md,
-    textAlign: 'center'
-  },
-  seriesActions: {
-    flexDirection: 'row',
-    gap: theme.spacing.sm
-  },
-  saveButton: {
-    backgroundColor: theme.colors.primary,
-    marginVertical: theme.spacing.lg,
-    paddingVertical: theme.spacing.base
-  },
-  seriesInputLabel: {
-    color: theme.colors.text.primary,
-    fontFamily: theme.typography.fontFamily.semiBold,
-    fontSize: theme.typography.fontSize.base,
-    marginBottom: theme.spacing.sm
   },
   emptyStateContainer: {
     alignItems: 'center',
@@ -899,39 +373,6 @@ const useStyles = (theme: any) => StyleSheet.create({
   emptyStateSubtext: {
     color: theme.colors.text.secondary,
     textAlign: 'center'
-  },
-  exerciseCard: {
-    backgroundColor: theme.colors.background.card,
-    borderRadius: theme.borderRadius.lg,
-    marginBottom: theme.spacing.md,
-    ...theme.shadows.sm
-  },
-  exerciseCardContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: theme.spacing.base
-  },
-  exerciseInfo: {
-    flex: 1
-  },
-  exerciseName: {
-    color: theme.colors.text.primary,
-    marginBottom: theme.spacing.xs
-  },
-  exerciseDetails: {
-    color: theme.colors.text.secondary
-  },
-  exerciseActions: {
-    flexDirection: 'row',
-    gap: theme.spacing.sm
-  },
-  exerciseActionButton: {
-    width: 36,
-    height: 36,
-    borderRadius: theme.borderRadius.full,
-    justifyContent: 'center',
-    alignItems: 'center'
   },
   bottomButtons: {
     flexDirection: 'column',
@@ -954,15 +395,10 @@ const useStyles = (theme: any) => StyleSheet.create({
     borderRadius: theme.borderRadius.md,
     marginTop: theme.spacing.base
   },
-  modalBackButton: {
-    width: 44,
-    height: 44,
-    borderRadius: theme.borderRadius.full,
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
   buttonIcon: {
     marginRight: theme.spacing.sm,
     alignSelf: 'center'
   }
 });
+
+export default NewRoutineScreen;

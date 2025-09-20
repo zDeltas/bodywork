@@ -17,6 +17,8 @@ export default {
     update: 'Mettre à jour',
     delete: 'Supprimer',
     ok: 'OK',
+    warning: 'Attention',
+    info: 'Information',
     use: 'Utiliser',
     select: 'Sélectionner',
     note: 'Note',
@@ -27,7 +29,28 @@ export default {
     finish: 'Terminer',
     or: 'ou',
     exercises: 'exercices',
-    series: 'séries'
+    series: 'séries',
+    seconds: 'secondes'
+  },
+
+  // Session
+  session: {
+    takeBreath: 'Prends ton souffle',
+    letsGo: 'C\'est parti !',
+    keepGoing: 'Continue !',
+    halfwayThere: 'À mi-chemin !',
+    almostDone: 'Presque fini !',
+    finalPush: 'Dernière ligne droite !',
+    series: 'Série',
+    exercise: 'Exercice',
+    restTime: 'Temps de repos',
+    workoutTime: 'Temps d\'exercice',
+    skipRest: 'Passer le repos',
+    next: 'Suivant',
+    exerciseNow: 'Faire l\'exercice',
+    restNow: 'Repos entre séries',
+    restBetweenExercises: 'Repos entre exercices',
+    preparationNow: 'Préparation'
   },
 
   // Profile screen
@@ -153,6 +176,20 @@ export default {
     rpeDescription: '1 = Très facile, 10 = Effort maximal',
     addExercise: 'Ajouter l\'exercice',
     searchExercises: 'Chercher des exercices...',
+    nextSeries: 'Prochaines séries',
+    workoutTime: 'Temps d\'entraînement',
+    exercise: 'Exercice',
+    skipRest: 'Passer le repos',
+    next: 'Suivant',
+    letsGo: 'C\'est parti !',
+    keepGoing: 'Continue !',
+    halfwayThere: 'À mi-chemin !',
+    almostDone: 'Presque fini !',
+    finalPush: 'Dernier effort !',
+    takeBreath: 'Reprends ton souffle',
+    restTime: 'Temps de repos',
+    restShort: 'repos',
+    workoutTime: 'Temps d\'entraînement',
     seriesType: 'Type de série',
     warmUp: 'Échauffement',
     workingSet: 'Série de travail',
@@ -171,6 +208,10 @@ export default {
     quitRoutineMessage: 'Êtes-vous sûr de vouloir abandonner cette routine ? Vos progrès seront perdus.',
     exercises: 'exercices',
     nextExercise: 'Exercice suivant',
+    upcomingExercises: 'Prochains exercices',
+    lastSeriesMessage: 'C\'est votre dernière série ! Donnez tout ce que vous avez !',
+    lastExerciseMessage: 'C\'est votre dernier exercice ! Finissez en beauté !',
+    noMoreExercises: 'Aucun autre exercice dans cette routine',
     loading: 'Chargement...'
   },
 
@@ -468,7 +509,21 @@ export default {
     optionalNote: 'Note optionnelle',
     selectDuration: 'Sélectionner la durée',
     withLoad: 'Avec charge',
-    seriesLabel: 'Série'
+    seriesLabel: 'Série',
+    // Exercise Rest Configuration
+    exerciseRestTitle: 'Temps entre exercices',
+    exerciseRestDescription: 'Configurez le temps de repos entre chaque exercice de votre routine',
+    beginnerMode: 'Mode débutant',
+    beginnerModeDescription: 'Temps commun pour tous les exercices',
+    advancedMode: 'Mode avancé',
+    advancedModeDescription: 'Temps personnalisé par exercice',
+    commonExerciseRest: 'Temps de repos commun',
+    // Preparation Time Configuration
+    preparationTitle: 'Temps de préparation',
+    preparationDescription: 'Configurez un temps de préparation avant chaque exercice',
+    enablePreparation: 'Activer le temps de préparation',
+    preparationTime: 'Durée de préparation',
+    preparationTimeDescription: 'Temps de préparation en secondes'
   },
 
   // Routines
@@ -498,7 +553,9 @@ export default {
       edit: 'Modifier',
       share: 'Partager',
       delete: 'Supprimer',
-      start: 'Démarrer'
+      start: 'Démarrer',
+      deleteConfirmTitle: 'Supprimer la routine',
+      deleteConfirmMessage: 'Êtes-vous sûr de vouloir supprimer la routine "{routineName}" ? Cette action est irréversible.'
     }
   },
 

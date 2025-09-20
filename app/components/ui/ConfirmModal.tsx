@@ -1,6 +1,6 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
-import { AlertTriangle } from 'lucide-react-native';
+import { StyleSheet, View, TouchableOpacity } from 'react-native';
+import { AlertTriangle, Trash2 } from 'lucide-react-native';
 import { useTheme } from '@/app/hooks/useTheme';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import Modal from './Modal';
@@ -63,18 +63,29 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
           onPress={onClose}
           style={styles.modalButton}
         />
-        <Button
-          title={confirmText || t('common.delete')}
-          variant="primary"
-          onPress={onConfirm}
-          style={{
-            flex: 1,
-            backgroundColor: 'transparent',
-            borderWidth: 1,
-            borderColor: getVariantColor()
-          }}
-          textStyle={{ color: getVariantColor() }}
-        />
+        {variant === 'danger' ? (
+          <TouchableOpacity
+            style={[styles.deleteButton, { backgroundColor: getVariantColor() }]}
+            onPress={onConfirm}
+          >
+            <Trash2 size={20} color={theme.colors.text.onPrimary} />
+            <Text style={[styles.deleteButtonText, { color: theme.colors.text.onPrimary }]}>
+              {confirmText || t('common.delete')}
+            </Text>
+          </TouchableOpacity>
+        ) : (
+          <Button
+            title={confirmText || t('common.delete')}
+            onPress={onConfirm}
+            style={{
+              flex: 1,
+              backgroundColor: 'transparent',
+              borderWidth: 1,
+              borderColor: getVariantColor()
+            }}
+            textStyle={{ color: getVariantColor() }}
+          />
+        )}
       </View>
     </Modal>
   );
@@ -97,6 +108,20 @@ const useStyles = (theme: any) => StyleSheet.create({
   },
   modalButton: {
     flex: 1
+  },
+  deleteButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: theme.spacing.md,
+    paddingHorizontal: theme.spacing.base,
+    borderRadius: theme.borderRadius.md,
+    gap: theme.spacing.sm,
+  },
+  deleteButtonText: {
+    fontSize: theme.typography.fontSize.base,
+    fontFamily: theme.typography.fontFamily.semiBold,
   }
 });
 

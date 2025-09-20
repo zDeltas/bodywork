@@ -249,7 +249,6 @@ export default function UnifiedExerciseList({
           entering={FadeIn.duration(400).delay(100 + index * 50)}
           style={styles.collapsibleSection}
         >
-          {}
           <TouchableOpacity
             style={[styles.collapsibleHeader, isSelected && styles.collapsibleHeaderSelected]}
             onPress={() => {
@@ -273,7 +272,6 @@ export default function UnifiedExerciseList({
             )}
           </TouchableOpacity>
 
-          {}
           {isExpanded && (
             <Animated.View entering={SlideInRight.duration(300)}>
               {exercisesToDisplay.map((exercise) => {
@@ -357,7 +355,6 @@ export default function UnifiedExerciseList({
 
   return (
     <View style={[styles.container, containerStyle]}>
-      {}
       {mode === 'screen' && (
         <View style={styles.header}>
           <Text variant="heading" style={styles.headerTitle}>
@@ -378,7 +375,6 @@ export default function UnifiedExerciseList({
         </View>
       )}
 
-      {}
       {showSearch && (
         <Animated.View entering={FadeIn.duration(500)} style={styles.searchContainer}>
           <View style={styles.searchInputContainer}>
@@ -401,7 +397,6 @@ export default function UnifiedExerciseList({
         </Animated.View>
       )}
 
-      {}
       {(selectedMuscleGroup || searchQuery) && (
         <Animated.View entering={SlideInRight.duration(300)} style={styles.filtersContainer}>
           <View style={styles.activeFilters}>
@@ -441,7 +436,6 @@ export default function UnifiedExerciseList({
         </Animated.View>
       )}
 
-      {}
       <FlatList
         key={`exercise-list-${currentViewMode}`}
         data={filteredExercises}
@@ -462,7 +456,6 @@ export default function UnifiedExerciseList({
         }
       />
 
-      {}
       {showAddButton && onAddCustomExercise && (
         <Animated.View entering={FadeIn.duration(500).delay(200)} style={styles.addButtonContainer}>
           <TouchableOpacity style={styles.addButton} onPress={onAddCustomExercise}>

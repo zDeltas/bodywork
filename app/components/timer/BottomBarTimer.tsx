@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Pause, Play } from 'lucide-react-native';
 import { useTranslation } from '@/app/hooks/useTranslation';
@@ -6,6 +6,7 @@ import { useTheme } from '@/app/hooks/useTheme';
 import useHaptics from '@/app/hooks/useHaptics';
 import Text from '@/app/components/ui/Text';
 import { Button } from '@/app/components/ui/Button';
+import { useCountdown } from '@/app/hooks/useCountdown';
 
 interface BottomBarTimerProps {
   initialTime: number;
@@ -22,45 +23,24 @@ export default function BottomBarTimer({
   const { theme } = useTheme();
   const haptics = useHaptics();
   const styles = useStyles();
-  const [time, setTime] = useState(initialTime);
-  const [isRunning, setIsRunning] = useState(autoStart);
+
+  const timer = useCountdown({ initialTime, onComplete, autoStart });
 
   useEffect(() => {
-    if (autoStart) setIsRunning(true);
-  }, [autoStart]);
-
-  useEffect(() => {
-    let interval: ReturnType<typeof setInterval>;
-    if (isRunning) {
-      interval = setInterval(() => {
-        setTime((prev) => {
-          if (prev <= 1) {
-            setIsRunning(false);
-            onComplete?.();
-            return initialTime;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    }
-    return () => clearInterval(interval);
-  }, [isRunning, initialTime, onComplete]);
-
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
+    // Reset timer when initialTime prop changes
+    timer.reset(initialTime);
+    if (autoStart) timer.start();
+  }, [initialTime, autoStart]);
 
   const toggleTimer = useCallback(() => {
-    setIsRunning((prev) => !prev);
+    timer.toggle();
     haptics.impactLight();
-  }, [haptics]);
+  }, [haptics, timer]);
 
   const adjustTime = useCallback((seconds: number) => {
-    setTime((prev) => Math.max(0, prev + seconds));
+    timer.adjustTime(seconds);
     haptics.impactLight();
-  }, [haptics]);
+  }, [haptics, timer]);
 
   return (
     <View style={styles.container}>
@@ -71,12 +51,13 @@ export default function BottomBarTimer({
               variant="icon"
               onPress={() => adjustTime(-5)}
               style={styles.sideButton}
+              disabled={timer.time < 5}
             >
               <Text style={styles.sideButtonText}>-5s</Text>
             </Button>
           </View>
           <Text style={styles.time} variant="heading" weight="bold">
-            {formatTime(time)}
+            {timer.formatTime(timer.time)}
           </Text>
           <View style={styles.sideButtonWrapper}>
             <Button
@@ -93,7 +74,7 @@ export default function BottomBarTimer({
             style={styles.playButton}
             onPress={toggleTimer}
           >
-            {isRunning ? (
+            {timer.isActive ? (
               <Pause size={32} color={theme.colors.background.main} />
             ) : (
               <Play size={32} color={theme.colors.background.main} />

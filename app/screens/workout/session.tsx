@@ -1,22 +1,23 @@
-import React, { useState } from 'react';
-import { ScrollView, StyleSheet, TextStyle, View, ViewStyle } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
-import { Check, Trophy } from 'lucide-react-native';
+import { Trophy } from 'lucide-react-native';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
-import { useSession } from '@/app/hooks/useSession';
+import useSession from '@/app/hooks/useSession';
 import Header from '@/app/components/layout/Header';
 import Text from '@/app/components/ui/Text';
 import { Button } from '@/app/components/ui/Button';
 import Modal from '@/app/components/ui/Modal';
-import FloatButtonAction from '@/app/components/ui/FloatButtonAction';
-import BottomBarTimer from '@/app/components/timer/BottomBarTimer';
 import ProgressBar from '@/app/components/session/ProgressBar';
 import CurrentExercise from '@/app/components/session/CurrentExercise';
-import NextExercise from '@/app/components/session/NextExercise';
+import UpcomingSection from '@/app/components/session/UpcomingSection';
+import CurrentSeries from '@/app/components/session/CurrentSeries';
 import ConfirmModal from '@/app/components/ui/ConfirmModal';
 import RpeModal from '@/app/components/session/RpeModal';
+import SessionBottomBar, { BOTTOM_BAR_HEIGHT } from '@/app/components/session/SessionBottomBar';
 import { SessionState } from '@/types/common';
+import { storageService } from '@/app/services';
 
 function WorkoutSessionScreen() {
   const { theme } = useTheme();
@@ -33,7 +34,11 @@ function WorkoutSessionScreen() {
     handleRestComplete,
     handleRpeSave,
     handleCancel,
-    handleFinishWorkout
+    handleFinishWorkout,
+    handlePrevious,
+    handleNext,
+    startPreparation,
+    handlePreparationComplete
   } = useSession(routineId as string);
 
   const handleConfirmCancel = () => {
@@ -51,11 +56,6 @@ function WorkoutSessionScreen() {
 
   const currentExercise = routine.exercises[sessionState.currentExerciseIndex];
   const currentSeries = currentExercise.series[sessionState.currentSeriesIndex];
-  const nextExercise = sessionState.currentSeriesIndex < currentExercise.series.length - 1
-    ? currentExercise
-    : sessionState.currentExerciseIndex < routine.exercises.length - 1
-      ? routine.exercises[sessionState.currentExerciseIndex + 1]
-      : null;
 
   return (
     <View style={styles.container}>
@@ -71,32 +71,46 @@ function WorkoutSessionScreen() {
         label={t('workout.exercises')}
       />
 
-      <ScrollView style={styles.content}>
+      <ScrollView
+        style={styles.content}
+        contentContainerStyle={{ paddingBottom: BOTTOM_BAR_HEIGHT }}
+      >
         <CurrentExercise
           exercise={currentExercise}
           currentSeries={currentSeries}
           currentSeriesIndex={sessionState.currentSeriesIndex}
         />
 
-        {sessionState.isResting && nextExercise && (
-          <NextExercise exercise={nextExercise} />
-        )}
+        <CurrentSeries
+          exercise={currentExercise}
+          currentSeries={currentSeries}
+          currentSeriesIndex={sessionState.currentSeriesIndex}
+        />
+
+        <UpcomingSection
+          routine={routine}
+          currentExerciseIndex={sessionState.currentExerciseIndex}
+          currentSeriesIndex={sessionState.currentSeriesIndex}
+        />
       </ScrollView>
 
-      {sessionState.isResting ? (
-        <View style={styles.timerContainer}>
-          <BottomBarTimer
-            initialTime={sessionState.restTime}
-            onComplete={handleRestComplete}
-            autoStart={true}
-          />
-        </View>
-      ) : (
-        <FloatButtonAction
-          icon={<Check size={24} color={theme.colors.background.main} />}
-          onPress={handleCompletedSeries}
-        />
-      )}
+      <SessionBottomBar
+        isResting={sessionState.isResting}
+        restTime={sessionState.restTime}
+        restType={sessionState.restType}
+        isPreparation={sessionState.isPreparation}
+        preparationTime={sessionState.preparationTime}
+        onRestComplete={handleRestComplete}
+        onPreparationComplete={handlePreparationComplete}
+        onPrevious={handlePrevious}
+        onNext={handleNext}
+        canGoPrevious={sessionState.currentExerciseIndex > 0 || sessionState.currentSeriesIndex > 0 || sessionState.isResting}
+        canGoNext={true}
+        currentSeriesIndex={sessionState.currentSeriesIndex}
+        totalSeries={currentExercise.series.length}
+        currentExerciseIndex={sessionState.currentExerciseIndex}
+        totalExercises={routine.exercises.length}
+      />
 
       {sessionState.routineFinished && (
         <Modal
@@ -165,44 +179,44 @@ const useStyles = () => {
     container: {
       flex: 1,
       backgroundColor: theme.colors.background.main
-    } as ViewStyle,
+    },
     loadingText: {
       color: theme.colors.text.primary,
       fontSize: theme.typography.fontSize.lg
-    } as TextStyle,
+    },
     content: {
       flex: 1,
       padding: theme.spacing.lg
-    } as ViewStyle,
+    },
     timerContainer: {
       backgroundColor: theme.colors.background.card,
       padding: theme.spacing.lg,
       borderTopLeftRadius: theme.borderRadius.lg,
       borderTopRightRadius: theme.borderRadius.lg,
       ...theme.shadows.lg
-    } as ViewStyle,
+    },
     modalContent: {
       alignItems: 'center',
       justifyContent: 'center',
       padding: theme.spacing.xl
-    } as ViewStyle,
+    },
     successIconContainer: {
       alignItems: 'center',
       marginBottom: theme.spacing.lg
-    } as ViewStyle,
+    },
     congratsTitle: {
       fontSize: theme.typography.fontSize['2xl'],
       color: theme.colors.primary,
       fontWeight: 'bold',
       textAlign: 'center',
       marginBottom: theme.spacing.sm
-    } as TextStyle,
+    },
     congratsText: {
       fontSize: theme.typography.fontSize.lg,
       color: theme.colors.text.secondary,
       textAlign: 'center',
       marginBottom: theme.spacing.xl
-    } as TextStyle,
+    },
     statsContainer: {
       flexDirection: 'row',
       justifyContent: 'center',
@@ -215,32 +229,32 @@ const useStyles = () => {
       width: '100%',
       maxWidth: 350,
       alignSelf: 'center'
-    } as ViewStyle,
+    },
     statItem: {
       flex: 1,
       alignItems: 'center'
-    } as ViewStyle,
+    },
     statValue: {
       fontSize: theme.typography.fontSize['2xl'],
       color: theme.colors.primary,
       fontWeight: 'bold',
       marginBottom: theme.spacing.xs
-    } as TextStyle,
+    },
     statLabel: {
       fontSize: theme.typography.fontSize.sm,
       color: theme.colors.text.secondary
-    } as TextStyle,
+    },
     statDivider: {
       width: 1,
       height: 40,
       backgroundColor: theme.colors.border.default,
       marginHorizontal: theme.spacing.xl
-    } as ViewStyle,
+    },
     actionButton: {
       width: '100%',
       marginTop: theme.spacing.lg,
       alignSelf: 'center'
-    } as ViewStyle
+    }
   });
 };
 

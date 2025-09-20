@@ -40,6 +40,7 @@ export interface Exercise {
   translationKey: string;
   series: Series[];
   note?: string;
+  restBetweenExercises?: number;
 }
 
 export interface Routine {
@@ -52,6 +53,9 @@ export interface Routine {
   favorite?: boolean;
   usageCount?: number;
   totalTime?: number;
+  exerciseRestMode?: 'beginner' | 'advanced';
+  enablePreparation?: boolean;
+  preparationTime?: number; // en secondes
 }
 
 export interface RoutineStats {
@@ -94,6 +98,9 @@ export interface SessionState {
   currentSeriesIndex: number;
   isResting: boolean;
   restTime: number;
+  restType?: 'series' | 'exercise'; // Type de repos en cours
+  isPreparation: boolean; // État de préparation avant exercice
+  preparationTime: number; // Temps de préparation restant
   routineFinished: boolean;
   completedExercises: Workout[];
   pendingSeries: { exerciseIdx: number; seriesIdx: number } | null;

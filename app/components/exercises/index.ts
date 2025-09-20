@@ -442,6 +442,109 @@ export const getExerciseUnitType = (exerciseKey: string): 'weight' | 'time' | 'd
   return 'weight';
 };
 
+// Mapping centralisé des exercices vers leurs images
+export const exerciseToImage: Record<string, any> = {
+  // Chest exercises
+  'exercise_chest_benchPress': require('../../../assets/images/muscles/chest.png'),
+  'exercise_chest_inclineBenchPress': require('../../../assets/images/muscles/chest.png'),
+  'exercise_chest_declineBenchPress': require('../../../assets/images/muscles/chest.png'),
+  'exercise_chest_dumbbellFlyes': require('../../../assets/images/muscles/chest.png'),
+  'exercise_chest_cableCrossover': require('../../../assets/images/muscles/chest.png'),
+  
+  // Back exercises
+  'exercise_back_pullUps': require('../../../assets/images/muscles/back.png'),
+  'exercise_back_latPulldown': require('../../../assets/images/muscles/back.png'),
+  'exercise_back_barbellRow': require('../../../assets/images/muscles/back.png'),
+  'exercise_back_dumbbellRow': require('../../../assets/images/muscles/back.png'),
+  'exercise_back_tBarRow': require('../../../assets/images/muscles/back.png'),
+  'exercise_back_uprightRow': require('../../../assets/images/muscles/back.png'),
+  'exercise_back_facePulls': require('../../../assets/images/muscles/back.png'),
+  
+  // Shoulder exercises
+  'exercise_shoulders_militaryPress': require('../../../assets/images/muscles/shoulders.png'),
+  'exercise_shoulders_lateralRaises': require('../../../assets/images/muscles/shoulders.png'),
+  'exercise_shoulders_frontRaises': require('../../../assets/images/muscles/shoulders.png'),
+  'exercise_shoulders_rearDeltFlyes': require('../../../assets/images/muscles/shoulders.png'),
+  'exercise_shoulders_shrugs': require('../../../assets/images/muscles/shoulders.png'),
+  
+  // Bicep exercises
+  'exercise_biceps_barbellCurl': require('../../../assets/images/muscles/biceps.png'),
+  'exercise_biceps_dumbbellCurl': require('../../../assets/images/muscles/biceps.png'),
+  'exercise_biceps_hammerCurl': require('../../../assets/images/muscles/biceps.png'),
+  'exercise_biceps_preacherCurl': require('../../../assets/images/muscles/biceps.png'),
+  'exercise_biceps_concentrationCurl': require('../../../assets/images/muscles/biceps.png'),
+  
+  // Tricep exercises
+  'exercise_triceps_cableExtension': require('../../../assets/images/muscles/triceps.png'),
+  'exercise_triceps_skullCrushers': require('../../../assets/images/muscles/triceps.png'),
+  'exercise_triceps_overheadExtension': require('../../../assets/images/muscles/triceps.png'),
+  'exercise_triceps_dips': require('../../../assets/images/muscles/triceps.png'),
+  'exercise_triceps_closegripBenchPress': require('../../../assets/images/muscles/triceps.png'),
+  
+  // Core exercises
+  'exercise_core_plank': require('../../../assets/images/muscles/core.png'),
+  'exercise_core_russianTwist': require('../../../assets/images/muscles/core.png'),
+  'exercise_core_legRaises': require('../../../assets/images/muscles/core.png'),
+  'exercise_core_crunches': require('../../../assets/images/muscles/core.png'),
+  'exercise_core_hangingKneeRaises': require('../../../assets/images/muscles/core.png'),
+  'exercise_core_sidePlank': require('../../../assets/images/muscles/core.png'),
+  'exercise_core_obliqueCrunches': require('../../../assets/images/muscles/core.png'),
+  'exercise_core_woodChops': require('../../../assets/images/muscles/core.png'),
+  
+  // Leg exercises
+  'exercise_legs_squat': require('../../../assets/images/muscles/legs.png'),
+  'exercise_legs_deadlift': require('../../../assets/images/muscles/legs.png'),
+  'exercise_legs_legPress': require('../../../assets/images/muscles/legs.png'),
+  'exercise_legs_lunges': require('../../../assets/images/muscles/legs.png'),
+  'exercise_legs_legExtension': require('../../../assets/images/muscles/legs.png'),
+  'exercise_legs_frontSquat': require('../../../assets/images/muscles/legs.png'),
+  'exercise_legs_bulgarianSplitSquat': require('../../../assets/images/muscles/legs.png'),
+  'exercise_legs_legCurls': require('../../../assets/images/muscles/legs.png'),
+  'exercise_legs_romanianDeadlift': require('../../../assets/images/muscles/legs.png'),
+  'exercise_legs_goodMornings': require('../../../assets/images/muscles/legs.png'),
+  'exercise_legs_gluteHamRaises': require('../../../assets/images/muscles/legs.png'),
+  'exercise_legs_sideLunges': require('../../../assets/images/muscles/legs.png'),
+  'exercise_legs_clamshells': require('../../../assets/images/muscles/legs.png'),
+  'exercise_legs_hipAbduction': require('../../../assets/images/muscles/legs.png'),
+  'exercise_legs_lateralWalks': require('../../../assets/images/muscles/legs.png'),
+  'exercise_legs_sumoSquats': require('../../../assets/images/muscles/legs.png'),
+  'exercise_legs_hipAdduction': require('../../../assets/images/muscles/legs.png'),
+  'exercise_legs_innerThighLifts': require('../../../assets/images/muscles/legs.png'),
+  'exercise_legs_adductorMachine': require('../../../assets/images/muscles/legs.png'),
+  'exercise_legs_calfRaises': require('../../../assets/images/muscles/legs.png'),
+  'exercise_legs_seatedCalfRaises': require('../../../assets/images/muscles/legs.png'),
+  'exercise_legs_boxJumps': require('../../../assets/images/muscles/legs.png'),
+  
+  // Forearm exercises (utilise biceps pour l'instant)
+  'exercise_forearms_wristCurls': require('../../../assets/images/muscles/biceps.png'),
+  'exercise_forearms_reverseCurls': require('../../../assets/images/muscles/biceps.png'),
+  'exercise_forearms_farmerWalk': require('../../../assets/images/muscles/biceps.png'),
+  'exercise_forearms_gripTraining': require('../../../assets/images/muscles/biceps.png'),
+  
+  // Cardio exercises (utilise core pour l'instant)
+  'exercise_cardio_running': require('../../../assets/images/muscles/core.png'),
+  'exercise_cardio_cycling': require('../../../assets/images/muscles/core.png'),
+  'exercise_cardio_rowing': require('../../../assets/images/muscles/core.png'),
+  'exercise_cardio_jumpingJacks': require('../../../assets/images/muscles/core.png'),
+  'exercise_cardio_burpees': require('../../../assets/images/muscles/core.png'),
+};
+
+// Image par défaut pour les exercices non mappés
+export const defaultExerciseImage = require('../../../assets/images/muscles/core.png');
+
+// Fonction helper pour extraire la clé de base d'un exercice (supprime le timestamp)
+export const getBaseExerciseKey = (exerciseKey: string): string => {
+  // Si la clé contient un underscore suivi de chiffres à la fin, on le supprime
+  const timestampPattern = /_\d+$/;
+  return exerciseKey.replace(timestampPattern, '');
+};
+
+// Fonction helper pour obtenir l'image d'un exercice
+export const getExerciseImage = (exerciseKey: string) => {
+  const baseKey = getBaseExerciseKey(exerciseKey);
+  return exerciseToImage[baseKey] || defaultExerciseImage;
+};
+
 // Composants
 export { default as UnifiedExerciseList } from './UnifiedExerciseList';
 export { default as ExerciseCard } from './ExerciseCard';

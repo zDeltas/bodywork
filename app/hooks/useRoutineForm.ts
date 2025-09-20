@@ -3,60 +3,49 @@ import { EditableSeries, Exercise, Routine } from '@/types/common';
 import { formatSeries, getValidSeries } from '../utils/seriesUtils';
 import { storageService } from '@/app/services/storage';
 
-/**
- * Hook personnalisé pour gérer l'état et la logique du formulaire de routine
- * Sépare la logique métier de l'interface utilisateur
- */
+const DEFAULT_UNIT_TYPE = 'repsAndWeight' as const;
+const DEFAULT_SERIES_TYPE = 'workingSet' as const;
+const UNIT_TYPES_WITH_LOAD = ['time', 'distance'] as const;
+
+const createDefaultSeries = (unitType: 'repsAndWeight' | 'reps' | 'time' | 'distance' = DEFAULT_UNIT_TYPE, seriesType: 'warmUp' | 'workingSet' = DEFAULT_SERIES_TYPE, rest = ''): EditableSeries => ({
+  unitType,
+  weight: '',
+  reps: '',
+  duration: '',
+  distance: '',
+  note: '',
+  rest,
+  type: seriesType
+});
+
 export const useRoutineForm = () => {
-  // État de base de la routine
   const [routine, setRoutine] = useState({
     title: '',
     description: '',
-    exercises: []
+    exercises: [],
+    exerciseRestMode: 'beginner' as 'beginner' | 'advanced'
   });
 
-  // État des exercices
+  const [defaultRestBetweenExercises, setDefaultRestBetweenExercises] = useState<number>(60);
+  const [enablePreparation, setEnablePreparation] = useState<boolean>(false);
+  const [preparationTime, setPreparationTime] = useState<number>(10); // 10 secondes par défaut
+
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [exerciseName, setExerciseName] = useState<string>('');
   const [exerciseKey, setExerciseKey] = useState<string>('');
   const [exerciseNote, setExerciseNote] = useState<string>('');
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
 
-  // État des séries
-  const [series, setSeries] = useState<EditableSeries[]>([
-    {
-      unitType: 'repsAndWeight',
-      weight: '',
-      reps: '',
-      duration: '',
-      distance: '',
-      note: '',
-      rest: '',
-      type: 'workingSet'
-    }
-  ]);
+  const [series, setSeries] = useState<EditableSeries[]>([createDefaultSeries()]);
 
-  // Configuration globale des séries
-  const [globalUnitType, setGlobalUnitType] = useState<'repsAndWeight' | 'reps' | 'time' | 'distance'>('repsAndWeight');
-  const [globalSeriesType, setGlobalSeriesType] = useState<'warmUp' | 'workingSet'>('workingSet');
+  const [globalUnitType, setGlobalUnitType] = useState<'repsAndWeight' | 'reps' | 'time' | 'distance'>(DEFAULT_UNIT_TYPE);
+  const [globalSeriesType, setGlobalSeriesType] = useState<'warmUp' | 'workingSet'>(DEFAULT_SERIES_TYPE);
   const [withLoad, setWithLoad] = useState<boolean>(false);
   const [globalRest, setGlobalRest] = useState<string>('');
+  const [exerciseRest, setExerciseRest] = useState<string>('');
 
-  // Fonctions de manipulation des séries
   const addSeries = useCallback(() => {
-    setSeries(prev => [
-      ...prev,
-      {
-        unitType: globalUnitType,
-        weight: '',
-        reps: '',
-        duration: '',
-        distance: '',
-        note: '',
-        rest: globalRest,
-        type: globalSeriesType
-      }
-    ]);
+    setSeries(prev => [...prev, createDefaultSeries(globalUnitType, globalSeriesType, globalRest)]);
   }, [globalUnitType, globalRest, globalSeriesType]);
 
   const removeSeries = useCallback((index: number) => {
@@ -76,25 +65,16 @@ export const useRoutineForm = () => {
     setSeries(prev => prev.map((s, i) => (i === index ? { ...s, [field]: value } : s)));
   }, []);
 
-  // Fonctions de manipulation des exercices
   const resetExerciseForm = useCallback(() => {
     setExerciseName('');
     setExerciseKey('');
-    setGlobalUnitType('repsAndWeight');
-    setGlobalSeriesType('workingSet');
+    setGlobalUnitType(DEFAULT_UNIT_TYPE);
+    setGlobalSeriesType(DEFAULT_SERIES_TYPE);
     setWithLoad(false);
     setExerciseNote('');
     setGlobalRest('');
-    setSeries([{
-      unitType: 'repsAndWeight',
-      weight: '',
-      reps: '',
-      duration: '',
-      distance: '',
-      note: '',
-      rest: '',
-      type: 'workingSet'
-    }]);
+    setExerciseRest('');
+    setSeries([createDefaultSeries()]);
     setEditingIndex(null);
   }, []);
 
@@ -103,8 +83,8 @@ export const useRoutineForm = () => {
     setExerciseName(ex.name);
     setExerciseKey(ex.translationKey);
     setExerciseNote(ex.note || '');
-    
-    // Inférer les paramètres globaux depuis la première série
+    setExerciseRest(ex.restBetweenExercises?.toString() || '');
+
     const first = ex.series[0];
     if (first) {
       setGlobalUnitType(first.unitType);
@@ -132,13 +112,18 @@ export const useRoutineForm = () => {
     const validSeries = getValidSeries(series);
     if (validSeries.length === 0) return false;
 
-    const formattedSeries = formatSeries(validSeries, '7');
+    const formattedSeries = formatSeries(validSeries, withLoad);
     const newEx: Exercise = {
       name: exerciseName,
       key: `${exerciseKey}_${Date.now()}`,
       translationKey: exerciseKey,
       series: formattedSeries,
-      note: exerciseNote?.trim() || undefined
+      note: exerciseNote?.trim() || undefined,
+      restBetweenExercises: routine.exerciseRestMode === 'advanced' && exerciseRest 
+        ? parseInt(exerciseRest) 
+        : routine.exerciseRestMode === 'beginner' 
+          ? defaultRestBetweenExercises 
+          : undefined
     };
 
     setExercises(prev => {
@@ -152,13 +137,12 @@ export const useRoutineForm = () => {
     });
     
     return true;
-  }, [exerciseKey, exerciseName, series, exerciseNote, editingIndex]);
+  }, [exerciseKey, exerciseName, series, exerciseNote, editingIndex, withLoad]);
 
   const removeExercise = useCallback((index: number) => {
     setExercises(prev => prev.filter((_, i) => i !== index));
   }, []);
 
-  // Fonction pour charger une routine existante (pour l'édition)
   const loadRoutine = useCallback(async (routineId: string) => {
     try {
       const routines = await storageService.getRoutines();
@@ -167,8 +151,21 @@ export const useRoutineForm = () => {
         setRoutine({
           title: existingRoutine.title,
           description: existingRoutine.description,
-          exercises: []
+          exercises: [],
+          exerciseRestMode: existingRoutine.exerciseRestMode || 'beginner'
         });
+
+        if (existingRoutine.exerciseRestMode === 'beginner' && existingRoutine.exercises.length > 0) {
+          const firstExerciseRest = existingRoutine.exercises[0]?.restBetweenExercises;
+          if (firstExerciseRest) {
+            setDefaultRestBetweenExercises(firstExerciseRest);
+          }
+        }
+
+        // Charger les paramètres de temps de préparation
+        setEnablePreparation(existingRoutine.enablePreparation || false);
+        setPreparationTime(existingRoutine.preparationTime || 10);
+
         setExercises(existingRoutine.exercises);
         return true;
       }
@@ -179,27 +176,102 @@ export const useRoutineForm = () => {
     }
   }, []);
 
-  // Fonctions de configuration globale
   const updateGlobalSeriesType = useCallback((type: 'warmUp' | 'workingSet') => {
     setGlobalSeriesType(type);
     setSeries(prev => prev.map(s => ({ ...s, type })));
   }, []);
 
+  const getFieldsToKeep = useCallback((unitType: string) => {
+    const fieldsConfig = {
+      repsAndWeight: ['weight', 'reps'],
+      reps: ['reps'],
+      time: ['duration'],
+      distance: ['distance']
+    };
+    return fieldsConfig[unitType as keyof typeof fieldsConfig] || [];
+  }, []);
+
   const updateGlobalUnitType = useCallback((unitType: 'repsAndWeight' | 'reps' | 'time' | 'distance') => {
     setGlobalUnitType(unitType);
-    setSeries(prev => prev.map(s => ({ ...s, unitType })));
-    if (unitType === 'repsAndWeight' || unitType === 'reps') {
+    
+    const fieldsToKeep = getFieldsToKeep(unitType);
+    const allFields = ['weight', 'reps', 'duration', 'distance'] as const;
+
+    setSeries(prev => prev.map(s => {
+      const cleanedSeries = { ...s, unitType };
+
+      allFields.forEach(field => {
+        if (!fieldsToKeep.includes(field)) {
+          switch (field) {
+            case 'weight':
+              cleanedSeries.weight = '';
+              break;
+            case 'reps':
+              cleanedSeries.reps = '';
+              break;
+            case 'duration':
+              cleanedSeries.duration = '';
+              break;
+            case 'distance':
+              cleanedSeries.distance = '';
+              break;
+          }
+        }
+      });
+      
+      return cleanedSeries;
+    }));
+
+    if (!UNIT_TYPES_WITH_LOAD.includes(unitType as any)) {
       setWithLoad(false);
     }
-  }, []);
+  }, [getFieldsToKeep]);
 
   const updateGlobalRest = useCallback((rest: string) => {
     setGlobalRest(rest);
     setSeries(prev => prev.map(s => ({ ...s, rest })));
   }, []);
 
+  const updateWithLoad = useCallback((newWithLoad: boolean) => {
+    setWithLoad(newWithLoad);
+
+    if (!newWithLoad && UNIT_TYPES_WITH_LOAD.includes(globalUnitType as any)) {
+      setSeries(prev => prev.map(s => ({ ...s, weight: '' })));
+    }
+  }, [globalUnitType]);
+
+  const updateExerciseRestMode = useCallback((mode: 'beginner' | 'advanced') => {
+    setRoutine(prev => ({ ...prev, exerciseRestMode: mode }));
+  }, []);
+
+  const updateDefaultRestBetweenExercises = useCallback((rest: number) => {
+    setDefaultRestBetweenExercises(rest);
+
+    if (routine.exerciseRestMode === 'beginner') {
+      setExercises(prev => prev.map(exercise => ({
+        ...exercise,
+        restBetweenExercises: rest
+      })));
+    }
+  }, [routine.exerciseRestMode]);
+
+  const updateExerciseRestTime = useCallback((exerciseIndex: number, restTime: number) => {
+    setExercises(prev => prev.map((exercise, index) => 
+      index === exerciseIndex 
+        ? { ...exercise, restBetweenExercises: restTime }
+        : exercise
+    ));
+  }, []);
+
+  const updateEnablePreparation = useCallback((enabled: boolean) => {
+    setEnablePreparation(enabled);
+  }, []);
+
+  const updatePreparationTime = useCallback((time: number) => {
+    setPreparationTime(time);
+  }, []);
+
   return {
-    // État
     routine,
     exercises,
     exerciseName,
@@ -211,15 +283,18 @@ export const useRoutineForm = () => {
     globalSeriesType,
     withLoad,
     globalRest,
-    
-    // Setters
+    exerciseRest,
+    defaultRestBetweenExercises,
+    enablePreparation,
+    preparationTime,
+
     setRoutine,
     setExerciseName,
     setExerciseKey,
     setExerciseNote,
     setWithLoad,
-    
-    // Actions
+    setExerciseRest,
+
     addSeries,
     removeSeries,
     copySeries,
@@ -231,6 +306,12 @@ export const useRoutineForm = () => {
     loadRoutine,
     updateGlobalSeriesType,
     updateGlobalUnitType,
-    updateGlobalRest
+    updateGlobalRest,
+    updateWithLoad,
+    updateExerciseRestMode,
+    updateDefaultRestBetweenExercises,
+    updateExerciseRestTime,
+    updateEnablePreparation,
+    updatePreparationTime
   };
 };

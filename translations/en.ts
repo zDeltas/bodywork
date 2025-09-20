@@ -14,8 +14,11 @@ export default {
     cancel: 'Cancel',
     reset: 'Reset',
     save: 'Save',
+    update: 'Update',
     delete: 'Delete',
     ok: 'OK',
+    warning: 'Warning',
+    info: 'Information',
     use: 'Use',
     select: 'Select',
     note: 'Note',
@@ -26,7 +29,28 @@ export default {
     finish: 'Finish',
     or: 'or',
     exercises: 'exercises',
-    series: 'series'
+    series: 'series',
+    seconds: 'seconds'
+  },
+
+  // Session
+  session: {
+    takeBreath: 'Catch your breath',
+    letsGo: "Let's go!",
+    keepGoing: 'Keep going!',
+    halfwayThere: 'Halfway there!',
+    almostDone: 'Almost done!',
+    finalPush: 'Final push!',
+    series: 'Series',
+    exercise: 'Exercise',
+    restTime: 'Rest time',
+    workoutTime: 'Workout time',
+    skipRest: 'Skip rest',
+    next: 'Next',
+    exerciseNow: 'Time to exercise',
+    restNow: 'Rest between series',
+    restBetweenExercises: 'Rest between exercises',
+    preparationNow: 'Preparation'
   },
 
   // Settings screen
@@ -137,6 +161,20 @@ export default {
     rpeDescription: '1 = Very easy, 10 = Maximum effort',
     addExercise: 'Add Exercise',
     searchExercises: 'Search Exercises...',
+    nextSeries: 'Next Series',
+    workoutTime: 'Workout Time',
+    exercise: 'Exercise',
+    skipRest: 'Skip Rest',
+    next: 'Next',
+    letsGo: "Let's Go!",
+    keepGoing: 'Keep Going!',
+    halfwayThere: 'Halfway There!',
+    almostDone: 'Almost Done!',
+    finalPush: 'Final Push!',
+    takeBreath: 'Take a Breath',
+    restTime: 'Rest Time',
+    restShort: 'rest',
+    workoutTime: 'Workout Time',
     seriesType: 'Series Type',
     warmUp: 'Warm-up',
     workingSet: 'Working Set',
@@ -154,6 +192,10 @@ export default {
     quitRoutineMessage: 'Are you sure you want to quit this routine? Your progress will be lost.',
     exercises: 'exercises',
     nextExercise: 'Next Exercise',
+    upcomingExercises: 'Upcoming Exercises',
+    lastSeriesMessage: 'This is your last series! Give it everything you\'ve got!',
+    lastExerciseMessage: 'This is your last exercise! Finish strong!',
+    noMoreExercises: 'No more exercises in this routine',
     loading: 'Loading...'
   },
 
@@ -448,6 +490,7 @@ export default {
   // Routine screen
   routine: {
     createTitle: 'New Routine',
+    editTitle: 'Edit Routine',
     title: 'Title',
     titlePlaceholder: 'Enter routine title',
     description: 'Description',
@@ -457,6 +500,7 @@ export default {
     noExerciseSelected: 'No exercise selected',
     addExerciseToStart: 'Add an exercise to get started',
     saved: 'Routine saved!',
+    updated: 'Routine updated!',
     configureSeries: 'Configure Series',
     seriesType: 'Series Type',
     warmUp: 'Warm Up',
@@ -469,7 +513,21 @@ export default {
     optionalNote: 'Optional Note',
     selectDuration: 'Select duration',
     withLoad: 'With load',
-    seriesLabel: 'Set'
+    seriesLabel: 'Set',
+    // Exercise Rest Configuration
+    exerciseRestTitle: 'Rest Between Exercises',
+    exerciseRestDescription: 'Configure rest time between each exercise in your routine',
+    beginnerMode: 'Beginner Mode',
+    beginnerModeDescription: 'Common time for all exercises',
+    advancedMode: 'Advanced Mode',
+    advancedModeDescription: 'Custom time per exercise',
+    commonExerciseRest: 'Common rest time',
+    // Preparation Time Configuration
+    preparationTitle: 'Preparation Time',
+    preparationDescription: 'Configure preparation time before each exercise',
+    enablePreparation: 'Enable preparation time',
+    preparationTime: 'Preparation duration',
+    preparationTimeDescription: 'Preparation time in seconds'
   },
 
   // Routines
@@ -499,7 +557,9 @@ export default {
       edit: 'Edit',
       share: 'Share',
       delete: 'Delete',
-      start: 'Start'
+      start: 'Start',
+      deleteConfirmTitle: 'Delete Routine',
+      deleteConfirmMessage: 'Are you sure you want to delete the routine "{routineName}"? This action cannot be undone.'
     }
   },
 

@@ -5,6 +5,7 @@ import { useRouter } from 'expo-router';
 import { useTheme } from '@/app/hooks/useTheme';
 import { Plus, Star } from 'lucide-react-native';
 import FloatButtonAction from '@/app/components/ui/FloatButtonAction';
+import ConfirmModal from '@/app/components/ui/ConfirmModal';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import useHaptics from '@/app/hooks/useHaptics';
 import { Routine } from '@/types/common';
@@ -17,6 +18,8 @@ import { TranslationKey } from '@/translations';
 export default function RoutinesListScreen() {
   const [routines, setRoutines] = useState<Routine[]>([]);
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [routineToDelete, setRoutineToDelete] = useState<Routine | null>(null);
   const router = useRouter();
   const { theme } = useTheme();
   const styles = useStyles(theme);
@@ -69,27 +72,23 @@ export default function RoutinesListScreen() {
     });
   };
 
-  const handleDeleteRoutine = async (routineId: string) => {
+  const handleDeleteRoutine = (routineId: string) => {
     haptics.impactMedium();
-    Alert.alert(
-      'Supprimer la routine',
-      'Êtes-vous sûr de vouloir supprimer cette routine ?',
-      [
-        {
-          text: 'Annuler',
-          style: 'cancel'
-        },
-        {
-          text: 'Supprimer',
-          style: 'destructive',
-          onPress: async () => {
-            const updatedRoutines = routines.filter(r => r.id !== routineId);
-            setRoutines(updatedRoutines);
-            await storageService.deleteRoutine(routineId);
-          }
-        }
-      ]
-    );
+    const routine = routines.find(r => r.id === routineId);
+    if (routine) {
+      setRoutineToDelete(routine);
+      setShowDeleteConfirm(true);
+    }
+  };
+
+  const confirmDeleteRoutine = async () => {
+    if (routineToDelete) {
+      const updatedRoutines = routines.filter(r => r.id !== routineToDelete.id);
+      setRoutines(updatedRoutines);
+      await storageService.deleteRoutine(routineToDelete.id);
+      setShowDeleteConfirm(false);
+      setRoutineToDelete(null);
+    }
   };
 
   const handleShareRoutine = async (routine: Routine) => {
@@ -129,16 +128,6 @@ export default function RoutinesListScreen() {
     } catch (error) {
       Alert.alert('Erreur', 'Impossible de partager la routine.');
     }
-  };
-
-  const handleAddPremadeRoutine = async (routine: Routine) => {
-    const newRoutine = {
-      ...routine,
-      id: `routine-${Date.now()}`,
-      createdAt: new Date().toISOString()
-    };
-    await storageService.saveRoutine(newRoutine);
-    setRoutines([...routines, newRoutine]);
   };
 
   const filteredRoutines = routines.filter(routine => {
@@ -192,6 +181,20 @@ export default function RoutinesListScreen() {
         <FloatButtonAction
           icon={<Plus size={24} color={theme.colors.background.main} />}
           onPress={handleCreateRoutine}
+        />
+        
+        <ConfirmModal
+          visible={showDeleteConfirm}
+          onClose={() => {
+            setShowDeleteConfirm(false);
+            setRoutineToDelete(null);
+          }}
+          onConfirm={confirmDeleteRoutine}
+          title={t('routines.item.deleteConfirmTitle')}
+          message={routineToDelete ? t('routines.item.deleteConfirmMessage').replace('{routineName}', routineToDelete.title) : ''}
+          confirmText={t('common.delete')}
+          cancelText={t('common.cancel')}
+          variant="danger"
         />
       </View>
     </GestureHandlerRootView>

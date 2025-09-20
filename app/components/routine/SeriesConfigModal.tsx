@@ -24,6 +24,8 @@ interface SeriesConfigModalProps {
   withLoad: boolean;
   globalRest: string;
   exerciseNote: string;
+  exerciseRest: string;
+  exerciseRestMode: 'beginner' | 'advanced';
   onClose: () => void;
   onExerciseSelect: () => void;
   onSeriesAdd: () => void;
@@ -35,6 +37,7 @@ interface SeriesConfigModalProps {
   onWithLoadToggle: () => void;
   onGlobalRestChange: (rest: string) => void;
   onExerciseNoteChange: (note: string) => void;
+  onExerciseRestChange: (rest: string) => void;
   onSave: () => void;
   canSave: boolean;
 }
@@ -48,6 +51,8 @@ const SeriesConfigModal: React.FC<SeriesConfigModalProps> = React.memo(({
   withLoad,
   globalRest,
   exerciseNote,
+  exerciseRest,
+  exerciseRestMode,
   onClose,
   onExerciseSelect,
   onSeriesAdd,
@@ -59,6 +64,7 @@ const SeriesConfigModal: React.FC<SeriesConfigModalProps> = React.memo(({
   onWithLoadToggle,
   onGlobalRestChange,
   onExerciseNoteChange,
+  onExerciseRestChange,
   onSave,
   canSave
 }) => {
@@ -155,7 +161,6 @@ const SeriesConfigModal: React.FC<SeriesConfigModalProps> = React.memo(({
 
           <ScrollView style={{ flex: 1 }}>
             <View style={styles.configContainer}>
-              {}
               <SeriesTypeSelector
                 selectedType={globalSeriesType}
                 onTypeChange={onGlobalSeriesTypeChange}
@@ -178,7 +183,6 @@ const SeriesConfigModal: React.FC<SeriesConfigModalProps> = React.memo(({
                 onPress={() => setShowTimerPicker(true)}
               />
 
-              {}
               <View style={styles.noteContainer}>
                 <Text variant="body" style={styles.noteLabel}>
                   {t('common.note')}
@@ -194,10 +198,8 @@ const SeriesConfigModal: React.FC<SeriesConfigModalProps> = React.memo(({
               </View>
             </View>
 
-            {}
             {seriesElements}
 
-            {}
             <TouchableOpacity
               style={styles.addSeriesButton}
               onPress={onSeriesAdd}
@@ -208,7 +210,6 @@ const SeriesConfigModal: React.FC<SeriesConfigModalProps> = React.memo(({
               </View>
             </TouchableOpacity>
 
-            {}
             <Button
               onPress={onSave}
               style={styles.saveButton}
@@ -220,7 +221,6 @@ const SeriesConfigModal: React.FC<SeriesConfigModalProps> = React.memo(({
         </View>
       </View>
 
-      {}
       <TimerPickerModal
         visible={showTimerPicker}
         onClose={() => setShowTimerPicker(false)}
@@ -333,6 +333,42 @@ const useStyles = (theme: any) => StyleSheet.create({
     backgroundColor: theme.colors.primary,
     marginVertical: theme.spacing.lg,
     paddingVertical: theme.spacing.base
+  },
+  // Exercise Rest Configuration Styles
+  exerciseRestContainer: {
+    marginTop: theme.spacing.sm,
+    marginBottom: theme.spacing.sm,
+    padding: theme.spacing.base,
+    backgroundColor: theme.colors.background.input,
+    borderRadius: theme.borderRadius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.border.default
+  },
+  exerciseRestLabel: {
+    color: theme.colors.text.primary,
+    fontFamily: theme.typography.fontFamily.semiBold,
+    fontSize: theme.typography.fontSize.base,
+    marginBottom: theme.spacing.sm
+  },
+  timeInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.sm
+  },
+  timeInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: theme.colors.border.default,
+    borderRadius: theme.borderRadius.md,
+    padding: theme.spacing.sm,
+    fontSize: theme.typography.fontSize.base,
+    backgroundColor: theme.colors.background.main,
+    color: theme.colors.text.primary,
+    textAlign: 'center'
+  },
+  timeUnit: {
+    color: theme.colors.text.secondary,
+    fontFamily: theme.typography.fontFamily.medium
   }
 });
 

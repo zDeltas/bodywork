@@ -115,7 +115,6 @@ const useStats = (selectedPeriod: Period) => {
 
           return acc;
         },
-        {}
       );
 
       const progressData = Object.entries(exerciseProgress)

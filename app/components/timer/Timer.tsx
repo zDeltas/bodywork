@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Platform, StyleSheet, Vibration, View } from 'react-native';
 import {
   Inter_400Regular as InterRegular,
@@ -14,6 +14,8 @@ import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { Button } from '@/app/components/ui/Button';
 import Svg, { Circle } from 'react-native-svg';
 import { useAudioPlayer, setAudioModeAsync } from 'expo-audio';
+import { useCountdown } from '@/app/hooks/useCountdown';
+import { useChrono } from '@/app/hooks/useChrono';
 
 interface TimerProps {
   initialTime?: number; // work time seconds
@@ -36,9 +38,6 @@ export default function Timer({
   const haptics = useHaptics();
   const styles = useStyles();
   const { theme } = useTheme();
-  const [workTime, setWorkTime] = useState(mode === 'timer' ? initialTime : 0);
-  const [restTimeState, setRestTimeState] = useState(restTime);
-  const [prepTimeState, setPrepTimeState] = useState(prepTime);
   const [isRunning, setIsRunning] = useState(false);
   const [currentSet, setCurrentSet] = useState(1);
   const [phase, setPhase] = useState<'prep' | 'work' | 'rest'>('prep');
@@ -48,6 +47,12 @@ export default function Timer({
   });
   const countdownPlayer = useAudioPlayer(require('@/assets/sounds/countdown.mp3'));
   const transitionPlayer = useAudioPlayer(require('@/assets/sounds/transition.mp3'));
+
+  // Timers: countdowns for prep/work/rest, chrono for stopwatch
+  const prepTimer = useCountdown({ initialTime: prepTime, autoStart: false });
+  const workCountdown = useCountdown({ initialTime, autoStart: false });
+  const restTimer = useCountdown({ initialTime: restTime, autoStart: false });
+  const workChrono = useChrono({ initialTime: 0, autoStart: false });
 
   // Ensure audio plays even in iOS silent mode
   useEffect(() => {
@@ -86,98 +91,90 @@ export default function Timer({
     }
   }, [haptics]);
 
-  const handleWorkComplete = useCallback(() => {
-    vibrateSuccess();
-    setPhase('rest');
-    setRestTimeState(restTime);
-  }, [restTime, vibrateSuccess]);
-
-  const handleRestComplete = useCallback(() => {
-    vibrateSuccess();
-    if (currentSet < sets) {
-      setCurrentSet((prev) => prev + 1);
-      setPhase('work');
-      setWorkTime(initialTime);
-    } else {
-      setIsRunning(false);
-      setPhase('prep');
-    }
-  }, [currentSet, sets, initialTime, onComplete, vibrateSuccess]);
-
+  // Reset timers when props change and not running
   useEffect(() => {
     if (!isRunning) {
-      setWorkTime(mode === 'timer' ? initialTime : 0);
-      setRestTimeState(restTime);
-      setPrepTimeState(prepTime);
+      prepTimer.reset(prepTime);
+      workCountdown.reset(initialTime);
+      restTimer.reset(restTime);
+      workChrono.reset(0);
       setPhase('prep');
     }
   }, [initialTime, restTime, prepTime, mode]);
 
+  // Control which timer runs
   useEffect(() => {
-    let interval: ReturnType<typeof setInterval>;
+    // Pause everything first
+    prepTimer.pause();
+    workCountdown.pause();
+    restTimer.pause();
+    workChrono.pause();
 
-    if (isRunning) {
-      interval = setInterval(() => {
-        if (mode === 'stopwatch') {
-          setWorkTime((prev) => prev + 1);
-          return;
-        }
+    if (!isRunning) return;
 
-        if (phase === 'prep') {
-          setPrepTimeState((prev) => {
-            if (prev <= 4 && prev >= 2) {
-              playCountdownSound();
-            }
-            if (prev === 1) {
-              playTransitionSound();
-            }
-            if (prev <= 1) {
-              vibrateSuccess();
-              setPhase('work');
-              return prepTime;
-            }
-            return prev - 1;
-          });
-        } else if (phase === 'work') {
-          setWorkTime((prev) => {
-            if (prev <= 4 && prev >= 2) {
-              playCountdownSound();
-            }
-            if (prev === 1) {
-              playTransitionSound();
-            }
-            if (prev <= 1) {
-              handleWorkComplete();
-              return initialTime;
-            }
-            return prev - 1;
-          });
-        } else if (phase === 'rest') {
-          setRestTimeState((prev) => {
-            if (prev <= 4 && prev >= 2) {
-              playCountdownSound();
-            }
-            if (prev === 1) {
-              playTransitionSound();
-            }
-            if (prev <= 1) {
-              handleRestComplete();
-              return restTime;
-            }
-            return prev - 1;
-          });
-        }
-      }, 1000);
+    if (mode === 'stopwatch') {
+      workChrono.start();
+      return;
     }
 
-    return () => clearInterval(interval);
-  }, [isRunning, mode, phase, handleWorkComplete, handleRestComplete, initialTime, restTime, prepTime, vibrateSuccess, playCountdownSound, playTransitionSound]);
+    if (phase === 'prep') {
+      prepTimer.start();
+    } else if (phase === 'work') {
+      workCountdown.start();
+    } else if (phase === 'rest') {
+      restTimer.start();
+    }
+  }, [isRunning, mode, phase]);
 
-  const formatTime = (seconds: number) => {
+  // Phase transitions and sounds for countdown timers
+  useEffect(() => {
+    if (!isRunning || mode === 'stopwatch' || phase !== 'prep') return;
+    const t = prepTimer.time;
+    if (t <= 4 && t >= 2) playCountdownSound();
+    if (t === 1) playTransitionSound();
+    if (t === 0) {
+      vibrateSuccess();
+      setPhase('work');
+      prepTimer.reset(prepTime);
+    }
+  }, [prepTimer.time, isRunning, mode, phase, playCountdownSound, playTransitionSound, vibrateSuccess, prepTime]);
+
+  useEffect(() => {
+    if (!isRunning || mode === 'stopwatch' || phase !== 'work') return;
+    const t = workCountdown.time;
+    if (t <= 4 && t >= 2) playCountdownSound();
+    if (t === 1) playTransitionSound();
+    if (t === 0) {
+      vibrateSuccess();
+      setPhase('rest');
+      workCountdown.reset(initialTime);
+    }
+  }, [workCountdown.time, isRunning, mode, phase, playCountdownSound, playTransitionSound, vibrateSuccess, initialTime]);
+
+  useEffect(() => {
+    if (!isRunning || mode === 'stopwatch' || phase !== 'rest') return;
+    const t = restTimer.time;
+    if (t <= 4 && t >= 2) playCountdownSound();
+    if (t === 1) playTransitionSound();
+    if (t === 0) {
+      vibrateSuccess();
+      if (currentSet < sets) {
+        setCurrentSet((prev) => prev + 1);
+        setPhase('work');
+        restTimer.reset(restTime);
+      } else {
+        setIsRunning(false);
+        setPhase('prep');
+        onComplete?.();
+      }
+    }
+  }, [restTimer.time, isRunning, mode, phase, playCountdownSound, playTransitionSound, vibrateSuccess, currentSet, sets, restTime, onComplete]);
+
+  const formatTime = useCallback((seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
+  }, []);
 
   const toggleTimer = useCallback(() => {
     setIsRunning((prev) => !prev);
@@ -188,11 +185,12 @@ export default function Timer({
     setIsRunning(false);
     setCurrentSet(1);
     setPhase('prep');
-    setWorkTime(mode === 'timer' ? initialTime : 0);
-    setRestTimeState(restTime);
-    setPrepTimeState(prepTime);
+    prepTimer.reset(prepTime);
+    workCountdown.reset(initialTime);
+    restTimer.reset(restTime);
+    workChrono.reset(0);
     haptics.impactMedium();
-  }, [initialTime, restTime, prepTime, mode, haptics]);
+  }, [initialTime, restTime, prepTime, haptics]);
 
   if (!fontsLoaded) {
     return null;
@@ -205,7 +203,7 @@ export default function Timer({
     rest: theme.colors.info
   } as const;
   const currentPhaseTotal = mode === 'stopwatch' ? 0 : (phase === 'prep' ? prepTime : phase === 'work' ? initialTime : restTime);
-  const currentPhaseRemaining = mode === 'stopwatch' ? workTime : (phase === 'prep' ? prepTimeState : phase === 'work' ? workTime : restTimeState);
+  const currentPhaseRemaining = mode === 'stopwatch' ? workChrono.time : (phase === 'prep' ? prepTimer.time : phase === 'work' ? workCountdown.time : restTimer.time);
   const size = 260;
   const stroke = 14;
   const radius = (size - stroke) / 2;
@@ -220,10 +218,10 @@ export default function Timer({
 
     const pre =
       phase === 'prep'
-        ? prepTimeState + initialTime + restTime
+        ? prepTimer.time + initialTime + restTime
         : phase === 'work'
-          ? workTime + restTime
-          : restTimeState;
+          ? workCountdown.time + restTime
+          : restTimer.time;
 
     return pre + futureSets * (initialTime + restTime);
   };

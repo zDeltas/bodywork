@@ -1,30 +1,32 @@
 import { EditableSeries, Series } from '../../types/common';
 
-/**
- * Converts editable series to final series format
- * @param series - Array of editable series
- * @param defaultRpe - Default RPE value to use when series RPE is not set
- * @returns Formatted series array
- */
-export const formatSeries = (series: EditableSeries[], defaultRpe: string = '7'): Series[] => {
-  return series.map((s) => ({
-    unitType: s.unitType || 'reps',
-    weight: parseFloat(s.weight) || 0,
-    reps: (s.unitType === 'reps' || s.unitType === 'repsAndWeight') ? (parseInt(s.reps || '0') || 0) : undefined,
-    duration: s.unitType === 'time' ? (parseInt(s.duration || '0') || 0) : undefined,
-    distance: s.unitType === 'distance' ? (parseFloat(s.distance || '0') || 0) : undefined,
-    note: s.note,
-    rest: s.rest ?? '',
-    rpe: s.type === 'warmUp' ? 0 : parseInt(s.rpe || defaultRpe) || 7,
-    type: s.type || 'workingSet'
-  }));
+const UNIT_TYPE_CONFIG = {
+  repsAndWeight: { weight: true, reps: true, duration: false, distance: false },
+  reps: { weight: false, reps: true, duration: false, distance: false },
+  time: { weight: 'withLoad', reps: false, duration: true, distance: false },
+  distance: { weight: 'withLoad', reps: false, duration: false, distance: true }
+} as const;
+
+export const formatSeries = (series: EditableSeries[], withLoad: boolean = false): Series[] => {
+  return series.map((s) => {
+    const unitType = s.unitType || 'reps';
+    const config = UNIT_TYPE_CONFIG[unitType as keyof typeof UNIT_TYPE_CONFIG];
+    
+    return {
+      unitType,
+      note: s.note,
+      rest: s.rest ?? '',
+      rpe: s.type === 'warmUp' ? 0 : parseInt(s.rpe || '5') || 5,
+      type: s.type || 'workingSet',
+      weight: config.weight === true ? (parseFloat(s.weight) || 0) : 
+              config.weight === 'withLoad' && withLoad ? (parseFloat(s.weight) || 0) : 0,
+      reps: config.reps ? (parseInt(s.reps || '0') || 0) : undefined,
+      duration: config.duration ? (parseInt(s.duration || '0') || 0) : undefined,
+      distance: config.distance ? (parseFloat(s.distance || '0') || 0) : undefined
+    };
+  });
 };
 
-/**
- * Validates if a series has valid data
- * @param series - Series to validate
- * @returns True if series has valid data
- */
 export const isValidSeries = (series: EditableSeries): boolean => {
   const unit = series.unitType || 'reps';
   return (
@@ -35,11 +37,6 @@ export const isValidSeries = (series: EditableSeries): boolean => {
   );
 };
 
-/**
- * Filters series to only include valid ones
- * @param series - Array of series to filter
- * @returns Array of valid series
- */
 export const getValidSeries = (series: EditableSeries[]): EditableSeries[] => {
   return series.filter(isValidSeries);
 };

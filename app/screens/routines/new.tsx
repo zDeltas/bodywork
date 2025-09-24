@@ -6,7 +6,7 @@ import Button from '@/app/components/ui/Button';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import ExerciseSelectionModal from '@/app/components/exercises/ExerciseSelectionModal';
 import TimerPickerModal from '@/app/components/timer/TimerPickerModal';
-import { Clock, Layers, Plus, Settings } from 'lucide-react-native';
+import { Timer, Layers, Plus, Settings } from 'lucide-react-native';
 import { useTheme } from '@/app/hooks/useTheme';
 import { storageService } from '@/app/services/storage';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -321,7 +321,7 @@ function NewRoutineScreen() {
       {}
       <View style={styles.exerciseRestSection}>
         <View style={styles.sectionTitleContainer}>
-          <Clock color={theme.colors.primary} size={20} style={styles.sectionTitleIcon} />
+          <Timer color={theme.colors.text.secondary} size={22} style={styles.sectionTitleIcon} />
           <Text variant="subheading" style={styles.sectionTitle}>
             {t('routine.exerciseRestTitle')}
           </Text>
@@ -341,7 +341,7 @@ function NewRoutineScreen() {
             onPress={() => updateExerciseRestMode('beginner')}
           >
             <View style={styles.modeContent}>
-              <Clock
+              <Timer
                 color={routine.exerciseRestMode === 'beginner' ? theme.colors.background.main : theme.colors.text.secondary}
                 size={16}
                 style={styles.modeIcon}
@@ -411,7 +411,7 @@ function NewRoutineScreen() {
       {/* Section Temps de préparation */}
       <View style={styles.exerciseRestSection}>
         <View style={styles.sectionTitleContainer}>
-          <Clock color={theme.colors.primary} size={20} style={styles.sectionTitleIcon} />
+          <Timer color={theme.colors.text.secondary} size={22} style={styles.sectionTitleIcon} />
           <Text variant="subheading" style={styles.sectionTitle}>
             {t('routine.preparationTitle')}
           </Text>

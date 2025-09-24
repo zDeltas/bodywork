@@ -21,7 +21,7 @@ const RestTimeSelector: React.FC<RestTimeSelectorProps> = React.memo(({
   return (
     <View style={styles.container}>
       <View style={styles.titleContainer}>
-        <TimerIcon color={theme.colors.primary} size={20} style={styles.titleIcon} />
+        <TimerIcon color={theme.colors.text.secondary} size={22} style={styles.titleIcon} />
         <Text variant="body" style={styles.label}>
           {t('timer.restTime')}
         </Text>

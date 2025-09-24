@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
-import { Edit2, X, Clock } from 'lucide-react-native';
+import { Edit2, X, Timer } from 'lucide-react-native';
 import Text from '@/app/components/ui/Text';
 import TimerPickerModal from '@/app/components/timer/TimerPickerModal';
 import { useTheme } from '@/app/hooks/useTheme';
@@ -65,7 +65,7 @@ const RoutineExerciseCard: React.FC<ExerciseCardProps> = React.memo(({
       {exerciseRestMode === 'advanced' && (
         <View style={styles.restTimeContainer}>
           <View style={styles.restTimeSection}>
-            <Clock size={16} color={theme.colors.text.secondary} style={styles.restTimeIcon} />
+            <Timer size={16} color={theme.colors.text.secondary} style={styles.restTimeIcon} />
             <Text variant="caption" style={styles.restTimeLabel}>
               {t('routine.exerciseRestTime')}
             </Text>

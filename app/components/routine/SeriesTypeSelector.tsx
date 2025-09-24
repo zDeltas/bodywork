@@ -64,6 +64,7 @@ SeriesTypeSelector.displayName = 'SeriesTypeSelector';
 
 const useStyles = (theme: any) => StyleSheet.create({
   container: {
+    marginTop: theme.spacing.base,
     marginBottom: theme.spacing.base
   },
   label: {

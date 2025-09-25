@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
-import { Dumbbell, Target, Ruler } from 'lucide-react-native';
+import { Dumbbell, Target, Ruler, Clock } from 'lucide-react-native';
 import Text from '@/app/components/ui/Text';
 import { useTheme } from '@/app/hooks/useTheme';
 import { useTranslation } from '@/app/hooks/useTranslation';
@@ -32,7 +32,7 @@ const UnitTypeSelector: React.FC<UnitTypeSelectorProps> = React.memo(({
     {
       key: 'time' as const,
       label: t('workout.duration'),
-      icon: null
+      icon: <Clock size={16} color={selectedType === 'time' ? theme.colors.primary : theme.colors.text.secondary} />
     },
     {
       key: 'distance' as const,
@@ -43,9 +43,12 @@ const UnitTypeSelector: React.FC<UnitTypeSelectorProps> = React.memo(({
 
   return (
     <View style={styles.container}>
-      <Text variant="body" style={styles.label}>
-        {t('workout.unitType')}
-      </Text>
+      <View style={styles.titleContainer}>
+        <Ruler color={theme.colors.text.secondary} size={22} style={styles.titleIcon} />
+        <Text variant="body" style={styles.label}>
+          {t('workout.unitType')}
+        </Text>
+      </View>
       <View style={styles.grid}>
         <View style={styles.row}>
           {unitTypes.slice(0, 2).map((unitType) => (
@@ -106,11 +109,18 @@ const useStyles = (theme: any) => StyleSheet.create({
   container: {
     marginBottom: theme.spacing.base
   },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: theme.spacing.sm
+  },
+  titleIcon: {
+    marginRight: theme.spacing.sm
+  },
   label: {
     color: theme.colors.text.primary,
     fontFamily: theme.typography.fontFamily.semiBold,
-    fontSize: theme.typography.fontSize.base,
-    marginBottom: theme.spacing.sm
+    fontSize: theme.typography.fontSize.base
   },
   grid: {
     marginBottom: theme.spacing.sm

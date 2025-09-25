@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { Modal, ScrollView, View, TouchableOpacity, TextInput, StyleSheet } from 'react-native';
-import { X, ChevronDown, Plus } from 'lucide-react-native';
+import { X, ChevronDown, Plus, FileText } from 'lucide-react-native';
 import Text from '@/app/components/ui/Text';
 import Button from '@/app/components/ui/Button';
 import TimerPickerModal from '@/app/components/timer/TimerPickerModal';
@@ -184,9 +184,12 @@ const SeriesConfigModal: React.FC<SeriesConfigModalProps> = React.memo(({
               />
 
               <View style={styles.noteContainer}>
-                <Text variant="body" style={styles.noteLabel}>
-                  {t('common.note')}
-                </Text>
+                <View style={styles.titleContainer}>
+                  <FileText color={theme.colors.text.secondary} size={22} style={styles.titleIcon} />
+                  <Text variant="body" style={styles.noteLabel}>
+                    {t('common.note')}
+                  </Text>
+                </View>
                 <TextInput
                   style={styles.noteInput}
                   value={exerciseNote}
@@ -198,7 +201,15 @@ const SeriesConfigModal: React.FC<SeriesConfigModalProps> = React.memo(({
               </View>
             </View>
 
-            {seriesElements}
+            <View style={styles.seriesSection}>
+              <View style={styles.titleContainer}>
+                <Plus color={theme.colors.text.secondary} size={22} style={styles.titleIcon} />
+                <Text variant="body" style={styles.titleLabel}>
+                  {t('workout.series')}
+                </Text>
+              </View>
+              {seriesElements}
+            </View>
 
             <TouchableOpacity
               style={styles.addSeriesButton}
@@ -288,11 +299,26 @@ const useStyles = (theme: any) => StyleSheet.create({
     marginTop: theme.spacing.sm,
     marginBottom: theme.spacing.sm
   },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: theme.spacing.sm
+  },
+  titleIcon: {
+    marginRight: theme.spacing.sm
+  },
+  titleLabel: {
+    color: theme.colors.text.primary,
+    fontFamily: theme.typography.fontFamily.semiBold,
+    fontSize: theme.typography.fontSize.base
+  },
   noteLabel: {
     color: theme.colors.text.primary,
     fontFamily: theme.typography.fontFamily.semiBold,
-    fontSize: theme.typography.fontSize.base,
-    marginBottom: theme.spacing.sm
+    fontSize: theme.typography.fontSize.base
+  },
+  seriesSection: {
+    marginBottom: theme.spacing.lg
   },
   noteInput: {
     backgroundColor: theme.colors.background.card,

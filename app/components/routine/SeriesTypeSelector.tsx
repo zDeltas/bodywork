@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import { Activity } from 'lucide-react-native';
 import Text from '@/app/components/ui/Text';
 import { useTheme } from '@/app/hooks/useTheme';
 import { useTranslation } from '@/app/hooks/useTranslation';
@@ -19,9 +20,12 @@ const SeriesTypeSelector: React.FC<SeriesTypeSelectorProps> = React.memo(({
 
   return (
     <View style={styles.container}>
-      <Text variant="body" style={styles.label}>
-        {t('routine.seriesType')}
-      </Text>
+      <View style={styles.titleContainer}>
+        <Activity color={theme.colors.text.secondary} size={22} style={styles.titleIcon} />
+        <Text variant="body" style={styles.label}>
+          {t('routine.seriesType')}
+        </Text>
+      </View>
       <View style={styles.buttonsContainer}>
         <TouchableOpacity
           style={[
@@ -67,11 +71,18 @@ const useStyles = (theme: any) => StyleSheet.create({
     marginTop: theme.spacing.base,
     marginBottom: theme.spacing.base
   },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: theme.spacing.sm
+  },
+  titleIcon: {
+    marginRight: theme.spacing.sm
+  },
   label: {
     color: theme.colors.text.primary,
     fontFamily: theme.typography.fontFamily.semiBold,
-    fontSize: theme.typography.fontSize.base,
-    marginBottom: theme.spacing.sm
+    fontSize: theme.typography.fontSize.base
   },
   buttonsContainer: {
     flexDirection: 'row',

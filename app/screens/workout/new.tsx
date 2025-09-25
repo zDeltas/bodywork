@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import { Modal, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
-import { Calendar, ChevronDown, Timer, Dumbbell, Plus } from 'lucide-react-native';
+import { Calendar, ChevronDown, Timer, Dumbbell, Plus, Activity, Ruler, FileText, Target } from 'lucide-react-native';
 import { Calendar as RNCalendar } from 'react-native-calendars';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -249,9 +249,12 @@ export default function NewWorkoutScreen() {
 
           {/* RPE Global */}
           <View style={styles.rpeContainer}>
-            <Text variant="body" style={styles.rpeLabel}>
-              {t('workout.rpe')}
-            </Text>
+            <View style={styles.titleContainer}>
+              <Target color={theme.colors.text.secondary} size={22} style={styles.titleIcon} />
+              <Text variant="body" style={styles.titleLabel}>
+                {t('workout.rpe')}
+              </Text>
+            </View>
             <View style={styles.rpeModalContent}>
               <View style={styles.rpeRow}>
                 {Array.from({ length: 5 }, (_, i) => i + 1).map((value) => (
@@ -305,9 +308,12 @@ export default function NewWorkoutScreen() {
           </View>
 
           <View style={styles.noteContainer}>
-            <Text variant="body" style={styles.configLabel}>
-              {t('common.note')}
-            </Text>
+            <View style={styles.titleContainer}>
+              <FileText color={theme.colors.text.secondary} size={22} style={styles.titleIcon} />
+              <Text variant="body" style={styles.titleLabel}>
+                {t('common.note')}
+              </Text>
+            </View>
             <TextInput
               style={styles.noteInput}
               value={exerciseNote}
@@ -323,7 +329,7 @@ export default function NewWorkoutScreen() {
         <View style={styles.sectionContainer}>
           <View style={styles.sectionTitleContainer}>
             <Plus color={theme.colors.text.secondary} size={22} style={styles.sectionTitleIcon} />
-            <Text variant="subheading" style={styles.sectionTitle}>
+            <Text variant="subheading" style={styles.titleLabel}>
               {t('workout.series')}
             </Text>
           </View>
@@ -541,6 +547,14 @@ const useStyles = () => {
     sectionTitleIcon: {
       marginRight: theme.spacing.sm
     },
+    titleContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: theme.spacing.sm
+    },
+    titleIcon: {
+      marginRight: theme.spacing.sm
+    },
     dateButton: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -642,11 +656,10 @@ const useStyles = () => {
       marginBottom: theme.spacing.md,
       paddingVertical: theme.spacing.xs
     },
-    configLabel: {
+    titleLabel: {
       color: theme.colors.text.primary,
-      fontFamily: theme.typography.fontFamily.regular,
-      fontSize: theme.typography.fontSize.base,
-      flex: 1
+      fontFamily: theme.typography.fontFamily.semiBold,
+      fontSize: theme.typography.fontSize.base
     },
     seriesContainer: {
       marginTop: theme.spacing.md
@@ -721,12 +734,6 @@ const useStyles = () => {
     rpeContainer: {
       gap: theme.spacing.md,
       marginBottom: theme.spacing.lg
-    },
-    rpeLabel: {
-      color: theme.colors.text.primary,
-      fontFamily: theme.typography.fontFamily.semiBold,
-      fontSize: theme.typography.fontSize.base,
-      marginBottom: theme.spacing.base
     },
     rpeModalContent: {
       gap: theme.spacing.md

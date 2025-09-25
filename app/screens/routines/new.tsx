@@ -6,7 +6,7 @@ import Button from '@/app/components/ui/Button';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import ExerciseSelectionModal from '@/app/components/exercises/ExerciseSelectionModal';
 import TimerPickerModal from '@/app/components/timer/TimerPickerModal';
-import { Timer, Layers, Plus, Settings } from 'lucide-react-native';
+import { Timer, Layers, Plus, Settings, FileText, Zap } from 'lucide-react-native';
 import { useTheme } from '@/app/hooks/useTheme';
 import { storageService } from '@/app/services/storage';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -188,8 +188,8 @@ function NewRoutineScreen() {
   const renderStep2 = useMemo(() => (
     <View style={{ flex: 1 }}>
       <View style={styles.sectionTitleContainer}>
-        <Layers color={theme.colors.primary} size={24} style={styles.sectionTitleIcon} />
-        <Text variant="heading" style={styles.sectionTitle}>
+        <Plus color={theme.colors.text.secondary} size={22} style={styles.sectionTitleIcon} />
+        <Text variant="heading" style={styles.titleLabel}>
           {t('routine.selectExercises')}
         </Text>
       </View>
@@ -299,24 +299,50 @@ function NewRoutineScreen() {
 
   const renderStep1 = useMemo(() => (
     <ScrollView style={{ flex: 1 }}>
-      <Text variant="subheading" style={styles.label}>{t('routine.title')}</Text>
-      <TextInput
-        style={styles.input}
-        placeholder={t('routine.titlePlaceholder')}
-        value={routine.title}
-        onChangeText={title => setRoutine(r => ({ ...r, title }))}
-        placeholderTextColor={theme.colors.text.secondary}
-      />
-      <Text variant="subheading" style={styles.label}>{t('routine.description')}</Text>
-      <TextInput
-        style={[styles.input, styles.textArea]}
-        placeholder={t('routine.descriptionPlaceholder')}
-        value={routine.description}
-        onChangeText={description => setRoutine(r => ({ ...r, description }))}
-        multiline
-        numberOfLines={3}
-        placeholderTextColor={theme.colors.text.secondary}
-      />
+      {/* Section Titre */}
+      <View style={styles.exerciseRestSection}>
+        <View style={styles.sectionTitleContainer}>
+          <FileText color={theme.colors.text.secondary} size={22} style={styles.sectionTitleIcon} />
+          <Text variant="subheading" style={styles.sectionTitle}>
+            {t('routine.title')}
+          </Text>
+        </View>
+
+        <Text variant="caption" style={styles.sectionDescription}>
+          {t('routine.titleDescription')}
+        </Text>
+
+        <TextInput
+          style={styles.input}
+          placeholder={t('routine.titlePlaceholder')}
+          value={routine.title}
+          onChangeText={title => setRoutine(r => ({ ...r, title }))}
+          placeholderTextColor={theme.colors.text.secondary}
+        />
+      </View>
+      {/* Section Description */}
+      <View style={styles.exerciseRestSection}>
+        <View style={styles.sectionTitleContainer}>
+          <FileText color={theme.colors.text.secondary} size={22} style={styles.sectionTitleIcon} />
+          <Text variant="subheading" style={styles.sectionTitle}>
+            {t('routine.description')}
+          </Text>
+        </View>
+
+        <Text variant="caption" style={styles.sectionDescription}>
+          {t('routine.descriptionDescription')}
+        </Text>
+
+        <TextInput
+          style={[styles.input, styles.textArea]}
+          placeholder={t('routine.descriptionPlaceholder')}
+          value={routine.description}
+          onChangeText={description => setRoutine(r => ({ ...r, description }))}
+          multiline
+          numberOfLines={3}
+          placeholderTextColor={theme.colors.text.secondary}
+        />
+      </View>
 
       {}
       <View style={styles.exerciseRestSection}>
@@ -411,7 +437,7 @@ function NewRoutineScreen() {
       {/* Section Temps de préparation */}
       <View style={styles.exerciseRestSection}>
         <View style={styles.sectionTitleContainer}>
-          <Timer color={theme.colors.text.secondary} size={22} style={styles.sectionTitleIcon} />
+          <Zap color={theme.colors.text.secondary} size={22} style={styles.sectionTitleIcon} />
           <Text variant="subheading" style={styles.sectionTitle}>
             {t('routine.preparationTitle')}
           </Text>
@@ -518,6 +544,19 @@ const useStyles = (theme: any) => StyleSheet.create({
   content: { flex: 1, padding: theme.spacing.base },
   title: { marginBottom: theme.spacing.base, color: theme.colors.text.primary },
   label: { marginBottom: theme.spacing.xs, color: theme.colors.text.primary },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: theme.spacing.sm
+  },
+  titleIcon: {
+    marginRight: theme.spacing.sm
+  },
+  titleLabel: {
+    color: theme.colors.text.primary,
+    fontFamily: theme.typography.fontFamily.semiBold,
+    fontSize: theme.typography.fontSize.base
+  },
   input: {
     borderWidth: 1,
     borderColor: theme.colors.border.default,

@@ -107,4 +107,4 @@ export interface SessionState {
   rpe: string;
 }
 
-export type Period = '1m' | '3m' | '6m';
+export type Period = '7d' | '14d' | '1m' | '3m';

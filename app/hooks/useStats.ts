@@ -2,10 +2,11 @@ import { useCallback, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { WorkoutDateUtils } from '@/types/workout';
 import { Period, StatsData, Workout } from '@/types/common';
-import { differenceInDays, subMonths } from 'date-fns';
+import { differenceInDays, subDays, subMonths } from 'date-fns';
 import calculations from '@/app/utils/calculations';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { TranslationKey } from '@/translations';
+import { predefinedExercises, getBaseExerciseKey } from '@/app/components/exercises';
 
 interface MuscleDistributionData {
   name: string;
@@ -37,6 +38,22 @@ const useStats = (selectedPeriod: Period) => {
     muscleDistribution: []
   });
 
+  // Helper: compute start date for a given period
+  const getStartDateForPeriod = useCallback((period: Period): Date => {
+    const now = new Date();
+    switch (period) {
+      case '7d':
+        return subDays(now, 7);
+      case '14d':
+        return subDays(now, 14);
+      case '1m':
+        return subMonths(now, 1);
+      case '3m':
+      default:
+        return subMonths(now, 3);
+    }
+  }, []);
+
   const calculateMonthlyProgress = useCallback((workouts: Workout[]): number => {
     const lastMonthWorkouts = workouts.filter((workout: Workout) => {
       const workoutDate = new Date(workout.date);
@@ -67,32 +84,20 @@ const useStats = (selectedPeriod: Period) => {
     return Math.round(((last1RM - first1RM) / first1RM) * 100);
   }, []);
 
-  const calculateTrainingFrequency = useCallback(
-    (workouts: Workout[]): number => {
-      const filteredWorkouts = workouts.filter((workout) => {
-        const workoutDate = new Date(workout.date);
-        const startDate = subMonths(
-          new Date(),
-          selectedPeriod === '1m' ? 1 : selectedPeriod === '3m' ? 3 : 6
-        );
-        return workoutDate >= startDate;
-      });
+  const calculateTrainingFrequency = useCallback((workouts: Workout[]): number => {
+    const startDate = getStartDateForPeriod(selectedPeriod);
+    const filteredWorkouts = workouts.filter((workout) => new Date(workout.date) >= startDate);
 
-      if (!filteredWorkouts || !Array.isArray(filteredWorkouts)) {
-        return 0;
-      }
+    if (!filteredWorkouts || !Array.isArray(filteredWorkouts)) {
+      return 0;
+    }
 
-      const uniqueDates = new Set(
-        filteredWorkouts.map((w) => WorkoutDateUtils.getDatePart(w.date))
-      );
-      const daysInPeriod = differenceInDays(
-        new Date(),
-        subMonths(new Date(), selectedPeriod === '1m' ? 1 : selectedPeriod === '3m' ? 3 : 6)
-      );
-      return Math.round((uniqueDates.size / daysInPeriod) * 100);
-    },
-    [selectedPeriod]
-  );
+    const uniqueDates = new Set(
+      filteredWorkouts.map((w) => WorkoutDateUtils.getDatePart(w.date))
+    );
+    const daysInPeriod = Math.max(1, differenceInDays(new Date(), startDate));
+    return Math.round((uniqueDates.size / daysInPeriod) * 100);
+  }, [selectedPeriod, getStartDateForPeriod]);
 
   const getBestProgressExercise = useCallback(
     (workouts: Workout[]): { progress: number; exercise: string } | null => {
@@ -140,20 +145,79 @@ const useStats = (selectedPeriod: Period) => {
   );
 
   const getMuscleDistribution = useCallback((workouts: Workout[]): MuscleDistributionData[] => {
+    // Apply period filter first
+    const startDate = getStartDateForPeriod(selectedPeriod);
+    const periodWorkouts = workouts.filter((w) => new Date(w.date) >= startDate);
+    // Portion configuration (per exercise): 70% for primary, 30% spread across all secondaries
+    const PRIMARY_PORTION = 0.7;
+    const SECONDARY_PORTION = 0.3;
+
+    // Build a quick lookup for exercise → { primaryMuscle, secondaryMuscles }
+    const exerciseIndex: Record<string, { primaryMuscle: string; secondaryMuscles: string[] }>
+      = predefinedExercises.reduce((acc, ex) => {
+        acc[ex.key] = {
+          primaryMuscle: ex.primaryMuscle,
+          secondaryMuscles: ex.secondaryMuscles ?? []
+        };
+        return acc;
+      }, {} as Record<string, { primaryMuscle: string; secondaryMuscles: string[] }>);
+
     const muscleGroups: Record<string, number> = {};
 
-    workouts.forEach((workout) => {
+    periodWorkouts.forEach((workout) => {
+      // Compute series score depending on unit type
       const volume = workout.series.reduce((total, series) => {
-        return total + series.weight * series.reps;
+        const unit = series.unitType as any;
+        switch (unit) {
+          case 'repsAndWeight': {
+            const reps = typeof series.reps === 'number' ? series.reps : 0;
+            const weight = typeof series.weight === 'number' ? series.weight : 0;
+            return total + weight * reps;
+          }
+          case 'reps': {
+            const reps = typeof series.reps === 'number' ? series.reps : 0;
+            return total + reps; // bodyweight equivalent
+          }
+          case 'time': {
+            const duration = typeof series.duration === 'number' ? series.duration : 0; // seconds
+            return total + duration;
+          }
+          case 'distance': {
+            const distance = typeof series.distance === 'number' ? series.distance : 0; // meters
+            return total + distance;
+          }
+          default:
+            return total;
+        }
       }, 0);
 
-      if (!muscleGroups[workout.muscleGroup]) {
-        muscleGroups[workout.muscleGroup] = 0;
+      if (volume <= 0) return; // skip if no meaningful volume
+
+      const baseKey = getBaseExerciseKey(workout.exercise);
+      const def = exerciseIndex[baseKey];
+
+      if (def) {
+        // Primary contribution (70%)
+        const primary = def.primaryMuscle;
+        muscleGroups[primary] = (muscleGroups[primary] ?? 0) + volume * PRIMARY_PORTION;
+
+        // Secondary contributions: spread remaining 30% equally
+        const secs = def.secondaryMuscles;
+        if (secs.length > 0) {
+          const share = (volume * SECONDARY_PORTION) / secs.length;
+          secs.forEach((m) => {
+            muscleGroups[m] = (muscleGroups[m] ?? 0) + share;
+          });
+        }
+      } else {
+        // Fallback to stored muscleGroup if exercise definition is unknown
+        const fallback = (workout.muscleGroup || 'other').toLowerCase();
+        muscleGroups[fallback] = (muscleGroups[fallback] ?? 0) + volume; // 100% to known group
       }
-      muscleGroups[workout.muscleGroup] += volume;
     });
 
-    const totalVolume = Object.values(muscleGroups).reduce((sum, volume) => sum + volume, 0);
+    const totalVolume = Object.values(muscleGroups).reduce((sum, v) => sum + v, 0);
+    if (totalVolume <= 0) return [];
 
     return Object.entries(muscleGroups)
       .map(([name, volume]) => ({
@@ -163,7 +227,7 @@ const useStats = (selectedPeriod: Period) => {
         originalName: name
       }))
       .sort((a, b) => b.value - a.value);
-  }, [t]);
+  }, [t, selectedPeriod, getStartDateForPeriod]);
 
   useEffect(() => {
     const loadWorkouts = async () => {

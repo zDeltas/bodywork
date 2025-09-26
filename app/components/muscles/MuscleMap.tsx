@@ -7,6 +7,7 @@ import { useTheme } from '@/app/hooks/useTheme';
 import Text from '@/app/components/ui/Text';
 import { Workout } from '@/types/common';
 import { useSettings } from '@/app/hooks/useSettings';
+import { predefinedExercises, getBaseExerciseKey } from '@/app/components/exercises';
 
 interface MuscleMapProps {
   workouts: Workout[];
@@ -41,11 +42,19 @@ const muscleSlugs: Record<string, Slug> = {
 const muscleGroupToSlug: Record<string, Slug> = {
   chest: muscleSlugs.CHEST,
   back: muscleSlugs.UPPER_BACK,
-  legs: muscleSlugs.QUADRICEPS,
   shoulders: muscleSlugs.DELTOIDS,
   biceps: muscleSlugs.BICEPS,
   triceps: muscleSlugs.TRICEPS,
-  core: muscleSlugs.ABS
+  core: muscleSlugs.ABS,
+  obliques: muscleSlugs.OBLIQUES,
+  forearms: muscleSlugs.FOREARM,
+  abductors: muscleSlugs.ADDUCTORS,
+  adductors: muscleSlugs.ADDUCTORS,
+  quadriceps: muscleSlugs.QUADRICEPS,
+  trapezius: muscleSlugs.TRAPEZIUS,
+  hamstrings: muscleSlugs.HAMSTRING,
+  calves: muscleSlugs.CALVES,
+  legs: muscleSlugs.QUADRICEPS // fallback generic
 };
 
 export default function MuscleMap({ workouts }: MuscleMapProps) {
@@ -70,33 +79,79 @@ export default function MuscleMap({ workouts }: MuscleMapProps) {
     transform: [{ rotateY: `${rotationValue.value}deg` }]
   }));
 
-  const getMuscleRestState = (muscleWorkouts: Workout[]) => {
-    if (muscleWorkouts.length === 0) return -1;
-
-    const lastWorkoutTime = muscleWorkouts.reduce((closest, workout) => {
-      const workoutDate = new Date(workout.date);
-      return workoutDate > closest ? workoutDate : closest;
-    }, new Date(0)).getTime();
-
-    const hoursSinceLastWorkout = (Date.now() - lastWorkoutTime) / (1000 * 60 * 60);
-
-    if (hoursSinceLastWorkout < 24) return 1;
-    if (hoursSinceLastWorkout < 72) return 2;
-    return 3;
-  };
-
+  // Compute weighted activation per muscle group using the same rules as MuscleDistribution
   const getExtendedBodyParts = (workouts: Workout[]) => {
-    const bodyParts: any[] = [];
-    
-    Object.entries(muscleGroupToSlug).forEach(([group, slug]) => {
-      const muscleWorkouts = workouts.filter((w) => w.muscleGroup === group);
-      const restState = getMuscleRestState(muscleWorkouts);
-      
-      if (restState !== -1) {
-        bodyParts.push({
-          slug: slug as Slug,
-          intensity: restState
-        });
+    // Build exercise index for quick lookup
+    const exerciseIndex: Record<string, { primaryMuscle: string; secondaryMuscles: string[] }> =
+      predefinedExercises.reduce((acc, ex) => {
+        acc[ex.key] = { primaryMuscle: ex.primaryMuscle, secondaryMuscles: ex.secondaryMuscles ?? [] };
+        return acc;
+      }, {} as Record<string, { primaryMuscle: string; secondaryMuscles: string[] }>);
+
+    // Aggregate scores per muscle
+    const scores: Record<string, number> = {};
+    const PRIMARY_PORTION = 0.7;
+    const SECONDARY_PORTION = 0.3;
+
+    workouts.forEach((workout) => {
+      const volume = workout.series.reduce((total, series) => {
+        switch (series.unitType) {
+          case 'repsAndWeight': {
+            const reps = typeof series.reps === 'number' ? series.reps : 0;
+            const weight = typeof series.weight === 'number' ? series.weight : 0;
+            return total + weight * reps;
+          }
+          case 'reps': {
+            const reps = typeof series.reps === 'number' ? series.reps : 0;
+            return total + reps;
+          }
+          case 'time': {
+            const duration = typeof series.duration === 'number' ? series.duration : 0;
+            return total + duration;
+          }
+          case 'distance': {
+            const distance = typeof series.distance === 'number' ? series.distance : 0;
+            return total + distance;
+          }
+          default:
+            return total;
+        }
+      }, 0);
+
+      if (volume <= 0) return;
+
+      const baseKey = getBaseExerciseKey(workout.exercise);
+      const def = exerciseIndex[baseKey];
+
+      if (def) {
+        // 70% to primary
+        scores[def.primaryMuscle] = (scores[def.primaryMuscle] ?? 0) + volume * PRIMARY_PORTION;
+        // 30% split among secondaries
+        const secs = def.secondaryMuscles;
+        if (secs.length > 0) {
+          const share = (volume * SECONDARY_PORTION) / secs.length;
+          secs.forEach((m) => {
+            scores[m] = (scores[m] ?? 0) + share;
+          });
+        }
+      } else {
+        const fallback = (workout.muscleGroup || 'other').toLowerCase();
+        scores[fallback] = (scores[fallback] ?? 0) + volume;
+      }
+    });
+
+    // Normalize into 3 intensity bins to match legend/colors
+    const values = Object.values(scores);
+    const max = values.length ? Math.max(...values) : 0;
+
+    const bodyParts: ExtendedBodyPart[] = [];
+    Object.entries(scores).forEach(([group, value]) => {
+      const slug = muscleGroupToSlug[group];
+      if (!slug) return;
+      const ratio = max > 0 ? value / max : 0;
+      const intensity = ratio === 0 ? 0 : ratio <= 1 / 3 ? 1 : ratio <= 2 / 3 ? 2 : 3;
+      if (intensity > 0) {
+        bodyParts.push({ slug, intensity });
       }
     });
 
@@ -106,9 +161,9 @@ export default function MuscleMap({ workouts }: MuscleMapProps) {
   const bodyData = getExtendedBodyParts(workouts);
 
   const intensityColors = [
-    theme.colors.error,
-    theme.colors.warning,
-    theme.colors.success
+    theme.colors.success, // low intensity
+    theme.colors.warning, // medium intensity
+    theme.colors.error    // high intensity
   ];
 
   return (
@@ -144,15 +199,15 @@ export default function MuscleMap({ workouts }: MuscleMapProps) {
         <View style={styles.legendItems}>
           <View style={styles.legendItem}>
             <View style={[styles.legendColor, { backgroundColor: intensityColors[0] }]} />
-            <Text style={styles.legendText}>{t('muscleMap.restPeriod0to24')}</Text>
+            <Text style={styles.legendText}>{t('muscleMap.lowIntensity')}</Text>
           </View>
           <View style={styles.legendItem}>
             <View style={[styles.legendColor, { backgroundColor: intensityColors[1] }]} />
-            <Text style={styles.legendText}>{t('muscleMap.restPeriod24to72')}</Text>
+            <Text style={styles.legendText}>{t('muscleMap.mediumIntensity')}</Text>
           </View>
           <View style={styles.legendItem}>
             <View style={[styles.legendColor, { backgroundColor: intensityColors[2] }]} />
-            <Text style={styles.legendText}>{t('muscleMap.restPeriod72plus')}</Text>
+            <Text style={styles.legendText}>{t('muscleMap.highIntensity')}</Text>
           </View>
         </View>
       </View>

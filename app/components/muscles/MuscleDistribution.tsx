@@ -12,7 +12,7 @@ interface MuscleGroupData {
   color: string;
 }
 
-type Period = '1m' | '3m' | '6m';
+type Period = '7d' | '14d' | '1m' | '3m';
 
 interface MuscleDistributionProps {
   fadeAnim: Animated.Value;
@@ -103,6 +103,10 @@ const MuscleDistribution: React.FC<MuscleDistributionProps> = ({
       fontSize: theme.typography.fontSize.sm,
       color: theme.colors.text.secondary
     },
+    centerPie: {
+      alignItems: 'center',
+      justifyContent: 'center'
+    },
     emptyStateContainer: {
       alignItems: 'center',
       justifyContent: 'center',
@@ -128,6 +132,28 @@ const MuscleDistribution: React.FC<MuscleDistributionProps> = ({
         </Text>
         <View style={styles.filterContainer}>
           <TouchableOpacity
+            style={[styles.filterButton, selectedPeriod === '7d' && styles.filterButtonActive]}
+            onPress={() => {
+              setSelectedPeriod('7d');
+              haptics.impactLight();
+            }}
+          >
+            <Text style={[styles.filterText, selectedPeriod === '7d' && styles.filterTextActive]}>
+              {t('periods.sevenDays')}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.filterButton, selectedPeriod === '14d' && styles.filterButtonActive]}
+            onPress={() => {
+              setSelectedPeriod('14d');
+              haptics.impactLight();
+            }}
+          >
+            <Text style={[styles.filterText, selectedPeriod === '14d' && styles.filterTextActive]}>
+              {t('periods.fourteenDays')}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
             style={[styles.filterButton, selectedPeriod === '1m' && styles.filterButtonActive]}
             onPress={() => {
               setSelectedPeriod('1m');
@@ -149,55 +175,46 @@ const MuscleDistribution: React.FC<MuscleDistributionProps> = ({
               {t('periods.threeMonths')}
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.filterButton, selectedPeriod === '6m' && styles.filterButtonActive]}
-            onPress={() => {
-              setSelectedPeriod('6m');
-              haptics.impactLight();
-            }}
-          >
-            <Text style={[styles.filterText, selectedPeriod === '6m' && styles.filterTextActive]}>
-              {t('periods.sixMonths')}
-            </Text>
-          </TouchableOpacity>
         </View>
       </View>
 
       {hasData ? (
         <>
-          <VictoryPie
-            data={muscleGroups}
-            x="name"
-            y="value"
-            colorScale={muscleGroups.map((g) => g.color)}
-            width={Dimensions.get('window').width - 40}
-            height={300}
-            innerRadius={70}
-            labelRadius={120}
-            style={{
-              labels: {
-                fill: theme.colors.text.primary,
-                fontSize: theme.typography.fontSize.sm,
-                fontFamily: theme.typography.fontFamily.regular
-              },
-              data: {
-                fill: ({ datum }) => datum.color,
-                fillOpacity: 0.9,
-                stroke: theme.colors.background.main,
-                strokeWidth: 2
-              }
-            }}
-            labelComponent={
-              <VictoryLabel
-                style={{
+          <View style={styles.centerPie}>
+            <VictoryPie
+              data={muscleGroups}
+              x="name"
+              y="value"
+              colorScale={muscleGroups.map((g) => g.color)}
+              width={Dimensions.get('window').width - 40}
+              height={300}
+              innerRadius={70}
+              labelRadius={120}
+              style={{
+                labels: {
                   fill: theme.colors.text.primary,
                   fontSize: theme.typography.fontSize.sm,
                   fontFamily: theme.typography.fontFamily.regular
-                }}
-                text={({ datum }) => datum.value > 5 ? `${datum.value}%` : ''}
-              />
-            }
-          />
+                },
+                data: {
+                  fill: ({ datum }) => datum.color,
+                  fillOpacity: 0.9,
+                  stroke: theme.colors.background.main,
+                  strokeWidth: 2
+                }
+              }}
+              labelComponent={
+                <VictoryLabel
+                  style={{
+                    fill: theme.colors.text.primary,
+                    fontSize: theme.typography.fontSize.sm,
+                    fontFamily: theme.typography.fontFamily.regular
+                  }}
+                  text={({ datum }) => datum.value > 5 ? `${datum.value}%` : ''}
+                />
+              }
+            />
+          </View>
           <View style={styles.legendContainer}>
             {muscleGroups.map((group, index) => (
               <View key={index} style={styles.legendItem}>

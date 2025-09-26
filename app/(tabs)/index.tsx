@@ -175,7 +175,7 @@ export default function WorkoutScreen() {
                           />
                           <Text style={styles.workoutInfoValue}>{info.sets}</Text>
                         </View>
-                        {info.rpe && info.rpe > 0 && (
+                        {info.rpe > 0 && (
                           <View style={[styles.rpeBadge, { backgroundColor: rpeBg }]}>
                             <Activity
                               size={14}

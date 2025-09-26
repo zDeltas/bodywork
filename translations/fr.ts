@@ -34,6 +34,14 @@ export default {
     seconds: 'secondes'
   },
 
+  // Periods
+  periods: {
+    sevenDays: '7 jours',
+    fourteenDays: '14 jours',
+    oneMonth: '1 mois',
+    threeMonths: '3 mois'
+  },
+
   // Session
   session: {
     takeBreath: 'Prends ton souffle',
@@ -145,7 +153,10 @@ export default {
     muscleRestState: 'État de repos des muscles',
     restPeriod0to24: '0-24h',
     restPeriod24to72: '24-72h',
-    restPeriod72plus: '72h+'
+    restPeriod72plus: '72h+',
+    lowIntensity: 'Faible',
+    mediumIntensity: 'Moyenne',
+    highIntensity: 'Élevée'
   },
 
   // Workout screen
@@ -298,13 +309,6 @@ export default {
     goalDetails: 'Détails de l\'objectif',
     currentWeightDescription: 'Poids actuel',
     targetWeightDescription: 'Poids cible'
-  },
-
-  // Time periods
-  periods: {
-    oneMonth: '1 mois',
-    threeMonths: '3 mois',
-    sixMonths: '6 mois'
   },
 
   // Exercise selector

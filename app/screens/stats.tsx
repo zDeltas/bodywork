@@ -22,7 +22,7 @@ import { Search } from 'lucide-react-native';
 import { TouchableOpacity } from 'react-native';
 import Text from '@/app/components/ui/Text';
 
-type Period = '1m' | '3m' | '6m';
+type Period = '7d' | '14d' | '1m' | '3m';
 
 export default function StatsScreen() {
   const { t } = useTranslation();
@@ -30,7 +30,7 @@ export default function StatsScreen() {
   const styles = useStyles();
 
   // State
-  const [selectedPeriod, setSelectedPeriod] = useState<Period>('1m');
+  const [selectedPeriod, setSelectedPeriod] = useState<Period>('7d');
   const [showExerciseModal, setShowExerciseModal] = useState(false);
 
   // Fonts

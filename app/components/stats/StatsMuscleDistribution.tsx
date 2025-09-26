@@ -4,7 +4,7 @@ import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
 import MuscleDistribution from '@/app/components/muscles/MuscleDistribution';
 
-type Period = '1m' | '3m' | '6m';
+type Period = '7d' | '14d' | '1m' | '3m';
 
 interface MuscleGroupData {
   name: string;

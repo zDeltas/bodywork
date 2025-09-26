@@ -22,6 +22,7 @@ export interface Settings {
   gender: 'male' | 'female';
   language: 'en' | 'fr';
   theme: 'dark' | 'light';
+  rpeMode: 'ask' | 'never';
 }
 
 export interface Measurement {
@@ -53,7 +54,8 @@ const defaultValues: StorageData = {
     weightUnit: 'kg',
     gender: 'male',
     language: 'fr',
-    theme: 'dark'
+    theme: 'dark',
+    rpeMode: 'ask'
   },
   [StorageKeys.FAVORITE_EXERCISES]: [],
   [StorageKeys.RECENT_EXERCISES]: [],

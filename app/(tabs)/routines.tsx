@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Alert, FlatList, Share, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { storageService } from '@/app/services/storage';
 import { useRouter } from 'expo-router';
@@ -14,8 +14,22 @@ import EmptyState from '@/app/components/routines/EmptyState';
 import Header from '@/app/components/layout/Header';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { TranslationKey } from '@/translations';
+import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold, useFonts } from '@expo-google-fonts/inter';
+import * as SplashScreen from 'expo-splash-screen';
 
 export default function RoutinesListScreen() {
+  const [fontsLoaded] = useFonts({
+    'Inter-Regular': Inter_400Regular,
+    'Inter-SemiBold': Inter_600SemiBold,
+    'Inter-Bold': Inter_700Bold
+  });
+
+  const onLayoutRootView = useCallback(async () => {
+    if (fontsLoaded) {
+      await SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded]);
+
   const [routines, setRoutines] = useState<Routine[]>([]);
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -135,8 +149,7 @@ export default function RoutinesListScreen() {
   });
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <View style={styles.container}>
+      <View style={styles.container} onLayout={onLayoutRootView}>
         <Header
           title={t('routines.title' as TranslationKey)}
           showBackButton={false}
@@ -197,7 +210,6 @@ export default function RoutinesListScreen() {
           variant="danger"
         />
       </View>
-    </GestureHandlerRootView>
   );
 }
 

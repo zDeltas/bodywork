@@ -17,8 +17,22 @@ import { formatRestTime, generateRoutineId, isRoutineComplete } from '@/app/util
 import SeriesConfigModal from '@/app/components/routine/SeriesConfigModal';
 import RoutineExerciseCard from '@/app/components/routine/RoutineExerciseCard';
 import { useSnackbar } from '@/app/hooks/useSnackbar';
+import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold, useFonts } from '@expo-google-fonts/inter';
+import * as SplashScreen from 'expo-splash-screen';
 
 function NewRoutineScreen() {
+  const [fontsLoaded] = useFonts({
+    'Inter-Regular': Inter_400Regular,
+    'Inter-SemiBold': Inter_600SemiBold,
+    'Inter-Bold': Inter_700Bold
+  });
+
+  const onLayoutRootView = useCallback(async () => {
+    if (fontsLoaded) {
+      await SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded]);
+
   const { t } = useTranslation();
   const { theme } = useTheme();
   const styles = useStyles(theme);
@@ -186,7 +200,7 @@ function NewRoutineScreen() {
   ), [showExerciseSelector, exerciseName, applyExerciseSelection, t]);
 
   const renderStep2 = useMemo(() => (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
       <View style={styles.sectionTitleContainer}>
         <Plus color={theme.colors.text.secondary} size={22} style={styles.sectionTitleIcon} />
         <Text variant="heading" style={styles.titleLabel}>
@@ -299,7 +313,7 @@ function NewRoutineScreen() {
 
   const renderStep1 = useMemo(() => (
     <ScrollView style={{ flex: 1 }}>
-      {/* Section Titre */}
+
       <View style={styles.exerciseRestSection}>
         <View style={styles.sectionTitleContainer}>
           <FileText color={theme.colors.text.secondary} size={22} style={styles.sectionTitleIcon} />
@@ -320,7 +334,7 @@ function NewRoutineScreen() {
           placeholderTextColor={theme.colors.text.secondary}
         />
       </View>
-      {/* Section Description */}
+
       <View style={styles.exerciseRestSection}>
         <View style={styles.sectionTitleContainer}>
           <FileText color={theme.colors.text.secondary} size={22} style={styles.sectionTitleIcon} />
@@ -344,7 +358,6 @@ function NewRoutineScreen() {
         />
       </View>
 
-      {}
       <View style={styles.exerciseRestSection}>
         <View style={styles.sectionTitleContainer}>
           <Timer color={theme.colors.text.secondary} size={22} style={styles.sectionTitleIcon} />
@@ -357,7 +370,6 @@ function NewRoutineScreen() {
           {t('routine.exerciseRestDescription')}
         </Text>
 
-        {}
         <View style={styles.modeContainer}>
           <TouchableOpacity
             style={[
@@ -416,7 +428,6 @@ function NewRoutineScreen() {
           </TouchableOpacity>
         </View>
 
-        {}
         {routine.exerciseRestMode === 'beginner' && (
           <View style={styles.commonRestContainer}>
             <Text variant="body" style={styles.commonRestLabel}>
@@ -434,7 +445,6 @@ function NewRoutineScreen() {
         )}
       </View>
 
-      {/* Section Temps de préparation */}
       <View style={styles.exerciseRestSection}>
         <View style={styles.sectionTitleContainer}>
           <Zap color={theme.colors.text.secondary} size={22} style={styles.sectionTitleIcon} />
@@ -447,7 +457,6 @@ function NewRoutineScreen() {
           {t('routine.preparationDescription')}
         </Text>
 
-        {/* Switch pour activer/désactiver le temps de préparation */}
         <View style={styles.preparationToggleContainer}>
           <Text variant="body" style={styles.preparationToggleLabel}>
             {t('routine.enablePreparation')}
@@ -466,7 +475,6 @@ function NewRoutineScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Configuration du temps de préparation si activé */}
         {enablePreparation && (
           <View style={styles.commonRestContainer}>
             <Text variant="body" style={styles.commonRestLabel}>

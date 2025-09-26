@@ -5,6 +5,7 @@ import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
 import { Activity, CircleUser, Dumbbell, Layers, LineChart, Plus, Repeat } from 'lucide-react-native';
 import Header from '@/app/components/layout/Header';
+import { useSettings } from '@/app/hooks/useSettings';
 import { Workout, WorkoutDateUtils } from '@/types/workout';
 import { useWorkouts } from '@/app/hooks/useWorkouts';
 import FloatButtonAction from '@/app/components/ui/FloatButtonAction';
@@ -39,6 +40,7 @@ export default function WorkoutScreen() {
   const { theme } = useTheme();
   const styles = useStyles();
   const { workouts, loading, error, refreshWorkouts } = useWorkouts();
+  const { settings } = useSettings();
 
   // Vérifier si un rafraîchissement est demandé via les paramètres de route
   useEffect(() => {
@@ -131,8 +133,10 @@ export default function WorkoutScreen() {
                     workout.series.length > 0 &&
                     workout.series[0].type === 'warmUp';
                   let rpeBg = theme.colors.primary;
-                  if (info.rpe >= 8) rpeBg = '#e74c3c';
-                  else if (info.rpe >= 5) rpeBg = '#f5c542';
+                  // Determine displayed RPE considering global setting
+                  const displayedRpe = info.rpe > 0 ? info.rpe : (settings.rpeMode === 'never' ? 7 : 0);
+                  if (displayedRpe >= 8) rpeBg = '#e74c3c';
+                  else if (displayedRpe >= 5) rpeBg = '#f5c542';
                   return (
                     <>
                       <View style={styles.workoutTypeBadgeContainer}>
@@ -175,14 +179,14 @@ export default function WorkoutScreen() {
                           />
                           <Text style={styles.workoutInfoValue}>{info.sets}</Text>
                         </View>
-                        {info.rpe > 0 && (
+                        {settings.rpeMode !== 'never' && displayedRpe > 0 && (
                           <View style={[styles.rpeBadge, { backgroundColor: rpeBg }]}>
                             <Activity
                               size={14}
                               color={theme.colors.background.main}
                               style={styles.rpeBadgeIcon}
                             />
-                            <Text style={styles.rpeBadgeText}>RPE {info.rpe}</Text>
+                            <Text style={styles.rpeBadgeText}>RPE {displayedRpe}</Text>
                           </View>
                         )}
                       </View>

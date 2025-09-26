@@ -89,6 +89,11 @@ export default {
     resetDataConfirmation: 'Are you sure you want to reset all data? This action cannot be undone.',
     dataResetSuccess: 'All data has been successfully reset.',
     errorResettingData: 'An error occurred while resetting the data.',
+    // RPE setting
+    rpeMode: 'RPE Setting',
+    rpeAsk: 'Ask RPE',
+    rpeNever: 'Do not ask (default 7)',
+
     routines: {
       title: 'Routines',
       deleteAll: 'Delete All Routines',

@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { ActivityIndicator, Alert, Linking, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { User, ChevronRight, Scale, Languages, SunMoon, Download, Trash2, Linkedin, Mail } from 'lucide-react-native';
+import { User, ChevronRight, Scale, Languages, SunMoon, Download, Trash2, Linkedin, Mail, CheckCircle, Circle } from 'lucide-react-native';
 import { BlurView } from 'expo-blur';
 import { useSettings } from '@/app/hooks/useSettings';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
 import { useCSVExport } from '@/app/hooks/useCSVExport';
 import Header from '@/app/components/layout/Header';
+import Modal from '@/app/components/ui/Modal';
 import { router } from 'expo-router';
 import Text from '@/app/components/ui/Text';
 import { TranslationKey } from '@/translations';
@@ -22,29 +23,65 @@ export default function SettingsScreen() {
   const { isExporting, exportWorkoutsToCSV } = useCSVExport();
   const styles = useStyles();
   const [showAbout, setShowAbout] = useState(false);
+  const [showRpeModeModal, setShowRpeModeModal] = useState(false);
+  const [showGenderModal, setShowGenderModal] = useState(false);
+  const [showWeightUnitModal, setShowWeightUnitModal] = useState(false);
+  const [showLanguageModal, setShowLanguageModal] = useState(false);
+  const [showThemeModal, setShowThemeModal] = useState(false);
   const haptics = useHaptics();
 
-  const toggleWeightUnit = () => {
-    const newUnit = settings.weightUnit === 'kg' ? 'lb' : 'kg';
-    updateSettings({ weightUnit: newUnit as 'kg' | 'lb' });
+  const openWeightUnitModal = () => {
+    setShowWeightUnitModal(true);
     haptics.impactLight();
   };
 
-  const toggleGender = () => {
-    const newGender = settings.gender === 'male' ? 'female' : 'male';
-    updateSettings({ gender: newGender as 'male' | 'female' });
+  const openGenderModal = () => {
+    setShowGenderModal(true);
     haptics.impactLight();
   };
 
-  const toggleLanguage = () => {
-    const newLanguage = settings.language === 'en' ? 'fr' : 'en';
-    updateSettings({ language: newLanguage as 'en' | 'fr' });
+  const openLanguageModal = () => {
+    setShowLanguageModal(true);
     haptics.impactLight();
   };
 
-  const toggleTheme = () => {
-    const newTheme = settings.theme === 'dark' ? 'light' : 'dark';
-    updateSettings({ theme: newTheme as 'dark' | 'light' });
+  const openThemeModal = () => {
+    setShowThemeModal(true);
+    haptics.impactLight();
+  };
+
+  const openRpeModeModal = () => {
+    setShowRpeModeModal(true);
+    haptics.impactLight();
+  };
+
+  const handleSelectRpeMode = async (mode: 'ask' | 'never') => {
+    await updateSettings({ rpeMode: mode });
+    setShowRpeModeModal(false);
+    haptics.impactLight();
+  };
+
+  const handleSelectGender = async (gender: 'male' | 'female') => {
+    await updateSettings({ gender });
+    setShowGenderModal(false);
+    haptics.impactLight();
+  };
+
+  const handleSelectWeightUnit = async (unit: 'kg' | 'lb') => {
+    await updateSettings({ weightUnit: unit });
+    setShowWeightUnitModal(false);
+    haptics.impactLight();
+  };
+
+  const handleSelectLanguage = async (lng: 'en' | 'fr') => {
+    await updateSettings({ language: lng });
+    setShowLanguageModal(false);
+    haptics.impactLight();
+  };
+
+  const handleSelectTheme = async (mode: 'dark' | 'light') => {
+    await updateSettings({ theme: mode });
+    setShowThemeModal(false);
     haptics.impactLight();
   };
 
@@ -55,12 +92,10 @@ export default function SettingsScreen() {
 
   const handleResetData = async () => {
     try {
-      // Utiliser le service de stockage pour réinitialiser les données
       await storageService.resetAllData();
 
       Alert.alert(t('settings.resetDataSuccess' as TranslationKey), '', [{ text: 'OK' }]);
 
-      // Mettre à jour les paramètres pour les préserver
       await updateSettings(settings);
     } catch (error) {
       Alert.alert(
@@ -94,12 +129,25 @@ export default function SettingsScreen() {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>{t('settings.preferences')}</Text>
 
+            <View className="rpe-setting" style={styles.settingItem}>
+              <View style={styles.settingInfo}>
+                <User size={24} color={theme.colors.primary} />
+                <Text style={styles.settingLabel}>{t('settings.rpeMode')}</Text>
+              </View>
+              <TouchableOpacity style={styles.settingControl} onPress={openRpeModeModal}>
+                <Text style={styles.settingValue}>
+                  {settings.rpeMode === 'never' ? t('settings.rpeNever') : t('settings.rpeAsk')}
+                </Text>
+                <ChevronRight size={20} color={theme.colors.text.secondary} />
+              </TouchableOpacity>
+            </View>
+
             <View style={styles.settingItem}>
               <View style={styles.settingInfo}>
                 <User size={24} color={theme.colors.primary} />
                 <Text style={styles.settingLabel}>{t('settings.gender')}</Text>
               </View>
-              <TouchableOpacity style={styles.settingControl} onPress={toggleGender}>
+              <TouchableOpacity style={styles.settingControl} onPress={openGenderModal}>
                 <Text style={styles.settingValue}>
                   {settings.gender === 'male' ? t('settings.male') : t('settings.female')}
                 </Text>
@@ -112,7 +160,7 @@ export default function SettingsScreen() {
                 <Scale size={24} color={theme.colors.primary} />
                 <Text style={styles.settingLabel}>{t('settings.weightUnit')}</Text>
               </View>
-              <TouchableOpacity style={styles.settingControl} onPress={toggleWeightUnit}>
+              <TouchableOpacity style={styles.settingControl} onPress={openWeightUnitModal}>
                 <Text style={styles.settingValue}>{settings.weightUnit.toUpperCase()}</Text>
                 <ChevronRight size={20} color={theme.colors.text.secondary} />
               </TouchableOpacity>
@@ -123,7 +171,7 @@ export default function SettingsScreen() {
                 <Languages size={24} color={theme.colors.primary} />
                 <Text style={styles.settingLabel}>{t('settings.language')}</Text>
               </View>
-              <TouchableOpacity style={styles.settingControl} onPress={toggleLanguage}>
+              <TouchableOpacity style={styles.settingControl} onPress={openLanguageModal}>
                 <Text style={styles.settingValue}>
                   {settings.language === 'en' ? t('settings.english') : t('settings.french')}
                 </Text>
@@ -136,7 +184,7 @@ export default function SettingsScreen() {
                 <SunMoon size={24} color={theme.colors.primary} />
                 <Text style={styles.settingLabel}>{t('settings.theme')}</Text>
               </View>
-              <TouchableOpacity style={styles.settingControl} onPress={toggleTheme}>
+              <TouchableOpacity style={styles.settingControl} onPress={openThemeModal}>
                 <Text style={styles.settingValue}>
                   {settings.theme === 'dark' ? t('settings.dark') : t('settings.light')}
                 </Text>
@@ -173,20 +221,6 @@ export default function SettingsScreen() {
               </View>
               <ChevronRight size={20} color={theme.colors.text.secondary} />
             </TouchableOpacity>
-
-            {/*<TouchableOpacity*/}
-            {/*  style={styles.settingItem}*/}
-            {/*  onPress={() => {*/}
-            {/*    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);*/}
-            {/*    router.push('/screens/contact');*/}
-            {/*  }}*/}
-            {/*>*/}
-            {/*  <View style={styles.settingInfo}>*/}
-            {/*    <Ionicons name="mail-outline" size={24} color={theme.colors.primary} />*/}
-            {/*    <Text style={styles.settingLabel}>{t('contact.title')}</Text>*/}
-            {/*  </View>*/}
-            {/*  <Ionicons name="chevron-forward" size={20} color={theme.colors.text.secondary} />*/}
-            {/*</TouchableOpacity>*/}
 
             <TouchableOpacity style={styles.settingItem} onPress={toggleAbout}>
               <View style={styles.settingInfo}>
@@ -226,11 +260,154 @@ export default function SettingsScreen() {
           )}
         </ScrollView>
       )}
+
+      <Modal
+        visible={showRpeModeModal}
+        onClose={() => setShowRpeModeModal(false)}
+        title={t('settings.rpeMode')}
+        showCloseButton
+      >
+        <View style={styles.modalOption}>
+          <TouchableOpacity style={styles.modalOptionButton} onPress={() => handleSelectRpeMode('ask')}>
+            {settings.rpeMode === 'ask' ? (
+              <CheckCircle size={20} color={theme.colors.primary} />
+            ) : (
+              <Circle size={20} color={theme.colors.text.secondary} />
+            )}
+            <Text style={styles.modalOptionText}>{t('settings.rpeAsk')}</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.modalOption}>
+          <TouchableOpacity style={styles.modalOptionButton} onPress={() => handleSelectRpeMode('never')}>
+            {settings.rpeMode === 'never' ? (
+              <CheckCircle size={20} color={theme.colors.primary} />
+            ) : (
+              <Circle size={20} color={theme.colors.text.secondary} />
+            )}
+            <Text style={styles.modalOptionText}>{t('settings.rpeNever')}</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+
+      {/* Gender Selection Modal */}
+      <Modal
+        visible={showGenderModal}
+        onClose={() => setShowGenderModal(false)}
+        title={t('settings.gender')}
+        showCloseButton
+      >
+        <View style={styles.modalOption}>
+          <TouchableOpacity style={styles.modalOptionButton} onPress={() => handleSelectGender('male')}>
+            {settings.gender === 'male' ? (
+              <CheckCircle size={20} color={theme.colors.primary} />
+            ) : (
+              <Circle size={20} color={theme.colors.text.secondary} />
+            )}
+            <Text style={styles.modalOptionText}>{t('settings.male')}</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.modalOption}>
+          <TouchableOpacity style={styles.modalOptionButton} onPress={() => handleSelectGender('female')}>
+            {settings.gender === 'female' ? (
+              <CheckCircle size={20} color={theme.colors.primary} />
+            ) : (
+              <Circle size={20} color={theme.colors.text.secondary} />
+            )}
+            <Text style={styles.modalOptionText}>{t('settings.female')}</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+
+      {/* Weight Unit Selection Modal */}
+      <Modal
+        visible={showWeightUnitModal}
+        onClose={() => setShowWeightUnitModal(false)}
+        title={t('settings.weightUnit')}
+        showCloseButton
+      >
+        <View style={styles.modalOption}>
+          <TouchableOpacity style={styles.modalOptionButton} onPress={() => handleSelectWeightUnit('kg')}>
+            {settings.weightUnit === 'kg' ? (
+              <CheckCircle size={20} color={theme.colors.primary} />
+            ) : (
+              <Circle size={20} color={theme.colors.text.secondary} />
+            )}
+            <Text style={styles.modalOptionText}>KG</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.modalOption}>
+          <TouchableOpacity style={styles.modalOptionButton} onPress={() => handleSelectWeightUnit('lb')}>
+            {settings.weightUnit === 'lb' ? (
+              <CheckCircle size={20} color={theme.colors.primary} />
+            ) : (
+              <Circle size={20} color={theme.colors.text.secondary} />
+            )}
+            <Text style={styles.modalOptionText}>LB</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+
+      {/* Language Selection Modal */}
+      <Modal
+        visible={showLanguageModal}
+        onClose={() => setShowLanguageModal(false)}
+        title={t('settings.language')}
+        showCloseButton
+      >
+        <View style={styles.modalOption}>
+          <TouchableOpacity style={styles.modalOptionButton} onPress={() => handleSelectLanguage('en')}>
+            {settings.language === 'en' ? (
+              <CheckCircle size={20} color={theme.colors.primary} />
+            ) : (
+              <Circle size={20} color={theme.colors.text.secondary} />
+            )}
+            <Text style={styles.modalOptionText}>{t('settings.english')}</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.modalOption}>
+          <TouchableOpacity style={styles.modalOptionButton} onPress={() => handleSelectLanguage('fr')}>
+            {settings.language === 'fr' ? (
+              <CheckCircle size={20} color={theme.colors.primary} />
+            ) : (
+              <Circle size={20} color={theme.colors.text.secondary} />
+            )}
+            <Text style={styles.modalOptionText}>{t('settings.french')}</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+
+      {/* Theme Selection Modal */}
+      <Modal
+        visible={showThemeModal}
+        onClose={() => setShowThemeModal(false)}
+        title={t('settings.theme')}
+        showCloseButton
+      >
+        <View style={styles.modalOption}>
+          <TouchableOpacity style={styles.modalOptionButton} onPress={() => handleSelectTheme('dark')}>
+            {settings.theme === 'dark' ? (
+              <CheckCircle size={20} color={theme.colors.primary} />
+            ) : (
+              <Circle size={20} color={theme.colors.text.secondary} />
+            )}
+            <Text style={styles.modalOptionText}>{t('settings.dark')}</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.modalOption}>
+          <TouchableOpacity style={styles.modalOptionButton} onPress={() => handleSelectTheme('light')}>
+            {settings.theme === 'light' ? (
+              <CheckCircle size={20} color={theme.colors.primary} />
+            ) : (
+              <Circle size={20} color={theme.colors.text.secondary} />
+            )}
+            <Text style={styles.modalOptionText}>{t('settings.light')}</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
 
-// Define styles using the current theme
 const useStyles = () => {
   const { theme } = useTheme();
 
@@ -366,6 +543,22 @@ const useStyles = () => {
       fontSize: theme.typography.fontSize.base,
       fontFamily: theme.typography.fontFamily.bold,
       color: theme.colors.text.primary
+    },
+    modalOption: {
+      width: '100%',
+      marginTop: theme.spacing.sm
+    },
+    modalOptionButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: theme.spacing.sm,
+      paddingVertical: theme.spacing.md
+    },
+    modalOptionText: {
+      fontSize: theme.typography.fontSize.base,
+      color: theme.colors.text.primary,
+      fontFamily: theme.typography.fontFamily.regular
     }
   });
 };
+

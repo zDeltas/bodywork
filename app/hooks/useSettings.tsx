@@ -5,7 +5,8 @@ const defaultSettings: Settings = {
   weightUnit: 'kg',
   gender: 'male',
   language: 'fr',
-  theme: 'dark'
+  theme: 'dark',
+  rpeMode: 'ask'
 };
 
 interface SettingsContextType {

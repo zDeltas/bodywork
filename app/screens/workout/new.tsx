@@ -15,6 +15,7 @@ import { useTheme } from '@/app/hooks/useTheme';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import useHaptics from '@/app/hooks/useHaptics';
 import { useWorkouts } from '@/app/hooks/useWorkouts';
+import { useSettings } from '@/app/hooks/useSettings';
 import { useWorkoutForm } from '@/app/hooks/useWorkoutForm';
 import { EditableSeries, Series, Workout } from '@/types/common';
 import { WorkoutDateUtils } from '@/types/workout';
@@ -50,6 +51,7 @@ export default function NewWorkoutScreen() {
   const haptics = useHaptics();
   const styles = useStyles();
   const { workouts, saveWorkout: saveWorkoutToStorage } = useWorkouts();
+  const { settings } = useSettings();
   const {
     exerciseName,
     exerciseKey,
@@ -82,20 +84,17 @@ export default function NewWorkoutScreen() {
   );
   const [showCalendar, setShowCalendar] = useState<boolean>(false);
 
-  // États copiés de SeriesConfigModal
   const [showTimerPicker, setShowTimerPicker] = useState(false);
   const [showDurationPicker, setShowDurationPicker] = useState(false);
   const [currentSeriesIndex, setCurrentSeriesIndex] = useState<number | null>(null);
   const [showExerciseSelector, setShowExerciseSelector] = useState(false);
 
-  // Ouvrir automatiquement la modal de sélection d'exercices au chargement
   useEffect(() => {
     if (!exerciseName && !exerciseKey) {
       setShowExerciseSelector(true);
     }
   }, [exerciseName, exerciseKey]);
 
-  // Callbacks copiés de SeriesConfigModal
   const handleTimerConfirm = useCallback(({ minutes, seconds }: { minutes: number; seconds: number }) => {
     const formatted = formatRestTime(minutes, seconds);
     updateGlobalRest(formatted);
@@ -129,7 +128,6 @@ export default function NewWorkoutScreen() {
   }, [removeSeries]);
 
 
-  // Éléments de série copiés de SeriesConfigModal
   const seriesElements = useMemo(() => {
     return series.map((item, index) => (
       <SeriesInput
@@ -160,7 +158,7 @@ export default function NewWorkoutScreen() {
 
       const processedSeries: Series[] = formatSeries(validSeries, withLoad).map(series => ({
         ...series,
-        rpe: rpe ? parseInt(rpe) : 0
+        rpe: rpe ? parseInt(rpe) : (settings.rpeMode === 'never' ? 7 : 0)
       }));
 
       const workout: Workout = {
@@ -191,7 +189,6 @@ export default function NewWorkoutScreen() {
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
 
-        {/* Section Date */}
         <View style={styles.sectionContainer}>
           <View style={styles.sectionTitleContainer}>
             <Calendar color={theme.colors.text.secondary} size={22} style={styles.sectionTitleIcon} />
@@ -207,7 +204,6 @@ export default function NewWorkoutScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Section Exercice */}
         <View style={styles.sectionContainer}>
           <TouchableOpacity
             style={styles.exerciseButton}
@@ -247,65 +243,66 @@ export default function NewWorkoutScreen() {
             onPress={() => setShowTimerPicker(true)}
           />
 
-          {/* RPE Global */}
-          <View style={styles.rpeContainer}>
-            <View style={styles.titleContainer}>
-              <Target color={theme.colors.text.secondary} size={22} style={styles.titleIcon} />
-              <Text variant="body" style={styles.titleLabel}>
-                {t('workout.rpe')}
-              </Text>
-            </View>
-            <View style={styles.rpeModalContent}>
-              <View style={styles.rpeRow}>
-                {Array.from({ length: 5 }, (_, i) => i + 1).map((value) => (
-                  <TouchableOpacity
-                    key={value}
-                    style={[
-                      styles.rpeButton,
-                      rpe === value.toString() && styles.rpeButtonSelected
-                    ]}
-                    onPress={() => {
-                      setRpe(value.toString());
-                      haptics.impactLight();
-                    }}
-                  >
-                    <Text
-                      style={[
-                        styles.rpeButtonText,
-                        rpe === value.toString() && styles.rpeButtonTextSelected
-                      ]}
-                    >
-                      {value}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
+          {settings.rpeMode !== 'never' && (
+            <View style={styles.rpeContainer}>
+              <View style={styles.titleContainer}>
+                <Target color={theme.colors.text.secondary} size={22} style={styles.titleIcon} />
+                <Text variant="body" style={styles.titleLabel}>
+                  {t('workout.rpe')}
+                </Text>
               </View>
-              <View style={styles.rpeRow}>
-                {Array.from({ length: 5 }, (_, i) => i + 6).map((value) => (
-                  <TouchableOpacity
-                    key={value}
-                    style={[
-                      styles.rpeButton,
-                      rpe === value.toString() && styles.rpeButtonSelected
-                    ]}
-                    onPress={() => {
-                      setRpe(value.toString());
-                      haptics.impactLight();
-                    }}
-                  >
-                    <Text
+              <View style={styles.rpeModalContent}>
+                <View style={styles.rpeRow}>
+                  {Array.from({ length: 5 }, (_, i) => i + 1).map((value) => (
+                    <TouchableOpacity
+                      key={value}
                       style={[
-                        styles.rpeButtonText,
-                        rpe === value.toString() && styles.rpeButtonTextSelected
+                        styles.rpeButton,
+                        rpe === value.toString() && styles.rpeButtonSelected
                       ]}
+                      onPress={() => {
+                        setRpe(value.toString());
+                        haptics.impactLight();
+                      }}
                     >
-                      {value}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
+                      <Text
+                        style={[
+                          styles.rpeButtonText,
+                          rpe === value.toString() && styles.rpeButtonTextSelected
+                        ]}
+                      >
+                        {value}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+                <View style={styles.rpeRow}>
+                  {Array.from({ length: 5 }, (_, i) => i + 6).map((value) => (
+                    <TouchableOpacity
+                      key={value}
+                      style={[
+                        styles.rpeButton,
+                        rpe === value.toString() && styles.rpeButtonSelected
+                      ]}
+                      onPress={() => {
+                        setRpe(value.toString());
+                        haptics.impactLight();
+                      }}
+                    >
+                      <Text
+                        style={[
+                          styles.rpeButtonText,
+                          rpe === value.toString() && styles.rpeButtonTextSelected
+                        ]}
+                      >
+                        {value}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
               </View>
             </View>
-          </View>
+          )}
 
           <View style={styles.noteContainer}>
             <View style={styles.titleContainer}>
@@ -325,7 +322,6 @@ export default function NewWorkoutScreen() {
           </View>
         </View>
 
-        {/* Section Séries */}
         <View style={styles.sectionContainer}>
           <View style={styles.sectionTitleContainer}>
             <Plus color={theme.colors.text.secondary} size={22} style={styles.sectionTitleIcon} />
@@ -353,7 +349,6 @@ export default function NewWorkoutScreen() {
         />
       </ScrollView>
 
-      {/* Modales copiées de SeriesConfigModal */}
       <Modal
         visible={showCalendar}
         transparent={true}

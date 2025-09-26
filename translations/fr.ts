@@ -130,7 +130,11 @@ export default {
     resetDataConfirmation:
       'Êtes-vous sûr de vouloir réinitialiser toutes les données ? Cette action est irréversible.',
     dataResetSuccess: 'Toutes les données ont été réinitialisées avec succès.',
-    errorResettingData: 'Une erreur est survenue lors de la réinitialisation des données.'
+    errorResettingData: 'Une erreur est survenue lors de la réinitialisation des données.',
+    // Réglage RPE
+    rpeMode: 'Réglage RPE',
+    rpeAsk: 'Demander le RPE',
+    rpeNever: 'Ne pas demander (par défaut 7)'
   },
 
   // About section

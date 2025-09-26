@@ -4,13 +4,14 @@ import useHaptics from '@/app/hooks/useHaptics';
 import storageService from '@/app/services/storage';
 import { Exercise, Routine, SessionState, Workout } from '@/types/common';
 import { INITIAL_SESSION_STATE, SessionContextType } from '../types/session';
+import { useSettings } from '@/app/hooks/useSettings';
 
 const useSession = (routineId: string): SessionContextType => {
   const haptics = useHaptics();
+  const { settings } = useSettings();
   const [routine, setRoutine] = useState<Routine | null>(null);
   const [sessionState, setSessionState] = useState<SessionState>(INITIAL_SESSION_STATE);
 
-  // Mémoisation de la conversion de temps
   const convertTimeToSeconds = useCallback((timeStr: string | undefined): number => {
     if (!timeStr) return 1;
     const [minutes, seconds] = timeStr.split(':').map(Number);
@@ -18,16 +19,13 @@ const useSession = (routineId: string): SessionContextType => {
     return (minutes * 60) + seconds;
   }, []);
 
-  // Helper pour déterminer le temps de repos approprié et son type
   const getRestTimeAndType = useCallback((isLastSeries: boolean, currentExercise: Exercise, currentSeries: any): { time: number; type: 'series' | 'exercise' } => {
     if (isLastSeries) {
-      // Pour la dernière série, utiliser restBetweenExercises si disponible
       return {
-        time: currentExercise.restBetweenExercises || 60, // 60s par défaut
+        time: currentExercise.restBetweenExercises || 60,
         type: 'exercise'
       };
     } else {
-      // Pour les autres séries, utiliser le temps de repos de la série
       return {
         time: convertTimeToSeconds(currentSeries.rest),
         type: 'series'
@@ -35,12 +33,10 @@ const useSession = (routineId: string): SessionContextType => {
     }
   }, [convertTimeToSeconds]);
 
-  // Helper pour rétrocompatibilité
   const getRestTime = useCallback((isLastSeries: boolean, currentExercise: Exercise, currentSeries: any): number => {
     return getRestTimeAndType(isLastSeries, currentExercise, currentSeries).time;
   }, [getRestTimeAndType]);
 
-  // Mémoisation des données de session courantes
   const currentSessionData = useMemo(() => {
     if (!routine) return null;
     
@@ -62,13 +58,38 @@ const useSession = (routineId: string): SessionContextType => {
     const { currentExercise, currentSeries, isLastSeries } = currentSessionData;
 
     if (currentSeries.type === 'workingSet') {
-      setSessionState((prev: SessionState) => ({
-        ...prev,
-        pendingSeries: {
-          exerciseIdx: sessionState.currentExerciseIndex,
-          seriesIdx: sessionState.currentSeriesIndex
+      if (settings.rpeMode === 'never') {
+        if (routine) {
+          const updatedRoutine = { ...routine };
+          updatedRoutine.exercises = [...routine.exercises];
+          const exIdx = sessionState.currentExerciseIndex;
+          const seIdx = sessionState.currentSeriesIndex;
+          updatedRoutine.exercises[exIdx] = { ...updatedRoutine.exercises[exIdx] } as any;
+          updatedRoutine.exercises[exIdx].series = [...updatedRoutine.exercises[exIdx].series];
+          updatedRoutine.exercises[exIdx].series[seIdx] = {
+            ...updatedRoutine.exercises[exIdx].series[seIdx],
+            rpe: 7
+          } as any;
+          setRoutine(updatedRoutine);
+          const { time: rest, type: restType } = getRestTimeAndType(isLastSeries, updatedRoutine.exercises[exIdx], updatedRoutine.exercises[exIdx].series[seIdx]);
+          setSessionState((prev: SessionState) => ({
+            ...prev,
+            restTime: rest,
+            restType,
+            isResting: true,
+            rpe: '',
+            pendingSeries: null
+          }));
         }
-      }));
+      } else {
+        setSessionState((prev: SessionState) => ({
+          ...prev,
+          pendingSeries: {
+            exerciseIdx: sessionState.currentExerciseIndex,
+            seriesIdx: sessionState.currentSeriesIndex
+          }
+        }));
+      }
     } else {
       const { time: rest, type: restType } = getRestTimeAndType(isLastSeries, currentExercise, currentSeries);
       setSessionState((prev: SessionState) => ({
@@ -80,7 +101,7 @@ const useSession = (routineId: string): SessionContextType => {
         pendingSeries: null
       }));
     }
-  }, [currentSessionData, sessionState.currentExerciseIndex, sessionState.currentSeriesIndex, getRestTimeAndType]);
+  }, [currentSessionData, sessionState.currentExerciseIndex, sessionState.currentSeriesIndex, getRestTimeAndType, settings.rpeMode, routine]);
 
   const handleRpeSave = useCallback(() => {
     if (!routine || !sessionState.pendingSeries) return;
@@ -94,8 +115,7 @@ const useSession = (routineId: string): SessionContextType => {
       rpe: parseInt(sessionState.rpe) || 7
     };
     setRoutine(updatedRoutine);
-    
-    // Déterminer si c'est la dernière série de l'exercice
+
     const currentExercise = updatedRoutine.exercises[exerciseIdx];
     const isLastSeries = seriesIdx === currentExercise.series.length - 1;
     const currentSeries = updatedRoutine.exercises[exerciseIdx].series[seriesIdx];
@@ -140,9 +160,7 @@ const useSession = (routineId: string): SessionContextType => {
     }));
 
     if (!isLastSeries) {
-      // Vérifier si la routine a la préparation activée pour la série suivante
       if (routine?.enablePreparation && routine.preparationTime && routine.preparationTime > 0) {
-        // Démarrer la préparation avant la série suivante
         setSessionState((prev: SessionState) => ({
           ...prev,
           currentSeriesIndex: prev.currentSeriesIndex + 1,
@@ -153,7 +171,6 @@ const useSession = (routineId: string): SessionContextType => {
           restType: undefined
         }));
       } else {
-        // Pas de préparation, passer directement à la série suivante
         setSessionState((prev: SessionState) => ({
           ...prev,
           currentSeriesIndex: prev.currentSeriesIndex + 1
@@ -171,9 +188,7 @@ const useSession = (routineId: string): SessionContextType => {
       await storageService.saveWorkout(workout);
 
       if (!isLastExercise) {
-        // Vérifier si la routine a la préparation activée pour la première série du nouvel exercice
         if (routine?.enablePreparation && routine.preparationTime && routine.preparationTime > 0) {
-          // Démarrer la préparation avant la première série du nouvel exercice
           setSessionState((prev: SessionState) => ({
             ...prev,
             currentExerciseIndex: prev.currentExerciseIndex + 1,
@@ -186,7 +201,6 @@ const useSession = (routineId: string): SessionContextType => {
             restType: undefined
           }));
         } else {
-          // Pas de préparation, passer directement au nouvel exercice
           setSessionState((prev: SessionState) => ({
             ...prev,
             currentExerciseIndex: prev.currentExerciseIndex + 1,
@@ -220,7 +234,6 @@ const useSession = (routineId: string): SessionContextType => {
     haptics.impactLight();
     
     setSessionState((prev: SessionState) => {
-      // Si on est en repos, on revient à la série actuelle
       if (prev.isResting) {
         return {
           ...prev,
@@ -228,8 +241,7 @@ const useSession = (routineId: string): SessionContextType => {
           restTime: 0
         };
       }
-      
-      // Sinon on revient à la série précédente
+
       if (prev.currentSeriesIndex > 0) {
         return {
           ...prev,
@@ -253,7 +265,6 @@ const useSession = (routineId: string): SessionContextType => {
     
     haptics.impactLight();
 
-    // Si on est en repos, "passer le repos" doit équivaloir à la fin du repos
     if (sessionState.isResting) {
       handleRestComplete();
       return;
@@ -263,18 +274,38 @@ const useSession = (routineId: string): SessionContextType => {
       const { currentExercise, currentSeries, isLastSeries } = currentSessionData;
       const { time: rest, type: restType } = getRestTimeAndType(isLastSeries, currentExercise, currentSeries);
 
-      // Si on est sur la dernière série de l'exercice, on demande le RPE si c'est une working set
       if (isLastSeries) {
         if (currentSeries.type === 'workingSet') {
-          return {
-            ...prev,
-            pendingSeries: {
-              exerciseIdx: prev.currentExerciseIndex,
-              seriesIdx: prev.currentSeriesIndex
+          if (settings.rpeMode === 'never') {
+            const updatedRoutine = { ...routine };
+            updatedRoutine.exercises = [...routine.exercises];
+            const exIdx = prev.currentExerciseIndex;
+            const seIdx = prev.currentSeriesIndex;
+            updatedRoutine.exercises[exIdx] = { ...updatedRoutine.exercises[exIdx] } as any;
+            updatedRoutine.exercises[exIdx].series = [...updatedRoutine.exercises[exIdx].series];
+            updatedRoutine.exercises[exIdx].series[seIdx] = {
+              ...updatedRoutine.exercises[exIdx].series[seIdx],
+              rpe: 7
+            } as any;
+            setRoutine(updatedRoutine);
+            if (rest > 0) {
+              return {
+                ...prev,
+                isResting: true,
+                restTime: rest,
+                restType
+              } as SessionState;
             }
-          };
+          } else {
+            return {
+              ...prev,
+              pendingSeries: {
+                exerciseIdx: prev.currentExerciseIndex,
+                seriesIdx: prev.currentSeriesIndex
+              }
+            } as SessionState;
+          }
         }
-        // Sinon (pas une working set), on déclenche d'abord le repos s'il existe
         if (rest > 0) {
           return {
             ...prev,
@@ -283,10 +314,8 @@ const useSession = (routineId: string): SessionContextType => {
             restType
           };
         }
-        // Pas de repos, vérifier si la préparation est activée avant de passer à l'exercice suivant
         if (prev.currentExerciseIndex < routine.exercises.length - 1) {
           if (routine?.enablePreparation && routine.preparationTime && routine.preparationTime > 0) {
-            // Démarrer la préparation avant la première série du nouvel exercice
             return {
               ...prev,
               currentExerciseIndex: prev.currentExerciseIndex + 1,
@@ -298,7 +327,6 @@ const useSession = (routineId: string): SessionContextType => {
               restType: undefined
             };
           } else {
-            // Pas de préparation, passer directement au nouvel exercice
             return {
               ...prev,
               currentExerciseIndex: prev.currentExerciseIndex + 1,
@@ -312,9 +340,6 @@ const useSession = (routineId: string): SessionContextType => {
         return prev;
       }
 
-      // Cas général (pas dernière série)
-      // Si un temps de repos est défini, on lance le repos sans avancer d'abord,
-      // puis handleRestComplete avancera à la série suivante à la fin du repos.
       if (rest > 0) {
         return {
           ...prev,
@@ -323,9 +348,7 @@ const useSession = (routineId: string): SessionContextType => {
           isResting: true
         };
       }
-      // Pas de repos: vérifier si la préparation est activée avant d'avancer à la série suivante
       if (routine?.enablePreparation && routine.preparationTime && routine.preparationTime > 0) {
-        // Démarrer la préparation avant la série suivante
         return {
           ...prev,
           currentSeriesIndex: prev.currentSeriesIndex + 1,
@@ -336,7 +359,6 @@ const useSession = (routineId: string): SessionContextType => {
           restType: undefined
         };
       } else {
-        // Pas de préparation, avancer directement à la série suivante
         return {
           ...prev,
           currentSeriesIndex: prev.currentSeriesIndex + 1,
@@ -346,16 +368,24 @@ const useSession = (routineId: string): SessionContextType => {
         };
       }
     });
-  }, [routine, currentSessionData, haptics, getRestTime, sessionState.isResting, handleRestComplete]);
+  }, [routine, currentSessionData, haptics, getRestTime, sessionState.isResting, handleRestComplete, settings.rpeMode]);
 
   useEffect(() => {
     const loadRoutine = async () => {
       const routines = await storageService.getRoutines();
       const foundRoutine = routines.find(r => r.id === routineId);
       if (foundRoutine) {
-        setRoutine(foundRoutine);
-        
-        // Démarrer la préparation au début de la première série si activée
+        if (settings.rpeMode === 'never') {
+          const updated = { ...foundRoutine } as Routine;
+          updated.exercises = foundRoutine.exercises.map(ex => ({
+            ...ex,
+            series: ex.series.map(se => se.type === 'workingSet' && (se as any).rpe == null ? { ...se, rpe: 7 } : se)
+          }));
+          setRoutine(updated);
+        } else {
+          setRoutine(foundRoutine);
+        }
+
         if (foundRoutine.enablePreparation && foundRoutine.preparationTime && foundRoutine.preparationTime > 0) {
           setSessionState(prev => ({
             ...prev,
@@ -369,7 +399,7 @@ const useSession = (routineId: string): SessionContextType => {
       }
     };
     loadRoutine();
-  }, [routineId]);
+  }, [routineId, settings.rpeMode]);
 
   return {
     routine,

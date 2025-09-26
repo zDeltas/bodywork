@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, useMemo } from 'react';
+import { useCallback, useEffect, useState, useMemo, useRef } from 'react';
 import { router } from 'expo-router';
 import useHaptics from '@/app/hooks/useHaptics';
 import storageService from '@/app/services/storage';
@@ -11,6 +11,56 @@ const useSession = (routineId: string): SessionContextType => {
   const { settings } = useSettings();
   const [routine, setRoutine] = useState<Routine | null>(null);
   const [sessionState, setSessionState] = useState<SessionState>(INITIAL_SESSION_STATE);
+
+  const phaseRef = useRef<'prep' | 'rest' | 'work' | 'idle'>('idle');
+  const lastTsRef = useRef<number>(Date.now());
+  const prepAccRef = useRef<number>(0);
+  const restSeriesAccRef = useRef<number>(0);
+  const restExerciseAccRef = useRef<number>(0);
+  const workAccRef = useRef<number>(0);
+  const restTypeRef = useRef<'series' | 'exercise' | undefined>(undefined);
+  const sessionExercisesRef = useRef<Workout[]>([]);
+
+  const getPhaseFromState = useCallback((): 'prep' | 'rest' | 'work' => {
+    if (sessionState.isPreparation) return 'prep';
+    if (sessionState.isResting) return 'rest';
+    return 'work';
+  }, [sessionState.isPreparation, sessionState.isResting]);
+
+  const switchPhase = useCallback((newPhase: 'prep' | 'rest' | 'work' | 'idle') => {
+    const now = Date.now();
+    const delta = Math.max(0, Math.floor((now - lastTsRef.current) / 1000));
+    switch (phaseRef.current) {
+      case 'prep':
+        prepAccRef.current += delta;
+        break;
+      case 'rest':
+        if (restTypeRef.current === 'series') {
+          restSeriesAccRef.current += delta;
+        } else if (restTypeRef.current === 'exercise') {
+          restExerciseAccRef.current += delta;
+        } else {
+          restSeriesAccRef.current += delta;
+        }
+        break;
+      case 'work':
+        workAccRef.current += delta;
+        break;
+    }
+    phaseRef.current = newPhase;
+    lastTsRef.current = now;
+  }, []);
+
+  useEffect(() => {
+    const desired = getPhaseFromState();
+    if (phaseRef.current !== desired) {
+      switchPhase(desired);
+    }
+  }, [sessionState.isPreparation, sessionState.isResting]);
+
+  useEffect(() => {
+    restTypeRef.current = sessionState.restType;
+  }, [sessionState.restType]);
 
   const convertTimeToSeconds = useCallback((timeStr: string | undefined): number => {
     if (!timeStr) return 1;
@@ -177,15 +227,34 @@ const useSession = (routineId: string): SessionContextType => {
         }));
       }
     } else {
+      switchPhase('idle');
+      const totalRest = restSeriesAccRef.current + restExerciseAccRef.current;
+      const totalSeconds = prepAccRef.current + totalRest + workAccRef.current;
       const workout: Workout = {
         id: Date.now().toString(),
         muscleGroup: currentExercise.translationKey.split('_')[0],
         exercise: currentExercise.translationKey,
         name: currentExercise.name,
         series: currentExercise.series,
-        date: new Date().toISOString()
+        date: new Date().toISOString(),
+        routineId: routine?.id,
+        routineTitle: routine?.title,
+        exerciseIndex: sessionState.currentExerciseIndex,
+        prepSeconds: prepAccRef.current,
+        restSeriesSeconds: restSeriesAccRef.current,
+        restBetweenExercisesSeconds: restExerciseAccRef.current,
+        restSeconds: totalRest,
+        workSeconds: workAccRef.current,
+        totalSeconds
       };
-      await storageService.saveWorkout(workout);
+      sessionExercisesRef.current.push(workout);
+
+      prepAccRef.current = 0;
+      restSeriesAccRef.current = 0;
+      restExerciseAccRef.current = 0;
+      workAccRef.current = 0;
+      lastTsRef.current = Date.now();
+      phaseRef.current = 'idle';
 
       if (!isLastExercise) {
         if (routine?.enablePreparation && routine.preparationTime && routine.preparationTime > 0) {
@@ -209,6 +278,42 @@ const useSession = (routineId: string): SessionContextType => {
           }));
         }
       } else {
+        try {
+          const exs = sessionExercisesRef.current;
+          const totals = {
+            prepSeconds: exs.reduce((s, w) => s + (w.prepSeconds || 0), 0),
+            restSeriesSeconds: exs.reduce((s, w) => s + (w.restSeriesSeconds || 0), 0),
+            restBetweenExercisesSeconds: exs.reduce((s, w) => s + (w.restBetweenExercisesSeconds || 0), 0),
+            workSeconds: exs.reduce((s, w) => s + (w.workSeconds || 0), 0),
+            totalSeconds: exs.reduce((s, w) => s + (w.totalSeconds || ((w.prepSeconds||0)+(w.workSeconds||0)+(w.restSeconds||((w.restSeriesSeconds||0)+(w.restBetweenExercisesSeconds||0))))), 0)
+          };
+          const notes: string[] = [];
+          let seriesCount = 0;
+          const musclesSet = new Set<string>();
+          exs.forEach(w => {
+            seriesCount += (w.series?.length || 0);
+            if (w.series && w.series.length > 0 && w.series[0].note) notes.push(w.series[0].note);
+            if (w.muscleGroup) musclesSet.add(w.muscleGroup);
+          });
+          const routineSession = {
+            id: `${Date.now()}`,
+            routineId: routine?.id || '',
+            routineTitle: routine?.title || '',
+            date: new Date().toISOString(),
+            exercises: exs,
+            totals,
+            notes,
+            muscles: Array.from(musclesSet),
+            exerciseCount: exs.length,
+            seriesCount
+          } as any;
+          await storageService.saveRoutineSession(routineSession);
+        } catch (e) {
+          console.warn('Failed to save RoutineSession', e);
+        } finally {
+          sessionExercisesRef.current = [];
+        }
+
         setSessionState((prev: SessionState) => ({
           ...prev,
           completedExercises: [...prev.completedExercises, workout],

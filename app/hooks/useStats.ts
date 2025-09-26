@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { WorkoutDateUtils } from '@/types/workout';
-import { Period, StatsData, Workout } from '@/types/common';
+import { Period, StatsData, Workout, RoutineSession } from '@/types/common';
 import { differenceInDays, subDays, subMonths } from 'date-fns';
 import calculations from '@/app/utils/calculations';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { TranslationKey } from '@/translations';
 import { predefinedExercises, getBaseExerciseKey } from '@/app/components/exercises';
+import { storageService } from '@/app/services/storage';
 
 interface MuscleDistributionData {
   name: string;
@@ -38,7 +38,6 @@ const useStats = (selectedPeriod: Period) => {
     muscleDistribution: []
   });
 
-  // Helper: compute start date for a given period
   const getStartDateForPeriod = useCallback((period: Period): Date => {
     const now = new Date();
     switch (period) {
@@ -135,24 +134,20 @@ const useStats = (selectedPeriod: Period) => {
         current.progress > max.progress ? current : max
       );
 
-      // Translate the exercise name using the key
       return {
         progress: bestExercise.progress,
-        exercise: t(bestExercise.exercise as TranslationKey) // Translate the exercise key
+        exercise: t(bestExercise.exercise as TranslationKey)
       };
     },
     [t]
   );
 
   const getMuscleDistribution = useCallback((workouts: Workout[]): MuscleDistributionData[] => {
-    // Apply period filter first
     const startDate = getStartDateForPeriod(selectedPeriod);
     const periodWorkouts = workouts.filter((w) => new Date(w.date) >= startDate);
-    // Portion configuration (per exercise): 70% for primary, 30% spread across all secondaries
     const PRIMARY_PORTION = 0.7;
     const SECONDARY_PORTION = 0.3;
 
-    // Build a quick lookup for exercise → { primaryMuscle, secondaryMuscles }
     const exerciseIndex: Record<string, { primaryMuscle: string; secondaryMuscles: string[] }>
       = predefinedExercises.reduce((acc, ex) => {
         acc[ex.key] = {
@@ -165,7 +160,6 @@ const useStats = (selectedPeriod: Period) => {
     const muscleGroups: Record<string, number> = {};
 
     periodWorkouts.forEach((workout) => {
-      // Compute series score depending on unit type
       const volume = workout.series.reduce((total, series) => {
         const unit = series.unitType as any;
         switch (unit) {
@@ -176,14 +170,14 @@ const useStats = (selectedPeriod: Period) => {
           }
           case 'reps': {
             const reps = typeof series.reps === 'number' ? series.reps : 0;
-            return total + reps; // bodyweight equivalent
+            return total + reps;
           }
           case 'time': {
-            const duration = typeof series.duration === 'number' ? series.duration : 0; // seconds
+            const duration = typeof series.duration === 'number' ? series.duration : 0;
             return total + duration;
           }
           case 'distance': {
-            const distance = typeof series.distance === 'number' ? series.distance : 0; // meters
+            const distance = typeof series.distance === 'number' ? series.distance : 0;
             return total + distance;
           }
           default:
@@ -191,17 +185,15 @@ const useStats = (selectedPeriod: Period) => {
         }
       }, 0);
 
-      if (volume <= 0) return; // skip if no meaningful volume
+      if (volume <= 0) return;
 
       const baseKey = getBaseExerciseKey(workout.exercise);
       const def = exerciseIndex[baseKey];
 
       if (def) {
-        // Primary contribution (70%)
         const primary = def.primaryMuscle;
         muscleGroups[primary] = (muscleGroups[primary] ?? 0) + volume * PRIMARY_PORTION;
 
-        // Secondary contributions: spread remaining 30% equally
         const secs = def.secondaryMuscles;
         if (secs.length > 0) {
           const share = (volume * SECONDARY_PORTION) / secs.length;
@@ -210,9 +202,8 @@ const useStats = (selectedPeriod: Period) => {
           });
         }
       } else {
-        // Fallback to stored muscleGroup if exercise definition is unknown
         const fallback = (workout.muscleGroup || 'other').toLowerCase();
-        muscleGroups[fallback] = (muscleGroups[fallback] ?? 0) + volume; // 100% to known group
+        muscleGroups[fallback] = (muscleGroups[fallback] ?? 0) + volume;
       }
     });
 
@@ -230,33 +221,51 @@ const useStats = (selectedPeriod: Period) => {
   }, [t, selectedPeriod, getStartDateForPeriod]);
 
   useEffect(() => {
-    const loadWorkouts = async () => {
+    const loadUnified = async () => {
       try {
-        const storedWorkouts = await AsyncStorage.getItem('workouts');
-        if (storedWorkouts) {
-          const parsedWorkouts = JSON.parse(storedWorkouts) as Workout[];
-          const workouts = parsedWorkouts.map((workout) => ({
-            ...workout,
-            series: workout.series.map((series) => ({
+        const [storedManual, sessions] = await Promise.all([
+          storageService.getWorkouts(),
+          storageService.getRoutineSessions()
+        ]);
+        const manual = (storedManual || []).filter((w) => !w.routineId).map((workout) => ({
+          ...workout,
+          series: workout.series.map((series) => ({
+            ...series,
+            type: series.type || 'workingSet'
+          }))
+        }));
+        const derivedFromSessions: Workout[] = (sessions || []).flatMap((s: RoutineSession) => {
+          const date = s.date;
+          const routineId = s.routineId;
+          const routineTitle = s.routineTitle;
+          return (s.exercises || []).map((ex) => ({
+            ...ex,
+            id: `${s.id}_${ex.exerciseIndex ?? 0}`,
+            date,
+            routineId,
+            routineTitle,
+            series: ex.series.map((series) => ({
               ...series,
               type: series.type || 'workingSet'
             }))
-          }));
+          } as Workout));
+        });
+        const unified = [...manual, ...derivedFromSessions];
 
-          setStatsData({
-            workouts,
-            monthlyProgress: calculateMonthlyProgress(workouts),
-            trainingFrequency: calculateTrainingFrequency(workouts),
-            bestProgressExercise: getBestProgressExercise(workouts),
-            muscleDistribution: getMuscleDistribution(workouts)
-          });
-        }
+        setStatsData({
+          workouts: unified,
+          monthlyProgress: calculateMonthlyProgress(unified),
+          trainingFrequency: calculateTrainingFrequency(unified),
+          bestProgressExercise: getBestProgressExercise(unified),
+          muscleDistribution: getMuscleDistribution(unified)
+        });
       } catch (error) {
-        console.error('Error loading workouts:', error);
+        console.error('Error loading unified workouts:', error);
+        setStatsData((prev) => ({ ...prev, workouts: [] }));
       }
     };
 
-    loadWorkouts();
+    loadUnified();
   }, [
     selectedPeriod,
     calculateMonthlyProgress,

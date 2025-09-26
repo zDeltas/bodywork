@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Goal, Workout } from '@/types/common';
+import { Goal, Workout, RoutineSession } from '@/types/common';
 
 // Énumérations pour les clés de stockage
 export enum StorageKeys {
@@ -11,6 +11,7 @@ export enum StorageKeys {
   RECENT_EXERCISES = 'recentExercises',
   STORAGE_VERSION = 'storage_version',
   ROUTINES = 'routines',
+  ROUTINE_SESSIONS = 'routine_sessions',
 }
 
 // Version actuelle du stockage (pour les migrations futures)
@@ -43,6 +44,7 @@ export type StorageData = {
   [StorageKeys.RECENT_EXERCISES]: string[];
   [StorageKeys.STORAGE_VERSION]: string;
   [StorageKeys.ROUTINES]: any[];
+  [StorageKeys.ROUTINE_SESSIONS]: RoutineSession[];
 };
 
 // Valeurs par défaut
@@ -60,7 +62,8 @@ const defaultValues: StorageData = {
   [StorageKeys.FAVORITE_EXERCISES]: [],
   [StorageKeys.RECENT_EXERCISES]: [],
   [StorageKeys.STORAGE_VERSION]: CURRENT_STORAGE_VERSION,
-  [StorageKeys.ROUTINES]: []
+  [StorageKeys.ROUTINES]: [],
+  [StorageKeys.ROUTINE_SESSIONS]: []
 };
 
 /**
@@ -88,45 +91,38 @@ class StorageService {
 
   /**
    * Réinitialise toutes les données utilisateur
-   * tout en préservant les paramètres et la version du stockage
+   * et réinitialise aussi les paramètres et la version du stockage
    */
   async resetAllData(): Promise<void> {
     try {
-      // Sauvegarder les paramètres et la version actuels
-      const settings = await this.getSettings();
-      const version = await this.getItem<string>(StorageKeys.STORAGE_VERSION);
-
-      // Clés à réinitialiser
-      const keysToReset = [
+      // Clés à réinitialiser (inclure settings, version et sessions de routine)
+      const keysToReset: StorageKeys[] = [
         StorageKeys.WORKOUTS,
         StorageKeys.GOALS,
         StorageKeys.MEASUREMENTS,
         StorageKeys.FAVORITE_EXERCISES,
         StorageKeys.RECENT_EXERCISES,
-        StorageKeys.ROUTINES
+        StorageKeys.ROUTINES,
+        StorageKeys.ROUTINE_SESSIONS,
+        StorageKeys.SETTINGS,
+        StorageKeys.STORAGE_VERSION
       ];
 
-      // Supprimer les données
+      // Supprimer toutes les données
       await AsyncStorage.multiRemove(keysToReset);
 
-      // Réinitialiser avec les valeurs par défaut
+      // Réinitialiser chaque clé avec les valeurs par défaut
       for (const key of keysToReset) {
-        await this.setItem(key, defaultValues[key]);
+        if (key === StorageKeys.STORAGE_VERSION) {
+          await this.setItem(StorageKeys.STORAGE_VERSION, CURRENT_STORAGE_VERSION);
+        } else if (key === StorageKeys.SETTINGS) {
+          await this.setItem(StorageKeys.SETTINGS, defaultValues[StorageKeys.SETTINGS]);
+        } else {
+          await this.setItem(key, (defaultValues as any)[key]);
+        }
       }
 
-      // Vérifier que les données ont bien été réinitialisées
-      const allReset = await Promise.all(
-        keysToReset.map(async (key) => {
-          const value = await this.getItem(key);
-          return Array.isArray(value) && value.length === 0;
-        })
-      );
-
-      if (!allReset.every((reset) => reset)) {
-        throw new Error('Certaines données n\'ont pas été correctement réinitialisées');
-      }
-
-      console.log('Toutes les données ont été réinitialisées avec succès');
+      console.log('Toutes les données (y compris paramètres et sessions) ont été réinitialisées avec succès');
     } catch (error) {
       console.error('Erreur lors de la réinitialisation des données:', error);
       throw error;
@@ -329,6 +325,28 @@ class StorageService {
     const routines = await this.getRoutines();
     const filteredRoutines = routines.filter((r) => r.id !== id);
     await this.setItem(StorageKeys.ROUTINES, filteredRoutines);
+  }
+
+  // Méthodes spécifiques pour les RoutineSessions
+  async getRoutineSessions(): Promise<RoutineSession[]> {
+    const sessions = await this.getItem<RoutineSession[]>(StorageKeys.ROUTINE_SESSIONS);
+    return sessions || defaultValues[StorageKeys.ROUTINE_SESSIONS];
+  }
+
+  async getRoutineSessionsByRoutineId(routineId: string): Promise<RoutineSession[]> {
+    const sessions = await this.getRoutineSessions();
+    return sessions.filter(s => s.routineId === routineId);
+  }
+
+  async saveRoutineSession(session: RoutineSession): Promise<void> {
+    const sessions = await this.getRoutineSessions();
+    const index = sessions.findIndex(s => s.id === session.id);
+    if (index !== -1) {
+      sessions[index] = session;
+    } else {
+      sessions.push(session);
+    }
+    await this.setItem(StorageKeys.ROUTINE_SESSIONS, sessions);
   }
 
   /**

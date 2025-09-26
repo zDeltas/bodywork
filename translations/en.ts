@@ -45,7 +45,7 @@ export default {
   // Session
   session: {
     takeBreath: 'Catch your breath',
-    letsGo: "Let's go!",
+    letsGo: 'Let\'s go!',
     keepGoing: 'Keep going!',
     halfwayThere: 'Halfway there!',
     almostDone: 'Almost done!',
@@ -191,7 +191,7 @@ export default {
     exercise: 'Exercise',
     skipRest: 'Skip Rest',
     next: 'Next',
-    letsGo: "Let's Go!",
+    letsGo: 'Let\'s Go!',
     keepGoing: 'Keep Going!',
     halfwayThere: 'Halfway There!',
     almostDone: 'Almost Done!',
@@ -363,6 +363,19 @@ export default {
   exerciseDetails: {
     estimated_1rm: 'Estimated 1RM',
     last_session: 'Last Session'
+  },
+
+  routineHistory: {
+    title: 'Routine History',
+    summary: 'Summary',
+    exercises: 'exercises',
+    preparation: 'Preparation',
+    rest: 'Rest',
+    work: 'Work',
+    muscles: 'Muscles',
+    exerciseList: 'Exercises',
+    notes: 'Notes',
+    noHistory: 'No history for this routine yet'
   },
 
   // Exercise names - Chest
@@ -563,7 +576,7 @@ export default {
     },
     noFavorites: {
       title: 'No favorites',
-      description: 'You have routines but none are marked as favorites',
+      description: 'You have routines but none are marked as favorites'
     },
     item: {
       new: 'New',

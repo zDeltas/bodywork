@@ -4,6 +4,7 @@ import { VictoryAxis, VictoryChart, VictoryLine, VictoryScatter, VictoryTheme, V
 import { format, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useLocalSearchParams } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
 import Header from '@/app/components/layout/Header';
@@ -11,18 +12,17 @@ import Text from '@/app/components/ui/Text';
 import calculations from '@/app/utils/calculations';
 import { ChartSkeleton, StatsCardSkeleton } from '@/app/components/ui/SkeletonComponents';
 import useWorkouts from '@/app/hooks/useWorkouts';
+import { TranslationKey } from '@/translations';
 
 interface ExerciseData {
   x: Date;
   y: number;
 }
 
-// Fonction pour formater la date en français
 const formatDate = (date: string): string => {
   return format(parseISO(date), 'dd MMM', { locale: fr });
 };
 
-// Define styles using the current theme
 const useStyles = () => {
   const { theme } = useTheme();
 
@@ -189,7 +189,7 @@ const ExerciseDetails = () => {
   const { theme } = useTheme();
   const styles = useStyles();
   const { exercise } = useLocalSearchParams<{ exercise: string }>();
-  const { workouts, loading } = useWorkouts();
+  const { workouts, loading, refreshWorkouts } = useWorkouts() as any;
   const [selectedPeriod, setSelectedPeriod] = useState<'1m' | '3m' | '6m'>('1m');
   const [selectedChartType, setSelectedChartType] = useState<'1rm' | 'volume' | 'reps'>('1rm');
   const [exerciseData, setExerciseData] = useState<ExerciseData[]>([]);
@@ -236,7 +236,13 @@ const ExerciseDetails = () => {
     setRepsData(repsDataArr);
   }, [workouts, exercise]);
 
-  // Get the first working set or the first series if no working set
+  useFocusEffect(
+    React.useCallback(() => {
+      refreshWorkouts?.();
+      return () => {};
+    }, [refreshWorkouts])
+  );
+
   const latestWorkout = workouts[workouts.length - 1];
   const workingSet =
     latestWorkout?.series?.find((s) => s.type === 'workingSet') || latestWorkout?.series?.[0];
@@ -253,7 +259,6 @@ const ExerciseDetails = () => {
       )
       : 0;
 
-  // Fonction pour obtenir le domaine Y approprié
   const getDomainY = (data: ExerciseData[], type: '1rm' | 'volume' | 'reps') => {
     if (data.length === 0) {
       switch (type) {
@@ -269,9 +274,8 @@ const ExerciseDetails = () => {
     const values = data.map((item) => item.y);
     const min = Math.min(...values);
     const max = Math.max(...values);
-    const padding = (max - min) * 0.1; // 10% padding
+    const padding = (max - min) * 0.1;
 
-    // Ajuster les domaines selon le type
     switch (type) {
       case '1rm':
         return {
@@ -288,13 +292,11 @@ const ExerciseDetails = () => {
     }
   };
 
-  // Format date for display in chart tooltip
   const formatTooltip = (datum: any) => {
     const date = new Date(datum.x);
     const formattedDate = format(date, 'dd/MM/yy', { locale: fr });
     let value = datum.y;
 
-    // Formater la valeur selon le type
     switch (selectedChartType) {
       case '1rm':
         value = `${Math.round(value)} kg`;
@@ -310,7 +312,6 @@ const ExerciseDetails = () => {
     return `${formattedDate}: ${value}`;
   };
 
-  // Fonction pour obtenir les données filtrées selon la période
   const getFilteredData = (data: ExerciseData[]) => {
     const now = new Date();
     const periodInMonths = parseInt(selectedPeriod);
@@ -322,7 +323,6 @@ const ExerciseDetails = () => {
     });
   };
 
-  // Fonction pour obtenir le format de date approprié selon la période
   const getDateFormat = () => {
     switch (selectedPeriod) {
       case '1m':
@@ -336,7 +336,6 @@ const ExerciseDetails = () => {
     }
   };
 
-  // Fonction pour obtenir le nombre de ticks approprié selon le type
   const getTickCount = () => {
     switch (selectedChartType) {
       case '1rm':
@@ -350,7 +349,6 @@ const ExerciseDetails = () => {
     }
   };
 
-  // Fonction pour obtenir le format des ticks de l'axe Y
   const getYTickFormat = (tick: number) => {
     switch (selectedChartType) {
       case '1rm':
@@ -364,22 +362,18 @@ const ExerciseDetails = () => {
     }
   };
 
-  // Format date for display on X axis
   const formatDateForDisplay = (date: Date) => {
     return format(date, getDateFormat(), { locale: fr });
   };
 
-  // Obtenir les données filtrées
   const filteredExerciseData = getFilteredData(exerciseData);
   const filteredVolumeData = getFilteredData(volumeData);
   const filteredRepsData = getFilteredData(repsData);
 
-  // Obtenir les domaines Y
   const domainY1RM = getDomainY(filteredExerciseData, '1rm');
   const domainYVolume = getDomainY(filteredVolumeData, 'volume');
   const domainYReps = getDomainY(filteredRepsData, 'reps');
 
-  // Obtenir la couleur appropriée pour le graphique
   const getChartColor = () => {
     switch (selectedChartType) {
       case '1rm':
@@ -393,7 +387,6 @@ const ExerciseDetails = () => {
     }
   };
 
-  // Fonction pour obtenir le titre du graphique
   const getChartTitle = () => {
     switch (selectedChartType) {
       case '1rm':
@@ -407,7 +400,6 @@ const ExerciseDetails = () => {
     }
   };
 
-  // Fonction pour obtenir l'unité de l'axe Y
   const getYAxisLabel = () => {
     switch (selectedChartType) {
       case '1rm':
@@ -426,7 +418,6 @@ const ExerciseDetails = () => {
       <Header title={t(exercise as TranslationKey)} showBackButton={true} />
 
       <ScrollView style={styles.content}>
-        {/* Statistiques principales */}
         <View style={styles.statsContainer}>
           {loading ? (
             <>
@@ -452,7 +443,6 @@ const ExerciseDetails = () => {
           )}
         </View>
 
-        {/* Filtres de période */}
         <View style={styles.filterSection}>
           <Text variant="subheading" style={styles.filterLabel}>
             {t('stats.period')}
@@ -485,7 +475,6 @@ const ExerciseDetails = () => {
           </View>
         </View>
 
-        {/* Sélecteur de type de graphique */}
         <View style={styles.chartTypeSelector}>
           <TouchableOpacity
             style={[

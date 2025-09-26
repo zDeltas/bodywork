@@ -380,6 +380,20 @@ export default {
     last_session: 'Dernière séance'
   },
 
+  // Routine history
+  routineHistory: {
+    title: 'Historique de la routine',
+    summary: 'Résumé',
+    exercises: 'exercices',
+    preparation: 'Préparation',
+    rest: 'Repos',
+    work: 'Travail',
+    muscles: 'Muscles',
+    exerciseList: 'Exercices',
+    notes: 'Notes',
+    noHistory: 'Pas encore d\'historique pour cette routine'
+  },
+
   // Exercise names - Chest
   exercise_chest_benchPress: 'Développé couché',
   exercise_chest_inclineBenchPress: 'Développé incliné',

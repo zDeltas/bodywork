@@ -71,6 +71,42 @@ export interface Workout {
   series: Series[];
   date: string;
   name?: string;
+  routineId?: string;
+  routineTitle?: string;
+  // Index of this exercise within the routine execution (0-based)
+  exerciseIndex?: number;
+  // Actual durations recorded during session (in seconds)
+  prepSeconds?: number;
+  // Split rest into per-series rest vs between-exercises rest for better analytics
+  restSeriesSeconds?: number;
+  restBetweenExercisesSeconds?: number;
+  // Backward-compat total rest (may be derived = restSeriesSeconds + restBetweenExercisesSeconds)
+  restSeconds?: number;
+  workSeconds?: number;
+  // Optional total time for this exercise (prep + rest + work)
+  totalSeconds?: number;
+}
+
+export interface RoutineSessionTotals {
+  prepSeconds: number;
+  restSeriesSeconds: number;
+  restBetweenExercisesSeconds: number;
+  workSeconds: number;
+  totalSeconds: number;
+}
+
+export interface RoutineSession {
+  id: string;
+  routineId: string;
+  routineTitle: string;
+  date: string; // ISO date for the session
+  exercises: Workout[]; // ordered by exerciseIndex
+  totals: RoutineSessionTotals;
+  // Aggregates/metadata
+  notes?: string[]; // collected notes (e.g., first series notes per exercise)
+  muscles?: string[]; // translated or raw keys, depending on usage
+  exerciseCount: number;
+  seriesCount: number;
 }
 
 export interface Goal {

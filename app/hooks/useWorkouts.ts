@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Workout } from '@/types/common';
+import { RoutineSession, Workout } from '@/types/common';
 import { storageService } from '@/app/services/storage';
 
 export function useWorkouts() {
@@ -7,12 +7,27 @@ export function useWorkouts() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  // Fonction pour charger les workouts
   const loadWorkouts = useCallback(async () => {
     setLoading(true);
     try {
-      const stored = await storageService.getWorkouts();
-      setWorkouts(stored || []);
+      const [storedManual, sessions] = await Promise.all([
+        storageService.getWorkouts(),
+        storageService.getRoutineSessions()
+      ]);
+      const manual = (storedManual || []).filter(w => !w.routineId);
+      const derivedFromSessions: Workout[] = (sessions || []).flatMap((s: RoutineSession) => {
+        const date = s.date;
+        const routineId = s.routineId;
+        const routineTitle = s.routineTitle;
+        return (s.exercises || []).map((ex) => ({
+          ...ex,
+          id: `${s.id}_${ex.exerciseIndex ?? 0}`,
+          date,
+          routineId,
+          routineTitle
+        } as Workout));
+      });
+      setWorkouts([...manual, ...derivedFromSessions]);
       setError(null);
     } catch (err) {
       setError(
@@ -24,7 +39,6 @@ export function useWorkouts() {
     }
   }, []);
 
-  // Charger les workouts au montage
   useEffect(() => {
     let mounted = true;
     const load = async () => {
@@ -38,8 +52,10 @@ export function useWorkouts() {
     };
   }, [loadWorkouts]);
 
-  // Ajouter ou mettre à jour un workout
   const saveWorkout = useCallback(async (workout: Workout) => {
+    if (workout.routineId) {
+      return;
+    }
     setWorkouts((prev) => {
       const idx = prev.findIndex((w) => w.id === workout.id);
       let updated;
@@ -50,26 +66,56 @@ export function useWorkouts() {
         updated = [...prev, workout];
       }
       storageService.saveWorkout(workout).then(async () => {
-        const stored = await storageService.getWorkouts();
-        setWorkouts(stored || []);
+        const [storedManual, sessions] = await Promise.all([
+          storageService.getWorkouts(),
+          storageService.getRoutineSessions()
+        ]);
+        const manual = (storedManual || []).filter(w => !w.routineId);
+        const derivedFromSessions: Workout[] = (sessions || []).flatMap((s: RoutineSession) => {
+          const date = s.date;
+          const routineId = s.routineId;
+          const routineTitle = s.routineTitle;
+          return (s.exercises || []).map((ex) => ({
+            ...ex,
+            id: `${s.id}_${ex.exerciseIndex ?? 0}`,
+            date,
+            routineId,
+            routineTitle
+          } as Workout));
+        });
+        setWorkouts([...manual, ...derivedFromSessions]);
       });
       return updated;
     });
   }, []);
 
-  // Supprimer un workout
   const deleteWorkout = useCallback(async (id: string) => {
     setWorkouts((prev) => {
       const updated = prev.filter((w) => w.id !== id);
       storageService.deleteWorkout(id).then(async () => {
-        const stored = await storageService.getWorkouts();
-        setWorkouts(stored || []);
+        const [storedManual, sessions] = await Promise.all([
+          storageService.getWorkouts(),
+          storageService.getRoutineSessions()
+        ]);
+        const manual = (storedManual || []).filter(w => !w.routineId);
+        const derivedFromSessions: Workout[] = (sessions || []).flatMap((s: RoutineSession) => {
+          const date = s.date;
+          const routineId = s.routineId;
+          const routineTitle = s.routineTitle;
+          return (s.exercises || []).map((ex) => ({
+            ...ex,
+            id: `${s.id}_${ex.exerciseIndex ?? 0}`,
+            date,
+            routineId,
+            routineTitle
+          } as Workout));
+        });
+        setWorkouts([...manual, ...derivedFromSessions]);
       });
       return updated;
     });
   }, []);
 
-  // Fonction pour récupérer un workout par son ID
   const getWorkoutById = useCallback(
     (id: string) => {
       return workouts.find((workout) => workout.id === id) || null;
@@ -77,7 +123,6 @@ export function useWorkouts() {
     [workouts]
   );
 
-  // Fonction pour filtrer les workouts par exercice
   const getWorkoutsByExercise = useCallback(
     (exercise: string) => {
       return workouts.filter((workout) => workout.exercise === exercise);
@@ -85,7 +130,6 @@ export function useWorkouts() {
     [workouts]
   );
 
-  // Fonction pour filtrer les workouts par groupe musculaire
   const getWorkoutsByMuscleGroup = useCallback(
     (muscleGroup: string) => {
       return workouts.filter((workout) => workout.muscleGroup === muscleGroup);
@@ -93,7 +137,6 @@ export function useWorkouts() {
     [workouts]
   );
 
-  // Fonction pour filtrer les workouts par date
   const getWorkoutsByDate = useCallback(
     (date: string) => {
       return workouts.filter((workout) => {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, TextStyle, TouchableOpacity, ViewStyle } from 'react-native';
+import { Text, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { useDynamicStyles } from '@/app/theme/dynamicComponents';
 
 type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'icon';
@@ -60,9 +60,13 @@ export const Button: React.FC<ButtonProps> = ({
 
   return (
     <TouchableOpacity onPress={onPress} disabled={disabled} style={buttonStyles}>
-      {icon && icon}
-      {title && <Text style={textStyles}>{title}</Text>}
-      {children}
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        {icon && icon}
+        {title && (
+          <Text style={[textStyles, icon ? { marginLeft: 8 } : null]}>{title}</Text>
+        )}
+        {children}
+      </View>
     </TouchableOpacity>
   );
 };

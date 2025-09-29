@@ -31,6 +31,7 @@ export const colors = {
     card: '#ffffff', // White for card backgrounds
     input: '#ffffff', // White for input backgrounds
     button: '#e0e0e0', // Light gray for button backgrounds
+    disabled: '#f0f0f0', // Disabled surfaces
     overlay: 'rgba(0, 0, 0, 0.3)' // Modal overlay (lighter for light theme)
   },
 

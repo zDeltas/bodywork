@@ -211,23 +211,23 @@ const SeriesConfigModal: React.FC<SeriesConfigModalProps> = React.memo(({
               {seriesElements}
             </View>
 
-            <TouchableOpacity
-              style={styles.addSeriesButton}
+            <Button
               onPress={onSeriesAdd}
-            >
-              <View style={styles.addSeriesContent}>
-                <Plus size={20} color={theme.colors.text.primary} />
-                <Text style={styles.addSeriesText}>{t('workout.addSeries')}</Text>
-              </View>
-            </TouchableOpacity>
+              variant="secondary"
+              size="large"
+              style={{ marginTop: theme.spacing.base }}
+              icon={<Plus size={20} color={theme.colors.text.primary} />}
+              title={t('workout.addSeries')}
+            />
 
             <Button
               onPress={onSave}
-              style={styles.saveButton}
+              variant="primary"
+              size="large"
+              style={{ marginVertical: theme.spacing.lg }}
               disabled={!canSave}
-            >
-              <Text style={{ color: theme.colors.text.primary }}>{t('common.save')}</Text>
-            </Button>
+              title={t('common.save')}
+            />
           </ScrollView>
         </View>
       </View>
@@ -333,33 +333,7 @@ const useStyles = (theme: any) => StyleSheet.create({
     minHeight: 80,
     textAlignVertical: 'top'
   },
-  addSeriesButton: {
-    marginTop: theme.spacing.base,
-    padding: theme.spacing.md,
-    backgroundColor: theme.colors.primary,
-    borderRadius: theme.borderRadius.lg,
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    ...theme.shadows.sm,
-    borderWidth: 1,
-    borderColor: theme.colors.primaryBorder
-  },
-  addSeriesContent: {
-    flexDirection: 'row',
-    alignItems: 'center'
-  },
-  addSeriesText: {
-    fontSize: theme.typography.fontSize.base,
-    fontWeight: 'bold',
-    color: theme.colors.text.primary,
-    marginLeft: theme.spacing.sm
-  },
-  saveButton: {
-    backgroundColor: theme.colors.primary,
-    marginVertical: theme.spacing.lg,
-    paddingVertical: theme.spacing.base
-  },
+  
   // Exercise Rest Configuration Styles
   exerciseRestContainer: {
     marginTop: theme.spacing.sm,

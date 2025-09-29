@@ -5,12 +5,14 @@ import { MeasurementKey } from '@/app/components/measurements/MeasurementBodyMap
 export type Measurement = {
   date: string;
   weight: number;
+  height: number;
   measurements: Record<MeasurementKey, number>;
 };
 
 const initialMeasurements: Measurement = {
   date: new Date().toISOString().split('T')[0],
   weight: 0,
+  height: 0,
   measurements: {
     neck: 0,
     shoulders: 0,
@@ -33,11 +35,14 @@ function groupMeasurementsByDate(stored: any[]): Measurement[] {
       byDate[date] = {
         date,
         weight: 0,
+        height: 0,
         measurements: { ...initialMeasurements.measurements }
       };
     }
     if (m.type === 'weight') {
       byDate[date].weight = m.value;
+    } else if (m.type === 'height') {
+      byDate[date].height = m.value;
     } else if (m.type in byDate[date].measurements) {
       byDate[date].measurements[m.type as MeasurementKey] = m.value;
     }
@@ -154,6 +159,40 @@ export function useMeasurements() {
     });
   }, []);
 
+  // Mettre à jour la taille
+  const updateHeight = useCallback(async (value: number) => {
+    setMeasurements((prev) => {
+      const updated = {
+        ...prev,
+        height: value
+      };
+      setAllMeasurements((prevAll) => {
+        const idx = prevAll.findIndex((m) => m.date === updated.date);
+        let arr;
+        if (idx >= 0) {
+          arr = [...prevAll];
+          arr[idx] = updated;
+        } else {
+          arr = [updated, ...prevAll];
+        }
+        return arr.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      });
+      storageService
+        .saveMeasurement({
+          id: `${updated.date}_height`,
+          date: new Date(updated.date).toISOString(),
+          type: 'height',
+          value,
+          unit: 'cm'
+        })
+        .then(async () => {
+          const stored = await storageService.getMeasurements();
+          setAllMeasurements(stored ? groupMeasurementsByDate(stored) : []);
+        });
+      return updated;
+    });
+  }, []);
+
   // Changer la date sélectionnée
   const setSelectedDate = useCallback(
     (date: string) => {
@@ -174,6 +213,7 @@ export function useMeasurements() {
       error,
       updateMeasurement,
       updateWeight,
+      updateHeight,
       setSelectedDate
     }),
     [
@@ -183,6 +223,7 @@ export function useMeasurements() {
       error,
       updateMeasurement,
       updateWeight,
+      updateHeight,
       setSelectedDate
     ]
   );

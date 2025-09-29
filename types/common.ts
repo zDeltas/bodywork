@@ -107,6 +107,8 @@ export interface RoutineSession {
   muscles?: string[]; // translated or raw keys, depending on usage
   exerciseCount: number;
   seriesCount: number;
+  // Optional total calories computed live during the session
+  caloriesKcal?: number;
 }
 
 export interface Goal {

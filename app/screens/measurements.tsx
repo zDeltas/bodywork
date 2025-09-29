@@ -3,12 +3,13 @@ import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-nati
 import { useTheme } from '@/app/hooks/useTheme';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import Header from '@/app/components/layout/Header';
-import { BarChart, Calendar as CalendarIcon, ChevronDown, ListPlus, Scale } from 'lucide-react-native';
+import { BarChart, Calendar as CalendarIcon, ChevronDown, ListPlus, Scale, Ruler } from 'lucide-react-native';
 import MeasurementBody, { MeasurementKey } from '@/app/components/measurements/MeasurementBodyMap';
 import MeasurementModal from '@/app/components/measurements/MeasurementModal';
 import MeasurementHistoryModal from '@/app/components/measurements/MeasurementHistoryModal';
 import MeasurementHistory from '@/app/components/measurements/MeasurementHistory';
 import WeightModal from '@/app/components/measurements/WeightModal';
+import HeightModal from '@/app/components/measurements/HeightModal';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Calendar } from 'react-native-calendars';
@@ -40,6 +41,7 @@ export default function MeasurementsScreen() {
   const params = useLocalSearchParams<{ openInput?: string; openWeight?: string }>();
   const { theme } = useTheme();
   const { t } = useTranslation();
+  
   const [viewMode, setViewMode] = useState<ViewMode>('history');
   const [modal, setModal] = useState<{ key: MeasurementKey | null; open: boolean }>({
     key: null,
@@ -51,6 +53,7 @@ export default function MeasurementsScreen() {
   });
   const [showCalendar, setShowCalendar] = useState(false);
   const [showWeightModal, setShowWeightModal] = useState(false);
+  const [showHeightModal, setShowHeightModal] = useState(false);
 
   // Ouvrir automatiquement les vues/modales depuis la navigation
   React.useEffect(() => {
@@ -69,7 +72,8 @@ export default function MeasurementsScreen() {
     loading,
     updateMeasurement,
     updateWeight,
-    setSelectedDate
+    setSelectedDate,
+    updateHeight
   } = useMeasurements();
 
   const openMeasurementModal = (key: MeasurementKey) => setModal({ key, open: true });
@@ -80,6 +84,8 @@ export default function MeasurementsScreen() {
 
   const openWeightModal = () => setShowWeightModal(true);
   const closeWeightModal = () => setShowWeightModal(false);
+  const openHeightModal = () => setShowHeightModal(true);
+  const closeHeightModal = () => setShowHeightModal(false);
 
   const openWeightHistoryModal = () => {
     setHistoryModal({ key: null, open: true });
@@ -230,6 +236,18 @@ export default function MeasurementsScreen() {
         </View>
       </TouchableOpacity>
 
+      {/* Height input */}
+      <TouchableOpacity style={styles.inputCard} onPress={openHeightModal}>
+        <View style={styles.inputHeader}>
+          <Ruler size={18} color={theme.colors.primary} />
+          <Text style={styles.inputLabel}>{t('measurements.height') || 'Taille'}</Text>
+        </View>
+        <View style={styles.dateDisplay}>
+          <Text style={styles.dateText}>{measurements.height > 0 ? `${measurements.height} cm` : '-'}</Text>
+          <ChevronDown size={18} color={theme.colors.text.secondary} />
+        </View>
+      </TouchableOpacity>
+
       {/* Calendar modal */}
       <Modal
         visible={showCalendar}
@@ -338,6 +356,13 @@ export default function MeasurementsScreen() {
         onClose={closeWeightModal}
         onSave={updateWeight}
         onShowHistory={openWeightHistoryModal}
+      />
+      {/* Height Modal */}
+      <HeightModal
+        open={showHeightModal}
+        value={measurements.height > 0 ? measurements.height : undefined}
+        onClose={closeHeightModal}
+        onSave={updateHeight}
       />
       {/* Modale d'historique */}
       <MeasurementHistoryModal

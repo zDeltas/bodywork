@@ -31,6 +31,7 @@ export const colors = {
     card: '#1a1a1a', // Card backgrounds
     input: '#1a1a1a', // Input backgrounds
     button: '#333', // Button backgrounds
+    disabled: '#151515', // Disabled surfaces
     overlay: 'rgba(0, 0, 0, 0.5)' // Modal overlay
   },
 

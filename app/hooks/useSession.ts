@@ -4,11 +4,14 @@ import useHaptics from '@/app/hooks/useHaptics';
 import storageService from '@/app/services/storage';
 import { Exercise, Routine, SessionState, Workout } from '@/types/common';
 import { INITIAL_SESSION_STATE, SessionContextType } from '../types/session';
+import { mapRpeToMet, MET_CONSTANTS, getExerciseMeta } from '@/app/components/exercises';
 import { useSettings } from '@/app/hooks/useSettings';
+import useMeasurements from '@/app/hooks/useMeasurements';
 
 const useSession = (routineId: string): SessionContextType => {
   const haptics = useHaptics();
   const { settings } = useSettings();
+  const { allMeasurements } = useMeasurements();
   const [routine, setRoutine] = useState<Routine | null>(null);
   const [sessionState, setSessionState] = useState<SessionState>(INITIAL_SESSION_STATE);
 
@@ -20,6 +23,90 @@ const useSession = (routineId: string): SessionContextType => {
   const workAccRef = useRef<number>(0);
   const restTypeRef = useRef<'series' | 'exercise' | undefined>(undefined);
   const sessionExercisesRef = useRef<Workout[]>([]);
+  const caloriesAccRef = useRef<number>(0);
+
+  // ---- Calories helpers ----
+  const getLatestWeightKg = useCallback((): number | undefined => {
+    const latest = (allMeasurements || [])
+      .filter(m => typeof m.weight === 'number' && m.weight > 0)
+      .sort((a, b) => new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime())[0];
+    return latest?.weight;
+  }, [allMeasurements]);
+
+  const getCaloriesOptions = useCallback(() => {
+    // Read optional settings; provide safe defaults
+    const includeRest = (settings as any)?.calories?.includeRest ?? true;
+    const includePreparation = (settings as any)?.calories?.includePreparation ?? true;
+    const epocEnabled = (settings as any)?.calories?.epocEnabled ?? false;
+    return { includeRest, includePreparation, epocEnabled } as {
+      includeRest: boolean;
+      includePreparation: boolean;
+      epocEnabled: boolean;
+    };
+  }, [settings]);
+
+  
+
+  const kcalFromMet = (met: number, weightKg: number | undefined, minutes: number): number => {
+    if (!weightKg || minutes <= 0 || met <= 0) return 0;
+    return met * 3.5 * weightKg / 200 * minutes;
+  };
+
+  const convertTimeToSeconds = useCallback((timeStr: string | undefined): number => {
+    if (!timeStr) return 1;
+    const [minutes, seconds] = timeStr.split(':').map(Number);
+    if (isNaN(minutes) || isNaN(seconds)) return 1;
+    return (minutes * 60) + seconds;
+  }, []);
+
+  const cardioKcalPerMin = useCallback((mode: 'walk' | 'run' | 'bike' | 'row' | 'elliptical' | 'other' | undefined, series?: any, weightKg?: number): number => {
+    // ACSM equations return kcal/min via: kcal/min = VO2(ml/kg/min) * weight(kg) / 200
+    const durationSec = series?.duration ? convertTimeToSeconds(series.duration) : undefined;
+    const distanceM = typeof series?.distance === 'number' ? series.distance : undefined;
+    const v = (durationSec && durationSec > 0 && distanceM && distanceM > 0)
+      ? (distanceM / durationSec) * 60 // m/min
+      : undefined;
+    const grade = typeof series?.grade === 'number' ? series.grade : 0; // decimal, default flat
+
+    let vo2: number | undefined;
+    if (mode === 'walk' && v) {
+      vo2 = 3.5 + 0.1 * v + 1.8 * v * grade;
+    } else if (mode === 'run' && v) {
+      vo2 = 3.5 + 0.2 * v + 0.9 * v * grade;
+    } else if (mode === 'bike') {
+      const powerW = typeof series?.power === 'number' ? series.power : undefined;
+      const wkg = (powerW && weightKg && weightKg > 0) ? (powerW / weightKg) : undefined;
+      if (wkg != null) {
+        vo2 = 7 + 10.8 * wkg;
+      }
+    }
+    if (vo2 != null && weightKg) {
+      return (vo2 * weightKg) / 200; // kcal/min
+    }
+    // Fallback to MET for cardio if inputs insufficient, use mode-specific defaults
+    const fallbackMet = (() => {
+      switch (mode) {
+        case 'walk': return 3.3;
+        case 'run': return 9.8;
+        case 'bike': return 8.0;
+        case 'row': return 8.0;
+        case 'elliptical': return 5.0;
+        default: return 7.0;
+      }
+    })();
+    return (weightKg ? (fallbackMet * 3.5 * weightKg / 200) : 0);
+  }, [convertTimeToSeconds]);
+
+  const getCurrentSeriesRpe = () => {
+    try {
+      const ex = routine?.exercises?.[sessionState.currentExerciseIndex];
+      const se = ex?.series?.[sessionState.currentSeriesIndex];
+      const rpe = (se && typeof (se as any).rpe === 'number') ? (se as any).rpe as number : undefined;
+      return { ex, se, rpe } as { ex?: Exercise; se?: any; rpe?: number };
+    } catch {
+      return { ex: undefined, se: undefined, rpe: undefined };
+    }
+  };
 
   const getPhaseFromState = useCallback((): 'prep' | 'rest' | 'work' => {
     if (sessionState.isPreparation) return 'prep';
@@ -30,6 +117,30 @@ const useSession = (routineId: string): SessionContextType => {
   const switchPhase = useCallback((newPhase: 'prep' | 'rest' | 'work' | 'idle') => {
     const now = Date.now();
     const delta = Math.max(0, Math.floor((now - lastTsRef.current) / 1000));
+    // Compute calories for the elapsed delta in the previous phase
+    const weightKg = getLatestWeightKg();
+    const prevPhase = phaseRef.current;
+    if (weightKg && delta > 0) {
+      const minutes = delta / 60;
+      const { includeRest, includePreparation } = getCaloriesOptions();
+      if (prevPhase === 'work') {
+        const { ex, se, rpe } = getCurrentSeriesRpe();
+        const meta = getExerciseMeta((ex as any)?.translationKey || ex?.name);
+        // Base: MET mapping (uses RPE when provided, else meta.defaultMet/cardioMode fallbacks)
+        const met = mapRpeToMet(rpe, meta);
+        let kcal = kcalFromMet(met, weightKg, minutes);
+        // Cardio override: use ACSM kcal if available
+        if (meta?.cardioMode) {
+          const acsmPerMin = cardioKcalPerMin(meta.cardioMode, se, weightKg);
+          if (acsmPerMin > 0) kcal = acsmPerMin * minutes;
+        }
+        caloriesAccRef.current += kcal;
+      } else if (prevPhase === 'rest' && includeRest) {
+        caloriesAccRef.current += kcalFromMet(MET_CONSTANTS.rest, weightKg, minutes);
+      } else if (prevPhase === 'prep' && includePreparation) {
+        caloriesAccRef.current += kcalFromMet(MET_CONSTANTS.preparation, weightKg, minutes);
+      }
+    }
     switch (phaseRef.current) {
       case 'prep':
         prepAccRef.current += delta;
@@ -49,7 +160,7 @@ const useSession = (routineId: string): SessionContextType => {
     }
     phaseRef.current = newPhase;
     lastTsRef.current = now;
-  }, []);
+  }, [getLatestWeightKg, getCaloriesOptions, getCurrentSeriesRpe, cardioKcalPerMin]);
 
   useEffect(() => {
     const desired = getPhaseFromState();
@@ -62,12 +173,6 @@ const useSession = (routineId: string): SessionContextType => {
     restTypeRef.current = sessionState.restType;
   }, [sessionState.restType]);
 
-  const convertTimeToSeconds = useCallback((timeStr: string | undefined): number => {
-    if (!timeStr) return 1;
-    const [minutes, seconds] = timeStr.split(':').map(Number);
-    if (isNaN(minutes) || isNaN(seconds)) return 1;
-    return (minutes * 60) + seconds;
-  }, []);
 
   const getRestTimeAndType = useCallback((isLastSeries: boolean, currentExercise: Exercise, currentSeries: any): { time: number; type: 'series' | 'exercise' } => {
     if (isLastSeries) {
@@ -287,6 +392,20 @@ const useSession = (routineId: string): SessionContextType => {
             workSeconds: exs.reduce((s, w) => s + (w.workSeconds || 0), 0),
             totalSeconds: exs.reduce((s, w) => s + (w.totalSeconds || ((w.prepSeconds||0)+(w.workSeconds||0)+(w.restSeconds||((w.restSeriesSeconds||0)+(w.restBetweenExercisesSeconds||0))))), 0)
           };
+          // EPOC bonus (optional)
+          const { epocEnabled } = getCaloriesOptions();
+          const density = totals.workSeconds / Math.max(1, (totals.workSeconds + totals.restSeriesSeconds + totals.restBetweenExercisesSeconds));
+          // Compute avg RPE across working sets if available
+          let rpeSum = 0; let rpeCount = 0;
+          exs.forEach(w => {
+            (w.series || []).forEach((se: any) => {
+              if (se?.type === 'workingSet' && typeof se.rpe === 'number') { rpeSum += se.rpe; rpeCount += 1; }
+            });
+          });
+          const avgRpe = rpeCount > 0 ? (rpeSum / rpeCount) : 0;
+          if (epocEnabled && avgRpe >= 7 && density >= 0.6) {
+            caloriesAccRef.current *= 1.06;
+          }
           const notes: string[] = [];
           let seriesCount = 0;
           const musclesSet = new Set<string>();
@@ -305,13 +424,15 @@ const useSession = (routineId: string): SessionContextType => {
             notes,
             muscles: Array.from(musclesSet),
             exerciseCount: exs.length,
-            seriesCount
+            seriesCount,
+            caloriesKcal: Math.round(caloriesAccRef.current)
           } as any;
           await storageService.saveRoutineSession(routineSession);
         } catch (e) {
           console.warn('Failed to save RoutineSession', e);
         } finally {
           sessionExercisesRef.current = [];
+          caloriesAccRef.current = 0;
         }
 
         setSessionState((prev: SessionState) => ({
@@ -369,6 +490,12 @@ const useSession = (routineId: string): SessionContextType => {
     if (!routine || !currentSessionData) return;
     
     haptics.impactLight();
+
+    // If we are currently in preparation, pressing Next should end preparation and start work
+    if (sessionState.isPreparation) {
+      handlePreparationComplete();
+      return;
+    }
 
     if (sessionState.isResting) {
       handleRestComplete();
@@ -473,7 +600,7 @@ const useSession = (routineId: string): SessionContextType => {
         };
       }
     });
-  }, [routine, currentSessionData, haptics, getRestTime, sessionState.isResting, handleRestComplete, settings.rpeMode]);
+  }, [routine, currentSessionData, haptics, getRestTime, sessionState.isResting, sessionState.isPreparation, handleRestComplete, handlePreparationComplete, settings.rpeMode]);
 
   useEffect(() => {
     const loadRoutine = async () => {

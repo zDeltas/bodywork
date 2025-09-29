@@ -21,6 +21,12 @@ export interface ExerciseDefinition {
   key: string;
   primaryMuscle: MuscleGroupKey;
   secondaryMuscles?: MuscleGroupKey[];
+  // Optional richer metadata
+  kind?: ExerciseKind; // strength_* or cardio_*
+  cardioMode?: 'walk' | 'run' | 'bike' | 'row' | 'elliptical' | 'other';
+  defaultMet?: number; // optional override/default MET
+  supportsGrade?: boolean; // for treadmill walking/running (ACSM)
+  supportsPower?: boolean; // for cycling ergometer (ACSM)
 }
 
 // Interface pour les exercices avec traductions (compatible avec types/common.ts)
@@ -59,184 +65,264 @@ export const predefinedExercises: ExerciseDefinition[] = [
   {
     key: 'exercise_chest_benchPress',
     primaryMuscle: 'chest',
-    secondaryMuscles: ['triceps', 'shoulders']
+    secondaryMuscles: ['triceps', 'shoulders'],
+    kind: 'strength_press',
+    tags: ['compound'],
+    equipment: 'barbell',
+    movementPattern: 'press',
+    unilateral: false,
+    skillLevel: 'beginner',
+    impact: 'low'
   },
   {
     key: 'exercise_chest_inclineBenchPress',
     primaryMuscle: 'chest',
-    secondaryMuscles: ['triceps', 'shoulders']
+    secondaryMuscles: ['triceps', 'shoulders'],
+    kind: 'strength_press',
+    defaultMet: 6.0
   },
   {
     key: 'exercise_chest_declineBenchPress',
     primaryMuscle: 'chest',
-    secondaryMuscles: ['triceps', 'shoulders']
+    secondaryMuscles: ['triceps', 'shoulders'],
+    kind: 'strength_press',
+    defaultMet: 6.0
   },
   {
     key: 'exercise_chest_dumbbellFlyes',
     primaryMuscle: 'chest',
-    secondaryMuscles: ['shoulders']
+    secondaryMuscles: ['shoulders'],
+    kind: 'strength_press',
+    defaultMet: 6.0
   },
   {
     key: 'exercise_chest_cableCrossover',
     primaryMuscle: 'chest',
-    secondaryMuscles: ['shoulders']
+    secondaryMuscles: ['shoulders'],
+    kind: 'strength_press',
+    defaultMet: 6.0
   },
 
   // Back
   {
     key: 'exercise_back_pullUps',
     primaryMuscle: 'back',
-    secondaryMuscles: ['biceps', 'shoulders']
+    secondaryMuscles: ['biceps', 'shoulders'],
+    kind: 'strength_pull',
+    defaultMet: 6.0
   },
   {
     key: 'exercise_back_latPulldown',
     primaryMuscle: 'back',
-    secondaryMuscles: ['biceps', 'shoulders']
+    secondaryMuscles: ['biceps', 'shoulders'],
+    kind: 'strength_pull',
+    defaultMet: 6.0
   },
   {
     key: 'exercise_back_barbellRow',
     primaryMuscle: 'back',
-    secondaryMuscles: ['biceps', 'shoulders']
+    secondaryMuscles: ['biceps', 'shoulders'],
+    kind: 'strength_pull',
+    tags: ['compound'],
+    equipment: 'barbell',
+    movementPattern: 'pull',
+    unilateral: false,
+    skillLevel: 'beginner',
+    impact: 'low'
   },
   {
     key: 'exercise_back_dumbbellRow',
     primaryMuscle: 'back',
-    secondaryMuscles: ['biceps', 'shoulders']
+    secondaryMuscles: ['biceps', 'shoulders'],
+    kind: 'strength_pull',
+    defaultMet: 6.0
   },
   {
     key: 'exercise_back_tBarRow',
     primaryMuscle: 'back',
-    secondaryMuscles: ['biceps', 'shoulders']
+    secondaryMuscles: ['biceps', 'shoulders'],
+    kind: 'strength_pull',
+    defaultMet: 6.0
   },
   {
     key: 'exercise_back_uprightRow',
     primaryMuscle: 'trapezius',
-    secondaryMuscles: ['shoulders', 'biceps']
+    secondaryMuscles: ['shoulders', 'biceps'],
+    kind: 'strength_pull',
+    defaultMet: 6.0
   },
   {
     key: 'exercise_back_facePulls',
     primaryMuscle: 'trapezius',
-    secondaryMuscles: ['shoulders', 'triceps']
+    secondaryMuscles: ['shoulders', 'triceps'],
+    kind: 'strength_pull',
+    defaultMet: 6.0
   },
 
   // Shoulders
   {
     key: 'exercise_shoulders_militaryPress',
     primaryMuscle: 'shoulders',
-    secondaryMuscles: ['triceps', 'core']
+    secondaryMuscles: ['triceps', 'core'],
+    kind: 'strength_press',
+    defaultMet: 6.0
   },
   {
     key: 'exercise_shoulders_lateralRaises',
-    primaryMuscle: 'shoulders'
+    primaryMuscle: 'shoulders',
+    kind: 'strength_press',
+    defaultMet: 6.0
   },
   {
     key: 'exercise_shoulders_frontRaises',
-    primaryMuscle: 'shoulders'
+    primaryMuscle: 'shoulders',
+    kind: 'strength_press',
+    defaultMet: 6.0
   },
   {
     key: 'exercise_shoulders_rearDeltFlyes',
     primaryMuscle: 'trapezius',
-    secondaryMuscles: ['shoulders']
+    secondaryMuscles: ['shoulders'],
+    kind: 'strength_pull',
+    defaultMet: 6.0
   },
   {
     key: 'exercise_shoulders_shrugs',
-    primaryMuscle: 'trapezius'
+    primaryMuscle: 'trapezius',
+    kind: 'strength_pull',
+    defaultMet: 6.0
   },
 
   // Biceps
   {
     key: 'exercise_biceps_barbellCurl',
     primaryMuscle: 'biceps',
-    secondaryMuscles: ['forearms']
+    secondaryMuscles: ['forearms'],
+    kind: 'strength_pull',
+    defaultMet: 6.0
   },
   {
     key: 'exercise_biceps_dumbbellCurl',
     primaryMuscle: 'biceps',
-    secondaryMuscles: ['forearms']
+    secondaryMuscles: ['forearms'],
+    kind: 'strength_pull',
+    defaultMet: 6.0
   },
   {
     key: 'exercise_biceps_hammerCurl',
     primaryMuscle: 'biceps',
-    secondaryMuscles: ['forearms']
+    secondaryMuscles: ['forearms'],
+    kind: 'strength_pull',
+    defaultMet: 6.0
   },
   {
     key: 'exercise_biceps_preacherCurl',
     primaryMuscle: 'biceps',
-    secondaryMuscles: ['forearms']
+    secondaryMuscles: ['forearms'],
+    kind: 'strength_pull',
+    defaultMet: 6.0
   },
   {
     key: 'exercise_biceps_concentrationCurl',
     primaryMuscle: 'biceps',
-    secondaryMuscles: ['forearms']
+    secondaryMuscles: ['forearms'],
+    kind: 'strength_pull',
+    defaultMet: 6.0
   },
 
   // Triceps
   {
     key: 'exercise_triceps_cableExtension',
     primaryMuscle: 'triceps',
-    secondaryMuscles: ['forearms']
+    secondaryMuscles: ['forearms'],
+    kind: 'strength_press',
+    defaultMet: 6.0
   },
   {
     key: 'exercise_triceps_skullCrushers',
     primaryMuscle: 'triceps',
-    secondaryMuscles: ['forearms']
+    secondaryMuscles: ['forearms'],
+    kind: 'strength_press',
+    defaultMet: 6.0
   },
   {
     key: 'exercise_triceps_overheadExtension',
     primaryMuscle: 'triceps',
-    secondaryMuscles: ['forearms']
+    secondaryMuscles: ['forearms'],
+    kind: 'strength_press',
+    defaultMet: 6.0
   },
   {
     key: 'exercise_triceps_dips',
     primaryMuscle: 'triceps',
-    secondaryMuscles: ['chest', 'shoulders']
+    secondaryMuscles: ['chest', 'shoulders'],
+    kind: 'strength_press',
+    defaultMet: 6.0
   },
   {
     key: 'exercise_triceps_closegripBenchPress',
     primaryMuscle: 'triceps',
-    secondaryMuscles: ['chest', 'forearms']
+    secondaryMuscles: ['chest', 'forearms'],
+    kind: 'strength_press',
+    defaultMet: 6.0
   },
 
   // Core
   {
     key: 'exercise_core_plank',
     primaryMuscle: 'core',
-    secondaryMuscles: ['shoulders', 'triceps']
+    secondaryMuscles: ['shoulders', 'triceps'],
+    kind: 'strength_core',
+    defaultMet: 3.5
   },
   {
     key: 'exercise_core_legRaises',
-    primaryMuscle: 'core'
+    primaryMuscle: 'core',
+    kind: 'strength_core',
+    defaultMet: 3.5
   },
   {
     key: 'exercise_core_crunches',
-    primaryMuscle: 'core'
+    primaryMuscle: 'core',
+    kind: 'strength_core',
+    defaultMet: 3.5
   },
   {
     key: 'exercise_core_hangingKneeRaises',
     primaryMuscle: 'core',
-    secondaryMuscles: ['forearms']
+    secondaryMuscles: ['forearms'],
+    kind: 'strength_core',
+    defaultMet: 3.5
   },
 
   // Obliques
   {
     key: 'exercise_core_russianTwist',
     primaryMuscle: 'obliques',
-    secondaryMuscles: ['core']
+    secondaryMuscles: ['core'],
+    kind: 'strength_core',
+    defaultMet: 3.5
   },
   {
     key: 'exercise_core_sidePlank',
     primaryMuscle: 'obliques',
-    secondaryMuscles: ['core', 'shoulders']
+    secondaryMuscles: ['core', 'shoulders'],
+    kind: 'strength_core',
+    defaultMet: 3.5
   },
   {
     key: 'exercise_core_obliqueCrunches',
     primaryMuscle: 'obliques',
-    secondaryMuscles: ['core']
+    secondaryMuscles: ['core'],
+    kind: 'strength_core',
+    defaultMet: 3.5
   },
   {
     key: 'exercise_core_woodChops',
     primaryMuscle: 'obliques',
-    secondaryMuscles: ['core', 'shoulders']
+    secondaryMuscles: ['core', 'shoulders'],
+    kind: 'strength_core',
+    defaultMet: 3.5
   },
 
   // Forearms
@@ -262,52 +348,72 @@ export const predefinedExercises: ExerciseDefinition[] = [
   {
     key: 'exercise_legs_squat',
     primaryMuscle: 'quadriceps',
-    secondaryMuscles: ['hamstrings', 'core', 'calves']
+    secondaryMuscles: ['hamstrings', 'core', 'calves'],
+    kind: 'strength_squat',
+    defaultMet: 6.0
   },
   {
     key: 'exercise_legs_legPress',
     primaryMuscle: 'quadriceps',
-    secondaryMuscles: ['hamstrings', 'calves']
+    secondaryMuscles: ['hamstrings', 'calves'],
+    kind: 'strength_squat',
+    defaultMet: 6.0
   },
   {
     key: 'exercise_legs_legExtension',
-    primaryMuscle: 'quadriceps'
+    primaryMuscle: 'quadriceps',
+    kind: 'strength_squat',
+    defaultMet: 6.0
   },
   {
     key: 'exercise_legs_frontSquat',
     primaryMuscle: 'quadriceps',
-    secondaryMuscles: ['hamstrings', 'core', 'calves']
+    secondaryMuscles: ['hamstrings', 'core', 'calves'],
+    kind: 'strength_squat',
+    defaultMet: 6.0
   },
   {
     key: 'exercise_legs_bulgarianSplitSquat',
     primaryMuscle: 'quadriceps',
-    secondaryMuscles: ['hamstrings', 'core', 'calves']
+    secondaryMuscles: ['hamstrings', 'core', 'calves'],
+    kind: 'strength_squat',
+    defaultMet: 6.0
   },
 
   // Hamstrings
   {
     key: 'exercise_legs_deadlift',
     primaryMuscle: 'hamstrings',
-    secondaryMuscles: ['back', 'trapezius', 'core', 'calves']
+    secondaryMuscles: ['back', 'trapezius', 'core', 'calves'],
+    kind: 'strength_hinge',
+    defaultMet: 6.0
   },
   {
     key: 'exercise_legs_legCurls',
-    primaryMuscle: 'hamstrings'
+    primaryMuscle: 'hamstrings',
+    kind: 'strength_hinge',
+    defaultMet: 6.0
   },
   {
     key: 'exercise_legs_romanianDeadlift',
     primaryMuscle: 'hamstrings',
-    secondaryMuscles: ['back', 'trapezius', 'core']
+    secondaryMuscles: ['back', 'trapezius', 'core'],
+    kind: 'strength_hinge',
+    defaultMet: 6.0
   },
   {
     key: 'exercise_legs_goodMornings',
     primaryMuscle: 'hamstrings',
-    secondaryMuscles: ['back', 'core']
+    secondaryMuscles: ['back', 'core'],
+    kind: 'strength_hinge',
+    defaultMet: 6.0
   },
   {
     key: 'exercise_legs_gluteHamRaises',
     primaryMuscle: 'hamstrings',
-    secondaryMuscles: ['core']
+    secondaryMuscles: ['core'],
+    kind: 'strength_hinge',
+    defaultMet: 6.0
   },
 
   // Abductors
@@ -368,28 +474,43 @@ export const predefinedExercises: ExerciseDefinition[] = [
   {
     key: 'exercise_cardio_running',
     primaryMuscle: 'cardio',
-    secondaryMuscles: ['calves', 'quadriceps', 'hamstrings']
+    secondaryMuscles: ['calves', 'quadriceps', 'hamstrings'],
+    kind: 'cardio_run',
+    cardioMode: 'run',
+    supportsGrade: true,
+    defaultMet: 9.8
   },
   {
     key: 'exercise_cardio_cycling',
     primaryMuscle: 'cardio',
-    secondaryMuscles: ['quadriceps', 'hamstrings', 'calves']
+    secondaryMuscles: ['quadriceps', 'hamstrings', 'calves'],
+    kind: 'cardio_bike',
+    cardioMode: 'bike',
+    supportsPower: true,
+    defaultMet: 8.0
   },
   {
     key: 'exercise_cardio_rowing',
     primaryMuscle: 'cardio',
-    secondaryMuscles: ['back', 'shoulders', 'legs']
+    secondaryMuscles: ['back', 'shoulders', 'legs'],
+    kind: 'cardio_row',
+    cardioMode: 'row',
+    defaultMet: 8.0
   },
   {
     key: 'exercise_cardio_jumpingJacks',
     primaryMuscle: 'cardio',
-    secondaryMuscles: ['calves', 'shoulders']
+    secondaryMuscles: ['calves', 'shoulders'],
+    kind: 'other',
+    defaultMet: 7.0
   },
   {
     key: 'exercise_cardio_burpees',
     primaryMuscle: 'cardio',
-    secondaryMuscles: ['chest', 'shoulders', 'triceps', 'quadriceps', 'hamstrings', 'calves']
-  }
+    secondaryMuscles: ['chest', 'shoulders', 'triceps', 'quadriceps', 'hamstrings', 'calves'],
+    kind: 'other',
+    defaultMet: 8.0
+  },
 ];
 
 // Fonction helper pour obtenir les exercices par groupe musculaire
@@ -398,6 +519,59 @@ export const getExercisesByMuscleGroup = (muscleGroup: MuscleGroupKey): Exercise
     exercise.primaryMuscle === muscleGroup || 
     exercise.secondaryMuscles?.includes(muscleGroup)
   );
+};
+
+// ---- MET mapping & helpers (centralized) ----
+
+export const MET_CONSTANTS = {
+  rest: 1.25,
+  preparation: 2.5,
+  cardioFallback: {
+    walk: 3.3,
+    run: 9.8,
+    bike: 8.0,
+    row: 8.0,
+    elliptical: 5.0,
+    other: 7.0,
+  },
+  strengthFallback: {
+    oly: 8.0,
+    squat: 6.0,
+    hinge: 6.0,
+    press: 6.0,
+    pull: 6.0,
+    core: 3.5,
+  },
+} as const;
+
+// getExerciseKindFromKeyOrName removed: we now rely on predefined kind in metadata
+
+export const getExerciseMeta = (keyOrName?: string): ExerciseDefinition | undefined => {
+  const raw = keyOrName || '';
+  const base = raw.replace(/_\d+$/, '');
+  return predefinedExercises.find(e => e.key === base);
+};
+
+export const mapRpeToMet = (rpe: number | undefined, meta?: ExerciseDefinition): number => {
+  // If RPE provided, use thresholds
+  if (typeof rpe === 'number') return rpe <= 4 ? 3.5 : (rpe >= 8 ? 8.0 : 6.0);
+
+  // Priority fallback: per-exercise defaultMet if provided
+  if (meta?.defaultMet) return meta.defaultMet;
+
+  // Cardio fallback by mode
+  if (meta?.cardioMode) {
+    const key = meta.cardioMode as keyof typeof MET_CONSTANTS.cardioFallback;
+    return MET_CONSTANTS.cardioFallback[key] ?? MET_CONSTANTS.cardioFallback.other;
+  }
+
+  // Core floor
+  if (meta?.primaryMuscle === 'core' || meta?.primaryMuscle === 'obliques') {
+    return MET_CONSTANTS.strengthFallback.core;
+  }
+
+  // Generic strength fallback
+  return MET_CONSTANTS.strengthFallback.press; // 6.0
 };
 
 // Fonction helper pour obtenir les exercices par muscle primaire uniquement

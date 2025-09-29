@@ -5,6 +5,42 @@ jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
 
+// Mock react-native-svg (used by lucide-react-native) with simple components
+jest.mock('react-native-svg', () => {
+  const React = require('react');
+  const { View } = require('react-native');
+  const Mock = (props) => React.createElement(View, props, props.children);
+  // Return a proxy so any imported SVG element (Svg, Path, G, Defs, etc.) is a noop component
+  const handler = new Proxy({ __esModule: true, default: Mock }, {
+    get: (_, prop) => {
+      if (prop === '__esModule') return true;
+      return Mock;
+    },
+  });
+  return handler;
+});
+
+// Mock lucide-react-native icons to simple View components
+jest.mock('lucide-react-native', () => {
+  const React = require('react');
+  const { View } = require('react-native');
+  const Icon = (props) => React.createElement(View, props, props.children);
+  return new Proxy({}, {
+    get: () => Icon,
+  });
+});
+
+// Mock react-native-body-highlighter
+jest.mock('react-native-body-highlighter', () => {
+  const React = require('react');
+  const { View } = require('react-native');
+  const MockBody = (props) => React.createElement(View, props, props.children);
+  return {
+    __esModule: true,
+    default: MockBody,
+  };
+});
+
 // Mock Expo modules
 jest.mock('expo-haptics', () => ({
   impactAsync: jest.fn(),
@@ -62,12 +98,51 @@ jest.mock('react-native', () => {
   };
 });
 
-// Mock React Native Reanimated
+// Mock React Native Reanimated with a handcrafted stub to avoid deep internal requires
 jest.mock('react-native-reanimated', () => {
-  const Reanimated = require('react-native-reanimated/mock');
-  Reanimated.default.call = () => {};
-  return Reanimated;
+  const { Animated } = require('react-native');
+  const Noop = () => ({});
+  const AnimationPreset = { duration: () => AnimationPreset, delay: () => AnimationPreset };
+  return {
+    __esModule: true,
+    default: {
+      ...Animated,
+      createAnimatedComponent: (Component) => Component,
+      addWhitelistedUIProps: () => {},
+      call: () => {},
+    },
+    // Commonly used layout/entry presets in the app
+    FadeIn: AnimationPreset,
+    FadeOut: AnimationPreset,
+    SlideInRight: AnimationPreset,
+    SlideInLeft: AnimationPreset,
+    SlideInDown: AnimationPreset,
+    SlideInUp: AnimationPreset,
+    SlideOutRight: AnimationPreset,
+    SlideOutLeft: AnimationPreset,
+    SlideOutDown: AnimationPreset,
+    SlideOutUp: AnimationPreset,
+    Easing: { linear: Noop, ease: Noop, inOut: Noop },
+    runOnJS: (fn) => fn,
+    useSharedValue: (v) => ({ value: v }),
+    useAnimatedStyle: () => ({}),
+    withTiming: (toValue) => toValue,
+    withSpring: (toValue) => toValue,
+    withDelay: (_delay, value) => value,
+  };
 });
+
+// Provide global worklet init no-op for reanimated
+global.__reanimatedWorkletInit = () => {};
+
+// Silence Animated helper warnings/errors in RN during tests (guarded for RN version)
+try {
+  // Only mock if the module exists in this RN version
+  require.resolve('react-native/Libraries/Animated/NativeAnimatedHelper');
+  jest.doMock('react-native/Libraries/Animated/NativeAnimatedHelper', () => ({}));
+} catch (_) {
+  // no-op for versions without this helper path
+}
 
 // Mock Gesture Handler
 jest.mock('react-native-gesture-handler', () => {
@@ -102,30 +177,20 @@ jest.mock('react-native-gesture-handler', () => {
   };
 });
 
-// Mock custom hooks with direct function approach
-jest.mock('@/app/hooks/useHaptics', () => {
-  const mockHaptics = {
+// Mock custom hooks - useHaptics with direct export
+jest.mock('@/app/hooks/useHaptics', () => ({
+  __esModule: true,
+  default: jest.fn(() => ({
     success: jest.fn().mockResolvedValue(undefined),
     error: jest.fn().mockResolvedValue(undefined),
-    warning: jest.fn().mockResolvedValue(undefined),
-    impact: jest.fn().mockResolvedValue(undefined),
     impactLight: jest.fn().mockResolvedValue(undefined),
     impactMedium: jest.fn().mockResolvedValue(undefined),
     impactHeavy: jest.fn().mockResolvedValue(undefined),
     selection: jest.fn().mockResolvedValue(undefined),
-    notification: jest.fn().mockResolvedValue(undefined),
     isEnabled: true,
     setEnabled: jest.fn(),
-  };
-  
-  // Return the function directly as default export
-  const useHapticsMock = jest.fn(() => mockHaptics);
-  
-  return {
-    __esModule: true,
-    default: useHapticsMock,
-  };
-});
+  })),
+}));
 
 jest.mock('@/app/hooks/useSettings', () => {
   const mockReturn = {
@@ -170,6 +235,54 @@ jest.mock('@/app/hooks/useTranslation', () => {
     default: () => mockReturn,
     useTranslation: () => mockReturn,
   };
+});
+
+// Mock useMeasurements hook
+jest.mock('@/app/hooks/useMeasurements', () => {
+  return jest.fn(() => ({
+    allMeasurements: [],
+    measurements: {
+      date: new Date().toISOString().split('T')[0],
+      weight: 0,
+      bodyFat: 0,
+      muscleMass: 0,
+      visceralFat: 0,
+      waterPercentage: 0,
+    },
+    loading: false,
+    error: null,
+    saveMeasurements: jest.fn().mockResolvedValue(undefined),
+    deleteMeasurements: jest.fn().mockResolvedValue(undefined),
+    updateMeasurement: jest.fn(),
+  }));
+});
+
+// Mock useTheme hook
+jest.mock('@/app/hooks/useTheme', () => {
+  return jest.fn(() => ({
+    theme: {
+      colors: {
+        primary: '#007AFF',
+        secondary: '#5856D6',
+        background: {
+          primary: '#000000',
+          secondary: '#1C1C1E',
+          card: '#2C2C2E',
+        },
+        text: {
+          primary: '#FFFFFF',
+          secondary: '#8E8E93',
+        },
+      },
+      spacing: {
+        xs: 4,
+        sm: 8,
+        md: 16,
+        lg: 24,
+        xl: 32,
+      },
+    },
+  }));
 });
 
 // Mock storage service with all methods as Jest functions

@@ -122,7 +122,6 @@ const useStyles = () => {
       color: theme.colors.text.secondary,
       marginLeft: theme.spacing.xs
     },
-    // Nouveaux styles pour la carte améliorée
     sessionHeader: {
       flexDirection: 'row',
       justifyContent: 'space-between',
@@ -180,10 +179,12 @@ const useStyles = () => {
       padding: theme.spacing.base,
       marginBottom: theme.spacing.sm,
       alignItems: 'center',
-      ...theme.shadows.xs
     },
     statItemWide: {
       width: '48%'
+    },
+    statItemFull: {
+      width: '100%'
     },
     statIcon: {
       width: 32,
@@ -193,7 +194,6 @@ const useStyles = () => {
       justifyContent: 'center',
       alignItems: 'center',
       marginBottom: theme.spacing.xs,
-      ...theme.shadows.xs
     },
     statLabel: {
       color: theme.colors.text.secondary,
@@ -207,11 +207,6 @@ const useStyles = () => {
     },
     musclesSection: {
       marginBottom: theme.spacing.lg
-    },
-    sectionHeader: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginBottom: theme.spacing.base
     },
     sectionTitle: {
       color: theme.colors.text.primary,
@@ -301,7 +296,6 @@ const useStyles = () => {
       flex: 1,
       lineHeight: 20
     },
-    // Styles supplémentaires pour les améliorations UI/UX
     exerciseMetrics: {
       flexDirection: 'row',
       gap: theme.spacing.xs,
@@ -327,7 +321,6 @@ const useStyles = () => {
       backgroundColor: theme.colors.background.card,
       justifyContent: 'center',
       alignItems: 'center',
-      ...theme.shadows.xs
     },
     noteIcon: {
       width: 24,
@@ -338,7 +331,6 @@ const useStyles = () => {
       marginRight: theme.spacing.sm,
       marginTop: 2
     },
-    // Styles pour la section des temps d'entraînement avec Donut
     timingSection: {
       marginBottom: theme.spacing.lg
     },
@@ -403,7 +395,6 @@ const formatTotalDuration = (totalSeconds: number): string => {
   return `${seconds}s`;
 };
 
-// Composant Donut Chart pour les temps d'entraînement utilisant VictoryPie
 const TimeDonutChart: React.FC<{
   prepTime: number;
   workTime: number;
@@ -414,7 +405,6 @@ const TimeDonutChart: React.FC<{
   const total = prepTime + workTime + restTime;
   if (total === 0) return null;
 
-  // Préparation des données pour VictoryPie
   const timeData = [
     {
       name: 'Préparation',
@@ -434,7 +424,7 @@ const TimeDonutChart: React.FC<{
       seconds: restTime,
       color: theme.colors.warning
     }
-  ].filter(item => item.seconds > 0); // Filtrer les temps à 0
+  ].filter(item => item.seconds > 0);
 
   return (
     <View style={{ alignItems: 'center', position: 'relative' }}>
@@ -457,7 +447,6 @@ const TimeDonutChart: React.FC<{
         labelComponent={<VictoryLabel style={{ display: 'none' }} />}
       />
 
-      {/* Durée totale au centre */}
       <View style={{
         position: 'absolute',
         top: '50%',
@@ -501,14 +490,12 @@ export default function RoutineHistoryScreen() {
     const r = routines.find((x: Routine) => x.id === params.routineId) || null;
     setRoutine(r);
 
-    // Trier les sessions par date (plus récente en premier)
     const sortedSessions = (storedSessions || []).sort((a, b) =>
       new Date(b.date).getTime() - new Date(a.date).getTime()
     );
 
     setAllSessions(sortedSessions);
 
-    // Si une date de session spécifique est fournie, trouver l'index correspondant
     if (params.sessionDate && sortedSessions.length > 0) {
       const sessionIndex = sortedSessions.findIndex(session =>
         WorkoutDateUtils.getDatePart(session.date) === WorkoutDateUtils.getDatePart(params.sessionDate!)
@@ -529,7 +516,6 @@ export default function RoutineHistoryScreen() {
       <ScrollView contentContainerStyle={styles.content}>
         {allSessions.length > 0 && (
           <>
-            {/* Navigation entre sessions */}
             {allSessions.length > 1 && (
               <View style={styles.navigationContainer}>
                 <TouchableOpacity
@@ -559,7 +545,6 @@ export default function RoutineHistoryScreen() {
               </View>
             )}
 
-            {/* Affichage de la session courante */}
             {(() => {
               const s = allSessions[currentSessionIndex];
               const exercises = s.exercises || [];
@@ -567,9 +552,28 @@ export default function RoutineHistoryScreen() {
               const notes = s.notes || [];
               const durations = s.totals;
 
+              const totalSeries = exercises.reduce((acc, w) => acc + (w.series?.length || 0), 0);
+              const totalReps = exercises.reduce(
+                (acc, w) => acc + (w.series?.reduce((a, ser) => a + (typeof ser.reps === 'number' ? ser.reps : 0), 0) || 0),
+                0
+              );
+              const totalVolume = exercises.reduce(
+                (acc, w) => acc + (w.series?.reduce((a, ser) => {
+                  const reps = typeof ser.reps === 'number' ? ser.reps : 0;
+                  const weight = typeof ser.weight === 'number' ? ser.weight : 0;
+                  return a + (ser.unitType === 'repsAndWeight' ? weight * reps : 0);
+                }, 0) || 0),
+                0
+              );
+              const prepTime = durations.prepSeconds || 0;
+              const workTime = durations.workSeconds || 0;
+              const restTime = (durations.restSeriesSeconds || 0) + (durations.restBetweenExercisesSeconds || 0);
+              const totalTime = prepTime + workTime + restTime;
+
+              const estimatedKcal = (s as any).caloriesKcal as number | undefined;
+
               return (
                 <View key={s.id} style={styles.section}>
-                  {/* En-tête avec date */}
                   <View style={styles.sessionHeader}>
                     <View style={styles.dateContainer}>
                       <Calendar size={20} color={theme.colors.primary} />
@@ -581,7 +585,6 @@ export default function RoutineHistoryScreen() {
                   </View>
 
                   <View style={styles.card}>
-                    {/* Résumé de l'entraînement */}
                     <View style={styles.summarySection}>
                       <View style={styles.summaryHeader}>
                         <Target size={18} color={theme.colors.primary} />
@@ -591,6 +594,46 @@ export default function RoutineHistoryScreen() {
                       </View>
 
                       <View style={styles.statsGrid}>
+                        <View style={[styles.statItem, styles.statItemFull, {
+                          backgroundColor: theme.colors.success + '10',
+                          borderColor: theme.colors.success + '20',
+                          borderWidth: 1
+                        }]}>
+                          <View style={[styles.statIcon, { backgroundColor: theme.colors.success + '15' }]}>
+                            <ActivitySquare size={16} color={theme.colors.success} />
+                          </View>
+                          <Text variant="caption" style={styles.statLabel}>Muscles impactés</Text>
+                          <Text variant="body" style={[styles.statValue, { color: theme.colors.success }]}>
+                            {muscles.length > 0 ? muscles.join(' • ') : '—'}
+                          </Text>
+                        </View>
+
+                        <View style={[styles.statItem, styles.statItemWide, {
+                          backgroundColor: theme.colors.info + '10',
+                          borderColor: theme.colors.info + '20',
+                          borderWidth: 1
+                        }]}>
+                          <View style={[styles.statIcon, { backgroundColor: theme.colors.info + '15' }]}>
+                            <ActivitySquare size={16} color={theme.colors.info} />
+                          </View>
+                          <Text variant="caption" style={styles.statLabel}>Séries</Text>
+                          <Text variant="subheading"
+                                style={[styles.statValue, { color: theme.colors.info }]}>{totalSeries}</Text>
+                        </View>
+
+                        <View style={[styles.statItem, styles.statItemWide, {
+                          backgroundColor: theme.colors.warning + '10',
+                          borderColor: theme.colors.warning + '20',
+                          borderWidth: 1
+                        }]}>
+                          <View style={[styles.statIcon, { backgroundColor: theme.colors.warning + '15' }]}>
+                            <Target size={16} color={theme.colors.warning} />
+                          </View>
+                          <Text variant="caption" style={styles.statLabel}>Répétitions</Text>
+                          <Text variant="subheading"
+                                style={[styles.statValue, { color: theme.colors.warning }]}>{totalReps}</Text>
+                        </View>
+
                         <View style={[styles.statItem, styles.statItemWide, {
                           backgroundColor: theme.colors.primary + '10',
                           borderColor: theme.colors.primary + '20',
@@ -599,27 +642,30 @@ export default function RoutineHistoryScreen() {
                           <View style={[styles.statIcon, { backgroundColor: theme.colors.primary + '15' }]}>
                             <Dumbbell size={16} color={theme.colors.primary} />
                           </View>
-                          <Text variant="caption" style={styles.statLabel}>Exercices</Text>
+                          <Text variant="caption" style={styles.statLabel}>Volume (∑ poids×reps)</Text>
                           <Text variant="subheading"
-                                style={[styles.statValue, { color: theme.colors.primary }]}>{s.exerciseCount}</Text>
+                                style={[styles.statValue, { color: theme.colors.primary }]}>{totalVolume}</Text>
                         </View>
 
-                        <View style={[styles.statItem, styles.statItemWide, {
-                          backgroundColor: theme.colors.success + '10',
-                          borderColor: theme.colors.success + '20',
-                          borderWidth: 1
-                        }]}>
-                          <View style={[styles.statIcon, { backgroundColor: theme.colors.success + '15' }]}>
-                            <Target size={16} color={theme.colors.success} />
+                        {estimatedKcal !== undefined && (
+                          <View style={[styles.statItem, styles.statItemWide, {
+                            backgroundColor: theme.colors.error + '10',
+                            borderColor: theme.colors.error + '20',
+                            borderWidth: 1
+                          }] }>
+                            <View style={[styles.statIcon, { backgroundColor: theme.colors.error + '15' }]}>
+                              <ActivitySquare size={16} color={theme.colors.error} />
+                            </View>
+                            <Text variant="caption" style={styles.statLabel}>Calories</Text>
+                            <Text variant="subheading"
+                                  style={[styles.statValue, { color: theme.colors.error }]}>
+                              {`${estimatedKcal} kcal`}
+                            </Text>
                           </View>
-                          <Text variant="caption" style={styles.statLabel}>Muscles</Text>
-                          <Text variant="subheading"
-                                style={[styles.statValue, { color: theme.colors.success }]}>{muscles.length}</Text>
-                        </View>
+                        )}
                       </View>
                     </View>
 
-                    {/* Détail des temps d'entraînement avec Donut Chart */}
                     <View style={styles.timingSection}>
                       <View style={styles.sectionHeader}>
                         <Clock size={18} color={theme.colors.primary} />
@@ -629,7 +675,6 @@ export default function RoutineHistoryScreen() {
                       </View>
 
                       <View style={styles.donutContainer}>
-                        {/* Donut Chart */}
                         <TimeDonutChart
                           prepTime={durations.prepSeconds}
                           workTime={durations.workSeconds}
@@ -638,7 +683,6 @@ export default function RoutineHistoryScreen() {
                           t={t}
                         />
 
-                        {/* Légende */}
                         <View style={styles.legendContainer}>
                           <View style={styles.legendItem}>
                             <View style={[styles.legendDot, { backgroundColor: theme.colors.info }]} />
@@ -673,9 +717,6 @@ export default function RoutineHistoryScreen() {
                       </View>
                     </View>
 
-                    {/* (Section décalée en bas après la liste des exercices) */}
-
-                    {/* Liste des exercices */}
                     {exercises.length > 0 && (
                       <View style={styles.exercisesSection}>
                         <View style={styles.sectionHeader}>
@@ -706,13 +747,18 @@ export default function RoutineHistoryScreen() {
                               </View>
                               <View style={styles.exerciseInfo}>
                                 <Text variant="body" style={styles.exerciseName}>{t(ex.exercise as any)}</Text>
-                                {ex.sets && (
+                                {(ex.series && ex.series.length > 0) && (
                                   <View style={styles.exerciseMetrics}>
                                     <View style={styles.metricBadge}>
-                                      <Text variant="caption" style={styles.metricText}>{ex.sets} séries</Text>
+                                      <Text variant="caption" style={styles.metricText}>{ex.series.length} séries</Text>
                                     </View>
                                     <View style={styles.metricBadge}>
-                                      <Text variant="caption" style={styles.metricText}>{ex.reps || '—'} reps</Text>
+                                      <Text variant="caption" style={styles.metricText}>
+                                        {(() => {
+                                          const totalReps = ex.series.reduce((sum, s) => sum + (typeof s.reps === 'number' ? s.reps : 0), 0);
+                                          return totalReps > 0 ? `${totalReps} reps` : '— reps';
+                                        })()}
+                                      </Text>
                                     </View>
                                   </View>
                                 )}
@@ -726,7 +772,6 @@ export default function RoutineHistoryScreen() {
                       </View>
                     )}
 
-                    {/* Notes */}
                     {notes.length > 0 && (
                       <View style={styles.notesSection}>
                         <View style={styles.sectionHeader}>
@@ -741,7 +786,7 @@ export default function RoutineHistoryScreen() {
                               styles.noteItem,
                               {
                                 backgroundColor: theme.colors.background.input,
-                                ...theme.shadows.xs
+                                ...theme.shadows.sm
                               }
                             ]}>
                               <View style={[
@@ -757,7 +802,6 @@ export default function RoutineHistoryScreen() {
                       </View>
                     )}
 
-                    {/* Muscles travaillés sur cette routine (placé en fin de carte) */}
                     {s.exercises && s.exercises.length > 0 && (
                       <View style={styles.musclesSection}>
                         <View style={styles.sectionHeader}>

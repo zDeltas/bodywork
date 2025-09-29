@@ -7,7 +7,7 @@ module.exports = {
     '<rootDir>/dist/',
   ],
   transformIgnorePatterns: [
-    'node_modules/(?!(react-native|@react-native|@expo|expo|@react-navigation|@testing-library|react-native-reanimated|react-native-gesture-handler|react-native-svg|lucide-react-native)/)',
+    'node_modules/(?!(react-native|@react-native|@expo|expo|@react-navigation|@testing-library|react-native-reanimated|react-native-gesture-handler|react-native-svg|lucide-react-native|react-native-body-highlighter)/)',
   ],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1',

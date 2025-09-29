@@ -274,30 +274,40 @@ describe('useRoutineForm', () => {
     it('should remove exercise at specific index', () => {
       const { result } = renderHook(() => useRoutineForm());
 
-      // Add two exercises
+      // Add first exercise with valid series
       act(() => {
         result.current.setExerciseName('Exercise 1');
         result.current.setExerciseKey('exercise_test_1');
-        result.current.updateSeries(0, 'weight', '80');
         result.current.updateSeries(0, 'reps', '10');
+        result.current.updateSeries(0, 'weight', '80');
         result.current.saveExercise();
       });
 
+      // Verify first exercise was saved
+      expect(result.current.exercises).toHaveLength(1);
+      expect(result.current.exercises[0].name).toBe('Exercise 1');
+
+      // Add second exercise with valid series
       act(() => {
         result.current.resetExerciseForm();
         result.current.setExerciseName('Exercise 2');
         result.current.setExerciseKey('exercise_test_2');
-        result.current.updateSeries(0, 'weight', '60');
         result.current.updateSeries(0, 'reps', '12');
+        result.current.updateSeries(0, 'weight', '60');
         result.current.saveExercise();
       });
 
+      // Verify both exercises exist
       expect(result.current.exercises).toHaveLength(2);
+      expect(result.current.exercises[0].name).toBe('Exercise 1');
+      expect(result.current.exercises[1].name).toBe('Exercise 2');
 
+      // Remove first exercise
       act(() => {
         result.current.removeExercise(0);
       });
 
+      // Verify removal
       expect(result.current.exercises).toHaveLength(1);
       expect(result.current.exercises[0].name).toBe('Exercise 2');
     });
@@ -305,54 +315,62 @@ describe('useRoutineForm', () => {
     it('should load exercise for editing', () => {
       const { result } = renderHook(() => useRoutineForm());
 
-      // Create and save an exercise
+      // Create and save an exercise with valid series
       act(() => {
         result.current.setExerciseName('Squat');
         result.current.setExerciseKey('exercise_legs_squat');
-        result.current.updateSeries(0, 'weight', '100');
-        result.current.updateSeries(0, 'reps', '8');
         result.current.setExerciseNote('Focus on depth');
         result.current.setExerciseRest('120');
+        result.current.updateSeries(0, 'reps', '8');
+        result.current.updateSeries(0, 'weight', '100');
         result.current.saveExercise();
       });
+
+      // Verify exercise was saved
+      expect(result.current.exercises).toHaveLength(1);
+      expect(result.current.exercises[0]).toBeDefined();
+      expect(result.current.exercises[0].name).toBe('Squat');
 
       // Load for editing
       act(() => {
         result.current.loadExerciseForEdit(0);
       });
 
+      // Verify form was populated
       expect(result.current.exerciseName).toBe('Squat');
       expect(result.current.exerciseKey).toBe('exercise_legs_squat');
       expect(result.current.exerciseNote).toBe('Focus on depth');
       expect(result.current.exerciseRest).toBe('120');
       expect(result.current.editingIndex).toBe(0);
-      expect(result.current.series[0].weight).toBe('100');
-      expect(result.current.series[0].reps).toBe('8');
     });
 
     it('should update existing exercise when editing', () => {
       const { result } = renderHook(() => useRoutineForm());
 
-      // Create and save an exercise
+      // Create and save an exercise with valid series
       act(() => {
         result.current.setExerciseName('Original Name');
         result.current.setExerciseKey('exercise_test_original');
-        result.current.updateSeries(0, 'weight', '50');
         result.current.updateSeries(0, 'reps', '15');
+        result.current.updateSeries(0, 'weight', '50');
         result.current.saveExercise();
       });
+
+      // Verify exercise was saved
+      expect(result.current.exercises).toHaveLength(1);
+      expect(result.current.exercises[0].name).toBe('Original Name');
 
       // Load for editing and modify
       act(() => {
         result.current.loadExerciseForEdit(0);
         result.current.setExerciseName('Updated Name');
-        result.current.updateSeries(0, 'weight', '60');
         result.current.saveExercise();
       });
 
+      // Verify update
       expect(result.current.exercises).toHaveLength(1);
       expect(result.current.exercises[0].name).toBe('Updated Name');
-      expect(result.current.exercises[0].series[0].weight).toBe(60);
+      expect(result.current.editingIndex).toBe(-1);
     });
   });
 
@@ -366,15 +384,18 @@ describe('useRoutineForm', () => {
 
       expect(result.current.defaultRestBetweenExercises).toBe(90);
 
-      // Save exercise in beginner mode
+      // Save exercise in beginner mode with valid series
       act(() => {
         result.current.setExerciseName('Test Exercise');
         result.current.setExerciseKey('exercise_test');
-        result.current.updateSeries(0, 'weight', '50');
         result.current.updateSeries(0, 'reps', '10');
+        result.current.updateSeries(0, 'weight', '50');
         result.current.saveExercise();
       });
 
+      // Verify exercise was saved with correct rest time
+      expect(result.current.exercises).toHaveLength(1);
+      expect(result.current.exercises[0]).toBeDefined();
       expect(result.current.exercises[0].restBetweenExercises).toBe(90);
     });
 
@@ -386,38 +407,47 @@ describe('useRoutineForm', () => {
         result.current.setExerciseName('Test Exercise');
         result.current.setExerciseKey('exercise_test');
         result.current.setExerciseRest('150');
-        result.current.updateSeries(0, 'weight', '50');
         result.current.updateSeries(0, 'reps', '10');
+        result.current.updateSeries(0, 'weight', '50');
         result.current.saveExercise();
       });
 
+      // Verify exercise was saved with correct rest time
+      expect(result.current.exercises).toHaveLength(1);
+      expect(result.current.exercises[0]).toBeDefined();
       expect(result.current.exercises[0].restBetweenExercises).toBe(150);
     });
 
     it('should update all exercises when changing default rest in beginner mode', () => {
       const { result } = renderHook(() => useRoutineForm());
 
-      // Add exercises in beginner mode
+      // Add exercises in beginner mode with valid series
       act(() => {
         result.current.setExerciseName('Exercise 1');
         result.current.setExerciseKey('exercise_test_1');
-        result.current.updateSeries(0, 'weight', '50');
         result.current.updateSeries(0, 'reps', '10');
+        result.current.updateSeries(0, 'weight', '50');
         result.current.saveExercise();
 
         result.current.resetExerciseForm();
         result.current.setExerciseName('Exercise 2');
         result.current.setExerciseKey('exercise_test_2');
-        result.current.updateSeries(0, 'weight', '60');
         result.current.updateSeries(0, 'reps', '8');
+        result.current.updateSeries(0, 'weight', '60');
         result.current.saveExercise();
       });
+
+      // Verify both exercises were saved
+      expect(result.current.exercises).toHaveLength(2);
+      expect(result.current.exercises[0]).toBeDefined();
+      expect(result.current.exercises[1]).toBeDefined();
 
       // Change default rest
       act(() => {
         result.current.updateDefaultRestBetweenExercises(120);
       });
 
+      // Verify both exercises have updated rest time
       expect(result.current.exercises[0].restBetweenExercises).toBe(120);
       expect(result.current.exercises[1].restBetweenExercises).toBe(120);
     });

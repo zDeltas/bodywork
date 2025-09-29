@@ -11,15 +11,22 @@ export const formatSeries = (series: EditableSeries[], withLoad: boolean = false
   return series.map((s) => {
     const unitType = s.unitType || 'reps';
     const config = UNIT_TYPE_CONFIG[unitType as keyof typeof UNIT_TYPE_CONFIG];
-    
+
+    const getRpe = () => {
+      return s.type === 'warmUp' ? 0 : (() => {
+        const rpeValue = parseInt(s.rpe || '5') || 5;
+        return rpeValue >= 1 && rpeValue <= 10 ? rpeValue : 5;
+      })();
+    };
+
     return {
       unitType,
       note: s.note,
       rest: s.rest ?? '',
-      rpe: s.type === 'warmUp' ? 0 : parseInt(s.rpe || '5') || 5,
+      rpe: getRpe(),
       type: s.type || 'workingSet',
-      weight: config.weight === true ? (parseFloat(s.weight) || 0) : 
-              config.weight === 'withLoad' && withLoad ? (parseFloat(s.weight) || 0) : 0,
+      weight: config.weight === true ? (parseFloat(s.weight) || 0) :
+        config.weight === 'withLoad' && withLoad ? (parseFloat(s.weight) || 0) : 0,
       reps: config.reps ? (parseInt(s.reps || '0') || 0) : undefined,
       duration: config.duration ? (parseInt(s.duration || '0') || 0) : undefined,
       distance: config.distance ? (parseFloat(s.distance || '0') || 0) : undefined

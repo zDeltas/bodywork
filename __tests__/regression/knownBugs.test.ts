@@ -122,6 +122,42 @@ describe('Regression Tests - Known Bug Fixes', () => {
       const formattedSeries = formatSeries(editableSeries);
       expect(formattedSeries[0].reps).toBe(10); // Should be integer
     });
+
+    it('should exclude warmUp series with RPE 0 from statistics calculations', () => {
+      // Regression test for warmUp series affecting stats
+      const editableSeries: EditableSeries[] = [
+        {
+          unitType: 'repsAndWeight',
+          weight: '40', // Échauffement avec poids léger
+          reps: '10',
+          duration: '',
+          distance: '',
+          note: '',
+          rest: '60',
+          rpe: '0', // RPE 0 pour warmUp
+          type: 'warmUp' // Type échauffement
+        },
+        {
+          unitType: 'repsAndWeight',
+          weight: '80', // Série de travail
+          reps: '8',
+          duration: '',
+          distance: '',
+          note: '',
+          rest: '90',
+          rpe: '7', // RPE normal
+          type: 'workingSet'
+        }
+      ];
+
+      const formattedSeries = formatSeries(editableSeries);
+      
+      expect(formattedSeries[0].type).toBe('warmUp');
+      expect(formattedSeries[0].rpe).toBe(0);
+      
+      expect(formattedSeries[1].type).toBe('workingSet');
+      expect(formattedSeries[1].rpe).toBe(7);
+    });
   });
 
   describe('Routine Form State Bugs', () => {

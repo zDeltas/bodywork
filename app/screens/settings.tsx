@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Linking, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { User, ChevronRight, Scale, Languages, SunMoon, Download, Trash2, Linkedin, Mail, CheckCircle, Circle } from 'lucide-react-native';
@@ -9,12 +9,14 @@ import { useTheme } from '@/app/hooks/useTheme';
 import { useCSVExport } from '@/app/hooks/useCSVExport';
 import Header from '@/app/components/layout/Header';
 import Modal from '@/app/components/ui/Modal';
+import FeedbackModal from '@/app/components/feedback/FeedbackModal';
 import { router } from 'expo-router';
 import Text from '@/app/components/ui/Text';
 import { TranslationKey } from '@/translations';
 import { StatsCardSkeleton } from '@/app/components/ui/SkeletonComponents';
 import { storageService } from '@/app/services';
 import useHaptics from '@/app/hooks/useHaptics';
+import { fetchAndLogAllFeedback } from '@/app/services/feedback/api';
 
 export default function SettingsScreen() {
   const { settings, updateSettings, isLoading } = useSettings();
@@ -29,6 +31,18 @@ export default function SettingsScreen() {
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [showThemeModal, setShowThemeModal] = useState(false);
   const haptics = useHaptics();
+  // Feedback modal state
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+
+  // Auto-open feedback modal if pending prompt is scheduled
+  useEffect(() => {
+    (async () => {
+      const state = await storageService.getFeedbackState();
+      if (state?.pendingPrompt) {
+        setShowFeedbackModal(true);
+      }
+    })();
+  }, []);
 
   const openWeightUnitModal = () => {
     setShowWeightUnitModal(true);
@@ -113,6 +127,26 @@ export default function SettingsScreen() {
     }
   };
 
+  const openFeedbackModal = () => {
+    setShowFeedbackModal(true);
+    haptics.impactLight();
+  };
+
+  const closeFeedbackModal = async () => {
+    setShowFeedbackModal(false);
+    try { await storageService.clearFeedbackPendingPrompt(); } catch {}
+  };
+
+  const handleFetchFeedbackLogs = async () => {
+    try {
+      await fetchAndLogAllFeedback();
+      Alert.alert(t('common.info'), t('settings.fetchFeedbackLogsDone'));
+    } catch (e: any) {
+      Alert.alert(t('common.error'), e?.message || 'Failed to fetch feedback logs');
+    }
+  };
+
+
   return (
     <SafeAreaView style={styles.container}>
       <Header title={t('settings.title')} showBackButton={true} onBack={() => router.back()} />
@@ -196,6 +230,16 @@ export default function SettingsScreen() {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>{t('settings.application')}</Text>
 
+            <TouchableOpacity style={styles.settingItem} onPress={openFeedbackModal}>
+              <View style={styles.settingInfo}>
+                <Mail size={24} color={theme.colors.primary} />
+                <Text style={styles.settingLabel}>
+                  {language === 'fr' ? 'Donner un avis' : 'Give Feedback'}
+                </Text>
+              </View>
+              <ChevronRight size={20} color={theme.colors.text.secondary} />
+            </TouchableOpacity>
+
             <TouchableOpacity
               style={styles.settingItem}
               onPress={handleExportData}
@@ -226,6 +270,14 @@ export default function SettingsScreen() {
               <View style={styles.settingInfo}>
                 <Mail size={24} color={theme.colors.primary} />
                 <Text style={styles.settingLabel}>{t('settings.about')}</Text>
+              </View>
+              <ChevronRight size={20} color={theme.colors.text.secondary} />
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.settingItem} onPress={handleFetchFeedbackLogs}>
+              <View style={styles.settingInfo}>
+                <Mail size={24} color={theme.colors.primary} />
+                <Text style={styles.settingLabel}>{t('settings.fetchFeedbackLogs')}</Text>
               </View>
               <ChevronRight size={20} color={theme.colors.text.secondary} />
             </TouchableOpacity>
@@ -288,6 +340,8 @@ export default function SettingsScreen() {
           </TouchableOpacity>
         </View>
       </Modal>
+
+      <FeedbackModal visible={showFeedbackModal} onClose={closeFeedbackModal} />
 
       {/* Gender Selection Modal */}
       <Modal

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal as RNModal, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Modal as RNModal, StyleSheet, TouchableOpacity, View, ScrollView } from 'react-native';
 import { useTheme } from '@/app/hooks/useTheme';
 import { X } from 'lucide-react-native';
 import Text from '@/app/components/ui/Text';
@@ -49,7 +49,13 @@ export default function Modal({
               )}
             </View>
           )}
-          {children}
+          <ScrollView
+            style={{ maxHeight: '90%' }}
+            contentContainerStyle={{ paddingBottom: theme.spacing.sm }}
+            showsVerticalScrollIndicator={false}
+          >
+            {children}
+          </ScrollView>
         </View>
       </View>
     </RNModal>
@@ -70,6 +76,7 @@ const useStyles = (theme: any) => StyleSheet.create({
     padding: theme.spacing.lg,
     width: '100%',
     maxWidth: 400,
+    maxHeight: '90%',
     ...theme.shadows.lg
   },
   modalHeader: {

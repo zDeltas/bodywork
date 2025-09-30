@@ -7,11 +7,13 @@ import { INITIAL_SESSION_STATE, SessionContextType } from '../types/session';
 import { mapRpeToMet, MET_CONSTANTS, getExerciseMeta } from '@/app/components/exercises';
 import { useSettings } from '@/app/hooks/useSettings';
 import useMeasurements from '@/app/hooks/useMeasurements';
+import useSnackbar from '@/app/hooks/useSnackbar';
 
 const useSession = (routineId: string): SessionContextType => {
   const haptics = useHaptics();
   const { settings } = useSettings();
   const { allMeasurements } = useMeasurements();
+  const { showInfo } = useSnackbar();
   const [routine, setRoutine] = useState<Routine | null>(null);
   const [sessionState, setSessionState] = useState<SessionState>(INITIAL_SESSION_STATE);
 
@@ -448,8 +450,11 @@ const useSession = (routineId: string): SessionContextType => {
     router.push('/(tabs)');
   }, []);
 
-  const handleFinishWorkout = useCallback(() => {
+  const handleFinishWorkout = useCallback(async () => {
     haptics.impactLight();
+    try {
+      await storageService.incrementFeedbackCompletedAndMaybeSchedulePrompt();
+    } catch {}
     setSessionState(INITIAL_SESSION_STATE);
     router.replace('/(tabs)');
   }, [haptics]);

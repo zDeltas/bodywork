@@ -1,7 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Goal, Workout, RoutineSession } from '@/types/common';
 
-// Énumérations pour les clés de stockage
 export enum StorageKeys {
   WORKOUTS = 'workouts',
   GOALS = 'goals',
@@ -12,12 +11,11 @@ export enum StorageKeys {
   STORAGE_VERSION = 'storage_version',
   ROUTINES = 'routines',
   ROUTINE_SESSIONS = 'routine_sessions',
+  FEEDBACK_STATE = 'feedback_state',
 }
 
-// Version actuelle du stockage (pour les migrations futures)
 const CURRENT_STORAGE_VERSION = '1.0';
 
-// Interfaces pour les types de données stockées
 export interface Settings {
   weightUnit: 'kg' | 'lb';
   gender: 'male' | 'female';
@@ -34,7 +32,6 @@ export interface Measurement {
   unit: string;
 }
 
-// Types pour les données stockées
 export type StorageData = {
   [StorageKeys.WORKOUTS]: Workout[];
   [StorageKeys.GOALS]: Goal[];
@@ -45,9 +42,9 @@ export type StorageData = {
   [StorageKeys.STORAGE_VERSION]: string;
   [StorageKeys.ROUTINES]: any[];
   [StorageKeys.ROUTINE_SESSIONS]: RoutineSession[];
+  [StorageKeys.FEEDBACK_STATE]: FeedbackState;
 };
 
-// Valeurs par défaut
 const defaultValues: StorageData = {
   [StorageKeys.WORKOUTS]: [],
   [StorageKeys.GOALS]: [],
@@ -63,25 +60,29 @@ const defaultValues: StorageData = {
   [StorageKeys.RECENT_EXERCISES]: [],
   [StorageKeys.STORAGE_VERSION]: CURRENT_STORAGE_VERSION,
   [StorageKeys.ROUTINES]: [],
-  [StorageKeys.ROUTINE_SESSIONS]: []
+  [StorageKeys.ROUTINE_SESSIONS]: [],
+  [StorageKeys.FEEDBACK_STATE]: {
+    completedCount: 0,
+    promptedOnce: false,
+    lastPromptAt: null
+  }
 };
 
-/**
- * Service de stockage centralisé
- */
+export type FeedbackState = {
+  completedCount: number;
+  promptedOnce: boolean;
+  lastPromptAt: string | null;
+  pendingPrompt?: boolean;
+};
+
 class StorageService {
-  /**
-   * Initialise le stockage avec la version actuelle
-   */
   async initialize(): Promise<void> {
     try {
       const version = await this.getItem<string>(StorageKeys.STORAGE_VERSION);
 
       if (!version) {
-        // Premier lancement, initialiser la version
         await this.setItem(StorageKeys.STORAGE_VERSION, CURRENT_STORAGE_VERSION);
       } else if (version !== CURRENT_STORAGE_VERSION) {
-        // Migration nécessaire
         await this.migrateStorage(version, CURRENT_STORAGE_VERSION);
       }
     } catch (error) {
@@ -89,13 +90,8 @@ class StorageService {
     }
   }
 
-  /**
-   * Réinitialise toutes les données utilisateur
-   * et réinitialise aussi les paramètres et la version du stockage
-   */
   async resetAllData(): Promise<void> {
     try {
-      // Clés à réinitialiser (inclure settings, version et sessions de routine)
       const keysToReset: StorageKeys[] = [
         StorageKeys.WORKOUTS,
         StorageKeys.GOALS,
@@ -104,19 +100,20 @@ class StorageService {
         StorageKeys.RECENT_EXERCISES,
         StorageKeys.ROUTINES,
         StorageKeys.ROUTINE_SESSIONS,
+        StorageKeys.FEEDBACK_STATE,
         StorageKeys.SETTINGS,
         StorageKeys.STORAGE_VERSION
       ];
 
-      // Supprimer toutes les données
       await AsyncStorage.multiRemove(keysToReset);
 
-      // Réinitialiser chaque clé avec les valeurs par défaut
       for (const key of keysToReset) {
         if (key === StorageKeys.STORAGE_VERSION) {
           await this.setItem(StorageKeys.STORAGE_VERSION, CURRENT_STORAGE_VERSION);
         } else if (key === StorageKeys.SETTINGS) {
           await this.setItem(StorageKeys.SETTINGS, defaultValues[StorageKeys.SETTINGS]);
+        } else if (key === StorageKeys.FEEDBACK_STATE) {
+          await this.setItem(StorageKeys.FEEDBACK_STATE, defaultValues[StorageKeys.FEEDBACK_STATE]);
         } else {
           await this.setItem(key, (defaultValues as any)[key]);
         }
@@ -129,9 +126,6 @@ class StorageService {
     }
   }
 
-  /**
-   * Méthode générique pour récupérer un élément
-   */
   async getItem<T>(key: StorageKeys): Promise<T | null> {
     try {
       const value = await AsyncStorage.getItem(key);
@@ -145,9 +139,6 @@ class StorageService {
     }
   }
 
-  /**
-   * Méthode générique pour stocker un élément
-   */
   async setItem<T>(key: StorageKeys, value: T): Promise<void> {
     try {
       await AsyncStorage.setItem(key, JSON.stringify(value));
@@ -156,9 +147,6 @@ class StorageService {
     }
   }
 
-  /**
-   * Méthode générique pour supprimer un élément
-   */
   async removeItem(key: StorageKeys): Promise<void> {
     try {
       await AsyncStorage.removeItem(key);
@@ -167,9 +155,6 @@ class StorageService {
     }
   }
 
-  /**
-   * Méthode pour effacer tout le stockage
-   */
   async clearAll(): Promise<void> {
     try {
       await AsyncStorage.clear();
@@ -178,7 +163,6 @@ class StorageService {
     }
   }
 
-  // Méthodes spécifiques pour les workouts
   async getWorkouts(): Promise<Workout[]> {
     const workouts = await this.getItem<Workout[]>(StorageKeys.WORKOUTS);
     return workouts || defaultValues[StorageKeys.WORKOUTS];
@@ -203,7 +187,6 @@ class StorageService {
     await this.setItem(StorageKeys.WORKOUTS, filteredWorkouts);
   }
 
-  // Méthodes spécifiques pour les goals
   async getGoals(): Promise<Goal[]> {
     const goals = await this.getItem<Goal[]>(StorageKeys.GOALS);
     return goals || defaultValues[StorageKeys.GOALS];
@@ -228,7 +211,6 @@ class StorageService {
     await this.setItem(StorageKeys.GOALS, filteredGoals);
   }
 
-  // Méthodes spécifiques pour les measurements
   async getMeasurements(): Promise<Measurement[]> {
     const measurements = await this.getItem<Measurement[]>(StorageKeys.MEASUREMENTS);
     return measurements || defaultValues[StorageKeys.MEASUREMENTS];
@@ -253,7 +235,6 @@ class StorageService {
     await this.setItem(StorageKeys.MEASUREMENTS, filteredMeasurements);
   }
 
-  // Méthodes spécifiques pour les settings
   async getSettings(): Promise<Settings> {
     const settings = await this.getItem<Settings>(StorageKeys.SETTINGS);
     return settings || defaultValues[StorageKeys.SETTINGS];
@@ -266,7 +247,6 @@ class StorageService {
     return updatedSettings;
   }
 
-  // Méthodes spécifiques pour les exercices favoris
   async getFavoriteExercises(): Promise<string[]> {
     const favorites = await this.getItem<string[]>(StorageKeys.FAVORITE_EXERCISES);
     return favorites || defaultValues[StorageKeys.FAVORITE_EXERCISES];
@@ -288,7 +268,6 @@ class StorageService {
     return updatedFavorites;
   }
 
-  // Méthodes spécifiques pour les exercices récents
   async getRecentExercises(): Promise<string[]> {
     const recents = await this.getItem<string[]>(StorageKeys.RECENT_EXERCISES);
     return recents || defaultValues[StorageKeys.RECENT_EXERCISES];
@@ -296,15 +275,12 @@ class StorageService {
 
   async addRecentExercise(exercise: string): Promise<string[]> {
     const recents = await this.getRecentExercises();
-    // Supprimer l'exercice s'il existe déjà pour le mettre en tête de liste
     const filteredRecents = recents.filter((e) => e !== exercise);
-    // Limiter à 10 exercices récents
     const updatedRecents = [exercise, ...filteredRecents].slice(0, 10);
     await this.setItem(StorageKeys.RECENT_EXERCISES, updatedRecents);
     return updatedRecents;
   }
 
-  // Méthodes spécifiques pour les routines
   async getRoutines(): Promise<any[]> {
     const routines = await this.getItem<any[]>(StorageKeys.ROUTINES);
     return routines || defaultValues[StorageKeys.ROUTINES];
@@ -327,7 +303,6 @@ class StorageService {
     await this.setItem(StorageKeys.ROUTINES, filteredRoutines);
   }
 
-  // Méthodes spécifiques pour les RoutineSessions
   async getRoutineSessions(): Promise<RoutineSession[]> {
     const sessions = await this.getItem<RoutineSession[]>(StorageKeys.ROUTINE_SESSIONS);
     return sessions || defaultValues[StorageKeys.ROUTINE_SESSIONS];
@@ -349,23 +324,44 @@ class StorageService {
     await this.setItem(StorageKeys.ROUTINE_SESSIONS, sessions);
   }
 
-  /**
-   * Méthode pour migrer le stockage d'une version à une autre
-   */
+  async getFeedbackState(): Promise<FeedbackState> {
+    const state = await this.getItem<FeedbackState>(StorageKeys.FEEDBACK_STATE);
+    return state || (defaultValues[StorageKeys.FEEDBACK_STATE] as FeedbackState);
+  }
+
+  async setFeedbackState(newState: FeedbackState): Promise<void> {
+    await this.setItem<FeedbackState>(StorageKeys.FEEDBACK_STATE, newState);
+  }
+
+  async incrementFeedbackCompletedAndMaybeSchedulePrompt(): Promise<FeedbackState> {
+    const current = await this.getFeedbackState();
+    const completedCount = (current.completedCount || 0) + 1;
+    let next: FeedbackState = { ...current, completedCount };
+    if (!current.promptedOnce && completedCount >= 5) {
+      next = {
+        ...next,
+        promptedOnce: true,
+        pendingPrompt: true,
+        lastPromptAt: new Date().toISOString(),
+      };
+    }
+    await this.setFeedbackState(next);
+    return next;
+  }
+
+  async clearFeedbackPendingPrompt(): Promise<FeedbackState> {
+    const current = await this.getFeedbackState();
+    const next: FeedbackState = { ...current, pendingPrompt: false, lastPromptAt: new Date().toISOString() };
+    await this.setFeedbackState(next);
+    return next;
+  }
+
   private async migrateStorage(fromVersion: string, toVersion: string): Promise<void> {
     console.log(`Migration du stockage de la version ${fromVersion} vers ${toVersion}`);
 
-    // Implémentez ici la logique de migration entre les versions
-    // Par exemple:
-    // if (fromVersion === '1.0' && toVersion === '1.1') {
-    //   // Migration spécifique de 1.0 à 1.1
-    // }
-
-    // Mettre à jour la version
     await this.setItem(StorageKeys.STORAGE_VERSION, toVersion);
   }
 }
 
-// Export d'une instance unique du service
 export const storageService = new StorageService();
 export default storageService;

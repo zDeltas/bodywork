@@ -34,6 +34,41 @@ export default {
     seconds: 'seconds'
   },
 
+  // Feedback modal
+  feedback: {
+    title: 'Your feedback matters',
+    score: 'Score (0-10)',
+    scoreLabelLow: 'Needs improvement',
+    scoreLabelMid: 'Good',
+    scoreLabelHigh: 'Excellent',
+    liked: 'What you liked',
+    missing: 'What is missing',
+    suggestion: 'Suggestion',
+    email: 'Contact email',
+    emailInvalid: 'Invalid email',
+    emailHint: 'Your email is optional and used only to reply to you.',
+    optional: 'Optional',
+    consent: 'I agree to be contacted',
+    send: 'Send',
+    sentSuccess: 'Thanks for your feedback!',
+    offlineQueued: "Offline: your feedback will be sent when you're back online.",
+    failedQueued: 'Send failed, will retry later.',
+    chips: {
+      liked: {
+        ui: 'Clear UI',
+        performance: 'Performance',
+        features: 'Features',
+        simplicity: 'Simplicity',
+      },
+      missing: {
+        stats: 'Stats',
+        exercises: 'Exercises',
+        customization: 'Customization',
+        export: 'Export',
+      }
+    }
+  },
+
   // Periods
   periods: {
     sevenDays: '7 days',

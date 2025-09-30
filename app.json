@@ -25,6 +25,10 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "SUPABASE_URL": "https://wzmosunetftpqpbtmfru.supabase.co",
+      "SUPABASE_ANON_KEY": "sb_publishable_13NLehrWpuLIKGAUjclQTQ_-IGv_T1J"
     }
   }
 }

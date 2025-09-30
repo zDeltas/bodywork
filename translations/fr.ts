@@ -34,6 +34,41 @@ export default {
     seconds: 'secondes'
   },
 
+  // Feedback modal
+  feedback: {
+    title: 'Votre avis compte',
+    score: 'Note (0-10)',
+    scoreLabelLow: 'À améliorer',
+    scoreLabelMid: 'Bien',
+    scoreLabelHigh: 'Excellent',
+    liked: 'Ce que vous avez aimé',
+    missing: 'Ce qui manque',
+    suggestion: 'Suggestion',
+    email: 'Email de contact',
+    emailInvalid: 'Email invalide',
+    emailHint: 'Votre email est optionnel et utilisé uniquement pour vous répondre.',
+    optional: 'Optionnel',
+    consent: "J'accepte d'être recontacté",
+    send: 'Envoyer',
+    sentSuccess: 'Merci pour votre avis !',
+    offlineQueued: 'Hors ligne: votre avis sera envoyé dès que possible.',
+    failedQueued: "Échec de l'envoi, sera réessayé plus tard.",
+    chips: {
+      liked: {
+        ui: 'UI claire',
+        performance: 'Performances',
+        features: 'Fonctionnalités',
+        simplicity: 'Simplicité',
+      },
+      missing: {
+        stats: 'Statistiques',
+        exercises: 'Exercices',
+        customization: 'Personnalisation',
+        export: 'Export',
+      }
+    }
+  },
+
   // Periods
   periods: {
     sevenDays: '7 jours',

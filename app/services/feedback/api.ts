@@ -37,7 +37,10 @@ export async function sendFeedback(payload: FeedbackPayload): Promise<void> {
  * Debug utility: fetch all feedback rows and log them.
  */
 export async function fetchAndLogAllFeedback(): Promise<void> {
-  console.log("here");
+  if (!__DEV__) {
+    console.warn('[Feedback] fetchAll disabled in production to enforce write-only client');
+    return;
+  }
   const supabase = getSupabaseClient();
   try {
     console.log('[Feedback] fetchAll -> start');

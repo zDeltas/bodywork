@@ -12,6 +12,7 @@ interface HeaderProps {
   rightComponent?: React.ReactNode;
   showBackButton?: boolean;
   onBack?: () => void;
+  transparent?: boolean;
 }
 
 const Header: React.FC<HeaderProps> = ({
@@ -20,11 +21,13 @@ const Header: React.FC<HeaderProps> = ({
                                          leftComponent,
                                          rightComponent,
                                          showBackButton = false,
-                                         onBack
+                                         onBack,
+                                         transparent = false
                                        }) => {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const { theme, isDarkMode } = useTheme();
+  const tintColor = transparent ? '#ffffff' : theme.colors.text.primary;
 
   const handleBack = () => {
     if (onBack) {
@@ -53,21 +56,22 @@ const Header: React.FC<HeaderProps> = ({
     <View
       style={[
         headerStyles.container,
-        { height: totalHeight, backgroundColor: theme.colors.background.main }
+        { height: totalHeight, backgroundColor: transparent ? 'transparent' : theme.colors.background.main }
       ]}
     >
       <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={theme.colors.background.main}
+        barStyle={transparent ? 'light-content' : (isDarkMode ? 'light-content' : 'dark-content')}
+        backgroundColor={transparent ? 'transparent' : theme.colors.background.main}
+        translucent={transparent}
       />
       <View style={[headerStyles.navBar, { height: navBarHeight }]}>
         <View style={headerStyles.leftContainer}>
           {showBackButton && (
             <TouchableOpacity onPress={handleBack} style={headerStyles.backButton}>
               {Platform.OS === 'ios' ? (
-                <ChevronLeft size={24} color={theme.colors.text.primary} />
+                <ChevronLeft size={24} color={tintColor} />
               ) : (
-                <ArrowLeft size={24} color={theme.colors.text.primary} />
+                <ArrowLeft size={24} color={tintColor} />
               )}
             </TouchableOpacity>
           )}
@@ -77,7 +81,7 @@ const Header: React.FC<HeaderProps> = ({
           style={[
             headerStyles.title,
             largeTitle && headerStyles.largeTitle,
-            { color: theme.colors.text.primary }
+            { color: tintColor }
           ]}
           numberOfLines={1}
         >

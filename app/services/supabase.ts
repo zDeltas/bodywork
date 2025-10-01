@@ -23,7 +23,11 @@ export function getSupabaseClient(): SupabaseClient {
   } catch {}
 
   client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-    auth: { persistSession: false },
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: false, // RN/Expo: no URL parsing
+    },
   });
   return client;
 }

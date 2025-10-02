@@ -6,7 +6,7 @@ export const useTranslation = () => {
 
   const language = (settings.language || 'fr') as Language;
 
-  const t = (key: TranslationKey): string => {
+  const t = (key: TranslationKey, params?: Record<string, string | number>): string => {
     const keys = key.split('.');
     let value: any = translations[language];
 
@@ -27,7 +27,17 @@ export const useTranslation = () => {
       return String(key);
     }
 
-    return String(value);
+    let result = String(value);
+    
+    // Handle parameter interpolation
+    if (params) {
+      Object.keys(params).forEach(paramKey => {
+        const placeholder = `{${paramKey}}`;
+        result = result.replace(new RegExp(placeholder, 'g'), String(params[paramKey]));
+      });
+    }
+
+    return result;
   };
 
   return {

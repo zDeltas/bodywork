@@ -31,7 +31,13 @@ export default {
     or: 'ou',
     exercises: 'exercices',
     series: 'séries',
-    seconds: 'secondes'
+    seconds: 'secondes',
+    enabled: 'Activé',
+    disabled: 'Désactivé',
+    day: 'Jour',
+    month: 'Mois',
+    year: 'Année',
+    confirm: 'Confirmer'
   },
 
   // Feedback modal
@@ -671,5 +677,168 @@ export default {
     clearAll: 'Tout effacer',
     noExercisesFound: 'Aucun exercice trouvé',
     addCustomExercise: 'Ajouter un exercice personnalisé'
+  },
+
+  // Onboarding
+  onboarding: {
+    // Navigation
+    step: 'Étape',
+    of: 'sur',
+    next: 'Suivant',
+    finish: 'Terminer',
+    skip: 'Passer',
+    continue: 'Continuer',
+    
+    // Composants communs
+    session: 'séance',
+    sessions: 'séances',
+    
+    // Écran 0: Accueil initial Gainizi
+    initialWelcome: {
+      title: 'Bienvenue sur Gainizi',
+      subtitle: 'Votre coach numérique pour suivre vos entraînements',
+      buttonText: 'Commencer',
+      languageLabel: 'Langue'
+    },
+    
+    // Écran 1: Sélection de langue
+    languageSelection: {
+      title: 'Choisissez votre langue',
+    },
+    
+    // Écran 1: Sélection de thème
+    themeSelection: {
+      title: 'Choisissez votre thème',
+      lightTheme: 'Thème clair',
+      lightDescription: 'Interface lumineuse et claire',
+      darkTheme: 'Thème sombre',
+      darkDescription: 'Interface sombre, idéale pour les yeux',
+      systemTheme: 'Automatique',
+      systemDescription: 'Suit les paramètres de votre appareil',
+      footerNote: 'Vous pourrez changer le thème à tout moment dans les paramètres'
+    },
+    
+    // Écran 2: Explication des données
+    dataExplanation: {
+      title: 'Personnalisons votre expérience',
+      subtitle: 'Ces informations nous aident à personnaliser votre expérience et à améliorer l\'application grâce à des données d\'analyse anonymisées',
+      personalizedGoals: 'Objectifs personnalisés',
+      personalizedGoalsDesc: 'Nous utilisons vos objectifs pour créer des programmes d\'entraînement adaptés à vos besoins spécifiques.',
+      adaptedLevel: 'Niveau sportif adapté',
+      adaptedLevelDesc: 'Votre niveau nous permet de proposer des exercices et intensités appropriés pour votre progression.',
+      smartRecommendations: 'Recommandations intelligentes',
+      smartRecommendationsDesc: 'Vos préférences nous aident à suggérer les meilleurs exercices et routines pour vous.',
+      secureData: 'Données sécurisées',
+      secureDataDesc: 'Vos informations restent privées: par défaut elles sont stockées localement sur votre appareil. Si vous créez un compte ou activez la synchronisation, vos données de séance peuvent être chiffrées et synchronisées sur nos serveurs.',
+      privacyGuaranteed: 'Confidentialité garantie :',
+      privacyNote: 'Nous utilisons uniquement des données d\'analyse anonymisées pour améliorer l\'application. Vos séances restent sur votre téléphone par défaut ; si vous activez la synchronisation, elles sont transmises de façon sécurisée à nos serveurs.',
+      startConfiguration: 'Commencer la configuration',
+      footerNote: 'Vous pourrez modifier ces informations à tout moment dans les paramètres'
+    },
+    
+    // Sélecteur de date
+    datePicker: {
+      day: 'Jour',
+      month: 'Mois',
+      year: 'Année',
+      confirm: 'Confirmer',
+      cancel: 'Annuler'
+    },
+    
+    // Écran 1: Profil de base
+    basicProfile: {
+      title: 'Profil de base',
+      subtitle: 'Commençons par apprendre à vous connaître',
+      name: 'Nom ou pseudo',
+      namePlaceholder: 'Entrez votre nom',
+      gender: 'Genre',
+      genderDescription: 'Comment vous identifiez-vous ?',
+      male: 'Homme',
+      female: 'Femme',
+      other: 'Autre',
+      biologicalSex: 'Sexe biologique',
+      biologicalSexDescription: 'Nécessaire pour la carte corporelle et les calculs physiologiques',
+      biologicalMale: 'Homme',
+      biologicalFemale: 'Femme',
+      birthDate: 'Date de naissance',
+      height: 'Taille (cm)',
+      weight: 'Poids (kg)',
+      heightPlaceholder: '175',
+      weightPlaceholder: '70',
+      selectDate: 'Sélectionner une date'
+    },
+    
+    // Écran 2: Objectifs & niveau
+    goalsLevel: {
+      title: 'Objectifs & niveau',
+      subtitle: 'Définissons vos objectifs et votre niveau',
+      primaryGoal: 'Objectif principal',
+      muscleGain: 'Prise de muscle',
+      weightLoss: 'Perte de poids',
+      fitness: 'Remise en forme',
+      fitnessLevel: 'Niveau sportif',
+      beginner: 'Débutant',
+      intermediate: 'Intermédiaire',
+      advanced: 'Avancé'
+    },
+    
+    // Écran 3: Préférences d'entraînement
+    workoutPrefs: {
+      title: 'Préférences d\'entraînement',
+      subtitle: 'Personnalisons votre expérience d\'entraînement',
+      weeklyWorkouts: 'Séances par semaine',
+      equipment: 'Équipement disponible',
+      gym: 'Salle de sport',
+      home: 'Maison',
+      limited: 'Matériel limité',
+      priorityMuscles: 'Groupes musculaires prioritaires',
+      legs: 'Jambes',
+      back: 'Dos',
+      arms: 'Bras',
+      chest: 'Pectoraux',
+      shoulders: 'Épaules',
+      core: 'Abdominaux',
+      fullBody: 'Corps entier'
+    },
+    
+    // Écran 4: Paramètres d'application
+    appSettings: {
+      title: 'Paramètres d\'application',
+      subtitle: 'Configurons l\'application selon vos préférences',
+      language: 'Langue',
+      french: 'Français',
+      english: 'Anglais',
+      units: 'Unité de mesure',
+      metric: 'Métrique (kg/cm)',
+      imperial: 'Impérial (lbs/inches)',
+      nutritionTracking: 'Suivi nutrition',
+      nutritionDesc: 'Activer le suivi de la nutrition',
+      rpeTracking: 'Utiliser le RPE',
+      rpeDesc: 'Activer l\'échelle de perception de l\'effort (RPE) pour évaluer l\'intensité de vos exercices'
+    },
+    
+    // Écran de confirmation
+    welcome: {
+      title: 'Bienvenue {name} 👋',
+      subtitle: 'Votre profil est prêt !',
+      message: 'Vous pouvez maintenant commencer votre parcours fitness avec une expérience personnalisée.',
+      motivation: 'Votre parcours fitness personnalisé commence maintenant. Nous avons hâte de vous accompagner dans l\'atteinte de vos objectifs !',
+      tutorialTitle: 'Besoin d\'aide pour commencer ?',
+      tutorialDescription: 'Découvrez nos guides et tutoriels pour optimiser votre expérience fitness.',
+      tutorialLink: 'Voir les tutoriels',
+      startJourney: 'Commencer l\'aventure',
+      startButton: 'Commencer l\'aventure'
+    },
+    
+    // Validation
+    validation: {
+      nameRequired: 'Le nom est requis',
+      heightRequired: 'La taille est requise',
+      weightRequired: 'Le poids est requis',
+      birthDateRequired: 'La date de naissance est requise',
+      invalidHeight: 'Taille invalide (100-250 cm)',
+      invalidWeight: 'Poids invalide (30-300 kg)',
+      selectAtLeastOne: 'Sélectionnez au moins une option'
+    }
   }
 };

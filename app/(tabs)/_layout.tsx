@@ -1,30 +1,16 @@
 import { View } from 'react-native';
-import { Tabs } from 'expo-router';
+import { Tabs, router } from 'expo-router';
 import { BookCheck, Calendar, Clock, CircleUser } from 'lucide-react-native';
 import { useTheme } from '@/app/hooks/useTheme';
-import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold, useFonts } from '@expo-google-fonts/inter';
-import * as SplashScreen from 'expo-splash-screen';
-import { useCallback, useEffect } from 'react';
+import { useEffect } from 'react';
 import { setupFeedbackQueueHandlers } from '@/app/services/feedback/queue';
-
-SplashScreen.preventAutoHideAsync();
+import { useOnboardingStatus } from '@/app/providers/OnboardingProvider';
 
 function TabLayout() {
   const { theme } = useTheme();
+  const { isOnboardingCompleted, isLoading } = useOnboardingStatus();
 
-  const [fontsLoaded, fontError] = useFonts({
-    'Inter-Regular': Inter_400Regular,
-    'Inter-SemiBold': Inter_600SemiBold,
-    'Inter-Bold': Inter_700Bold
-  });
-
-  const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded || fontError) {
-      await SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded, fontError]);
-
-  // Initialize feedback offline queue handlers (retry on startup and connectivity changes)
+  // Initialize feedback offline queue handlers
   useEffect(() => {
     const teardown = setupFeedbackQueueHandlers();
     return () => {
@@ -32,12 +18,22 @@ function TabLayout() {
     };
   }, []);
 
-  if (!fontsLoaded && !fontError) {
-    return null;
-  }
+  // Simple onboarding check - redirect if needed
+  useEffect(() => {
+    if (!isLoading && !isOnboardingCompleted) {
+      console.log('[TabLayout] Onboarding not completed, redirecting to onboarding...');
+      // Use a small delay to avoid race conditions during completion
+      const timer = setTimeout(() => {
+        router.replace('/screens/onboarding/OnboardingScreen');
+      }, 50);
+      return () => clearTimeout(timer);
+    } else if (!isLoading && isOnboardingCompleted) {
+      console.log('[TabLayout] Onboarding completed, staying in main app');
+    }
+  }, [isLoading, isOnboardingCompleted]);
 
   return (
-    <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
+    <View style={{ flex: 1 }}>
       <Tabs
         initialRouteName="index"
         screenOptions={{

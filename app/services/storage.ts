@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Goal, Workout, RoutineSession } from '@/types/common';
+import { UserProfile } from '@/types/onboarding';
 
 export enum StorageKeys {
   WORKOUTS = 'workouts',
@@ -12,6 +13,8 @@ export enum StorageKeys {
   ROUTINES = 'routines',
   ROUTINE_SESSIONS = 'routine_sessions',
   FEEDBACK_STATE = 'feedback_state',
+  ONBOARDING_COMPLETED = 'onboarding_completed',
+  ONBOARDING_PROFILE = 'onboarding_profile',
 }
 
 const CURRENT_STORAGE_VERSION = '1.0';
@@ -20,7 +23,7 @@ export interface Settings {
   weightUnit: 'kg' | 'lb';
   gender: 'male' | 'female';
   language: 'en' | 'fr';
-  theme: 'dark' | 'light';
+  theme: 'dark' | 'light' | 'system';
   rpeMode: 'ask' | 'never';
 }
 
@@ -43,6 +46,8 @@ export type StorageData = {
   [StorageKeys.ROUTINES]: any[];
   [StorageKeys.ROUTINE_SESSIONS]: RoutineSession[];
   [StorageKeys.FEEDBACK_STATE]: FeedbackState;
+  [StorageKeys.ONBOARDING_COMPLETED]: boolean;
+  [StorageKeys.ONBOARDING_PROFILE]: UserProfile | null;
 };
 
 const defaultValues: StorageData = {
@@ -65,7 +70,9 @@ const defaultValues: StorageData = {
     completedCount: 0,
     promptedOnce: false,
     lastPromptAt: null
-  }
+  },
+  [StorageKeys.ONBOARDING_COMPLETED]: false,
+  [StorageKeys.ONBOARDING_PROFILE]: null,
 };
 
 export type FeedbackState = {
@@ -102,6 +109,8 @@ class StorageService {
         StorageKeys.ROUTINE_SESSIONS,
         StorageKeys.FEEDBACK_STATE,
         StorageKeys.SETTINGS,
+        StorageKeys.ONBOARDING_COMPLETED,
+        StorageKeys.ONBOARDING_PROFILE,
         StorageKeys.STORAGE_VERSION
       ];
 
@@ -354,6 +363,25 @@ class StorageService {
     const next: FeedbackState = { ...current, pendingPrompt: false, lastPromptAt: new Date().toISOString() };
     await this.setFeedbackState(next);
     return next;
+  }
+
+  // --- Onboarding helpers ---
+  async getOnboardingStatus(): Promise<boolean> {
+    const status = await this.getItem<boolean>(StorageKeys.ONBOARDING_COMPLETED);
+    return status ?? defaultValues[StorageKeys.ONBOARDING_COMPLETED];
+  }
+
+  async setOnboardingStatus(completed: boolean): Promise<void> {
+    await this.setItem<boolean>(StorageKeys.ONBOARDING_COMPLETED, completed);
+  }
+
+  async getOnboardingProfile(): Promise<UserProfile | null> {
+    const profile = await this.getItem<UserProfile | null>(StorageKeys.ONBOARDING_PROFILE);
+    return profile ?? defaultValues[StorageKeys.ONBOARDING_PROFILE];
+  }
+
+  async setOnboardingProfile(profile: UserProfile): Promise<void> {
+    await this.setItem<UserProfile | null>(StorageKeys.ONBOARDING_PROFILE, profile);
   }
 
   private async migrateStorage(fromVersion: string, toVersion: string): Promise<void> {

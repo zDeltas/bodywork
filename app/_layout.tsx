@@ -1,6 +1,8 @@
 import 'react-native-reanimated';
-import React from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { Stack } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
+import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold, useFonts } from '@expo-google-fonts/inter';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Platform } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
@@ -10,7 +12,10 @@ import StorageProvider from './providers/StorageProvider';
 import { SnackbarProvider } from '@/app/contexts/SnackbarContext';
 import SnackbarContainer from '@/app/components/ui/SnackbarContainer';
 import AuthProvider from '@/app/contexts/AuthContext';
+import OnboardingProvider from '@/app/providers/OnboardingProvider';
  
+// Ensure splash doesn't auto hide until fonts and providers are ready
+SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   useFrameworkReady();
@@ -19,11 +24,38 @@ export default function RootLayout() {
   const getSlideAnimation = Platform.OS === 'ios' ? 'slide_from_right' : 'slide_from_right';
   const getModalAnimation = Platform.OS === 'ios' ? 'slide_from_bottom' : 'slide_from_bottom';
 
+  // Load fonts globally for the whole app (tabs + onboarding)
+  const [fontsLoaded, fontError] = useFonts({
+    'Inter-Regular': Inter_400Regular,
+    'Inter-SemiBold': Inter_600SemiBold,
+    'Inter-Bold': Inter_700Bold,
+  });
+
+  // Hide splash when fonts are ready
+  useEffect(() => {
+    if (fontsLoaded || fontError) {
+      console.log('[App] Fonts status => loaded:', !!fontsLoaded, 'error:', !!fontError);
+      SplashScreen.hideAsync().catch(() => {});
+      console.log('[App] Splash hidden');
+    }
+  }, [fontsLoaded, fontError]);
+
+  // Initial launch log (must be declared before any conditional return to preserve hooks order)
+  useEffect(() => {
+    console.log('[App] Launch: RootLayout mounted (platform:', Platform.OS, ')');
+  }, []);
+
+  // Block rendering until fonts are ready to avoid flicker
+  if (!fontsLoaded && !fontError) {
+    return null;
+  }
+
   return (
     <StorageProvider>
       <SettingsProvider>
         <AuthProvider>
-          <SnackbarProvider>
+          <OnboardingProvider>
+            <SnackbarProvider>
             <GestureHandlerRootView style={{ flex: 1 }}>
               <SafeAreaProvider>
                 <SafeAreaView style={{ flex: 1 }}>
@@ -150,6 +182,15 @@ export default function RootLayout() {
                       }}
                     />
                     <Stack.Screen
+                      name="screens/onboarding/OnboardingScreen"
+                      options={{
+                        headerShown: false,
+                        animation: getSlideAnimation,
+                        animationDuration: 300,
+                        gestureEnabled: false
+                      }}
+                    />
+                    <Stack.Screen
                       name="screens/contact"
                       options={{
                         presentation: 'card',
@@ -185,7 +226,8 @@ export default function RootLayout() {
                 </SafeAreaView>
               </SafeAreaProvider>
             </GestureHandlerRootView>
-          </SnackbarProvider>
+            </SnackbarProvider>
+          </OnboardingProvider>
         </AuthProvider>
       </SettingsProvider>
     </StorageProvider>

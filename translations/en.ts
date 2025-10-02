@@ -31,7 +31,13 @@ export default {
     or: 'or',
     exercises: 'exercises',
     series: 'series',
-    seconds: 'seconds'
+    seconds: 'seconds',
+    enabled: 'Enabled',
+    disabled: 'Disabled',
+    day: 'Day',
+    month: 'Month',
+    year: 'Year',
+    confirm: 'Confirm'
   },
 
   // Feedback modal
@@ -673,5 +679,168 @@ export default {
     clearAll: 'Clear All',
     noExercisesFound: 'No exercises found',
     addCustomExercise: 'Add Custom Exercise'
+  },
+
+  // Onboarding
+  onboarding: {
+    // Navigation
+    step: 'Step',
+    of: 'of',
+    next: 'Next',
+    finish: 'Finish',
+    skip: 'Skip',
+    continue: 'Continue',
+    
+    // Common components
+    session: 'session',
+    sessions: 'sessions',
+    
+    // Screen 0: Initial Gainizi Welcome
+    initialWelcome: {
+      title: 'Welcome to Gainizi',
+      subtitle: 'Your digital coach to track your workouts',
+      buttonText: 'Get Started',
+      languageLabel: 'Language'
+    },
+    
+    // Screen 1: Language Selection
+    languageSelection: {
+      title: 'Choose your language',
+    },
+    
+    // Screen 1: Theme Selection
+    themeSelection: {
+      title: 'Choose your theme',
+      lightTheme: 'Light theme',
+      lightDescription: 'Bright and clear interface',
+      darkTheme: 'Dark theme',
+      darkDescription: 'Dark interface, easy on the eyes',
+      systemTheme: 'Automatic',
+      systemDescription: 'Follows your device settings',
+      footerNote: 'You can change the theme anytime in settings'
+    },
+    
+    // Screen 2: Data Explanation
+    dataExplanation: {
+      title: 'Let\'s personalize your experience',
+      subtitle: 'This information helps personalize your experience and improve the app with anonymized analytics data',
+      personalizedGoals: 'Personalized goals',
+      personalizedGoalsDesc: 'We use your goals to create workout programs tailored to your specific needs.',
+      adaptedLevel: 'Adapted fitness level',
+      adaptedLevelDesc: 'Your level allows us to suggest appropriate exercises and intensities for your progression.',
+      smartRecommendations: 'Smart recommendations',
+      smartRecommendationsDesc: 'Your preferences help us suggest the best exercises and routines for you.',
+      secureData: 'Secure data',
+      secureDataDesc: 'Your information remains private: by default it is stored locally on your device. If you create an account or enable sync, your session data may be encrypted and synced to our servers.',
+      privacyGuaranteed: 'Privacy guaranteed:',
+      privacyNote: 'We only use anonymized analytics to improve the app. Your sessions stay on your phone by default; if you enable sync, they are transmitted securely to our servers.',
+      startConfiguration: 'Start configuration',
+      footerNote: 'You can modify this information anytime in settings'
+    },
+    
+    // Date picker
+    datePicker: {
+      day: 'Day',
+      month: 'Month',
+      year: 'Year',
+      confirm: 'Confirm',
+      cancel: 'Cancel'
+    },
+    
+    // Screen 1: Basic Profile
+    basicProfile: {
+      title: 'Basic Profile',
+      subtitle: 'Let\'s start by getting to know you',
+      name: 'Name or username',
+      namePlaceholder: 'Enter your name',
+      gender: 'Gender',
+      genderDescription: 'How do you identify yourself?',
+      male: 'Male',
+      female: 'Female',
+      other: 'Other',
+      biologicalSex: 'Biological Sex',
+      biologicalSexDescription: 'Required for body map and physiological calculations',
+      biologicalMale: 'Male',
+      biologicalFemale: 'Female',
+      birthDate: 'Birth date',
+      height: 'Height (cm)',
+      weight: 'Weight (kg)',
+      heightPlaceholder: '175',
+      weightPlaceholder: '70',
+      selectDate: 'Select date'
+    },
+    
+    // Screen 2: Goals & Level
+    goalsLevel: {
+      title: 'Goals & Level',
+      subtitle: 'Let\'s define your goals and level',
+      primaryGoal: 'Primary goal',
+      muscleGain: 'Muscle gain',
+      weightLoss: 'Weight loss',
+      fitness: 'Fitness',
+      fitnessLevel: 'Fitness level',
+      beginner: 'Beginner',
+      intermediate: 'Intermediate',
+      advanced: 'Advanced'
+    },
+    
+    // Screen 3: Workout Preferences
+    workoutPrefs: {
+      title: 'Workout Preferences',
+      subtitle: 'Let\'s customize your workout experience',
+      weeklyWorkouts: 'Workouts per week',
+      equipment: 'Available equipment',
+      gym: 'Gym',
+      home: 'Home',
+      limited: 'Limited equipment',
+      priorityMuscles: 'Priority muscle groups',
+      legs: 'Legs',
+      back: 'Back',
+      arms: 'Arms',
+      chest: 'Chest',
+      shoulders: 'Shoulders',
+      core: 'Core',
+      fullBody: 'Full body'
+    },
+    
+    // Screen 4: App Settings
+    appSettings: {
+      title: 'App Settings',
+      subtitle: 'Let\'s configure the app to your preferences',
+      language: 'Language',
+      french: 'French',
+      english: 'English',
+      units: 'Units',
+      metric: 'Metric (kg/cm)',
+      imperial: 'Imperial (lbs/inches)',
+      nutritionTracking: 'Nutrition tracking',
+      nutritionDesc: 'Enable nutrition tracking',
+      rpeTracking: 'Use RPE',
+      rpeDesc: 'Enable Rate of Perceived Exertion (RPE) scale to assess exercise intensity'
+    },
+    
+    // Welcome Screen
+    welcome: {
+      title: 'Welcome {name} 👋',
+      subtitle: 'Your profile is ready!',
+      message: 'You can now start your fitness journey with a personalized experience.',
+      motivation: 'Your personalized fitness journey starts now. We can\'t wait to help you achieve your goals!',
+      tutorialTitle: 'Need help getting started?',
+      tutorialDescription: 'Discover our guides and tutorials to optimize your fitness experience.',
+      tutorialLink: 'View tutorials',
+      startJourney: 'Start the adventure',
+      startButton: 'Start the adventure'
+    },
+    
+    // Validation
+    validation: {
+      nameRequired: 'Name is required',
+      heightRequired: 'Height is required',
+      weightRequired: 'Weight is required',
+      birthDateRequired: 'Birth date is required',
+      invalidHeight: 'Invalid height (100-250 cm)',
+      invalidWeight: 'Invalid weight (30-300 kg)',
+      selectAtLeastOne: 'Select at least one option'
+    }
   }
 };

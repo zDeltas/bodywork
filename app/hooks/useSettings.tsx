@@ -5,7 +5,7 @@ const defaultSettings: Settings = {
   weightUnit: 'kg',
   gender: 'male',
   language: 'fr',
-  theme: 'dark',
+  theme: 'system',
   rpeMode: 'ask'
 };
 

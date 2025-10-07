@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Linking, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { User, ChevronRight, Scale, Languages, SunMoon, Download, Trash2, Linkedin, Mail, CheckCircle, Circle } from 'lucide-react-native';
+import { User, ChevronRight, Scale, Languages, SunMoon, Download, Trash2, Linkedin, Mail, CheckCircle, Circle, Sparkles } from 'lucide-react-native';
 import { BlurView } from 'expo-blur';
 import { useSettings } from '@/app/hooks/useSettings';
 import { useTranslation } from '@/app/hooks/useTranslation';
@@ -33,6 +33,9 @@ export default function SettingsScreen() {
   const haptics = useHaptics();
   // Feedback modal state
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [profileLoading, setProfileLoading] = useState(true);
+  const [showPhilosophyCard, setShowPhilosophyCard] = useState<boolean>(true);
+  const [showPhilosophyModal, setShowPhilosophyModal] = useState(false);
 
   // Auto-open feedback modal if pending prompt is scheduled
   useEffect(() => {
@@ -43,6 +46,35 @@ export default function SettingsScreen() {
       }
     })();
   }, []);
+
+  // Load onboarding profile flag
+  useEffect(() => {
+    (async () => {
+      try {
+        const profile = await storageService.getOnboardingProfile();
+        setShowPhilosophyCard(profile?.showPhilosophyCard ?? true);
+      } catch {}
+      setProfileLoading(false);
+    })();
+  }, []);
+
+  const openPhilosophyModal = () => {
+    setShowPhilosophyModal(true);
+    haptics.impactLight();
+  };
+
+  const handleSelectPhilosophy = async (enabled: boolean) => {
+    try {
+      const profile = await storageService.getOnboardingProfile();
+      const updated = { ...(profile || {}), showPhilosophyCard: enabled } as any;
+      await storageService.setOnboardingProfile(updated);
+      setShowPhilosophyCard(enabled);
+      setShowPhilosophyModal(false);
+      haptics.impactLight();
+    } catch (e) {
+      Alert.alert(t('common.error'), (e as Error)?.message || 'Failed to update setting');
+    }
+  };
 
   const openWeightUnitModal = () => {
     setShowWeightUnitModal(true);
@@ -162,6 +194,24 @@ export default function SettingsScreen() {
         <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: 100 }}>
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>{t('settings.preferences')}</Text>
+
+            {/* Philosophy card visibility */}
+            <View style={styles.settingItem}>
+              <View style={styles.settingInfo}>
+                <Sparkles size={24} color={theme.colors.primary} />
+                <Text style={styles.settingLabel}>{t('onboarding.appSettings.philosophyToggle')}</Text>
+              </View>
+              <TouchableOpacity style={styles.settingControl} onPress={openPhilosophyModal} disabled={profileLoading}>
+                {profileLoading ? (
+                  <ActivityIndicator size="small" color={theme.colors.primary} />
+                ) : (
+                  <Text style={styles.settingValue}>
+                    {showPhilosophyCard ? t('common.enabled') : t('common.disabled')}
+                  </Text>
+                )}
+                <ChevronRight size={20} color={theme.colors.text.secondary} />
+              </TouchableOpacity>
+            </View>
 
             <View className="rpe-setting" style={styles.settingItem}>
               <View style={styles.settingInfo}>
@@ -337,6 +387,35 @@ export default function SettingsScreen() {
               <Circle size={20} color={theme.colors.text.secondary} />
             )}
             <Text style={styles.modalOptionText}>{t('settings.rpeNever')}</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+
+      {/* Philosophy visibility modal */}
+      <Modal
+        visible={showPhilosophyModal}
+        onClose={() => setShowPhilosophyModal(false)}
+        title={t('onboarding.appSettings.philosophyToggle')}
+        showCloseButton
+      >
+        <View style={styles.modalOption}>
+          <TouchableOpacity style={styles.modalOptionButton} onPress={() => handleSelectPhilosophy(true)}>
+            {showPhilosophyCard ? (
+              <CheckCircle size={20} color={theme.colors.primary} />
+            ) : (
+              <Circle size={20} color={theme.colors.text.secondary} />
+            )}
+            <Text style={styles.modalOptionText}>{t('common.enabled')}</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.modalOption}>
+          <TouchableOpacity style={styles.modalOptionButton} onPress={() => handleSelectPhilosophy(false)}>
+            {!showPhilosophyCard ? (
+              <CheckCircle size={20} color={theme.colors.primary} />
+            ) : (
+              <Circle size={20} color={theme.colors.text.secondary} />
+            )}
+            <Text style={styles.modalOptionText}>{t('common.disabled')}</Text>
           </TouchableOpacity>
         </View>
       </Modal>

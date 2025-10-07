@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { StyleSheet, TextInput, TouchableOpacity, View, FlatList } from 'react-native';
-import { Search, X, Star, Plus, Filter, Grid, List, ChevronDown, ChevronUp } from 'lucide-react-native';
+import { Search, X, Star, Plus, Filter, Grid, List, ChevronDown, ChevronUp, Info } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
 import Animated, { FadeIn, SlideInRight } from 'react-native-reanimated';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
@@ -9,6 +10,8 @@ import { useExercises } from '@/app/hooks/useExercises';
 import Text from '@/app/components/ui/Text';
 import { predefinedExercises, getMuscleGroups, muscleGroupKeys, getExercisesByMuscleGroup, MuscleGroupKey, Exercise, ExerciseDefinition } from './index';
 import ExerciseCard from './ExerciseCard';
+import storageService from '@/app/services/storage';
+import { useFocusEffect } from '@react-navigation/native';
 
 export type ExerciseListMode = 'screen' | 'modal' | 'inline';
 export type ExerciseListViewMode = 'grid' | 'list' | 'collapsible';
@@ -60,6 +63,7 @@ export default function UnifiedExerciseList({
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery || '');
   const [selectedMuscleGroup, setSelectedMuscleGroup] = useState(initialMuscleGroup || selectedMuscle || '');
   const [currentViewMode, setCurrentViewMode] = useState<ExerciseListViewMode>(viewMode);
+  const [customExercises, setCustomExercises] = useState<any[]>([]);
   const [expandedMuscleGroups, setExpandedMuscleGroups] = useState<string[]>([]);
   
   const { t } = useTranslation();
@@ -67,8 +71,28 @@ export default function UnifiedExerciseList({
   const { impactLight, impactMedium } = useHaptics();
   const { isFavorite, toggleFavorite } = useExercises();
   const styles = useStyles();
+  const router = useRouter();
 
   const muscleGroups = useMemo(() => getMuscleGroups(t as (key: string) => string), [t]);
+
+  // Load custom exercises
+  const loadCustoms = useCallback(async () => {
+    const list = await storageService.getCustomExercises();
+    setCustomExercises(list || []);
+  }, []);
+
+  useEffect(() => {
+    loadCustoms();
+  }, [loadCustoms]);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (mode === 'screen') {
+        loadCustoms();
+      }
+      return () => {};
+    }, [mode, loadCustoms])
+  );
 
   useEffect(() => {
     if (initialSearchQuery !== undefined) {
@@ -83,7 +107,7 @@ export default function UnifiedExerciseList({
   }, [initialMuscleGroup]);
 
   const allExercises = useMemo(() => {
-    return predefinedExercises.map(exercise => ({
+    const base = predefinedExercises.map(exercise => ({
       name: t(exercise.key as any),
       key: exercise.key,
       translationKey: exercise.key,
@@ -91,7 +115,16 @@ export default function UnifiedExerciseList({
       primaryMuscle: exercise.primaryMuscle,
       secondaryMuscles: exercise.secondaryMuscles
     }));
-  }, [t]);
+    const customs = (customExercises || []).map((ex: any) => ({
+      name: ex.name,
+      key: ex.key,
+      translationKey: ex.key,
+      series: [],
+      primaryMuscle: ex.primaryMuscle,
+      secondaryMuscles: ex.secondaryMuscles || []
+    }));
+    return [...base, ...customs];
+  }, [t, customExercises]);
 
   const filteredExercises = useMemo(() => {
     let exercises: Exercise[] = [];
@@ -102,7 +135,7 @@ export default function UnifiedExerciseList({
       ) as MuscleGroupKey;
       
       if (muscleKey) {
-        const allMuscleExercises = getExercisesByMuscleGroup(muscleKey).map(exercise => ({
+        const predefined = getExercisesByMuscleGroup(muscleKey).map(exercise => ({
           name: t(exercise.key as any),
           key: exercise.key,
           translationKey: exercise.key,
@@ -110,6 +143,19 @@ export default function UnifiedExerciseList({
           primaryMuscle: exercise.primaryMuscle,
           secondaryMuscles: exercise.secondaryMuscles
         }));
+
+        const customMatches = (customExercises || [])
+          .filter((ex: any) => ex.primaryMuscle === muscleKey || (ex.secondaryMuscles || []).includes(muscleKey))
+          .map((ex: any) => ({
+            name: ex.name,
+            key: ex.key,
+            translationKey: ex.key,
+            series: [],
+            primaryMuscle: ex.primaryMuscle,
+            secondaryMuscles: ex.secondaryMuscles || []
+          }));
+
+        const allMuscleExercises = [...predefined, ...customMatches];
 
         const primaryExercises = allMuscleExercises.filter(exercise => exercise.primaryMuscle === muscleKey);
         const secondaryExercises = allMuscleExercises.filter(exercise => exercise.primaryMuscle !== muscleKey);
@@ -193,6 +239,18 @@ export default function UnifiedExerciseList({
     impactLight();
   }, [currentViewMode, impactLight]);
 
+  const handleInfoPress = useCallback((exercise: Exercise) => {
+    router.push({
+      pathname: '/screens/exercise-tutorial',
+      params: {
+        name: exercise.name,
+        key: exercise.translationKey || exercise.key,
+        primaryMuscle: (exercise as any).primaryMuscle,
+        secondaryMuscles: Array.isArray((exercise as any).secondaryMuscles) ? (exercise as any).secondaryMuscles.join(',') : ''
+      }
+    });
+  }, [router]);
+
   const renderExerciseItem = ({ item }: { item: Exercise }) => {
     if (currentViewMode === 'grid') {
       return (
@@ -201,6 +259,7 @@ export default function UnifiedExerciseList({
           isFavorite={showFavorites ? isFavorite(item.name) : false}
           onToggleFavorite={showFavorites ? toggleFavorite : () => {}}
           onSelect={handleExerciseSelect}
+          onInfo={handleInfoPress}
         />
       );
     }
@@ -217,20 +276,29 @@ export default function UnifiedExerciseList({
               {item.name}
             </Text>
           </View>
-          
-          {showFavorites && (
+
+          <View style={styles.rowActions}>
             <TouchableOpacity
-              style={styles.favoriteButton}
-              onPress={() => toggleFavorite(item.name)}
+              style={styles.infoIconButton}
+              onPress={() => handleInfoPress(item)}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
-              <Star
-                size={20}
-                color={isFavorite(item.name) ? theme.colors.warning : theme.colors.text.secondary}
-                fill={isFavorite(item.name) ? theme.colors.warning : 'transparent'}
-              />
+              <Info size={18} color={theme.colors.text.primary} />
             </TouchableOpacity>
-          )}
+            {showFavorites && (
+              <TouchableOpacity
+                style={styles.favoriteButton}
+                onPress={() => toggleFavorite(item.name)}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              >
+                <Star
+                  size={20}
+                  color={isFavorite(item.name) ? theme.colors.warning : theme.colors.text.secondary}
+                  fill={isFavorite(item.name) ? theme.colors.warning : 'transparent'}
+                />
+              </TouchableOpacity>
+            )}
+          </View>
         </TouchableOpacity>
       </Animated.View>
     );

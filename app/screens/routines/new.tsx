@@ -17,21 +17,8 @@ import { formatRestTime, generateRoutineId, isRoutineComplete } from '@/app/util
 import SeriesConfigModal from '@/app/components/routine/SeriesConfigModal';
 import RoutineExerciseCard from '@/app/components/routine/RoutineExerciseCard';
 import { useSnackbar } from '@/app/hooks/useSnackbar';
-import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold, useFonts } from '@expo-google-fonts/inter';
-import * as SplashScreen from 'expo-splash-screen';
 
 function NewRoutineScreen() {
-  const [fontsLoaded] = useFonts({
-    'Inter-Regular': Inter_400Regular,
-    'Inter-SemiBold': Inter_600SemiBold,
-    'Inter-Bold': Inter_700Bold
-  });
-
-  const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
-      await SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded]);
 
   const { t } = useTranslation();
   const { theme } = useTheme();
@@ -200,7 +187,7 @@ function NewRoutineScreen() {
   ), [showExerciseSelector, exerciseName, applyExerciseSelection, t]);
 
   const renderStep2 = useMemo(() => (
-    <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
+    <View style={{ flex: 1 }}>
       <View style={styles.sectionTitleContainer}>
         <Plus color={theme.colors.text.secondary} size={22} style={styles.sectionTitleIcon} />
         <Text variant="heading" style={styles.titleLabel}>

@@ -4,7 +4,7 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold, useFonts } from '@expo-google-fonts/inter';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { Platform } from 'react-native';
+import { Platform, StatusBar } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { SettingsProvider } from '@/app/hooks/useSettings';
 import { useFrameworkReady } from '@/app/hooks/useFrameworkReady';
@@ -13,9 +13,23 @@ import { SnackbarProvider } from '@/app/contexts/SnackbarContext';
 import SnackbarContainer from '@/app/components/ui/SnackbarContainer';
 import AuthProvider from '@/app/contexts/AuthContext';
 import OnboardingProvider from '@/app/providers/OnboardingProvider';
+import { useTheme } from '@/app/hooks/useTheme';
  
 // Ensure splash doesn't auto hide until fonts and providers are ready
 SplashScreen.preventAutoHideAsync();
+
+// Global StatusBar component
+function GlobalStatusBar() {
+  const { theme, isDarkMode } = useTheme();
+  
+  return (
+    <StatusBar
+      barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+      backgroundColor={theme.colors.background.main}
+      translucent={false}
+    />
+  );
+}
 
 export default function RootLayout() {
   useFrameworkReady();
@@ -58,15 +72,15 @@ export default function RootLayout() {
             <SnackbarProvider>
             <GestureHandlerRootView style={{ flex: 1 }}>
               <SafeAreaProvider>
-                <SafeAreaView style={{ flex: 1 }}>
-                  <Stack
-                    screenOptions={{
-                      headerShown: false,
-                      animation: getDefaultAnimation,
-                      animationDuration: 300,
-                      contentStyle: { backgroundColor: 'transparent' }
-                    }}
-                  >
+                <GlobalStatusBar />
+                <Stack
+                  screenOptions={{
+                    headerShown: false,
+                    animation: getDefaultAnimation,
+                    animationDuration: 300,
+                    contentStyle: { backgroundColor: 'transparent' }
+                  }}
+                >
                     <Stack.Screen
                       name="(tabs)"
                       options={{
@@ -223,7 +237,6 @@ export default function RootLayout() {
                     />
                   </Stack>
                   <SnackbarContainer />
-                </SafeAreaView>
               </SafeAreaProvider>
             </GestureHandlerRootView>
             </SnackbarProvider>

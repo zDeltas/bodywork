@@ -1,14 +1,11 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Animated, ScrollView, StyleSheet, View } from 'react-native';
-import { FadeIn } from 'react-native-reanimated';
-import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold, useFonts } from '@expo-google-fonts/inter';
-import * as SplashScreen from 'expo-splash-screen';
+import { Animated, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { router } from 'expo-router';
 import { useTheme } from '@/app/hooks/useTheme';
 import KpiMotivation from '@/app/components/stats/KpiMotivation';
 import { Workout } from '@/types/common';
-import { MuscleGroupKey } from '@/app/components/exercises';
 import StatsGoals from '@/app/components/stats/StatsGoals';
 import StatsMuscleDistribution from '@/app/components/stats/StatsMuscleDistribution';
 import MuscleRestState from '@/app/components/muscles/MuscleRestState';
@@ -19,7 +16,6 @@ import useExercises from '@/app/hooks/useExercises';
 import { ChartSkeleton } from '@/app/components/ui/SkeletonComponents';
 import ExerciseSearchModal from '@/app/components/stats/ExerciseSearchModal';
 import { Search } from 'lucide-react-native';
-import { TouchableOpacity } from 'react-native';
 import Text from '@/app/components/ui/Text';
 
 type Period = '7d' | '14d' | '1m' | '3m';
@@ -33,12 +29,6 @@ export default function StatsScreen() {
   const [selectedPeriod, setSelectedPeriod] = useState<Period>('7d');
   const [showExerciseModal, setShowExerciseModal] = useState(false);
 
-  // Fonts
-  const [fontsLoaded] = useFonts({
-    'Inter-Regular': Inter_400Regular,
-    'Inter-SemiBold': Inter_600SemiBold,
-    'Inter-Bold': Inter_700Bold
-  });
 
   // Refs
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -52,20 +42,13 @@ export default function StatsScreen() {
 
   // Effects
   useEffect(() => {
-    if (fontsLoaded) {
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 500,
-        useNativeDriver: true
-      }).start();
-    }
-  }, [fontsLoaded]);
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 500,
+      useNativeDriver: true
+    }).start();
+  }, []);
 
-  const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
-      await SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded]);
 
   const handleOpenExerciseModal = useCallback(() => {
     setShowExerciseModal(true);
@@ -83,12 +66,9 @@ export default function StatsScreen() {
     });
   }, [router]);
 
-  if (!fontsLoaded) {
-    return null;
-  }
 
   return (
-    <View style={styles.container} onLayout={onLayoutRootView}>
+    <SafeAreaView style={styles.container}>
       <Header title={t('stats.title')} showBackButton={true} onBack={() => router.back()} />
       <ScrollView
         style={styles.content}
@@ -139,13 +119,13 @@ export default function StatsScreen() {
           )}
         </View>
       </ScrollView>
-      
+
       <ExerciseSearchModal
         visible={showExerciseModal}
         onClose={handleCloseExerciseModal}
         onExerciseSelect={handleExerciseSelect}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -162,7 +142,7 @@ const useStyles = () => {
     },
     exerciseSearchSection: {
       paddingHorizontal: theme.spacing.lg,
-      paddingVertical: theme.spacing.md,
+      paddingVertical: theme.spacing.md
     },
     exerciseSearchButton: {
       flexDirection: 'row',
@@ -178,13 +158,13 @@ const useStyles = () => {
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.1,
       shadowRadius: 4,
-      elevation: 3,
+      elevation: 3
     },
     exerciseSearchText: {
       color: theme.colors.primary,
       fontFamily: theme.typography.fontFamily.semiBold,
       marginLeft: theme.spacing.md,
-      fontSize: theme.typography.fontSize.lg,
+      fontSize: theme.typography.fontSize.lg
     }
   });
 };

@@ -1,182 +1,243 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View, Animated } from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router';
+import { Animated, ScrollView, StyleSheet, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { router } from 'expo-router';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
-import { LineChart, Plus } from 'lucide-react-native';
+import { LineChart, Heart, Ruler, ListPlus, Plus } from 'lucide-react-native';
 import Header from '@/app/components/layout/Header';
-import { useSettings } from '@/app/hooks/useSettings';
-import { Workout, WorkoutDateUtils } from '@/types/workout';
-import { RoutineSession } from '@/types/common';
-import storageService from '@/app/services/storage';
-import { useWorkouts } from '@/app/hooks/useWorkouts';
-import FloatButtonAction from '@/app/components/ui/FloatButtonAction';
-import WeeklyCalendar from '@/app/components/ui/WeeklyCalendar';
-import WorkoutCard from '@/app/components/history/WorkoutCard';
-import RoutineSessionCard from '@/app/components/history/RoutineSessionCard';
+import { useHomeData } from '@/app/hooks/useHomeData';
 import EmptyState from '@/app/components/history/EmptyState';
+import Text from '@/app/components/ui/Text';
+import {
+  PhilosophyCard,
+  DisciplineCard,
+  PrideCard,
+  MotivationCard,
+  ConfidenceCard,
+  EmotionalActionButton
+} from '@/app/components/home/emotional';
+import QuickActionsRow from '@/app/components/home/QuickActionsRow';
 
-interface MarkedDate {
-  marked?: boolean;
-  dotColor?: string;
-  selected?: boolean;
-}
-
-export default function WorkoutScreen() {
-  const params = useLocalSearchParams();
-  const [selectedDate, setSelectedDate] = useState<string>(
-    WorkoutDateUtils.getDatePart(new Date().toISOString())
-  );
-  const { t, language } = useTranslation();
+export default function HomeScreen() {
+  const { t } = useTranslation();
   const { theme } = useTheme();
   const styles = useStyles();
-  const { workouts, loading, error, refreshWorkouts } = useWorkouts();
-  const [routineSessions, setRoutineSessions] = useState<RoutineSession[]>([]);
-  const { settings } = useSettings();
+  const { data: homeData, loading, error } = useHomeData();
   const fadeAnim = useState(new Animated.Value(0))[0];
 
-  useEffect(() => {
-    const reloadSessions = async () => {
-      try {
-        const sessions = await storageService.getRoutineSessions();
-        setRoutineSessions(sessions || []);
-      } catch {
-      }
-    };
-    if (params.refresh === 'true') {
-      refreshWorkouts();
-      reloadSessions();
-    }
-  }, [params.refresh, refreshWorkouts]);
+  // Citations inspirantes avec rotation
+  const inspirationalQuotes = useMemo(() => [
+    { text: t('quotes.strength'), author: 'Nelson Mandela' },
+    { text: t('quotes.discipline'), author: 'Jim Rohn' },
+    { text: t('quotes.progress'), author: 'Tony Robbins' },
+    { text: t('quotes.consistency'), author: 'Dwayne Johnson' },
+    { text: t('quotes.mindset'), author: 'Carol Dweck' },
+  ], [t]);
 
-  useEffect(() => {
-    let isMounted = true;
-    (async () => {
-      try {
-        const sessions = await storageService.getRoutineSessions();
-        if (!isMounted) return;
-        setRoutineSessions(sessions || []);
-      } catch (e) {
-      }
-    })();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+  const currentQuote = useMemo(() => {
+    const today = new Date().getDate();
+    return inspirationalQuotes[today % inspirationalQuotes.length];
+  }, [inspirationalQuotes]);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const sessions = await storageService.getRoutineSessions();
-        setRoutineSessions(sessions || []);
-      } catch {
-      }
-    })();
-  }, [selectedDate]);
+  // Détection de l'humeur utilisateur basée sur les données
+  const userMood = useMemo(() => {
+    if (!homeData) return 'motivated';
+    
+    const { weeklyStats, lastSession } = homeData;
+    const timeSinceLastSession = lastSession ? 
+      (Date.now() - new Date(lastSession.date).getTime()) / (1000 * 60 * 60 * 24) : 7;
+    
+    if (timeSinceLastSession > 3) return 'tired';
+    if (weeklyStats.progressPercentage >= 80) return 'energetic';
+    if (weeklyStats.streak >= 3) return 'focused';
+    return 'motivated';
+  }, [homeData]);
 
-
-  const markedDates = useMemo(() => {
-    const acc: Record<string, MarkedDate> = {};
-    for (const workout of workouts) {
-      const date = WorkoutDateUtils.getDatePart(workout.date);
-      acc[date] = { marked: true, dotColor: theme.colors.primary };
-    }
-    for (const s of routineSessions) {
-      const date = WorkoutDateUtils.getDatePart(s.date);
-      acc[date] = { marked: true, dotColor: theme.colors.primary };
-    }
-    return acc;
-  }, [workouts, routineSessions, theme.colors.primary]);
-
-  const { filteredWorkouts, sessionsForDate, nonRoutineWorkouts, totalWorkouts } = useMemo(() => {
-    const filtered = workouts.filter((workout: Workout) => {
-      const workoutDate = WorkoutDateUtils.getDatePart(workout.date);
-      return workoutDate === selectedDate;
-    });
-
-    const sessions = routineSessions.filter(s => {
-      const d = WorkoutDateUtils.getDatePart(s.date);
-      return d === selectedDate;
-    });
-
-    const nonRoutine = filtered.filter(w => !w.routineTitle);
-    const total = sessions.length + nonRoutine.length;
-
-    return {
-      filteredWorkouts: filtered,
-      sessionsForDate: sessions,
-      nonRoutineWorkouts: nonRoutine,
-      totalWorkouts: total
-    };
-  }, [workouts, routineSessions, selectedDate]);
 
   // Animation d'entrée
   useEffect(() => {
     Animated.timing(fadeAnim, {
       toValue: 1,
-      duration: 300,
-      useNativeDriver: true,
+      duration: 500,
+      useNativeDriver: true
     }).start();
   }, [fadeAnim]);
 
-  React.useEffect(() => {
-    if (!__DEV__) return;
-    try {
-      console.log('[Index] selectedDate:', selectedDate);
-      console.log('[Index] sessionsForDate:', JSON.stringify(sessionsForDate));
-      console.log('[Index] nonRoutineWorkouts:', nonRoutineWorkouts.length);
-    } catch {
-    }
-  }, [selectedDate, sessionsForDate.length, nonRoutineWorkouts.length]);
+  // Handlers émotionnels
+  const handleLastSessionPress = () => {
+    router.push('/(tabs)/history');
+  };
+
+  const handleStatsPress = () => {
+    router.push('/screens/stats');
+  };
+
+  const handleStartSession = () => {
+    // TODO: Vérifier s'il y a une session active
+    router.push('/screens/workout/new');
+  };
+
+  const handleCreateRoutine = () => {
+    router.push('/screens/routines/new');
+  };
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Header
+          title={t('common.appTitle')}
+          rightComponent={
+            <LineChart size={24} color={theme.colors.text.secondary} />
+          }
+        />
+        <View style={styles.loadingContainer}>
+          <EmptyState type="loading" />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (error) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Header
+          title={t('common.appTitle')}
+          rightComponent={
+            <LineChart size={24} color={theme.colors.text.secondary} />
+          }
+        />
+        <View style={styles.errorContainer}>
+          <EmptyState type="error" />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
+      {/* Header avec icône stats */}
       <Header
         title={t('common.appTitle')}
         rightComponent={
-          <View>
-            <TouchableOpacity onPress={() => router.push('/screens/stats')}>
-              <LineChart size={24} color={theme.colors.primary} />
-            </TouchableOpacity>
+          <View style={styles.headerIcons}>
+            <LineChart
+              size={24}
+              color={theme.colors.primary}
+              onPress={handleStatsPress}
+            />
           </View>
         }
       />
 
-      <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: 100 }}>
-        <WeeklyCalendar
-          selectedDate={selectedDate}
-          onDateSelect={setSelectedDate}
-          markedDates={markedDates}
-        />
-
-
+      <ScrollView
+        style={styles.content}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
         <Animated.View style={{ opacity: fadeAnim }}>
-          {loading ? (
-            <EmptyState type="loading" />
-          ) : error ? (
-            <EmptyState type="error" />
-          ) : totalWorkouts > 0 ? (
-            <>
-              {/* Sessions de routine */}
-              {sessionsForDate.map(session => (
-                <RoutineSessionCard key={session.id} session={session} />
-              ))}
+          {/* Salutation émotionnelle personnalisée */}
+          <View style={styles.welcomeSection}>
+            <Text variant="heading" style={styles.welcomeText}>
+              {t('home.emotional.greeting', { name: homeData.userName || 'Champion' })}
+            </Text>
+            <Text variant="caption" style={styles.moodText}>
+              {t(`home.emotional.mood.${userMood}`)} • {new Date().toLocaleDateString()}
+            </Text>
+          </View>
 
-              {/* Entraînements individuels */}
-              {nonRoutineWorkouts.map(workout => (
-                <WorkoutCard key={workout.id} workout={workout} settings={settings} />
-              ))}
-            </>
-          ) : (
-            <EmptyState type="noWorkouts" selectedDate={selectedDate} />
+          {/* Pilier 1: Citation → Philosophie → Inspiration */}
+          {homeData.showPhilosophyCard && (
+            <PhilosophyCard
+              quote={currentQuote.text}
+              author={currentQuote.author}
+            />
           )}
+
+          {/* Pilier 2: Semaine → Discipline → Satisfaction */}
+          <DisciplineCard
+            weekProgress={homeData.weeklyStats.progressPercentage}
+            streak={homeData.weeklyStats.streak}
+            sessionsCompleted={homeData.weeklyStats.sessionsCompleted}
+            targetSessions={homeData.weeklyGoal.targetSessions}
+          />
+
+          {/* Pilier 3: Dernière séance → Performance → Fierté */}
+          {homeData.lastSession && (
+            <PrideCard
+              date={homeData.lastSession.date}
+              duration={homeData.lastSession.duration}
+              totalVolume={homeData.lastSession.totalVolume}
+              muscleGroups={homeData.lastSession.muscleGroups}
+              personalRecord={homeData.lastSession.personalRecord}
+              onPress={handleLastSessionPress}
+            />
+          )}
+
+          {/* Pilier 4: Objectif → Défi → Motivation */}
+          <MotivationCard
+            currentSessions={homeData.weeklyGoal.currentSessions}
+            targetSessions={homeData.weeklyGoal.targetSessions}
+            weeklyGoal={homeData.weeklyGoal.description}
+          />
+
+          {/* Pilier 5: Routine → Personnalisation → Confiance + Récompense → Résultats → Plaisir */}
+          <ConfidenceCard
+            totalRoutines={homeData.routineStats?.total || 0}
+            customRoutines={homeData.routineStats?.custom || 0}
+            totalWorkouts={homeData.totalWorkouts || 0}
+            averageRating={homeData.averageRating}
+            onCreateRoutine={handleCreateRoutine}
+          />
+
+          {/* Bouton d'action émotionnel principal */}
+          <EmotionalActionButton
+            hasActiveSession={homeData.hasActiveSession || false}
+            onPress={handleStartSession}
+            userMood={userMood}
+          />
+
+          {/* Actions rapides - Accès pratique aux fonctionnalités */}
+          <View style={styles.quickActionsSection}>
+            <Text variant="body" style={styles.sectionTitle}>
+              {t('home.quickAccess')}
+            </Text>
+            <QuickActionsRow
+              orientation="column"
+              actions={[
+                {
+                  key: 'measurements',
+                  label: t('measurements.title'),
+                  Icon: Ruler,
+                  onPress: () => router.push('/screens/measurements'),
+                },
+                {
+                  key: 'stats',
+                  label: t('stats.title'),
+                  Icon: LineChart,
+                  onPress: () => router.push('/screens/stats'),
+                },
+                {
+                  key: 'addExercise',
+                  label: t('home.viewExercise'),
+                  Icon: ListPlus,
+                  onPress: () => router.push('/screens/exercise-selection'),
+                },
+                {
+                  key: 'newRoutine',
+                  label: t('routines.title'),
+                  Icon: Plus,
+                  onPress: () => router.push('/screens/routines/new'),
+                },
+              ]}
+            />
+          </View>
+
+          {/* Espace final pour le scroll */}
+          <View style={styles.bottomSpacing} />
         </Animated.View>
       </ScrollView>
-      <FloatButtonAction
-        icon={<Plus size={24} color={theme.colors.background.main} />}
-        onPress={() => router.push({ pathname: '/screens/workout/new', params: { selectedDate } })}
-      />
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -191,5 +252,58 @@ const useStyles = () => {
     content: {
       flex: 1
     },
+    scrollContent: {
+      paddingBottom: theme.spacing.xl * 2
+    },
+    loadingContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center'
+    },
+    errorContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center'
+    },
+    headerIcons: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    welcomeSection: {
+      alignItems: 'center',
+      paddingHorizontal: theme.spacing.lg,
+      paddingVertical: theme.spacing.xl,
+      marginBottom: theme.spacing.md,
+    },
+    welcomeText: {
+      color: theme.colors.text.primary,
+      fontFamily: theme.typography.fontFamily.bold,
+      fontSize: theme.typography.fontSize.xl,
+      textAlign: 'center',
+      marginBottom: theme.spacing.xs,
+    },
+    moodText: {
+      color: theme.colors.text.secondary,
+      fontFamily: theme.typography.fontFamily.medium,
+      textAlign: 'center',
+    },
+    quickActionsSection: {
+      marginTop: theme.spacing.xl,
+      paddingTop: theme.spacing.lg,
+      borderTopWidth: 1,
+      borderTopColor: theme.colors.background.input,
+    },
+    sectionTitle: {
+      marginHorizontal: theme.spacing.lg,
+      marginBottom: theme.spacing.md,
+      color: theme.colors.text.secondary,
+      fontFamily: theme.typography.fontFamily.medium,
+      fontSize: theme.typography.fontSize.sm,
+      textTransform: 'uppercase',
+      letterSpacing: 0.5,
+    },
+    bottomSpacing: {
+      height: theme.spacing.xl * 2,
+    }
   });
 };

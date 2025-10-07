@@ -1,6 +1,7 @@
-import React, { useCallback, useMemo, useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Modal, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
-import { Calendar, ChevronDown, Timer, Dumbbell, Plus, Activity, Ruler, FileText, Target } from 'lucide-react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Calendar, ChevronDown, FileText, Plus, Target } from 'lucide-react-native';
 import { Calendar as RNCalendar } from 'react-native-calendars';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -23,28 +24,13 @@ import { formatDuration, formatRestTime } from '@/app/utils/routineUtils';
 import { formatSeries, getValidSeries } from '../../utils/seriesUtils';
 import { predefinedExercises } from '@/app/components/exercises';
 import { TranslationKey } from '@/translations';
-import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold, useFonts } from '@expo-google-fonts/inter';
-
 import UnitTypeSelector from '@/app/components/routine/UnitTypeSelector';
 import SeriesTypeSelector from '@/app/components/routine/SeriesTypeSelector';
 import SeriesInput from '@/app/components/routine/SeriesInput';
 import RestTimeSelector from '@/app/components/routine/RestTimeSelector';
 import LoadToggle from '@/app/components/routine/LoadToggle';
 
-SplashScreen.preventAutoHideAsync();
-
 export default function NewWorkoutScreen() {
-  const [fontsLoaded] = useFonts({
-    'Inter-Regular': Inter_400Regular,
-    'Inter-SemiBold': Inter_600SemiBold,
-    'Inter-Bold': Inter_700Bold
-  });
-
-  const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
-      await SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded]);
 
   const { t } = useTranslation();
   const { theme } = useTheme();
@@ -184,7 +170,7 @@ export default function NewWorkoutScreen() {
 
 
   return (
-    <View style={styles.container} onLayout={onLayoutRootView}>
+    <SafeAreaView style={styles.container}>
       <Header title={t('workout.newWorkout')} showBackButton={true} />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -408,7 +394,7 @@ export default function NewWorkoutScreen() {
         title={t('exerciseSelection.title')}
       />
 
-    </View>
+    </SafeAreaView>
   );
 }
 

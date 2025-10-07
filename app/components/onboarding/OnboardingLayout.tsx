@@ -44,7 +44,7 @@ const OnboardingLayout: React.FC<OnboardingLayoutProps> = ({
   const styles = useStyles();
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       {/* Header fixe en haut */}
       <OnboardingHeader 
         title={title} 
@@ -55,8 +55,7 @@ const OnboardingLayout: React.FC<OnboardingLayoutProps> = ({
         onBack={onBack}
       />
 
-      {/* Contenu scrollable */}
-      <ScrollView 
+      <ScrollView
         style={styles.content} 
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
@@ -78,7 +77,7 @@ const OnboardingLayout: React.FC<OnboardingLayoutProps> = ({
           nextButtonDisabled={nextButtonDisabled}
         />
       )}
-    </SafeAreaView>
+    </View>
   );
 };
 

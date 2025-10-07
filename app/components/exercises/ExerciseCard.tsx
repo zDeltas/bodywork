@@ -1,6 +1,6 @@
 import React from 'react';
 import { TouchableOpacity, View, StyleSheet, Image } from 'react-native';
-import { Star } from 'lucide-react-native';
+import { Star, Info } from 'lucide-react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { useTheme } from '@/app/hooks/useTheme';
 import useHaptics from '@/app/hooks/useHaptics';
@@ -14,13 +14,15 @@ interface ExerciseCardProps {
   isFavorite: boolean;
   onToggleFavorite: (exerciseName: string) => void;
   onSelect: (exercise: Exercise) => void;
+  onInfo?: (exercise: Exercise) => void;
 }
 
 export default function ExerciseCard({
   exercise,
   isFavorite,
   onToggleFavorite,
-  onSelect
+  onSelect,
+  onInfo
 }: ExerciseCardProps) {
   const { theme } = useTheme();
   const { impactLight, impactMedium } = useHaptics();
@@ -34,6 +36,11 @@ export default function ExerciseCard({
   const handleSelect = () => {
     impactMedium();
     onSelect(exercise);
+  };
+
+  const handleInfo = () => {
+    impactLight();
+    onInfo?.(exercise);
   };
 
   // Obtenir l'image de l'exercice
@@ -55,6 +62,20 @@ export default function ExerciseCard({
             style={styles.exerciseImage}
             resizeMode="contain"
           />
+
+          {/* Bouton info */}
+          {onInfo && (
+            <TouchableOpacity
+              style={styles.infoButton}
+              onPress={handleInfo}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Info
+                size={18}
+                color={theme.colors.text.primary}
+              />
+            </TouchableOpacity>
+          )}
           
           {/* Bouton favori */}
           <TouchableOpacity
@@ -120,6 +141,22 @@ const useStyles = () => {
       position: 'absolute',
       top: theme.spacing.sm,
       right: theme.spacing.sm,
+      backgroundColor: theme.colors.background.main,
+      borderRadius: theme.borderRadius.full,
+      padding: theme.spacing.xs,
+      shadowColor: theme.colors.shadow,
+      shadowOffset: {
+        width: 0,
+        height: 1,
+      },
+      shadowOpacity: 0.2,
+      shadowRadius: 2,
+      elevation: 2,
+    },
+    infoButton: {
+      position: 'absolute',
+      top: theme.spacing.sm,
+      left: theme.spacing.sm,
       backgroundColor: theme.colors.background.main,
       borderRadius: theme.borderRadius.full,
       padding: theme.spacing.xs,

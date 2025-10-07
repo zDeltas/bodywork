@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Alert, FlatList, Share, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, FlatList, Share, StyleSheet, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { storageService } from '@/app/services/storage';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@/app/hooks/useTheme';
 import { Plus, Star } from 'lucide-react-native';
 import FloatButtonAction from '@/app/components/ui/FloatButtonAction';
 import ConfirmModal from '@/app/components/ui/ConfirmModal';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import useHaptics from '@/app/hooks/useHaptics';
 import { Routine } from '@/types/common';
 import RoutineItem from '@/app/components/routines/RoutineItem';
@@ -14,21 +14,8 @@ import EmptyState from '@/app/components/routines/EmptyState';
 import Header from '@/app/components/layout/Header';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { TranslationKey } from '@/translations';
-import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold, useFonts } from '@expo-google-fonts/inter';
-import * as SplashScreen from 'expo-splash-screen';
 
 export default function RoutinesListScreen() {
-  const [fontsLoaded] = useFonts({
-    'Inter-Regular': Inter_400Regular,
-    'Inter-SemiBold': Inter_600SemiBold,
-    'Inter-Bold': Inter_700Bold
-  });
-
-  const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
-      await SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded]);
 
   const [routines, setRoutines] = useState<Routine[]>([]);
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
@@ -149,67 +136,67 @@ export default function RoutinesListScreen() {
   });
 
   return (
-      <View style={styles.container} onLayout={onLayoutRootView}>
-        <Header
-          title={t('routines.title' as TranslationKey)}
-          showBackButton={false}
-          rightComponent={
-            <TouchableOpacity
-              style={[styles.filterButton, showFavoritesOnly && styles.filterButtonActive]}
-              onPress={() => {
-                haptics.impactLight();
-                setShowFavoritesOnly(!showFavoritesOnly);
-              }}
-            >
-              <Star
-                size={20}
-                color={showFavoritesOnly ? theme.colors.primary : theme.colors.text.secondary}
-                fill={showFavoritesOnly ? theme.colors.primary : 'none'}
-              />
-            </TouchableOpacity>
-          }
-        />
+    <SafeAreaView style={styles.container}>
+      <Header
+        title={t('routines.title' as TranslationKey)}
+        showBackButton={false}
+        rightComponent={
+          <TouchableOpacity
+            style={[styles.filterButton, showFavoritesOnly && styles.filterButtonActive]}
+            onPress={() => {
+              haptics.impactLight();
+              setShowFavoritesOnly(!showFavoritesOnly);
+            }}
+          >
+            <Star
+              size={20}
+              color={showFavoritesOnly ? theme.colors.primary : theme.colors.text.secondary}
+              fill={showFavoritesOnly ? theme.colors.primary : 'none'}
+            />
+          </TouchableOpacity>
+        }
+      />
 
-        <FlatList
-          data={filteredRoutines}
-          renderItem={({ item }) => (
-            <RoutineItem
-              item={item}
-              onStart={handleStartRoutine}
-              onEdit={handleEditRoutine}
-              onDelete={handleDeleteRoutine}
-              onToggleFavorite={toggleFavorite}
-              onShare={handleShareRoutine}
-            />
-          )}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.listContent}
-          ListEmptyComponent={
-            <EmptyState
-              onCreateRoutine={handleCreateRoutine}
-              isFavoritesEmpty={showFavoritesOnly && routines.length > 0}
-            />
-          }
-        />
-        <FloatButtonAction
-          icon={<Plus size={24} color={theme.colors.background.main} />}
-          onPress={handleCreateRoutine}
-        />
-        
-        <ConfirmModal
-          visible={showDeleteConfirm}
-          onClose={() => {
-            setShowDeleteConfirm(false);
-            setRoutineToDelete(null);
-          }}
-          onConfirm={confirmDeleteRoutine}
-          title={t('routines.item.deleteConfirmTitle')}
-          message={routineToDelete ? t('routines.item.deleteConfirmMessage').replace('{routineName}', routineToDelete.title) : ''}
-          confirmText={t('common.delete')}
-          cancelText={t('common.cancel')}
-          variant="danger"
-        />
-      </View>
+      <FlatList
+        data={filteredRoutines}
+        renderItem={({ item }) => (
+          <RoutineItem
+            item={item}
+            onStart={handleStartRoutine}
+            onEdit={handleEditRoutine}
+            onDelete={handleDeleteRoutine}
+            onToggleFavorite={toggleFavorite}
+            onShare={handleShareRoutine}
+          />
+        )}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={styles.listContent}
+        ListEmptyComponent={
+          <EmptyState
+            onCreateRoutine={handleCreateRoutine}
+            isFavoritesEmpty={showFavoritesOnly && routines.length > 0}
+          />
+        }
+      />
+      <FloatButtonAction
+        icon={<Plus size={24} color={theme.colors.background.main} />}
+        onPress={handleCreateRoutine}
+      />
+
+      <ConfirmModal
+        visible={showDeleteConfirm}
+        onClose={() => {
+          setShowDeleteConfirm(false);
+          setRoutineToDelete(null);
+        }}
+        onConfirm={confirmDeleteRoutine}
+        title={t('routines.item.deleteConfirmTitle')}
+        message={routineToDelete ? t('routines.item.deleteConfirmMessage').replace('{routineName}', routineToDelete.title) : ''}
+        confirmText={t('common.delete')}
+        cancelText={t('common.cancel')}
+        variant="danger"
+      />
+    </SafeAreaView>
   );
 }
 

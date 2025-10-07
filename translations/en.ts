@@ -5,7 +5,7 @@ export default {
     close: 'Close',
     errorLoadingWorkouts: 'Error loading workouts:',
     errorSavingWorkouts: 'Error saving workouts:',
-    appTitle: 'Body Work',
+    appTitle: 'Gainizi',
     noWorkoutForDate: 'No workout recorded for this date',
     date: 'Date',
     noDataAvailable: 'No data available for this period',
@@ -38,6 +38,58 @@ export default {
     month: 'Month',
     year: 'Year',
     confirm: 'Confirm'
+  },
+
+  // Exercise Types (editor)
+  exerciseTypes: {
+    strength: 'Strength',
+    cardio: 'Cardio',
+    other: 'Other',
+    strength_press: 'Press',
+    strength_pull: 'Pull',
+    strength_squat: 'Squat',
+    strength_hinge: 'Hinge',
+    strength_core: 'Core',
+    cardio_run: 'Run',
+    cardio_bike: 'Bike',
+    cardio_row: 'Row',
+  },
+
+  // Home screen
+  home: {
+    greeting: 'Hey {name}',
+    morningMotivation: 'Ready to start strong today? 💪',
+    eveningMotivation: 'One last push for the road? 🔥',
+    afternoonMotivation: 'Ready to sweat? 🔥',
+    weekProgress: '{current}/{total} sessions',
+    currentWeek: 'Current week',
+    vsLastWeek: 'vs last week',
+    totalVolume: 'Total volume',
+    sessionsCompleted: 'Sessions completed',
+    streak: 'Streak',
+    streakDays: 'consecutive days',
+    lastSession: 'Last session',
+    seeDetails: 'See details',
+    weeklyGoal: 'Weekly goal',
+    almostThere: 'You\'re almost there 👊',
+    oneMoreSession: '1 more session to reach your goal 🔥',
+    goalAchieved: 'Goal achieved! 🎉',
+    quickActions: 'Quick actions',
+    viewExercise: 'View an exercise',
+    startSession: 'Start my session',
+    resumeSession: 'Resume my session',
+    motivationalQuotes: [
+      'Every rep brings you closer to your best version 💪',
+      'The only bad workout is the one you don\'t do 🔥',
+      'Your muscles grow when you sleep, but they\'re forged here 💪',
+      'Today is the perfect day to get stronger 🚀',
+      'Every drop of sweat is a step towards your goal 💦',
+      'You are stronger than your excuses 💪',
+      'Progress starts with the first step 🚀'
+    ],
+    muscleGroups: 'Muscle groups worked',
+    duration: 'Duration',
+    volume: 'Volume'
   },
 
   // Feedback modal
@@ -816,13 +868,14 @@ export default {
       nutritionTracking: 'Nutrition tracking',
       nutritionDesc: 'Enable nutrition tracking',
       rpeTracking: 'Use RPE',
-      rpeDesc: 'Enable Rate of Perceived Exertion (RPE) scale to assess exercise intensity'
+      rpeDesc: 'Enable Rate of Perceived Exertion (RPE) scale to assess exercise intensity',
+      philosophyToggle: 'Show philosophy',
+      philosophyDesc: 'Display an inspiration card with a daily quote on the home screen'
     },
     
     // Welcome Screen
     welcome: {
       title: 'Welcome {name} 👋',
-      subtitle: 'Your profile is ready!',
       message: 'You can now start your fitness journey with a personalized experience.',
       motivation: 'Your personalized fitness journey starts now. We can\'t wait to help you achieve your goals!',
       tutorialTitle: 'Need help getting started?',
@@ -841,6 +894,133 @@ export default {
       invalidHeight: 'Invalid height (100-250 cm)',
       invalidWeight: 'Invalid weight (30-300 kg)',
       selectAtLeastOne: 'Select at least one option'
+    }
+  },
+
+  // Inspirational quotes
+  quotes: {
+    strength: 'Strength does not come from physical capacity. It comes from an indomitable will.',
+    discipline: 'Discipline is the bridge between goals and accomplishment.',
+    progress: 'Progress is impossible without change, and those who cannot change their minds cannot change anything.',
+    consistency: 'Success isn\'t always about greatness. It\'s about consistency. Consistent hard work leads to success.',
+    mindset: 'In a growth mindset, challenges are exciting rather than threatening.'
+  },
+
+  // Emotional messages for home screen
+  home: {
+    quickAccess: 'Quick Access',
+    emotional: {
+      greeting: 'Hey {name}! 👋',
+      // Pillar 1: Quote → Philosophy → Inspiration
+      philosophy: 'Philosophy',
+      inspiration: 'Inspiration',
+      
+      // Pillar 2: Week → Discipline → Satisfaction
+      weeklyDiscipline: 'Weekly Discipline',
+      sessions: 'sessions',
+      daysStreak: 'consecutive days',
+      discipline: {
+        complete: 'Exemplary discipline! 🏆',
+        excellent: 'Excellent consistency! 💪',
+        good: 'Great regularity! 👍',
+        progress: 'Making progress! 📈',
+        start: 'Let\'s start together! 🚀'
+      },
+      satisfaction: {
+        complete: 'Accomplished',
+        high: 'Satisfied',
+        medium: 'On track',
+        building: 'Building'
+      },
+      
+      // Pillar 3: Last session → Performance → Pride
+      lastPerformance: 'Last Performance',
+      musclesWorked: 'Muscles worked',
+      newRecord: 'New Record!',
+      pride: {
+        record: 'Exceptional performance! 🔥',
+        exceptional: 'Impressive strength! 💥',
+        strong: 'Solid performance! 💪',
+        solid: 'Good work done! 👏',
+        progress: 'Steady progress! 📊'
+      },
+      performance: {
+        record: 'Record',
+        exceptional: 'Exceptional',
+        strong: 'Strong',
+        solid: 'Solid',
+        building: 'Progress'
+      },
+      
+      // Pillar 4: Goal → Challenge → Motivation
+      weeklyChallenge: 'Weekly Challenge',
+      progress: 'Progress',
+      defaultGoal: 'Achieve my fitness goals',
+      oneMore: 'Just one more session! 🎯',
+      sessionsLeft: '{count} sessions left',
+      challenge: {
+        conquered: 'Challenge conquered! You\'re incredible! 🏆',
+        final: 'Final stretch! You\'re almost there! 🔥',
+        close: 'So close to the goal! Keep going! 💪',
+        halfway: 'Halfway there! Excellent pace! 📈',
+        begin: 'Challenge begins! Show your strength! ⚡'
+      },
+      motivation: {
+        achieved: 'Achieved',
+        final: 'Ultimate',
+        close: 'Close',
+        momentum: 'Momentum',
+        ignite: 'Ignite'
+      },
+      
+      // Pillar 5: Routine → Personalization → Confidence + Reward → Results → Pleasure
+      personalization: 'Personalization',
+      routines: 'Routines',
+      custom: 'Custom',
+      workouts: 'Workouts',
+      enjoyment: 'enjoyment',
+      createHint: 'Tap to create a new routine',
+      confidence: {
+        expert: 'You\'ve become an expert! 🎓',
+        experienced: 'Solid experience gained! 💼',
+        growing: 'Growing confidence! 🌱',
+        building: 'Building expertise! 🔨',
+        starting: 'Beginning the journey! 🌟'
+      },
+      personalization: {
+        master: 'Routine creation master! 🎨',
+        creator: 'Passionate creator! ✨',
+        adapter: 'Smart adapter! 🔧',
+        beginner: 'First creative steps! 🎯',
+        explorer: 'Curious explorer! 🔍'
+      },
+      pleasure: {
+        joy: 'Joy',
+        satisfaction: 'Satisfaction',
+        content: 'Content',
+        progress: 'Progress',
+        discovery: 'Discovery'
+      },
+      
+      // Emotional action button
+      action: {
+        continue: 'Continue Excellence',
+        keepGoing: 'Your momentum is perfect',
+        unleash: 'Unleash Your Energy',
+        energyReady: 'Your strength overflows',
+        focus: 'Channel Your Focus',
+        mindReady: 'Your mind is ready',
+        gentle: 'Gentle Start',
+        easyStart: 'Respecting your pace',
+        transform: 'Transform Yourself',
+        readyToGrow: 'Ready to grow'
+      },
+      mood: {
+        motivated: 'Motivated',
+        tired: 'Tired',
+        energetic: 'Energetic',
+        focused: 'Focused'
+      }
     }
   }
 };

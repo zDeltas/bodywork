@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, ActivityIndicator, StatusBar, KeyboardAvoidingView, Platform, ScrollView, TextInput, ImageBackground } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, TextInput, ImageBackground } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 // Removed LinearGradient in favor of full-screen background image
 import { router, useLocalSearchParams } from 'expo-router';
@@ -125,8 +125,6 @@ const LoginScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
-
       <ImageBackground
         source={require('../../../assets/images/auth/download.jpg')}
         style={styles.bg}

@@ -1,6 +1,5 @@
-import { View } from 'react-native';
 import { Tabs, router } from 'expo-router';
-import { BookCheck, Calendar, Clock, CircleUser } from 'lucide-react-native';
+import { BookCheck, Clock, CircleUser, History, Home as HomeIcon, Calendar } from 'lucide-react-native';
 import { useTheme } from '@/app/hooks/useTheme';
 import { useEffect } from 'react';
 import { setupFeedbackQueueHandlers } from '@/app/services/feedback/queue';
@@ -10,7 +9,6 @@ function TabLayout() {
   const { theme } = useTheme();
   const { isOnboardingCompleted, isLoading } = useOnboardingStatus();
 
-  // Initialize feedback offline queue handlers
   useEffect(() => {
     const teardown = setupFeedbackQueueHandlers();
     return () => {
@@ -18,11 +16,9 @@ function TabLayout() {
     };
   }, []);
 
-  // Simple onboarding check - redirect if needed
   useEffect(() => {
     if (!isLoading && !isOnboardingCompleted) {
       console.log('[TabLayout] Onboarding not completed, redirecting to onboarding...');
-      // Use a small delay to avoid race conditions during completion
       const timer = setTimeout(() => {
         router.replace('/screens/onboarding/OnboardingScreen');
       }, 50);
@@ -33,7 +29,6 @@ function TabLayout() {
   }, [isLoading, isOnboardingCompleted]);
 
   return (
-    <View style={{ flex: 1 }}>
       <Tabs
         initialRouteName="index"
         screenOptions={{
@@ -42,8 +37,6 @@ function TabLayout() {
           tabBarStyle: {
             backgroundColor: theme.colors.background.card,
             borderTopWidth: 0,
-            height: theme.spacing['3xl'],
-            paddingBottom: theme.spacing.sm,
             ...theme.shadows.sm
           },
           tabBarLabelStyle: {
@@ -70,7 +63,14 @@ function TabLayout() {
         <Tabs.Screen
           name="index"
           options={{
-            title: 'Workouts',
+            title: 'Home',
+            tabBarIcon: ({ color, size }) => <HomeIcon size={size} color={color} />
+          }}
+        />
+        <Tabs.Screen
+          name="history"
+          options={{
+            title: 'History',
             tabBarIcon: ({ color, size }) => <Calendar size={size} color={color} />
           }}
         />
@@ -82,7 +82,6 @@ function TabLayout() {
           }}
         />
       </Tabs>
-    </View>
   );
 }
 

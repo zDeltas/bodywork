@@ -28,7 +28,7 @@ export const useDynamicStyles = () => {
       ...theme.shadows.primary
     },
     primaryText: {
-      color: theme.colors.text.primary,
+      color: theme.colors.background.main,
       fontFamily: theme.typography.fontFamily.bold,
       fontSize: theme.typography.fontSize.lg
     },

@@ -23,4 +23,9 @@ export default interface SessionContextType {
   handleRpeSave: () => void;
   handleCancel: () => void;
   handleFinishWorkout: () => void;
+}
+
+// Default export to satisfy Expo Router
+export default function SessionTypesIndex() {
+  // Empty function to satisfy Expo Router requirement
 } 

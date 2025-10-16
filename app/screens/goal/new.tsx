@@ -1,7 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Alert, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
-import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold, useFonts } from '@expo-google-fonts/inter';
-import * as SplashScreen from 'expo-splash-screen';
 import { router } from 'expo-router';
 import { ChevronDown } from 'lucide-react-native';
 import { useTranslation } from '@/app/hooks/useTranslation';
@@ -15,8 +13,6 @@ import ExerciseSelectionModal from '@/app/components/exercises/ExerciseSelection
 import { Button } from '@/app/components/ui/Button';
 import useGoals from '@/app/hooks/useGoals';
 import useWorkouts from '@/app/hooks/useWorkouts';
-
-SplashScreen.preventAutoHideAsync();
 
 // Define styles using the current theme
 const useStyles = () => {
@@ -348,17 +344,6 @@ export default function NewGoalScreen() {
   const [highestWeight, setHighestWeight] = useState<number | null>(null);
   const [isExerciseModalVisible, setIsExerciseModalVisible] = useState(false);
 
-  const [fontsLoaded] = useFonts({
-    'Inter-Regular': Inter_400Regular,
-    'Inter-SemiBold': Inter_600SemiBold,
-    'Inter-Bold': Inter_700Bold
-  });
-
-  const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
-      await SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded]);
 
   // Utiliser les hooks optimisés
   const { workouts } = useWorkouts();
@@ -482,12 +467,9 @@ export default function NewGoalScreen() {
   };
 
 
-  if (!fontsLoaded) {
-    return null;
-  }
 
   return (
-    <View style={styles.container} onLayout={onLayoutRootView}>
+    <View style={styles.container}>
       <Header title={t('goals.addGoal')} showBackButton={true} />
       <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: 100 }}>
         <Animated.View entering={FadeIn.duration(400).delay(100)} style={styles.formCard}>

@@ -137,3 +137,8 @@ export const formatEstimatedDuration = (durationInSeconds: number): string => {
   const remainingMinutes = minutes % 60;
   return `${hours}h ${remainingMinutes}min`;
 };
+
+// Default export to satisfy Expo Router
+export default function RoutineUtilsIndex() {
+  // Empty function to satisfy Expo Router requirement
+}

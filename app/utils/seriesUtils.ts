@@ -47,3 +47,8 @@ export const isValidSeries = (series: EditableSeries): boolean => {
 export const getValidSeries = (series: EditableSeries[]): EditableSeries[] => {
   return series.filter(isValidSeries);
 };
+
+// Default export to satisfy Expo Router
+export default function SeriesUtilsIndex() {
+  // Empty function to satisfy Expo Router requirement
+}

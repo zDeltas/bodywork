@@ -98,3 +98,8 @@ export const useSnackbarContext = (): SnackbarContextType => {
   }
   return context;
 };
+
+// Default export to satisfy Expo Router
+export default function SnackbarContextIndex() {
+  // Empty function to satisfy Expo Router requirement
+}

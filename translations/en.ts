@@ -5,7 +5,7 @@ export default {
     close: 'Close',
     errorLoadingWorkouts: 'Error loading workouts:',
     errorSavingWorkouts: 'Error saving workouts:',
-    appTitle: 'Body Work',
+    appTitle: 'Gainizi',
     noWorkoutForDate: 'No workout recorded for this date',
     date: 'Date',
     noDataAvailable: 'No data available for this period',
@@ -38,6 +38,58 @@ export default {
     month: 'Month',
     year: 'Year',
     confirm: 'Confirm'
+  },
+
+  // Exercise Types (editor)
+  exerciseTypes: {
+    strength: 'Strength',
+    cardio: 'Cardio',
+    other: 'Other',
+    strength_press: 'Press',
+    strength_pull: 'Pull',
+    strength_squat: 'Squat',
+    strength_hinge: 'Hinge',
+    strength_core: 'Core',
+    cardio_run: 'Run',
+    cardio_bike: 'Bike',
+    cardio_row: 'Row',
+  },
+
+  // Home screen
+  home: {
+    greeting: 'Hey {name}',
+    morningMotivation: 'Ready to start strong today? 💪',
+    eveningMotivation: 'One last push for the road? 🔥',
+    afternoonMotivation: 'Ready to sweat? 🔥',
+    weekProgress: '{current}/{total} sessions',
+    currentWeek: 'Current week',
+    vsLastWeek: 'vs last week',
+    totalVolume: 'Total volume',
+    sessionsCompleted: 'Sessions completed',
+    streak: 'Streak',
+    streakDays: 'consecutive days',
+    lastSession: 'Last session',
+    seeDetails: 'See details',
+    weeklyGoal: 'Weekly goal',
+    almostThere: 'You\'re almost there 👊',
+    oneMoreSession: '1 more session to reach your goal 🔥',
+    goalAchieved: 'Goal achieved! 🎉',
+    quickActions: 'Quick actions',
+    viewExercise: 'View an exercise',
+    startSession: 'Start my session',
+    resumeSession: 'Resume my session',
+    motivationalQuotes: [
+      'Every rep brings you closer to your best version 💪',
+      'The only bad workout is the one you don\'t do 🔥',
+      'Your muscles grow when you sleep, but they\'re forged here 💪',
+      'Today is the perfect day to get stronger 🚀',
+      'Every drop of sweat is a step towards your goal 💦',
+      'You are stronger than your excuses 💪',
+      'Progress starts with the first step 🚀'
+    ],
+    muscleGroups: 'Muscle groups worked',
+    duration: 'Duration',
+    volume: 'Volume'
   },
 
   // Feedback modal
@@ -146,7 +198,7 @@ export default {
 
   // About section
   about: {
-    title: 'BodyWork',
+    title: 'Gainizi',
     version: 'Version 1.0.0',
     description:
       'An application to track your workouts, measure your progress and achieve your fitness goals.',
@@ -604,7 +656,47 @@ export default {
     preparationDescription: 'Configure preparation time before each exercise',
     enablePreparation: 'Enable preparation time',
     preparationTime: 'Preparation duration',
-    preparationTimeDescription: 'Preparation time in seconds'
+    preparationTimeDescription: 'Preparation time in seconds',
+    skipScheduling: 'Skip scheduling',
+    updateWithoutScheduling: 'Update without scheduling'
+  },
+
+  // Schedule (top-level)
+  schedule: {
+    title: 'Schedule Routine',
+    planRoutine: 'Schedule Routine',
+    description: 'When would you like to do "{routine}"? Select the days that work for you.',
+    quickSelections: 'Quick selections',
+    chooseDays: 'Choose days',
+    summary: 'This routine will be scheduled {count} day(s) per week: {days}',
+    infoNote: 'You can modify this schedule at any time from the settings.',
+    save: 'Schedule routine',
+    update: 'Update',
+    error: {
+      title: 'Error',
+      noDaysSelected: 'Please select at least one day.'
+    },
+    quick: {
+      none: 'None',
+      weekdays: 'Weekdays',
+      weekend: 'Weekend'
+    },
+    days: {
+      monday: 'Monday',
+      tuesday: 'Tuesday',
+      wednesday: 'Wednesday',
+      thursday: 'Thursday',
+      friday: 'Friday',
+      saturday: 'Saturday',
+      sunday: 'Sunday',
+      mondayShort: 'Mon',
+      tuesdayShort: 'Tue',
+      wednesdayShort: 'Wed',
+      thursdayShort: 'Thu',
+      fridayShort: 'Fri',
+      saturdayShort: 'Sat',
+      sundayShort: 'Sun'
+    }
   },
 
   // Routines
@@ -816,13 +908,14 @@ export default {
       nutritionTracking: 'Nutrition tracking',
       nutritionDesc: 'Enable nutrition tracking',
       rpeTracking: 'Use RPE',
-      rpeDesc: 'Enable Rate of Perceived Exertion (RPE) scale to assess exercise intensity'
+      rpeDesc: 'Enable Rate of Perceived Exertion (RPE) scale to assess exercise intensity',
+      philosophyToggle: 'Show philosophy',
+      philosophyDesc: 'Display an inspiration card with a daily quote on the home screen'
     },
     
     // Welcome Screen
     welcome: {
       title: 'Welcome {name} 👋',
-      subtitle: 'Your profile is ready!',
       message: 'You can now start your fitness journey with a personalized experience.',
       motivation: 'Your personalized fitness journey starts now. We can\'t wait to help you achieve your goals!',
       tutorialTitle: 'Need help getting started?',
@@ -841,6 +934,284 @@ export default {
       invalidHeight: 'Invalid height (100-250 cm)',
       invalidWeight: 'Invalid weight (30-300 kg)',
       selectAtLeastOne: 'Select at least one option'
+    }
+  },
+
+  // Inspirational quotes
+  quotes: {
+    strength: 'Strength does not come from physical capacity. It comes from an indomitable will.',
+    discipline: 'Discipline is the bridge between goals and accomplishment.',
+    progress: 'Progress is impossible without change, and those who cannot change their minds cannot change anything.',
+    consistency: 'Success isn\'t always about greatness. It\'s about consistency. Consistent hard work leads to success.',
+    mindset: 'In a growth mindset, challenges are exciting rather than threatening.'
+  },
+
+  // Emotional messages for home screen
+  home: {
+    quickAccess: 'Quick Access',
+    
+    // Weekly Discipline & Challenge - Distinct micro-copy
+    weeklyDiscipline: {
+      title: 'Weekly Discipline',
+      adherenceRate: 'Adherence rate',
+      streakWeeks: 'consecutive weeks',
+      onTime: 'On-time',
+      microCopy: '{completed}/{planned} planned sessions held • 🔥 Streak {streak} wks.',
+      cta: {
+        planWeek: 'Plan my week',
+        catchUp: 'Catch up a session',
+        maintain: 'Stay on track'
+      },
+      messages: {
+        exemplary: 'Exemplary consistency! 🏆',
+        excellent: 'Excellent adherence! 💪',
+        good: 'Great regularity! 👍',
+        progress: 'Making progress! 📈',
+        restart: 'Let\'s get back on track! 🚀'
+      }
+    },
+    
+    weeklyChallenge: {
+      title: 'Weekly Challenge',
+      microCopy: 'Challenge {current}/{target} {unit} • {days} days left ⚡',
+      units: {
+        sessions: 'sessions',
+        volume: 'kg',
+        pr: 'PR'
+      },
+      cta: {
+        newChallenge: 'New challenge',
+        startSession: 'Start session #{number}',
+        continue: 'Continue challenge'
+      },
+      messages: {
+        conquered: 'Challenge conquered! 🏆',
+        final: 'Final stretch! 🔥',
+        close: 'So close to the goal! 💪',
+        halfway: 'Halfway there! 📈',
+        begin: 'Challenge begins! ⚡'
+      }
+    },
+
+    // New Gainizi cards
+    adherence: {
+      title: 'Planning Adherence',
+      subtitle: 'Stay true to your program',
+      sessionsHeld: 'sessions held',
+      regularWeeks: 'regular weeks',
+      excellent: 'Excellent discipline 💪',
+      good: 'You\'re on the right track 🚀',
+      building: 'Keep it up 👊',
+      restart: 'Try to keep the pace 👊'
+    },
+
+    challenge: {
+      title: 'Weekly Challenge',
+      subtitle: 'Reach your goal before Sunday!',
+      progress: 'Progress',
+      sessions: 'sessions',
+      exercises: 'exercises',
+      completed: 'Challenge completed! 🏆',
+      almostThere: 'Almost there ⚡',
+      halfway: 'Halfway through! 🔥',
+      building: 'Taking shape! 💪',
+      start: 'The challenge begins! 🔥',
+      sessionsLeft: '{count} more session to succeed',
+      daysLeft: '{count} days left'
+    },
+
+    gainizi: {
+      title: 'Gainizi Dashboard',
+      subtitle: 'Smart tracking of your performance'
+    },
+
+    dailyRoutine: {
+      title: 'Today\'s Sessions',
+      estimatedDuration: 'Estimated duration',
+      lastTime: 'Last time',
+      startSession: 'Start my session',
+      resumeSession: 'Resume my session',
+      viewSession: 'View session',
+      startNewSession: 'Start a session',
+      createRoutine: 'Create a routine',
+      allCompleted: 'All done 🎉',
+      noRoutineMessage: 'No session planned for today. Ready to create your own session?',
+      sessionCompletedMessage: 'Well done! You completed today\'s session 🎉',
+      viewPlanning: 'View my planning',
+      routinesPlanned: 'sessions planned',
+      totalDuration: 'Total duration',
+      progress: 'Progress',
+      motivationalReady: 'Ready to train? 💪',
+      motivationalContinue: 'Keep your consistency streak going 🔥',
+      motivationalCompleted: 'Great consistency today! 🔥',
+      motivationalRest: 'Enjoy your rest day ☀️'
+    },
+
+    weeklyRoutines: {
+      title: 'This Week\'s Planned Sessions',
+      weekProgress: 'Week: {completed}/{target} sessions completed',
+      targetReached: 'Target reached! Keep the momentum going 🔥',
+      weekCompleted: 'Week completed ✅ {completed}/{target} sessions — excellent consistency 👏',
+      oneMore: '1 more to complete your goal 💪',
+      twoMore: '2 more to complete your goal 💪',
+      keepGoing: '{remaining} more to complete your goal 💪',
+      weekEnded: 'Week ended! Prepare for the next one 📅',
+      planNextWeek: 'Plan next week',
+      viewRoutines: 'View my sessions',
+      viewProgramming: 'View my programming',
+      restDay: 'Rest ☀️'
+    },
+
+    schedule: {
+      title: 'Schedule Routine',
+      planRoutine: 'Schedule Routine',
+      description: 'When would you like to do "test"? Select the days that work for you.',
+      quickSelections: 'Quick selections',
+      chooseDays: 'Choose days',
+      summary: 'This routine will be scheduled {count} day(s) per week: {days}',
+      infoNote: 'You can modify this schedule at any time from the settings.',
+      save: 'Schedule routine',
+      update: 'Update',
+      error: {
+        title: 'Error',
+        noDaysSelected: 'Please select at least one day.'
+      },
+      quick: {
+        none: 'None',
+        weekdays: 'Weekdays',
+        weekend: 'Weekend'
+      },
+      days: {
+        monday: 'Monday',
+        tuesday: 'Tuesday',
+        wednesday: 'Wednesday',
+        thursday: 'Thursday',
+        friday: 'Friday',
+        saturday: 'Saturday',
+        sunday: 'Sunday',
+        mondayShort: 'Mon',
+        tuesdayShort: 'Tue',
+        wednesdayShort: 'Wed',
+        thursdayShort: 'Thu',
+        fridayShort: 'Fri',
+        saturdayShort: 'Sat',
+        sundayShort: 'Sun'
+      }
+    },
+
+    
+    emotional: {
+      greeting: 'Hey {name}! 👋',
+      // Pillar 1: Quote → Philosophy → Inspiration
+      philosophy: 'Philosophy',
+      inspiration: 'Inspiration',
+      
+      // Pillar 2: Week → Discipline → Satisfaction
+      weeklyDiscipline: 'Weekly Discipline',
+      sessions: 'sessions',
+      daysStreak: 'consecutive days',
+      discipline: {
+        complete: 'Exemplary discipline! 🏆',
+        excellent: 'Excellent consistency! 💪',
+        good: 'Great regularity! 👍',
+        progress: 'Making progress! 📈',
+        start: 'Let\'s start together! 🚀'
+      },
+      satisfaction: {
+        complete: 'Accomplished',
+        high: 'Satisfied',
+        medium: 'On track',
+        building: 'Building'
+      },
+      
+      // Pillar 3: Last session → Performance → Pride
+      lastPerformance: 'Last Performance',
+      musclesWorked: 'Muscles worked',
+      newRecord: 'New Record!',
+      pride: {
+        record: 'Exceptional performance! 🔥',
+        exceptional: 'Impressive strength! 💥',
+        strong: 'Solid performance! 💪',
+        solid: 'Good work done! 👏',
+        progress: 'Steady progress! 📊'
+      },
+      performance: {
+        record: 'Record',
+        exceptional: 'Exceptional',
+        strong: 'Strong',
+        solid: 'Solid',
+        building: 'Progress'
+      },
+      
+      // Pillar 4: Goal → Challenge → Motivation (Legacy - to remove)
+      weeklyChallenge: 'Weekly Challenge',
+      progress: 'Progress',
+      defaultGoal: 'Achieve my fitness goals',
+      oneMore: 'Just one more session! 🎯',
+      sessionsLeft: '{count} sessions left',
+      challenge: {
+        conquered: 'Challenge conquered! You\'re incredible! 🏆',
+        final: 'Final stretch! You\'re almost there! 🔥',
+        close: 'So close to the goal! Keep going! 💪',
+        halfway: 'Halfway there! Excellent pace! 📈',
+        begin: 'Challenge begins! Show your strength! ⚡'
+      },
+      motivation: {
+        achieved: 'Achieved',
+        final: 'Ultimate',
+        close: 'Close',
+        momentum: 'Momentum',
+        ignite: 'Ignite'
+      },
+      
+      // Pillar 5: Routine → Personalization → Confidence + Reward → Results → Pleasure
+      personalization: 'Personalization',
+      routines: 'Routines',
+      custom: 'Custom',
+      workouts: 'Workouts',
+      enjoyment: 'enjoyment',
+      createHint: 'Tap to create a new routine',
+      confidence: {
+        expert: 'You\'ve become an expert! 🎓',
+        experienced: 'Solid experience gained! 💼',
+        growing: 'Growing confidence! 🌱',
+        building: 'Building expertise! 🔨',
+        starting: 'Beginning the journey! 🌟'
+      },
+      personalization: {
+        master: 'Routine creation master! 🎨',
+        creator: 'Passionate creator! ✨',
+        adapter: 'Smart adapter! 🔧',
+        beginner: 'First creative steps! 🎯',
+        explorer: 'Curious explorer! 🔍'
+      },
+      pleasure: {
+        joy: 'Joy',
+        satisfaction: 'Satisfaction',
+        content: 'Content',
+        progress: 'Progress',
+        discovery: 'Discovery'
+      },
+      
+      // Emotional action button
+      action: {
+        continue: 'Continue Excellence',
+        keepGoing: 'Your momentum is perfect',
+        unleash: 'Unleash Your Energy',
+        energyReady: 'Your strength overflows',
+        focus: 'Channel Your Focus',
+        mindReady: 'Your mind is ready',
+        gentle: 'Gentle Start',
+        easyStart: 'Respecting your pace',
+        transform: 'Transform Yourself',
+        readyToGrow: 'Ready to grow'
+      },
+      mood: {
+        motivated: 'Motivated',
+        tired: 'Tired',
+        energetic: 'Energetic',
+        focused: 'Focused'
+      }
     }
   }
 };

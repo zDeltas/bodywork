@@ -1,5 +1,5 @@
 /**
- * Light theme configuration for the Bodywork application
+ * Light theme configuration for the Gainizi application
  * This file contains all the styling variables for the light theme
  */
 

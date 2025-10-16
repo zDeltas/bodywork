@@ -12,6 +12,7 @@ import { WorkoutDateUtils } from '@/types/workout';
 import { Calendar, ChevronLeft, ChevronRight, Clock, Dumbbell, FileText, ActivitySquare, Target } from 'lucide-react-native';
 import { getExerciseImage } from '@/app/components/exercises';
 import MuscleMap from '@/app/components/muscles/MuscleMap';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const useStyles = () => {
   const { theme } = useTheme();
@@ -511,7 +512,7 @@ export default function RoutineHistoryScreen() {
   }, [loadData]);
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Header title={params.title || routine?.title || t('routineHistory.title')} showBackButton />
       <ScrollView contentContainerStyle={styles.content}>
         {allSessions.length > 0 && (
@@ -826,6 +827,6 @@ export default function RoutineHistoryScreen() {
           </View>
         )}
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }

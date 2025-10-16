@@ -164,3 +164,8 @@ export const useWorkoutForm = () => {
     canSave
   };
 };
+
+// Default export to satisfy Expo Router
+export default function UseWorkoutFormIndex() {
+  // Empty function to satisfy Expo Router requirement
+}

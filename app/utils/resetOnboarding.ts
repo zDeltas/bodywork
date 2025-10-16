@@ -29,3 +29,8 @@ export const checkOnboardingStatus = async () => {
     return null;
   }
 };
+
+// Default export to satisfy Expo Router
+export default function ResetOnboardingIndex() {
+  // Empty function to satisfy Expo Router requirement
+}

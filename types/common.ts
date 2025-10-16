@@ -56,6 +56,20 @@ export interface Routine {
   exerciseRestMode?: 'beginner' | 'advanced';
   enablePreparation?: boolean;
   preparationTime?: number; // en secondes
+  // Planification
+  scheduledDays?: DayOfWeek[];
+  isScheduled?: boolean;
+}
+
+export type DayOfWeek = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
+
+export interface RoutineSchedule {
+  routineId: string;
+  routineTitle: string;
+  scheduledDays: DayOfWeek[];
+  createdAt: string;
+  updatedAt: string;
+  isActive: boolean;
 }
 
 export interface RoutineStats {

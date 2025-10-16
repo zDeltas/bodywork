@@ -11,13 +11,17 @@ import {
   Share as ShareIcon,
   Star,
   Trash2,
-  TrendingUp
+  TrendingUp,
+  Calendar
 } from 'lucide-react-native';
 import useHaptics from '@/app/hooks/useHaptics';
 import { Routine, RoutineStats } from '@/types/common';
 import Modal from '@/app/components/ui/Modal';
 import { useTheme } from '@/app/hooks/useTheme';
 import { useTranslation } from '@/app/hooks/useTranslation';
+import { useRoutineSchedule } from '@/app/hooks/useRoutineSchedule';
+import routineScheduleService from '@/app/services/routineSchedule';
+import { DayOfWeek } from '@/types/common';
 
 type RoutineItemProps = {
   item: Routine;
@@ -59,6 +63,34 @@ const RoutineItem = React.memo(({
   const { t } = useTranslation();
   const styles = useStyles(theme);
   const stats = calculateStats(item);
+  const { getScheduleByRoutineId } = useRoutineSchedule();
+  const schedule = getScheduleByRoutineId(item.id);
+
+  const getDayShortLabel = (day: DayOfWeek) => {
+    switch (day) {
+      case 'monday': return t('schedule.days.mondayShort');
+      case 'tuesday': return t('schedule.days.tuesdayShort');
+      case 'wednesday': return t('schedule.days.wednesdayShort');
+      case 'thursday': return t('schedule.days.thursdayShort');
+      case 'friday': return t('schedule.days.fridayShort');
+      case 'saturday': return t('schedule.days.saturdayShort');
+      case 'sunday': return t('schedule.days.sundayShort');
+    }
+  };
+
+  const renderScheduledDays = () => {
+    if (!schedule || !schedule.isActive || schedule.scheduledDays.length === 0) return null;
+    const ordered = [...schedule.scheduledDays].sort(
+      (a, b) => routineScheduleService.getDayNumber(a) - routineScheduleService.getDayNumber(b)
+    );
+    const label = ordered.map((d) => getDayShortLabel(d)).join(', ');
+    return (
+      <View style={styles.scheduledRow}>
+        <Calendar size={16} color={theme.colors.text.secondary} />
+        <Text style={styles.scheduledText}>{label}</Text>
+      </View>
+    );
+  };
 
   const handleAction = (action: () => void) => {
     setShowActionsModal(false);
@@ -103,9 +135,7 @@ const RoutineItem = React.memo(({
 
   return (
     <>
-      <TouchableOpacity
-        onLongPress={() => haptics.impactMedium()}
-        delayLongPress={200}
+      <View
         style={styles.routineCard}
       >
         <View style={styles.routineHeader}>
@@ -124,6 +154,8 @@ const RoutineItem = React.memo(({
         {item.description && (
           <Text style={styles.routineDescription}>{item.description}</Text>
         )}
+
+        {renderScheduledDays()}
 
         <View style={styles.routineStats}>
           {renderStats().map((stat, index) => (
@@ -159,7 +191,7 @@ const RoutineItem = React.memo(({
             </TouchableOpacity>
           </View>
         </View>
-      </TouchableOpacity>
+      </View>
 
       <Modal
         visible={showActionsModal}
@@ -228,6 +260,16 @@ const useStyles = (theme: any) => StyleSheet.create({
     flexDirection: 'row',
     gap: 16,
     marginBottom: 12
+  },
+  scheduledRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 8
+  },
+  scheduledText: {
+    fontSize: 13,
+    color: theme.colors.text.secondary
   },
   statItem: {
     flexDirection: 'row',

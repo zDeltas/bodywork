@@ -58,7 +58,7 @@ export const useCSVExport = () => {
 
       // Create a temporary file
       const fileDate = new Date().toISOString().split('T')[0];
-      const fileName = `bodywork_workouts_${fileDate}.csv`;
+      const fileName = `gainizi_workouts_${fileDate}.csv`;
       const filePath = `${FileSystem.documentDirectory}${fileName}`;
 
       // Write CSV content to the file

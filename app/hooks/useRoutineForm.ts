@@ -315,3 +315,8 @@ export const useRoutineForm = () => {
     updatePreparationTime
   };
 };
+
+// Default export to satisfy Expo Router
+export default function UseRoutineFormIndex() {
+  // Empty function to satisfy Expo Router requirement
+}

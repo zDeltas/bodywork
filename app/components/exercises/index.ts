@@ -725,3 +725,8 @@ export { default as ExerciseCard } from './ExerciseCard';
 export { default as InteractiveMuscleMap } from './InteractiveMuscleMap';
 export { default as ExerciseListModal } from './ExerciseListModal';
 
+// Default export to satisfy Expo Router
+export default function ExercisesIndex() {
+  // Empty function to satisfy Expo Router requirement
+}
+

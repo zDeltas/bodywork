@@ -49,3 +49,8 @@ export const useOnboarding = (): OnboardingContextType => {
   }
   return ctx as OnboardingContextType;
 };
+
+// Default export to satisfy Expo Router
+export default function UseOnboardingIndex() {
+  // Empty function to satisfy Expo Router requirement
+}

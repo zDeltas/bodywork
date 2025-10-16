@@ -13,15 +13,12 @@ import calculations from '@/app/utils/calculations';
 import { ChartSkeleton, StatsCardSkeleton } from '@/app/components/ui/SkeletonComponents';
 import useWorkouts from '@/app/hooks/useWorkouts';
 import { TranslationKey } from '@/translations';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface ExerciseData {
   x: Date;
   y: number;
 }
-
-const formatDate = (date: string): string => {
-  return format(parseISO(date), 'dd MMM', { locale: fr });
-};
 
 const useStyles = () => {
   const { theme } = useTheme();
@@ -400,21 +397,8 @@ const ExerciseDetails = () => {
     }
   };
 
-  const getYAxisLabel = () => {
-    switch (selectedChartType) {
-      case '1rm':
-        return 'kg';
-      case 'volume':
-        return 'kg';
-      case 'reps':
-        return t('stats.repetitions');
-      default:
-        return '';
-    }
-  };
-
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Header title={t(exercise as TranslationKey)} showBackButton={true} />
 
       <ScrollView style={styles.content}>
@@ -775,7 +759,7 @@ const ExerciseDetails = () => {
           )}
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 

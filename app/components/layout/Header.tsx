@@ -1,5 +1,5 @@
 import React from 'react';
-import { Platform, StatusBar, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import { Platform, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/app/hooks/useTheme';
 import { router } from 'expo-router';
@@ -38,32 +38,19 @@ const Header: React.FC<HeaderProps> = ({
   };
 
   // Calcul des dimensions selon la plateforme
-  const statusBarHeight =
-    Platform.select({
-      ios: insets.top,
-      android: StatusBar.currentHeight || 0
-    }) ?? 0;
-
   const navBarHeight =
     Platform.select({
       ios: largeTitle ? 96 : 44,
       android: 56
     }) ?? 44;
 
-  const totalHeight = statusBarHeight + navBarHeight;
-
   return (
     <View
       style={[
         headerStyles.container,
-        { height: totalHeight, backgroundColor: transparent ? 'transparent' : theme.colors.background.main }
+        { height: navBarHeight, backgroundColor: transparent ? 'transparent' : theme.colors.background.main }
       ]}
     >
-      <StatusBar
-        barStyle={transparent ? 'light-content' : (isDarkMode ? 'light-content' : 'dark-content')}
-        backgroundColor={transparent ? 'transparent' : theme.colors.background.main}
-        translucent={transparent}
-      />
       <View style={[headerStyles.navBar, { height: navBarHeight }]}>
         <View style={headerStyles.leftContainer}>
           {showBackButton && (

@@ -347,7 +347,7 @@ jest.mock('@/app/services/storage', () => {
       WORKOUTS: 'workouts',
       GOALS: 'goals',
       MEASUREMENTS: 'measurements',
-      SETTINGS: 'bodywork_settings',
+      SETTINGS: 'gainizi_settings',
       FAVORITE_EXERCISES: 'favoriteExercises',
       RECENT_EXERCISES: 'recentExercises',
       STORAGE_VERSION: 'storage_version',

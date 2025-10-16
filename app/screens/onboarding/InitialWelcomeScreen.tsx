@@ -70,7 +70,6 @@ const InitialWelcomeScreen: React.FC = () => {
           </TouchableOpacity>
         )}
 
-        {/* Overlay sombre pour améliorer la lisibilité */}
         <View style={styles.overlay} />
         
         <View style={styles.content}>

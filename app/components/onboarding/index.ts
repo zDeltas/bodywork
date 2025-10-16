@@ -13,3 +13,8 @@ export { default as DatePicker } from './DatePicker';
 export { default as RadioGroup } from './RadioGroup';
 export { default as WeeklySlider } from './WeeklySlider';
 export { default as CheckboxGroup } from './CheckboxGroup';
+
+// Default export to satisfy Expo Router
+export default function OnboardingIndex() {
+  // Empty function to satisfy Expo Router requirement
+}

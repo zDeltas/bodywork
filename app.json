@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "bodywork",
-    "slug": "bodywork",
+    "name": "gainizi",
+    "slug": "gainizi",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -25,10 +25,6 @@
     ],
     "experiments": {
       "typedRoutes": true
-    },
-    "extra": {
-      "SUPABASE_URL": "https://wzmosunetftpqpbtmfru.supabase.co",
-      "SUPABASE_ANON_KEY": "sb_publishable_13NLehrWpuLIKGAUjclQTQ_-IGv_T1J"
     }
   }
 }

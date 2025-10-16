@@ -5,6 +5,7 @@ import { useTranslation } from '@/app/hooks/useTranslation';
 import Modal from '@/app/components/ui/Modal';
 import UnifiedExerciseList from '@/app/components/exercises/UnifiedExerciseList';
 import { Exercise } from '@/types/common';
+import { useRouter } from 'expo-router';
 
 interface ExerciseListModalProps {
   visible: boolean;
@@ -28,6 +29,7 @@ export default function ExerciseListModal({
   const { theme } = useTheme();
   const { t } = useTranslation();
   const styles = useStyles();
+  const router = useRouter();
 
   const modalTitle = title || t('stats.selectExercise');
 
@@ -51,8 +53,14 @@ export default function ExerciseListModal({
           onExerciseSelect={onExerciseSelect}
           showSearch
           showViewModeToggle={false}
-          showAddButton={false}
+          showAddButton={true}
           showFavorites={false}
+          onAddCustomExercise={() =>
+            router.push({
+              pathname: '/screens/exercise-custom-edit',
+              params: { muscleGroupLabel: selectedMuscle || '' }
+            })
+          }
         />
       </ScrollView>
     </Modal>

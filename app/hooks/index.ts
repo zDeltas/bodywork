@@ -14,3 +14,8 @@ export { default as useStorage } from './useStorage';
 export { default as useTheme } from './useTheme';
 export { default as useTranslation } from './useTranslation';
 export { default as useWorkouts } from './useWorkouts';
+
+// Default export to satisfy Expo Router
+export default function HooksIndex() {
+  // Empty function to satisfy Expo Router requirement
+}

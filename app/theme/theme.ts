@@ -1,5 +1,5 @@
 /**
- * Main theme configuration for the Bodywork application
+ * Main theme configuration for the Gainizi application
  * This file contains all the styling variables used throughout the app
  */
 

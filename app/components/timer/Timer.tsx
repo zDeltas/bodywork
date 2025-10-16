@@ -1,10 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Platform, StyleSheet, Vibration, View } from 'react-native';
-import {
-  Inter_400Regular as InterRegular,
-  Inter_600SemiBold as InterSemiBold,
-  useFonts
-} from '@expo-google-fonts/inter';
 import { Pause, Play, RotateCcw } from 'lucide-react-native';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
@@ -41,10 +36,6 @@ export default function Timer({
   const [isRunning, setIsRunning] = useState(false);
   const [currentSet, setCurrentSet] = useState(1);
   const [phase, setPhase] = useState<'prep' | 'work' | 'rest'>('prep');
-  const [fontsLoaded] = useFonts({
-    'Inter-Regular': InterRegular,
-    'Inter-SemiBold': InterSemiBold
-  });
   const countdownPlayer = useAudioPlayer(require('@/assets/sounds/countdown.mp3'));
   const transitionPlayer = useAudioPlayer(require('@/assets/sounds/transition.mp3'));
 
@@ -191,10 +182,6 @@ export default function Timer({
     workChrono.reset(0);
     haptics.impactMedium();
   }, [initialTime, restTime, prepTime, haptics]);
-
-  if (!fontsLoaded) {
-    return null;
-  }
 
   const phaseLabel = phase === 'prep' ? 'Préparation' : phase === 'work' ? 'Travail' : 'Repos';
   const phaseColors = {

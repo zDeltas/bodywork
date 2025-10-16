@@ -10,7 +10,6 @@ import Header from '@/app/components/layout/Header';
 import Text from '@/app/components/ui/Text';
 import useHaptics from '@/app/hooks/useHaptics';
 import Modal from '@/app/components/ui/Modal';
-import useAuth from '@/app/hooks/useAuth';
 
 interface SettingItemProps {
   icon: React.ReactNode;
@@ -77,7 +76,6 @@ function ProfileScreen({ showBackButton = true }: ProfileScreenProps) {
   const styles = useStyles();
   const [showInstagramModal, setShowInstagramModal] = useState(false);
   const haptics = useHaptics();
-  const { isAuthenticated } = useAuth();
 
   const openInstagram = async (useApp: boolean) => {
     const instagramUrl = 'instagram://user?username=gainiziapp';

@@ -8,6 +8,7 @@ import useHaptics from '@/app/hooks/useHaptics';
 import Text from '@/app/components/ui/Text';
 import InteractiveMuscleMap, { MuscleGroupKey } from './InteractiveMuscleMap';
 import UnifiedExerciseList from './UnifiedExerciseList';
+import { useRouter } from 'expo-router';
 import { Exercise, getMuscleGroups, muscleGroupKeys } from './index';
 
 export interface ExerciseSelectionModalProps {
@@ -33,6 +34,7 @@ export default function ExerciseSelectionModal({
   const { theme } = useTheme();
   const { impactLight, impactMedium } = useHaptics();
   const styles = useStyles();
+  const router = useRouter();
 
   const muscleGroups = useMemo(() => getMuscleGroups(t as (key: string) => string), [t]);
 
@@ -145,8 +147,14 @@ export default function ExerciseSelectionModal({
                 onExerciseSelect={handleExerciseChosen}
                 showSearch={false}
                 showViewModeToggle={true}
-                showAddButton={false}
+                showAddButton={true}
                 showFavorites={true}
+                onAddCustomExercise={() =>
+                  router.push({
+                    pathname: '/screens/exercise-custom-edit',
+                    params: { muscleGroupLabel: selectedMuscle ? getMuscleGroupName(selectedMuscle) : '' }
+                  })
+                }
               />
             </View>
           )}

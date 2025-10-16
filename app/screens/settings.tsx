@@ -44,6 +44,8 @@ export default function SettingsScreen() {
     })();
   }, []);
 
+  
+
   const openWeightUnitModal = () => {
     setShowWeightUnitModal(true);
     haptics.impactLight();
@@ -162,7 +164,6 @@ export default function SettingsScreen() {
         <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: 100 }}>
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>{t('settings.preferences')}</Text>
-
             <View className="rpe-setting" style={styles.settingItem}>
               <View style={styles.settingInfo}>
                 <User size={24} color={theme.colors.primary} />

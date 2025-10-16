@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Platform, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import * as SplashScreen from 'expo-splash-screen';
 import { Clock, Minus, Plus, Settings, Timer as TimerIcon } from 'lucide-react-native';
 import { useTranslation } from '@/app/hooks/useTranslation';
@@ -64,7 +65,7 @@ function TimerScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Header
         title={String(t('timer.title'))}
         showBackButton={false}
@@ -181,7 +182,7 @@ function TimerScreen() {
         onConfirm={handleCustomPrepTimeSave}
         modalTitle={'Préparation'}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 

@@ -6,9 +6,10 @@ export enum StorageKeys {
   WORKOUTS = 'workouts',
   GOALS = 'goals',
   MEASUREMENTS = 'measurements',
-  SETTINGS = 'bodywork_settings',
+  SETTINGS = 'gainizi_settings',
   FAVORITE_EXERCISES = 'favoriteExercises',
   RECENT_EXERCISES = 'recentExercises',
+  CUSTOM_EXERCISES = 'customExercises',
   STORAGE_VERSION = 'storage_version',
   ROUTINES = 'routines',
   ROUTINE_SESSIONS = 'routine_sessions',
@@ -42,6 +43,7 @@ export type StorageData = {
   [StorageKeys.SETTINGS]: Settings;
   [StorageKeys.FAVORITE_EXERCISES]: string[];
   [StorageKeys.RECENT_EXERCISES]: string[];
+  [StorageKeys.CUSTOM_EXERCISES]: any[];
   [StorageKeys.STORAGE_VERSION]: string;
   [StorageKeys.ROUTINES]: any[];
   [StorageKeys.ROUTINE_SESSIONS]: RoutineSession[];
@@ -63,6 +65,7 @@ const defaultValues: StorageData = {
   },
   [StorageKeys.FAVORITE_EXERCISES]: [],
   [StorageKeys.RECENT_EXERCISES]: [],
+  [StorageKeys.CUSTOM_EXERCISES]: [],
   [StorageKeys.STORAGE_VERSION]: CURRENT_STORAGE_VERSION,
   [StorageKeys.ROUTINES]: [],
   [StorageKeys.ROUTINE_SESSIONS]: [],
@@ -95,6 +98,28 @@ class StorageService {
     } catch (error) {
       console.error('Erreur lors de l\'initialisation du stockage:', error);
     }
+  }
+
+  async getCustomExercises(): Promise<any[]> {
+    const list = await this.getItem<any[]>(StorageKeys.CUSTOM_EXERCISES);
+    return list || defaultValues[StorageKeys.CUSTOM_EXERCISES];
+  }
+
+  async saveCustomExercise(ex: any): Promise<void> {
+    const list = await this.getCustomExercises();
+    const idx = list.findIndex((e) => e.key === ex.key);
+    if (idx !== -1) {
+      list[idx] = ex;
+    } else {
+      list.push(ex);
+    }
+    await this.setItem(StorageKeys.CUSTOM_EXERCISES, list);
+  }
+
+  async deleteCustomExercise(key: string): Promise<void> {
+    const list = await this.getCustomExercises();
+    const next = list.filter((e) => e.key !== key);
+    await this.setItem(StorageKeys.CUSTOM_EXERCISES, next);
   }
 
   async resetAllData(): Promise<void> {
@@ -365,7 +390,6 @@ class StorageService {
     return next;
   }
 
-  // --- Onboarding helpers ---
   async getOnboardingStatus(): Promise<boolean> {
     const status = await this.getItem<boolean>(StorageKeys.ONBOARDING_COMPLETED);
     return status ?? defaultValues[StorageKeys.ONBOARDING_COMPLETED];

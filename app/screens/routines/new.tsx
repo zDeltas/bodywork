@@ -3,6 +3,7 @@ import { ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react
 import Header from '@/app/components/layout/Header';
 import Text from '@/app/components/ui/Text';
 import Button from '@/app/components/ui/Button';
+import OnboardingFooter from '@/app/components/onboarding/OnboardingFooter';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import ExerciseSelectionModal from '@/app/components/exercises/ExerciseSelectionModal';
 import TimerPickerModal from '@/app/components/timer/TimerPickerModal';
@@ -17,21 +18,13 @@ import { formatRestTime, generateRoutineId, isRoutineComplete } from '@/app/util
 import SeriesConfigModal from '@/app/components/routine/SeriesConfigModal';
 import RoutineExerciseCard from '@/app/components/routine/RoutineExerciseCard';
 import { useSnackbar } from '@/app/hooks/useSnackbar';
-import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold, useFonts } from '@expo-google-fonts/inter';
-import * as SplashScreen from 'expo-splash-screen';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRoutineSchedule } from '@/app/hooks/useRoutineSchedule';
+import { DayOfWeek } from '@/types/common';
+import routineScheduleService from '@/app/services/routineSchedule';
+import ActionFooter from '@/app/components/ui/ActionFooter';
 
 function NewRoutineScreen() {
-  const [fontsLoaded] = useFonts({
-    'Inter-Regular': Inter_400Regular,
-    'Inter-SemiBold': Inter_600SemiBold,
-    'Inter-Bold': Inter_700Bold
-  });
-
-  const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
-      await SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded]);
 
   const { t } = useTranslation();
   const { theme } = useTheme();
@@ -45,9 +38,13 @@ function NewRoutineScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [showCommonRestTimePicker, setShowCommonRestTimePicker] = useState(false);
   const [showPreparationTimePicker, setShowPreparationTimePicker] = useState(false);
+  const [savedRoutineId, setSavedRoutineId] = useState<string | null>(null);
+  const [selectedDays, setSelectedDays] = useState<DayOfWeek[]>([]);
+  const [quickSelection, setQuickSelection] = useState<'none' | 'week' | 'weekend'>('none');
   const isEditMode = Boolean(id);
 
   const { showSuccess, showError } = useSnackbar();
+  const { saveSchedule } = useRoutineSchedule();
 
   const {
     routine,
@@ -112,6 +109,33 @@ function NewRoutineScreen() {
     }
   }, [isEditMode, id]);
 
+  // Preselect scheduled days when editing
+  useEffect(() => {
+    const loadExistingSchedule = async () => {
+      if (!isEditMode || !id) return;
+      try {
+        const existing = await routineScheduleService.getScheduleByRoutineId(id as string);
+        if (existing && Array.isArray(existing.scheduledDays)) {
+          setSelectedDays(existing.scheduledDays);
+          // infer quick selection
+          const weekdays: DayOfWeek[] = ['monday','tuesday','wednesday','thursday','friday'];
+          const weekend: DayOfWeek[] = ['saturday','sunday'];
+          const sameSet = (a: DayOfWeek[], b: DayOfWeek[]) => a.length === b.length && a.every(d => b.includes(d));
+          const sorted = [...existing.scheduledDays].sort((a,b) => ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'].indexOf(a) - ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'].indexOf(b));
+          if (sameSet(sorted, weekdays)) setQuickSelection('week');
+          else if (sameSet(sorted, weekend)) setQuickSelection('weekend');
+          else setQuickSelection('none');
+        } else {
+          setSelectedDays([]);
+          setQuickSelection('none');
+        }
+      } catch (e) {
+        // Silent fail: keep defaults
+      }
+    };
+    loadExistingSchedule();
+  }, [isEditMode, id, step]);
+
   const applyExerciseSelection = useCallback((name: string, key: string) => {
     setExerciseName(name);
     setExerciseKey(key);
@@ -158,8 +182,9 @@ function NewRoutineScreen() {
         return;
       }
 
+      const routineId = isEditMode ? (id as string) : generateRoutineId();
       const routineToSave = {
-        id: isEditMode ? (id as string) : generateRoutineId(),
+        id: routineId,
         title: routine.title.trim(),
         description: routine.description.trim(),
         exercises: exercises,
@@ -170,13 +195,175 @@ function NewRoutineScreen() {
       };
 
       await storageService.saveRoutine(routineToSave);
-      showSuccess(isEditMode ? t('routine.updated') : t('routine.saved'));
-      router.push('/(tabs)/routines');
+      setSavedRoutineId(routineId);
+      
+      if (isEditMode) {
+        showSuccess(t('routine.updated'));
+        router.push('/(tabs)/routines');
+      } else {
+        // Pour une nouvelle routine, passer à l'étape de planification
+        setStep(3);
+      }
     } catch (error) {
       console.error('Error saving routine:', error);
       showError(t('common.error'));
     }
   }, [routine, exercises, t, router, isEditMode, id, enablePreparation, preparationTime, showSuccess, showError]);
+
+  const handleScheduleSave = useCallback(async (schedule: any) => {
+    try {
+      await saveSchedule(schedule);
+      showSuccess(t('routine.saved'));
+      router.push('/(tabs)/routines');
+    } catch (error) {
+      console.error('Error saving schedule:', error);
+      showError(t('common.error'));
+    }
+  }, [saveSchedule, showSuccess, showError, t, router]);
+
+  const handleSkipScheduling = useCallback(() => {
+    if (isEditMode) {
+      handleSaveRoutine();
+    } else {
+      showSuccess(t('routine.saved'));
+      router.push('/(tabs)/routines');
+    }
+  }, [isEditMode, handleSaveRoutine, showSuccess, t, router]);
+
+  const handleUpdateWithSchedule = useCallback(async () => {
+    try {
+      // D'abord sauvegarder la routine
+      if (!isRoutineComplete(routine.title, exercises.length)) {
+        showError(t('common.error'));
+        return;
+      }
+
+      const routineId = id as string;
+      const routineToSave = {
+        id: routineId,
+        title: routine.title.trim(),
+        description: routine.description.trim(),
+        exercises: exercises,
+        createdAt: new Date().toISOString(),
+        exerciseRestMode: routine.exerciseRestMode || 'beginner',
+        enablePreparation: enablePreparation,
+        preparationTime: enablePreparation ? preparationTime : undefined
+      };
+
+      await storageService.saveRoutine(routineToSave);
+
+      // Ensuite sauvegarder la planification si des jours sont sélectionnés
+      if (selectedDays.length > 0) {
+        const schedule = routineScheduleService.createSchedule(
+          routineId,
+          routine.title.trim(),
+          selectedDays
+        );
+        await saveSchedule(schedule);
+      }
+
+      showSuccess(t('routine.updated'));
+      router.push('/(tabs)/routines');
+    } catch (error) {
+      console.error('Error updating routine with schedule:', error);
+      showError(t('common.error'));
+    }
+  }, [routine, exercises, selectedDays, id, enablePreparation, preparationTime, saveSchedule, showSuccess, showError, t, router]);
+
+  // Jours de la semaine avec traductions
+  const daysOfWeek = useMemo(() => [
+    { key: 'monday' as DayOfWeek, label: t('schedule.days.monday'), shortLabel: t('schedule.days.mondayShort') },
+    { key: 'tuesday' as DayOfWeek, label: t('schedule.days.tuesday'), shortLabel: t('schedule.days.tuesdayShort') },
+    { key: 'wednesday' as DayOfWeek, label: t('schedule.days.wednesday'), shortLabel: t('schedule.days.wednesdayShort') },
+    { key: 'thursday' as DayOfWeek, label: t('schedule.days.thursday'), shortLabel: t('schedule.days.thursdayShort') },
+    { key: 'friday' as DayOfWeek, label: t('schedule.days.friday'), shortLabel: t('schedule.days.fridayShort') },
+    { key: 'saturday' as DayOfWeek, label: t('schedule.days.saturday'), shortLabel: t('schedule.days.saturdayShort') },
+    { key: 'sunday' as DayOfWeek, label: t('schedule.days.sunday'), shortLabel: t('schedule.days.sundayShort') }
+  ], [t]);
+
+  const handleDayToggle = useCallback((day: DayOfWeek) => {
+    setSelectedDays(prev => {
+      if (prev.includes(day)) {
+        return prev.filter(d => d !== day);
+      } else {
+        return [...prev, day];
+      }
+    });
+    setQuickSelection('none');
+  }, []);
+
+  const handleQuickSelection = useCallback((type: 'none' | 'week' | 'weekend') => {
+    setQuickSelection(type);
+    
+    switch (type) {
+      case 'none':
+        setSelectedDays([]);
+        break;
+      case 'week':
+        setSelectedDays(['monday', 'tuesday', 'wednesday', 'thursday', 'friday']);
+        break;
+      case 'weekend':
+        setSelectedDays(['saturday', 'sunday']);
+        break;
+    }
+  }, []);
+
+  const getDaysSummary = useCallback(() => {
+    if (selectedDays.length === 0) return '';
+    
+    const dayLabels = selectedDays
+      .sort((a, b) => {
+        const dayOrder: DayOfWeek[] = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+        return dayOrder.indexOf(a) - dayOrder.indexOf(b);
+      })
+      .map(day => {
+        const dayInfo = daysOfWeek.find(d => d.key === day);
+        return dayInfo?.shortLabel || day;
+      });
+
+    return dayLabels.join(', ');
+  }, [selectedDays, daysOfWeek]);
+
+  const handleDirectScheduleSave = useCallback(async () => {
+    if (selectedDays.length === 0) return;
+
+    try {
+      let routineId = savedRoutineId;
+
+      // Ensure routine is saved first (creation flow safety)
+      if (!routineId) {
+        if (!isRoutineComplete(routine.title, exercises.length)) {
+          showError(t('common.error'));
+          return;
+        }
+        routineId = generateRoutineId();
+        const routineToSave = {
+          id: routineId,
+          title: routine.title.trim(),
+          description: routine.description.trim(),
+          exercises: exercises,
+          createdAt: new Date().toISOString(),
+          exerciseRestMode: routine.exerciseRestMode || 'beginner',
+          enablePreparation: enablePreparation,
+          preparationTime: enablePreparation ? preparationTime : undefined
+        };
+        await storageService.saveRoutine(routineToSave);
+        setSavedRoutineId(routineId);
+      }
+
+      const schedule = routineScheduleService.createSchedule(
+        routineId as string,
+        routine.title,
+        selectedDays
+      );
+      await saveSchedule(schedule);
+      showSuccess(t('routine.saved'));
+      router.push('/(tabs)/routines');
+    } catch (error) {
+      console.error('Error saving schedule:', error);
+      showError(t('common.error'));
+    }
+  }, [savedRoutineId, selectedDays, routine.title, exercises.length, routine.description, routine.exerciseRestMode, enablePreparation, preparationTime, saveSchedule, showSuccess, showError, t, router]);
 
   const canSave = useMemo(() => {
     return getValidSeries(series).length > 0;
@@ -200,7 +387,7 @@ function NewRoutineScreen() {
   ), [showExerciseSelector, exerciseName, applyExerciseSelection, t]);
 
   const renderStep2 = useMemo(() => (
-    <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
+    <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.sectionTitleContainer}>
         <Plus color={theme.colors.text.secondary} size={22} style={styles.sectionTitleIcon} />
         <Text variant="heading" style={styles.titleLabel}>
@@ -236,16 +423,23 @@ function NewRoutineScreen() {
         <Button
           title={t('routine.addExercise')}
           onPress={openAddExercise}
+          variant="secondary"
           style={styles.secondaryButton}
           icon={<Plus size={20} color={theme.colors.text.primary} style={styles.buttonIcon} />}
         />
-        <Button
-          title={isEditMode ? t('common.update') : t('common.save')}
-          onPress={handleSaveRoutine}
-          style={styles.primaryButton}
-          disabled={!isRoutineSaveReady}
-        />
       </View>
+
+      <View style={styles.footerSpacer} />
+
+      <ActionFooter
+        type="double"
+        showSkipButton
+        skipButtonText={t('common.back')}
+        onSkip={() => setStep(1)}
+        nextButtonText={t('common.next')}
+        onNext={() => (isEditMode ? setStep(3) : handleSaveRoutine())}
+        nextButtonDisabled={!isRoutineSaveReady}
+      />
 
       {renderExerciseSelectorModal}
       <SeriesConfigModal
@@ -274,7 +468,7 @@ function NewRoutineScreen() {
         onSave={handleSaveExercise}
         canSave={canSave}
       />
-    </View>
+    </SafeAreaView>
   ), [
     t,
     theme.colors.primary,
@@ -517,9 +711,161 @@ function NewRoutineScreen() {
     </ScrollView>
   ), [routine.title, routine.description, routine.exerciseRestMode, defaultRestBetweenExercises, enablePreparation, preparationTime, t, theme.colors, styles, setRoutine, updateExerciseRestMode, updateDefaultRestBetweenExercises, updateEnablePreparation, showCommonRestTimePicker, showPreparationTimePicker, handleCommonRestTimeConfirm, handlePreparationTimeConfirm]);
 
+  const renderStep3 = useMemo(() => (
+    <ScrollView style={{ flex: 1 }}>
+      <View style={styles.sectionTitleContainer}>
+        <Timer color={theme.colors.text.secondary} size={22} style={styles.sectionTitleIcon} />
+        <Text variant="heading" style={styles.titleLabel}>
+          {t('schedule.planRoutine')}
+        </Text>
+      </View>
+
+      <View style={styles.exerciseRestSection}>
+        <Text variant="body" style={styles.sectionDescription}>
+          {t('schedule.description', { routine: routine.title })}
+        </Text>
+
+        {/* Sélections rapides */}
+        <View style={styles.quickSelectionContainer}>
+          <Text variant="body" style={styles.quickSelectionLabel}>
+            {t('schedule.quickSelections')}
+          </Text>
+          
+          <View style={styles.quickSelectionButtons}>
+            <TouchableOpacity
+              style={[
+                styles.quickButton,
+                quickSelection === 'none' && styles.quickButtonActive
+              ]}
+              onPress={() => handleQuickSelection('none')}
+            >
+              <Text style={[
+                styles.quickButtonText,
+                quickSelection === 'none' && styles.quickButtonTextActive
+              ]}>
+                {t('schedule.quick.none')}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.quickButton,
+                quickSelection === 'week' && styles.quickButtonActive
+              ]}
+              onPress={() => handleQuickSelection('week')}
+            >
+              <Text style={[
+                styles.quickButtonText,
+                quickSelection === 'week' && styles.quickButtonTextActive
+              ]}>
+                {t('schedule.quick.weekdays')}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.quickButton,
+                quickSelection === 'weekend' && styles.quickButtonActive
+              ]}
+              onPress={() => handleQuickSelection('weekend')}
+            >
+              <Text style={[
+                styles.quickButtonText,
+                quickSelection === 'weekend' && styles.quickButtonTextActive
+              ]}>
+                {t('schedule.quick.weekend')}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Sélection des jours */}
+        <View style={styles.daysContainer}>
+          <Text variant="body" style={styles.daysLabel}>
+            {t('schedule.chooseDays')}
+          </Text>
+          
+          <View style={styles.daysGrid}>
+            {daysOfWeek.map((day) => {
+              const isSelected = selectedDays.includes(day.key);
+              return (
+                <TouchableOpacity
+                  key={day.key}
+                  style={[
+                    styles.dayButton,
+                    isSelected && styles.dayButtonSelected
+                  ]}
+                  onPress={() => handleDayToggle(day.key)}
+                >
+                  <Text style={[
+                    styles.dayButtonText,
+                    isSelected && styles.dayButtonTextSelected
+                  ]}>
+                    {day.shortLabel}
+                  </Text>
+                  <Text style={[
+                    styles.dayButtonSubtext,
+                    isSelected && styles.dayButtonSubtextSelected
+                  ]}>
+                    {day.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </View>
+
+        {/* Résumé */}
+        {selectedDays.length > 0 && (
+          <View style={styles.summaryContainer}>
+            <Text variant="body" style={styles.summaryText}>
+              {t('schedule.summary', { 
+                count: selectedDays.length,
+                days: getDaysSummary()
+              })}
+            </Text>
+          </View>
+        )}
+
+        {/* Note d'information */}
+        <View style={styles.infoContainer}>
+          <Text variant="caption" style={styles.infoText}>
+            💡 {t('schedule.infoNote')}
+          </Text>
+        </View>
+      </View>
+
+      <View style={styles.footerSpacer} />
+
+      <ActionFooter
+        type="double"
+        showSkipButton
+        skipButtonText={isEditMode ? t('common.back') : t('routine.skipScheduling')}
+        onSkip={isEditMode ? () => setStep(2) : handleSkipScheduling}
+        nextButtonText={isEditMode ? t('common.update') : t('schedule.save')}
+        onNext={isEditMode ? handleUpdateWithSchedule : handleDirectScheduleSave}
+        nextButtonDisabled={!isEditMode && selectedDays.length === 0}
+      />
+    </ScrollView>
+  ), [
+    t,
+    theme.colors,
+    isEditMode,
+    routine.title,
+    selectedDays,
+    quickSelection,
+    daysOfWeek,
+    handleQuickSelection,
+    handleDayToggle,
+    getDaysSummary,
+    handleDirectScheduleSave,
+    handleSkipScheduling,
+    styles
+  ]);
+
   if (isLoading) {
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
         <Header
           title={isEditMode ? t('routine.editTitle') : t('routine.createTitle')}
           showBackButton
@@ -529,12 +875,12 @@ function NewRoutineScreen() {
             {t('common.loading')}
           </Text>
         </View>
-      </View>
+      </SafeAreaView>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Header
         title={isEditMode ? t('routine.editTitle') : t('routine.createTitle')}
         showBackButton
@@ -542,8 +888,9 @@ function NewRoutineScreen() {
       <View style={styles.content}>
         {step === 1 && renderStep1}
         {step === 2 && renderStep2}
+        {step === 3 && renderStep3}
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -621,11 +968,6 @@ const useStyles = (theme: any) => StyleSheet.create({
     marginTop: theme.spacing.lg,
     paddingBottom: theme.spacing.xl,
     paddingHorizontal: theme.spacing.base
-  },
-  primaryButton: {
-    backgroundColor: theme.colors.primary,
-    marginVertical: theme.spacing.sm,
-    height: 48
   },
   secondaryButton: {
     flexDirection: 'row',
@@ -770,7 +1112,114 @@ const useStyles = (theme: any) => StyleSheet.create({
   },
   switchThumbActive: {
     alignSelf: 'flex-end'
-  }
+  },
+  scheduleActions: {
+    flexDirection: 'column',
+    gap: theme.spacing.sm,
+    marginTop: theme.spacing.lg
+  },
+  quickSelectionContainer: {
+    marginBottom: theme.spacing.xl,
+  },
+  quickSelectionLabel: {
+    color: theme.colors.text.primary,
+    marginBottom: theme.spacing.md,
+    fontFamily: theme.typography.fontFamily.semibold,
+  },
+  quickSelectionButtons: {
+    flexDirection: 'row',
+    gap: theme.spacing.sm,
+  },
+  quickButton: {
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.sm,
+    borderRadius: theme.borderRadius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.background.input,
+    backgroundColor: theme.colors.background.secondary,
+  },
+  quickButtonActive: {
+    backgroundColor: theme.colors.primary,
+    borderColor: theme.colors.primary,
+  },
+  quickButtonText: {
+    color: theme.colors.text.secondary,
+    fontSize: theme.typography.fontSize.sm,
+  },
+  quickButtonTextActive: {
+    color: 'white',
+    fontFamily: theme.typography.fontFamily.semibold,
+  },
+  daysContainer: {
+    marginBottom: theme.spacing.xl,
+  },
+  daysLabel: {
+    color: theme.colors.text.primary,
+    marginBottom: theme.spacing.md,
+    fontFamily: theme.typography.fontFamily.semibold,
+  },
+  daysGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: theme.spacing.sm,
+  },
+  dayButton: {
+    width: '30%',
+    aspectRatio: 1.2,
+    borderRadius: theme.borderRadius.lg,
+    borderWidth: 2,
+    borderColor: theme.colors.background.input,
+    backgroundColor: theme.colors.background.secondary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: theme.spacing.sm,
+  },
+  dayButtonSelected: {
+    borderColor: theme.colors.primary,
+    backgroundColor: theme.colors.primary + '15',
+  },
+  dayButtonText: {
+    color: theme.colors.text.primary,
+    fontSize: theme.typography.fontSize.lg,
+    fontFamily: theme.typography.fontFamily.bold,
+    marginBottom: theme.spacing.xs,
+  },
+  dayButtonTextSelected: {
+    color: theme.colors.primary,
+  },
+  dayButtonSubtext: {
+    color: theme.colors.text.secondary,
+    fontSize: theme.typography.fontSize.xs,
+    textAlign: 'center',
+  },
+  dayButtonSubtextSelected: {
+    color: theme.colors.primary,
+  },
+  summaryContainer: {
+    backgroundColor: theme.colors.primary + '10',
+    borderRadius: theme.borderRadius.md,
+    padding: theme.spacing.md,
+    marginBottom: theme.spacing.lg,
+  },
+  summaryText: {
+    color: theme.colors.primary,
+    textAlign: 'center',
+    fontFamily: theme.typography.fontFamily.semibold,
+  },
+  infoContainer: {
+    backgroundColor: theme.colors.background.input,
+    borderRadius: theme.borderRadius.md,
+    padding: theme.spacing.md,
+    marginBottom: theme.spacing.lg,
+  },
+  infoText: {
+    color: theme.colors.text.secondary,
+    textAlign: 'center',
+    lineHeight: 18,
+  },
+  footerSpacer: {
+    height: theme.spacing.xl * 3,
+  },
 });
 
 export default NewRoutineScreen;

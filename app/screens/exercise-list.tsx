@@ -15,13 +15,22 @@ export default function ExerciseListScreen() {
   const styles = useStyles();
 
   const handleExerciseSelect = (exercise: any) => {
-    // Cette logique n'est plus nécessaire avec la modal simplifiée
-    router.back();
+    router.push({
+      pathname: '/screens/exercise-tutorial',
+      params: {
+        name: exercise.name,
+        key: exercise.translationKey || exercise.key,
+        primaryMuscle: exercise.primaryMuscle,
+        secondaryMuscles: Array.isArray(exercise.secondaryMuscles) ? exercise.secondaryMuscles.join(',') : ''
+      }
+    });
   };
 
   const handleAddCustomExercise = () => {
-    // TODO: Implémenter l'ajout d'exercice personnalisé
-    console.log('Add custom exercise');
+    router.push({
+      pathname: '/screens/exercise-custom-edit',
+      params: { muscleGroupLabel: (params.muscleGroup as string) || '' }
+    });
   };
 
   return (

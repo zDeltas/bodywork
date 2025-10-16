@@ -5,11 +5,46 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "scheme": "gainizi",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true
+    },
+    "android": {
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "data": [
+            {
+              "scheme": "gainizi",
+              "host": "auth"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        },
+        {
+          "action": "VIEW",
+          "data": [
+            {
+              "scheme": "com.googleusercontent.apps.202346023206-thoo1qgqt788cbrk7sg1v97nammhouc3",
+              "path": "/oauth2redirect/google"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ],
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+      ],
+      "package": "com.dlb.gainizi"
     },
     "web": {
       "bundler": "metro",
@@ -25,6 +60,12 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "backendUrl": "https://api.gainizi.com/auth/google",
+      "googleOAuth": {
+        "androidClientId": "202346023206-thoo1qgqt788cbrk7sg1v97nammhouc3.apps.googleusercontent.com"
+      }
     }
   }
 }

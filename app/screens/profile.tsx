@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Alert, Linking, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Alert, Linking, ScrollView, StyleSheet, TouchableOpacity, View, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { User, Trophy, Instagram, Share2, Star, ChevronRight, Ruler, ChartLine as LineChart, Image as ImageIcon } from 'lucide-react-native';
 import { router } from 'expo-router';
-
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
+import { useAuth } from '@/app/contexts/AuthContext';
 import Header from '@/app/components/layout/Header';
 import Text from '@/app/components/ui/Text';
 import useHaptics from '@/app/hooks/useHaptics';
@@ -73,6 +73,7 @@ type ProfileScreenProps = { showBackButton?: boolean };
 function ProfileScreen({ showBackButton = true }: ProfileScreenProps) {
   const { t } = useTranslation();
   const { theme } = useTheme();
+  const { isAuthenticated, user } = useAuth();
   const styles = useStyles();
   const [showInstagramModal, setShowInstagramModal] = useState(false);
   const haptics = useHaptics();
@@ -98,14 +99,9 @@ function ProfileScreen({ showBackButton = true }: ProfileScreenProps) {
     setShowInstagramModal(false);
   };
 
-  const handleEditProfile = () => {
-    haptics.impactLight();
-    // ... rest of the code ...
-  };
-
-  // UI texts
   const challengesMotivation = 'Lance-toi et relève de nouveaux défis !';
-  const pseudo = 'Mon compte';
+  const displayName = isAuthenticated && user?.name ? user.name : 'Mon compte';
+  const displayStatus = isAuthenticated && user?.email ? user.email : t('profile.auth.notSignedIn');
 
   return (
     <SafeAreaView style={styles.container}>
@@ -114,13 +110,20 @@ function ProfileScreen({ showBackButton = true }: ProfileScreenProps) {
         <View style={styles.section}>
           <SettingItem
             icon={
-              <View style={styles.avatar}>
-                <ImageIcon size={20} color={theme.colors.primary} />
-              </View>
+              isAuthenticated && user?.picture ? (
+                <Image 
+                  source={{ uri: user.picture }} 
+                  style={styles.avatar}
+                />
+              ) : (
+                <View style={styles.avatar}>
+                  <ImageIcon size={20} color={theme.colors.primary} />
+                </View>
+              )
             }
-            label={pseudo}
-            subLabel={t('profile.auth.notSignedIn')}
-            onPress={() => router.push('/screens/my-account-wip')}
+            label={displayName}
+            subLabel={displayStatus}
+            onPress={() => router.push('/screens/my-account')}
             variant="primary"
           />
         </View>
@@ -298,7 +301,8 @@ const useStyles = () => {
       borderRadius: 20,
       backgroundColor: theme.colors.background.main,
       alignItems: 'center',
-      justifyContent: 'center'
+      justifyContent: 'center',
+      overflow: 'hidden'
     },
     section: {
       marginBottom: theme.spacing.xl

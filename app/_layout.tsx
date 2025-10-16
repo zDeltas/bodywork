@@ -13,6 +13,7 @@ import { SnackbarProvider } from '@/app/contexts/SnackbarContext';
 import SnackbarContainer from '@/app/components/ui/SnackbarContainer';
 import OnboardingProvider from '@/app/providers/OnboardingProvider';
 import { useTheme } from '@/app/hooks/useTheme';
+import { AuthProvider } from '@/app/contexts/AuthContext';
  
 // Ensure splash doesn't auto hide until fonts and providers are ready
 SplashScreen.preventAutoHideAsync();
@@ -68,10 +69,11 @@ export default function RootLayout() {
       <SettingsProvider>
         <OnboardingProvider>
           <SnackbarProvider>
-            <GestureHandlerRootView style={{ flex: 1 }}>
-              <SafeAreaProvider>
-                <GlobalStatusBar />
-                <Stack
+            <AuthProvider>
+              <GestureHandlerRootView style={{ flex: 1 }}>
+                <SafeAreaProvider>
+                  <GlobalStatusBar />
+                  <Stack
                   screenOptions={{
                     headerShown: false,
                     animation: getDefaultAnimation,
@@ -195,8 +197,9 @@ export default function RootLayout() {
                     />
                   </Stack>
                   <SnackbarContainer />
-              </SafeAreaProvider>
-            </GestureHandlerRootView>
+                </SafeAreaProvider>
+              </GestureHandlerRootView>
+            </AuthProvider>
           </SnackbarProvider>
         </OnboardingProvider>
       </SettingsProvider>

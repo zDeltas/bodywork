@@ -5,6 +5,7 @@ import { getAuthRequestConfig, GoogleAuthResult } from '@/app/utils/auth/google'
 import { assertConfig } from '@/app/utils/config';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { StoredUser } from '@/app/services/auth/tokenStorage';
+import { AuthApiClient } from '@/app/services/api';
 
 export type UseGoogleAuthResult = {
   loading: boolean;
@@ -33,43 +34,14 @@ export function useGoogleAuth(): UseGoogleAuthResult {
     console.log('========================================');
     console.log('[GoogleAuth] 📡 BACKEND EXCHANGE');
     console.log('========================================');
-    console.log('[GoogleAuth] ID Token (first 50 chars):', idToken.substring(0, 50) + '...');
-    console.log('[GoogleAuth] Backend URL: http://10.0.2.2:8080/auth/google');
     
     try {
-      console.log('[GoogleAuth] 🚀 Starting fetch...');
-      const response = await fetch('http://10.0.2.2:8080/auth/google', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ idToken }),
-      });
-
-      console.log('[GoogleAuth] 📨 Response received');
-      console.log('[GoogleAuth] Status:', response.status);
-      console.log('[GoogleAuth] OK:', response.ok);
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        const errorMessage = errorData.message || `Backend error: ${response.status}`;
-        console.error('[GoogleAuth] ❌ Backend error:', errorMessage);
-        throw new Error(errorMessage);
-      }
-
-      const data = await response.json();
-      console.log('[GoogleAuth] ✅ Backend response:', {
-        hasAccessToken: !!data.accessToken,
-        hasRefreshToken: !!data.refreshToken,
-        hasUser: !!data.user,
-        userEmail: data.user?.email
-      });
-
-      return {
-        accessToken: data.accessToken,
-        refreshToken: data.refreshToken,
-        user: data.user as StoredUser,
-      };
+      // Utilise le AuthApiClient qui gère automatiquement l'URL et les headers
+      console.log('[GoogleAuth] 🚀 Calling AuthApiClient.loginWithGoogle...');
+      const backendTokens = await AuthApiClient.loginWithGoogle(idToken);
+      
+      console.log('[GoogleAuth] ✅ Backend exchange successful');
+      return backendTokens;
     } catch (error: any) {
       console.error('========================================');
       console.error('[GoogleAuth] ❌ BACKEND ERROR');
@@ -81,10 +53,9 @@ export function useGoogleAuth(): UseGoogleAuthResult {
       if (error.message.includes('Network request failed')) {
         console.error('[GoogleAuth] 🔴 NETWORK FAILED - Backend not reachable');
         console.error('[GoogleAuth] Possible causes:');
-        console.error('[GoogleAuth] - Backend Spring Boot not running on port 8080');
-        console.error('[GoogleAuth] - Using emulator: Try http://10.0.2.2:8080');
-        console.error('[GoogleAuth] - Using real device: Use PC IP address');
-        throw new Error('Backend non accessible. Vérifiez que Spring Boot tourne sur le port 8080.');
+        console.error('[GoogleAuth] - Backend Spring Boot not running');
+        console.error('[GoogleAuth] - Check Config.apiBaseUrl in app/utils/config.ts');
+        throw new Error('Backend non accessible. Vérifiez que le backend est démarré.');
       }
       throw error;
     }

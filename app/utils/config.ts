@@ -2,10 +2,12 @@ import Constants from 'expo-constants';
 
 // Centralized configuration access
 export const Config = {
-  backendUrl:
-    (Constants.expoConfig?.extra as any)?.backendUrl ||
-    process.env.EXPO_PUBLIC_BACKEND_URL ||
-    '',
+  // API Backend unique (localhost en dev, distant en prod)
+  apiBaseUrl:
+    (Constants.expoConfig?.extra as any)?.apiBaseUrl ||
+    process.env.EXPO_PUBLIC_API_BASE_URL ||
+    (__DEV__ ? 'http://192.168.1.125:8080' : 'https://api.gainizi.com'),
+
   googleAndroidClientId:
     ((Constants.expoConfig?.extra as any)?.googleOAuth?.androidClientId as string) ||
     process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID ||
@@ -20,14 +22,10 @@ export function assertConfig() {
       'Set extra.googleOAuth.androidClientId in app.json with your WEB client ID.'
     );
   }
-  if (!Config.backendUrl) {
-    console.warn(
-      '[Auth] Missing backendUrl. Set extra.backendUrl in app.json or EXPO_PUBLIC_BACKEND_URL.'
-    );
-  }
   
   // Log configuration au démarrage
-  console.log('[Auth] Configuration loaded:');
-  console.log(`[Auth] - Client ID: ${Config.googleAndroidClientId ? '✅ Configured' : '❌ Missing'}`);
-  console.log(`[Auth] - Backend URL: ${Config.backendUrl || '❌ Not configured (placeholder)'}`);
+  console.log('[Config] Configuration loaded:');
+  console.log(`[Config] - Client ID: ${Config.googleAndroidClientId ? '✅ Configured' : '❌ Missing'}`);
+  console.log(`[Config] - API Base URL: ${Config.apiBaseUrl}`);
+  console.log(`[Config] - Environment: ${__DEV__ ? 'Development' : 'Production'}`);
 }

@@ -16,7 +16,6 @@ import { TranslationKey } from '@/translations';
 import { StatsCardSkeleton } from '@/app/components/ui/SkeletonComponents';
 import { storageService } from '@/app/services';
 import useHaptics from '@/app/hooks/useHaptics';
-import { fetchAndLogAllFeedback } from '@/app/services/feedback/api';
 
 export default function SettingsScreen() {
   const { settings, updateSettings, isLoading } = useSettings();
@@ -139,14 +138,6 @@ export default function SettingsScreen() {
     try { await storageService.clearFeedbackPendingPrompt(); } catch {}
   };
 
-  const handleFetchFeedbackLogs = async () => {
-    try {
-      await fetchAndLogAllFeedback();
-      Alert.alert(t('common.info'), t('settings.fetchFeedbackLogsDone'));
-    } catch (e: any) {
-      Alert.alert(t('common.error'), e?.message || 'Failed to fetch feedback logs');
-    }
-  };
 
 
   return (
@@ -275,13 +266,6 @@ export default function SettingsScreen() {
               <ChevronRight size={20} color={theme.colors.text.secondary} />
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.settingItem} onPress={handleFetchFeedbackLogs}>
-              <View style={styles.settingInfo}>
-                <Mail size={24} color={theme.colors.primary} />
-                <Text style={styles.settingLabel}>{t('settings.fetchFeedbackLogs')}</Text>
-              </View>
-              <ChevronRight size={20} color={theme.colors.text.secondary} />
-            </TouchableOpacity>
           </View>
 
           {showAbout && (

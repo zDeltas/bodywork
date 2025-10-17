@@ -15,13 +15,34 @@ export default function MyAccountScreen() {
   const { theme } = useTheme();
   const styles = useStyles();
   const { loading, error, signIn, isAuthenticated, user } = useGoogleAuth();
-  const { signOut, isLoading: authLoading } = useAuth();
+  const { signIn: authSignIn, signOut, isLoading: authLoading } = useAuth();
 
   const handleSignOut = async () => {
     try {
       await signOut();
     } catch (error) {
       console.error('[MyAccount] Sign out error:', error);
+    }
+  };
+
+  const handleDevLogin = async () => {
+    try {
+      // Mock tokens JWT
+      const mockAccessToken = 'mock_access_token_' + Date.now();
+      const mockRefreshToken = 'mock_refresh_token_' + Date.now();
+
+      // Vos vraies données Google
+      const mockUser = {
+        id: '108868871093985038965',
+        email: 'dleborgne12@gmail.com',
+        name: 'Damien Le Borgne',
+        picture: 'https://lh3.googleusercontent.com/a/ACg8ocKlJWXanRzoTH0RTVRPyJr2tNkoHQfpRQW7jjI9aqwfxwuGSIc=s96-c',
+      };
+      
+      await authSignIn(mockAccessToken, mockRefreshToken, mockUser);
+      console.log('[MyAccount] Dev login successful');
+    } catch (error) {
+      console.error('[MyAccount] Dev login error:', error);
     }
   };
 
@@ -48,6 +69,14 @@ export default function MyAccountScreen() {
             </Text>
 
             <View style={{ height: theme.spacing.xl }} />
+
+            <Button 
+              title="🔧 Dev Login (Mock)"
+              onPress={handleDevLogin}
+              variant="primary"
+            />
+
+            <View style={{ height: theme.spacing.md }} />
 
             <Button 
               title={t('profile.auth.continueWithGoogle')} 

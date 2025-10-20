@@ -150,7 +150,7 @@ const useStyles = () => {
     },
     toggleText: {
       fontSize: theme.typography.fontSize.base,
-      fontFamily: theme.typography.fontFamily.medium,
+      fontFamily: theme.typography.fontFamily.regular,
     },
   });
 };

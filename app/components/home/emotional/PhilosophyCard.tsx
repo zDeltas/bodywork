@@ -64,7 +64,7 @@ const useStyles = () => {
     },
     author: {
       color: theme.colors.text.secondary,
-      fontFamily: theme.typography.fontFamily.medium,
+      fontFamily: theme.typography.fontFamily.regular,
     },
     inspirationBadge: {
       backgroundColor: theme.colors.primary + '20',
@@ -75,7 +75,7 @@ const useStyles = () => {
     },
     inspirationText: {
       color: theme.colors.primary,
-      fontFamily: theme.typography.fontFamily.semibold,
+      fontFamily: theme.typography.fontFamily.semiBold,
       textTransform: 'uppercase',
       letterSpacing: 0.5,
     },

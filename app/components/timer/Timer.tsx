@@ -297,48 +297,41 @@ const useStyles = () => {
     },
     content: {
       width: '100%',
-      paddingVertical: 24,
-      paddingHorizontal: 20,
+      paddingVertical: theme.spacing.xl,
+      paddingHorizontal: theme.spacing.lg,
       backgroundColor: theme.colors.background.card,
-      borderRadius: 24,
-      ...Platform.select({
-        ios: {
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.25,
-          shadowRadius: 16
-        },
-        android: {
-          elevation: 8
-        }
-      })
+      borderRadius: theme.borderRadius.xl,
+      ...theme.shadows.lg
     },
     topRow: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      marginBottom: 8
+      marginBottom: theme.spacing.sm
     },
     headerTitle: {
-      fontSize: Platform.OS === 'ios' ? 20 : 18,
-      fontWeight: '700'
+      fontSize: theme.typography.fontSize.lg,
+      fontFamily: theme.typography.fontFamily.bold,
+      color: theme.colors.text.primary
     },
     globalTime: {
-      fontSize: 14,
-      fontWeight: '600'
+      fontSize: theme.typography.fontSize.sm,
+      fontFamily: theme.typography.fontFamily.semiBold,
+      color: theme.colors.text.secondary
     },
     resetBtn: {
-      width: 36,
-      height: 36,
-      borderRadius: 18,
+      width: 40,
+      height: 40,
+      borderRadius: theme.borderRadius.full,
       backgroundColor: theme.colors.primary,
       justifyContent: 'center',
-      alignItems: 'center'
+      alignItems: 'center',
+      ...theme.shadows.sm
     },
     ringContainer: {
       alignItems: 'center',
       justifyContent: 'center',
-      marginVertical: 8
+      marginVertical: theme.spacing.md
     },
     centerContent: {
       position: 'absolute',
@@ -346,11 +339,14 @@ const useStyles = () => {
       justifyContent: 'center'
     },
     nextText: {
-      marginTop: 8,
-      textAlign: 'center'
+      marginTop: theme.spacing.md,
+      textAlign: 'center',
+      fontSize: theme.typography.fontSize.sm,
+      fontFamily: theme.typography.fontFamily.regular,
+      color: theme.colors.text.secondary
     },
     bottomRow: {
-      marginTop: 12,
+      marginTop: theme.spacing.lg,
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between'
@@ -358,26 +354,16 @@ const useStyles = () => {
     bigActionButton: {
       width: 72,
       height: 72,
-      borderRadius: 36,
+      borderRadius: theme.borderRadius.full,
       justifyContent: 'center',
       alignItems: 'center',
       backgroundColor: theme.colors.primary,
-      ...Platform.select({
-        ios: {
-          shadowColor: theme.colors.primary,
-          shadowOffset: { width: 0, height: 6 },
-          shadowOpacity: 0.35,
-          shadowRadius: 12
-        },
-        android: {
-          elevation: 10
-        }
-      })
+      ...theme.shadows.sm
     },
     setInfo: {
-      fontSize: Platform.OS === 'ios' ? 18 : 16,
-      fontWeight: '600',
-      opacity: 0.9,
+      fontSize: theme.typography.fontSize.base,
+      fontFamily: theme.typography.fontFamily.semiBold,
+      color: theme.colors.text.secondary,
       textAlign: 'center'
     },
     time: {
@@ -388,11 +374,12 @@ const useStyles = () => {
       lineHeight: Platform.OS === 'ios' ? 84 : 76
     },
     phaseText: {
-      fontSize: Platform.OS === 'ios' ? 18 : 16,
-      fontWeight: '600',
+      fontSize: theme.typography.fontSize.base,
+      fontFamily: theme.typography.fontFamily.semiBold,
+      color: theme.colors.text.secondary,
       textTransform: 'none',
       letterSpacing: 0.5,
-      marginTop: 4
+      marginTop: theme.spacing.xs
     }
   });
 };

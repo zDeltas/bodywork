@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
-import { Calendar, Clock, ChevronRight } from 'lucide-react-native';
+import { Calendar, Clock, ChevronRight, Dumbbell, Zap, Activity } from 'lucide-react-native';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
 import Text from '@/app/components/ui/Text';
@@ -42,24 +42,32 @@ const LastSessionCard: React.FC<LastSessionCardProps> = React.memo(({
     return `${mins}min`;
   }, []);
 
-  // Émojis pour les groupes musculaires
-  const getMuscleEmoji = (muscle: string) => {
-    const emojiMap: { [key: string]: string } = {
-      'chest': '💪',
-      'pectoraux': '💪',
-      'back': '🦾',
-      'dos': '🦾',
-      'legs': '🦵',
-      'jambes': '🦵',
-      'shoulders': '💪',
-      'épaules': '💪',
-      'arms': '💪',
-      'bras': '💪',
-      'core': '🔥',
-      'abdominaux': '🔥',
-    };
+  // Icônes pour les groupes musculaires
+  const getMuscleIcon = (muscle: string) => {
+    const muscleLower = muscle.toLowerCase();
+    const iconColor = theme.colors.primary;
+    const iconSize = 14;
     
-    return emojiMap[muscle.toLowerCase()] || '💪';
+    if (muscleLower.includes('chest') || muscleLower.includes('pectoraux')) {
+      return <Dumbbell size={iconSize} color={iconColor} />;
+    }
+    if (muscleLower.includes('back') || muscleLower.includes('dos')) {
+      return <Zap size={iconSize} color={iconColor} />;
+    }
+    if (muscleLower.includes('leg') || muscleLower.includes('jambe')) {
+      return <Activity size={iconSize} color={iconColor} />;
+    }
+    if (muscleLower.includes('shoulder') || muscleLower.includes('épaule')) {
+      return <Dumbbell size={iconSize} color={iconColor} />;
+    }
+    if (muscleLower.includes('arm') || muscleLower.includes('bras')) {
+      return <Dumbbell size={iconSize} color={iconColor} />;
+    }
+    if (muscleLower.includes('core') || muscleLower.includes('abdominauxin')) {
+      return <Zap size={iconSize} color={iconColor} />;
+    }
+    
+    return <Dumbbell size={iconSize} color={iconColor} />;
   };
 
   return (
@@ -96,9 +104,7 @@ const LastSessionCard: React.FC<LastSessionCardProps> = React.memo(({
           <View style={styles.muscleGroups}>
             {muscleGroups.slice(0, 3).map((muscle, index) => (
               <View key={index} style={styles.muscleGroup}>
-                <Text style={styles.muscleEmoji}>
-                  {getMuscleEmoji(muscle)}
-                </Text>
+                {getMuscleIcon(muscle)}
                 <Text variant="caption" style={styles.muscleText}>
                   {muscle}
                 </Text>
@@ -194,9 +200,6 @@ const useStyles = () => {
       paddingHorizontal: theme.spacing.sm,
       paddingVertical: theme.spacing.xs,
       borderRadius: 12,
-    },
-    muscleEmoji: {
-      fontSize: 14,
     },
     muscleText: {
       color: theme.colors.text.primary,

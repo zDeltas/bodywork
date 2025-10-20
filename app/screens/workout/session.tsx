@@ -119,29 +119,42 @@ function WorkoutSessionScreen() {
           title={undefined}
           onClose={handleFinishWorkout}
           contentStyle={styles.modalContent}
+          scrollable={false}
         >
           <View style={styles.successIconContainer}>
-            <Trophy size={56} color={theme.colors.primary} />
+            <View style={styles.iconCircle}>
+              <Trophy size={40} color="#4CC9F0" strokeWidth={2} />
+            </View>
           </View>
+
+          {/* Titre et message */}
           <Text style={styles.congratsTitle}>
             {t('workout.routineCompleted')}
           </Text>
           <Text style={styles.congratsText}>
-            Félicitations, tu as terminé ta séance !
+            {t('workout.congratulationsMessage')}
           </Text>
+
           <View style={styles.statsContainer}>
             <View style={styles.statItem}>
               <Text style={styles.statValue}>{routine.exercises.length}</Text>
-              <Text style={styles.statLabel}>{t('common.exercises')}</Text>
+              <Text style={styles.statLabel}>
+                {routine.exercises.length === 1 ? t('common.exercise') : t('common.exercises')}
+              </Text>
             </View>
             <View style={styles.statDivider} />
             <View style={styles.statItem}>
               <Text style={styles.statValue}>
                 {routine.exercises.reduce((total, exercise) => total + exercise.series.length, 0)}
               </Text>
-              <Text style={styles.statLabel}>{t('common.series')}</Text>
+              <Text style={styles.statLabel}>
+                {routine.exercises.reduce((total, exercise) => total + exercise.series.length, 0) === 1 
+                  ? t('workout.series') 
+                  : t('workout.seriesPlural')}
+              </Text>
             </View>
           </View>
+
           <Button
             title={t('common.finish')}
             onPress={handleFinishWorkout}
@@ -198,37 +211,51 @@ const useStyles = () => {
     modalContent: {
       alignItems: 'center',
       justifyContent: 'center',
-      padding: theme.spacing.xl
+      paddingHorizontal: theme.spacing.lg,
+      paddingTop: theme.spacing.lg,
+      paddingBottom: theme.spacing.md
     },
     successIconContainer: {
       alignItems: 'center',
       marginBottom: theme.spacing.lg
     },
+    iconCircle: {
+      width: 80,
+      height: 80,
+      borderRadius: 40,
+      backgroundColor: '#4CC9F0' + '15',
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderWidth: 2,
+      borderColor: '#4CC9F0' + '30'
+    },
     congratsTitle: {
-      fontSize: theme.typography.fontSize['2xl'],
-      color: theme.colors.primary,
-      fontWeight: 'bold',
+      fontSize: theme.typography.fontSize.xl,
+      fontFamily: theme.typography.fontFamily.bold,
+      color: theme.colors.text.primary,
       textAlign: 'center',
       marginBottom: theme.spacing.sm
     },
     congratsText: {
-      fontSize: theme.typography.fontSize.lg,
+      fontSize: theme.typography.fontSize.sm,
+      fontFamily: theme.typography.fontFamily.regular,
       color: theme.colors.text.secondary,
       textAlign: 'center',
-      marginBottom: theme.spacing.xl
+      lineHeight: theme.typography.lineHeight.normal * theme.typography.fontSize.sm,
+      marginBottom: theme.spacing.lg
     },
     statsContainer: {
       flexDirection: 'row',
       justifyContent: 'center',
       alignItems: 'center',
-      marginBottom: theme.spacing.xl,
+      marginBottom: theme.spacing.lg,
       paddingVertical: theme.spacing.lg,
-      paddingHorizontal: theme.spacing.xl,
+      paddingHorizontal: theme.spacing.md,
       backgroundColor: theme.colors.background.card,
       borderRadius: theme.borderRadius.lg,
       width: '100%',
-      maxWidth: 350,
-      alignSelf: 'center'
+      borderWidth: 1,
+      borderColor: theme.colors.text.secondary + '15'
     },
     statItem: {
       flex: 1,
@@ -236,23 +263,24 @@ const useStyles = () => {
     },
     statValue: {
       fontSize: theme.typography.fontSize['2xl'],
-      color: theme.colors.primary,
-      fontWeight: 'bold',
-      marginBottom: theme.spacing.xs
+      fontFamily: theme.typography.fontFamily.bold,
+      color: '#4CC9F0',
+      marginBottom: theme.spacing.xs / 2
     },
     statLabel: {
-      fontSize: theme.typography.fontSize.sm,
-      color: theme.colors.text.secondary
+      fontSize: theme.typography.fontSize.xs,
+      fontFamily: theme.typography.fontFamily.medium,
+      color: theme.colors.text.secondary,
+      textTransform: 'lowercase'
     },
     statDivider: {
       width: 1,
-      height: 40,
-      backgroundColor: theme.colors.border.default,
-      marginHorizontal: theme.spacing.xl
+      height: 36,
+      backgroundColor: theme.colors.text.secondary + '20',
+      marginHorizontal: theme.spacing.md
     },
     actionButton: {
       width: '100%',
-      marginTop: theme.spacing.lg,
       alignSelf: 'center'
     }
   });

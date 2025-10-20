@@ -287,7 +287,7 @@ const useStyles = (theme: any) => StyleSheet.create({
   },
   exerciseButtonText: {
     color: theme.colors.text.primary,
-    fontFamily: theme.typography.fontFamily.medium,
+    fontFamily: theme.typography.fontFamily.regular,
     fontSize: theme.typography.fontSize.md,
     flex: 1,
     marginLeft: theme.spacing.sm
@@ -368,7 +368,7 @@ const useStyles = (theme: any) => StyleSheet.create({
   },
   timeUnit: {
     color: theme.colors.text.secondary,
-    fontFamily: theme.typography.fontFamily.medium
+    fontFamily: theme.typography.fontFamily.regular
   }
 });
 

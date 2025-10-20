@@ -116,7 +116,7 @@ const PrideCard: React.FC<PrideCardProps> = ({
       {personalRecord && (
         <View style={styles.recordBanner}>
           <Text variant="caption" style={styles.recordText}>
-            🏆 {t('home.emotional.newRecord')}
+            {t('home.emotional.newRecord')}
           </Text>
         </View>
       )}
@@ -150,7 +150,7 @@ const useStyles = () => {
     statText: {
       marginLeft: theme.spacing.xs,
       color: theme.colors.text.primary,
-      fontFamily: theme.typography.fontFamily.medium,
+      fontFamily: theme.typography.fontFamily.regular,
     },
     muscleContainer: {
       alignItems: 'center',
@@ -162,14 +162,14 @@ const useStyles = () => {
     },
     muscleText: {
       color: theme.colors.text.primary,
-      fontFamily: theme.typography.fontFamily.medium,
+      fontFamily: theme.typography.fontFamily.regular,
     },
     prideSection: {
       alignItems: 'center',
     },
     prideMessage: {
       textAlign: 'center',
-      fontFamily: theme.typography.fontFamily.semibold,
+      fontFamily: theme.typography.fontFamily.semiBold,
       fontSize: theme.typography.fontSize.md,
       marginBottom: theme.spacing.sm,
     },
@@ -179,7 +179,7 @@ const useStyles = () => {
       borderRadius: theme.borderRadius.full,
     },
     prideText: {
-      fontFamily: theme.typography.fontFamily.semibold,
+      fontFamily: theme.typography.fontFamily.semiBold,
       textTransform: 'uppercase',
       letterSpacing: 0.5,
     },

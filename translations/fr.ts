@@ -29,6 +29,7 @@ export default {
     next: 'Suivant',
     finish: 'Terminer',
     or: 'ou',
+    exercise: 'exercice',
     exercises: 'exercices',
     series: 'séries',
     seconds: 'secondes',
@@ -37,7 +38,8 @@ export default {
     day: 'Jour',
     month: 'Mois',
     year: 'Année',
-    confirm: 'Confirmer'
+    confirm: 'Confirmer',
+    week: 'sem'
   },
 
   // Types d'exercices (éditeur)
@@ -58,9 +60,9 @@ export default {
   // Home screen
   home: {
     greeting: 'Salut {name}',
-    morningMotivation: 'On démarre fort aujourd\'hui ? 💪',
-    eveningMotivation: 'Une dernière pour la route ? 🔥',
-    afternoonMotivation: 'Prêt à transpirer ? 🔥',
+    morningMotivation: 'On démarre fort aujourd\'hui ?',
+    eveningMotivation: 'Une dernière pour la route ?',
+    afternoonMotivation: 'Prêt à transpirer ?',
     weekProgress: '{current}/{total} séances',
     currentWeek: 'Semaine en cours',
     vsLastWeek: 'vs semaine dernière',
@@ -71,21 +73,21 @@ export default {
     lastSession: 'Dernière séance',
     seeDetails: 'Voir détails',
     weeklyGoal: 'Objectif de la semaine',
-    almostThere: 'Tu y es presque 👊',
-    oneMoreSession: 'Encore 1 séance pour atteindre ton objectif 🔥',
-    goalAchieved: 'Objectif atteint ! 🎉',
+    almostThere: 'Tu y es presque',
+    oneMoreSession: 'Encore 1 séance pour atteindre ton objectif',
+    goalAchieved: 'Objectif atteint !',
     quickActions: 'Actions rapides',
     viewExercise: 'Voir un exercice',
     startSession: 'Commencer ma séance',
     resumeSession: 'Reprendre ma séance',
     motivationalQuotes: [
-      'Chaque rep te rapproche de ta meilleure version 💪',
-      'La seule mauvaise séance est celle que tu ne fais pas 🔥',
-      'Tes muscles grandissent quand tu dors, mais ils se forgent ici 💪',
-      'Aujourd\'hui est le jour parfait pour devenir plus fort 🚀',
-      'Chaque goutte de sueur est un pas vers ton objectif 💦',
-      'Tu es plus fort que tes excuses 💪',
-      'La progression commence par le premier pas 🚀'
+      'Chaque rep te rapproche de ta meilleure version',
+      'La seule mauvaise séance est celle que tu ne fais pas',
+      'Tes muscles grandissent quand tu dors, mais ils se forgent ici',
+      'Aujourd\'hui est le jour parfait pour devenir plus fort',
+      'Chaque goutte de sueur est un pas vers ton objectif',
+      'Tu es plus fort que tes excuses',
+      'La progression commence par le premier pas'
     ],
     muscleGroups: 'Groupes musculaires travaillés',
     duration: 'Durée',
@@ -158,6 +160,27 @@ export default {
   // Profile screen
   profile: {
     title: 'Profil',
+    myProfile: 'Mon profil',
+    trackingChallenges: 'Suivi & Défis',
+    fitnessProfile: 'Mon Profil Fitness',
+    athleteProfile: 'Profil athlétique',
+    athleteProfileDesc: 'Objectif, fréquence, matériel',
+    configurePreferences: 'Configurer mes préférences',
+    measurementsDesc: 'Poids, taille, mensurations',
+    statsDesc: 'Visualiser mes performances',
+    level: 'Niveau',
+    stats: {
+      thisWeek: 'Cette semaine',
+      totalSessions: 'Séances total',
+      routines: 'Routines'
+    },
+    physicalInfo: 'Informations physiques',
+    goals: 'Objectifs',
+    training: 'Entraînement',
+    age: 'Âge',
+    years: 'ans',
+    invalidHeight: 'Veuillez entrer une taille valide (50-250 cm)',
+    invalidWeight: 'Veuillez entrer un poids valide (30-300 kg)',
     account: 'Compte',
     myAccount: 'Mon Compte',
     createAccount: 'Créer un compte',
@@ -165,9 +188,12 @@ export default {
     resetData: 'Réinitialiser les données',
     social: 'Social',
     share: 'Partager l\'application',
+    shareDesc: 'Inviter vos amis',
     rate: 'Évaluer l\'application',
+    rateDesc: 'Donnez votre avis',
     settings: 'Paramètres',
     appSettings: 'Paramètres de l\'application',
+    appSettingsDesc: 'Langue, thème, notifications',
     instagram: 'Instagram',
     instagramHandle: '@gainiziapp',
     instagramModal: {
@@ -227,7 +253,15 @@ export default {
     // Réglage RPE
     rpeMode: 'Réglage RPE',
     rpeAsk: 'Demander le RPE',
-    rpeNever: 'Ne pas demander (par défaut 7)'
+    rpeNever: 'Ne pas demander (par défaut 7)',
+    // Onboarding settings
+    onboarding: {
+      profile: 'Profil utilisateur',
+      viewProfile: 'Voir le profil',
+      appPreferences: 'Préférences d\'application',
+      resetOnboarding: 'Réinitialiser l\'onboarding',
+      resetWarning: 'Êtes-vous sûr de vouloir réinitialiser l\'onboarding ? Cela supprimera toutes vos informations de profil.'
+    }
   },
 
   // About section
@@ -323,6 +357,7 @@ export default {
     duplicateLastSeries: 'Dupliquer la dernière série',
     completedSeries: 'Serie terminée',
     routineCompleted: 'La routine est terminée !',
+    congratulationsMessage: 'Félicitations, tu as terminé ta séance !',
     quitRoutine: 'Arrêter la routine',
     quitRoutineMessage: 'Êtes-vous sûr de vouloir abandonner cette routine ? Vos progrès seront perdus.',
     exercises: 'exercices',
@@ -955,24 +990,24 @@ export default {
       adherenceRate: 'Taux d\'adhérence',
       streakWeeks: 'semaines consécutives',
       onTime: 'Ponctualité',
-      microCopy: '{completed}/{planned} séances planifiées tenues • 🔥 Streak {streak} sem.',
+      microCopy: '{completed}/{planned} séances planifiées tenues • Streak {streak} sem.',
       cta: {
         planWeek: 'Planifier ma semaine',
         catchUp: 'Rattraper une séance',
         maintain: 'Maintenir le cap'
       },
       messages: {
-        exemplary: 'Constance exemplaire ! 🏆',
-        excellent: 'Excellente adhérence ! 💪',
-        good: 'Belle régularité ! 👍',
-        progress: 'En progression ! 📈',
-        restart: 'Reprenons le rythme ! 🚀'
+        exemplary: 'Constance exemplaire !',
+        excellent: 'Excellente adhérence !',
+        good: 'Belle régularité !',
+        progress: 'En progression !',
+        restart: 'Reprenons le rythme !'
       }
     },
     
     weeklyChallenge: {
       title: 'Défi Hebdomadaire',
-      microCopy: 'Défi {current}/{target} {unit} • {days} jours restants ⚡',
+      microCopy: 'Défi {current}/{target} {unit} • {days} jours restants',
       units: {
         sessions: 'séances',
         volume: 'kg',
@@ -984,11 +1019,11 @@ export default {
         continue: 'Poursuivre le défi'
       },
       messages: {
-        conquered: 'Défi conquis ! 🏆',
-        final: 'Dernière ligne droite ! 🔥',
-        close: 'Si proche du but ! 💪',
-        halfway: 'À mi-parcours ! 📈',
-        begin: 'Le défi commence ! ⚡'
+        conquered: 'Défi conquis !',
+        final: 'Dernière ligne droite !',
+        close: 'Si proche du but !',
+        halfway: 'À mi-parcours !',
+        begin: 'Le défi commence !'
       }
     },
 
@@ -998,10 +1033,10 @@ export default {
       subtitle: 'Reste fidèle à ton programme',
       sessionsHeld: 'séances tenues',
       regularWeeks: 'semaines régulières',
-      excellent: 'Excellente discipline 💪',
-      good: 'Tu es sur la bonne voie 🚀',
-      building: 'Continue comme ça 👊',
-      restart: 'Essaie de garder le rythme 👊'
+      excellent: 'Excellente discipline',
+      good: 'Tu es sur la bonne voie',
+      building: 'Continue comme ça',
+      restart: 'Essaie de garder le rythme'
     },
 
     challenge: {
@@ -1010,11 +1045,11 @@ export default {
       progress: 'Progression',
       sessions: 'séances',
       exercises: 'exercices',
-      completed: 'Défi réussi ! 🏆',
-      almostThere: 'Presque au bout ⚡',
-      halfway: 'À mi-parcours ! 🔥',
-      building: 'Ça prend forme ! 💪',
-      start: 'Le challenge commence ! 🔥',
+      completed: 'Défi réussi !',
+      almostThere: 'Presque au bout',
+      halfway: 'À mi-parcours !',
+      building: 'Ça prend forme !',
+      start: 'Le challenge commence !',
       sessionsLeft: 'Encore {count} séance pour réussir',
       daysLeft: '{count} jours restants'
     },
@@ -1033,32 +1068,32 @@ export default {
       viewSession: 'Voir la séance',
       startNewSession: 'Démarrer une séance',
       createRoutine: 'Créer une routine',
-      allCompleted: 'Tout terminé 🎉',
+      allCompleted: 'Tout terminé',
       noRoutineMessage: 'Aucune séance planifiée pour aujourd\'hui. Prêt à créer ta propre séance ?',
-      sessionCompletedMessage: 'Bravo ! Tu as terminé ta séance d\'aujourd\'hui 🎉',
+      sessionCompletedMessage: 'Bravo ! Tu as terminé ta séance d\'aujourd\'hui',
       viewPlanning: 'Voir mon planning',
       routinesPlanned: 'séances planifiées',
       totalDuration: 'Durée totale',
       progress: 'Progression',
-      motivationalReady: 'Prêt à t\'entraîner ? 💪',
-      motivationalContinue: 'On continue ta série de régularité 🔥',
-      motivationalCompleted: 'Super régularité aujourd\'hui ! 🔥',
-      motivationalRest: 'Profite de ta journée de repos ☀️'
+      motivationalReady: 'Prêt à t\'entraîner ?',
+      motivationalContinue: 'On continue ta série de régularité',
+      motivationalCompleted: 'Super régularité aujourd\'hui !',
+      motivationalRest: 'Profite de ta journée de repos'
     },
 
     weeklyRoutines: {
       title: 'Séances planifiées cette semaine',
       weekProgress: 'Semaine : {completed}/{target} séances réalisées',
-      targetReached: 'Objectif atteint ! Continue sur ta lancée 🔥',
-      weekCompleted: 'Semaine terminée ✅ {completed}/{target} séances — superbe régularité 👏',
-      oneMore: 'Encore 1 pour boucler ton objectif 💪',
-      twoMore: 'Encore 2 pour boucler ton objectif 💪',
-      keepGoing: 'Encore {remaining} pour boucler ton objectif 💪',
-      weekEnded: 'Semaine terminée ! Prépare la suivante 📅',
+      targetReached: 'Objectif atteint ! Continue sur ta lancée',
+      weekCompleted: 'Semaine terminée {completed}/{target} séances — superbe régularité',
+      oneMore: 'Encore 1 pour boucler ton objectif',
+      twoMore: 'Encore 2 pour boucler ton objectif',
+      keepGoing: 'Encore {remaining} pour boucler ton objectif',
+      weekEnded: 'Semaine terminée ! Prépare la suivante',
       planNextWeek: 'Planifier la semaine prochaine',
       viewRoutines: 'Voir mes séances',
       viewProgramming: 'Voir ma programmation',
-      restDay: 'Repos ☀️'
+      restDay: 'Repos'
     },
 
     schedule: {
@@ -1100,7 +1135,7 @@ export default {
 
     
     emotional: {
-      greeting: 'Salut {name} ! 👋',
+      greeting: 'Salut {name} !',
       // Pilier 1: Citation → Philosophie → Inspiration
       philosophy: 'Philosophie',
       inspiration: 'Inspiration',
@@ -1110,11 +1145,11 @@ export default {
       sessions: 'séances',
       daysStreak: 'jours consécutifs',
       discipline: {
-        complete: 'Discipline exemplaire ! 🏆',
-        excellent: 'Excellente constance ! 💪',
-        good: 'Belle régularité ! 👍',
-        progress: 'En progression ! 📈',
-        start: 'Commençons ensemble ! 🚀'
+        complete: 'Discipline exemplaire !',
+        excellent: 'Excellente constance !',
+        good: 'Belle régularité !',
+        progress: 'En progression !',
+        start: 'Commençons ensemble !'
       },
       satisfaction: {
         complete: 'Accompli',
@@ -1128,11 +1163,11 @@ export default {
       musclesWorked: 'Muscles travaillés',
       newRecord: 'Nouveau Record !',
       pride: {
-        record: 'Performance exceptionnelle ! 🔥',
-        exceptional: 'Force impressionnante ! 💥',
-        strong: 'Solide performance ! 💪',
-        solid: 'Bon travail accompli ! 👏',
-        progress: 'Progression constante ! 📊'
+        record: 'Performance exceptionnelle !',
+        exceptional: 'Force impressionnante !',
+        strong: 'Solide performance !',
+        solid: 'Bon travail accompli !',
+        progress: 'Progression constante !'
       },
       performance: {
         record: 'Record',
@@ -1146,14 +1181,14 @@ export default {
       weeklyChallenge: 'Défi Hebdomadaire',
       progress: 'Progression',
       defaultGoal: 'Atteindre mes objectifs fitness',
-      oneMore: 'Plus qu\'une séance ! 🎯',
+      oneMore: 'Plus qu\'une séance !',
       sessionsLeft: 'Encore {count} séances',
       challenge: {
-        conquered: 'Défi conquis ! Vous êtes incroyable ! 🏆',
-        final: 'Dernière ligne droite ! Vous y êtes presque ! 🔥',
-        close: 'Si proche du but ! Continuez ! 💪',
-        halfway: 'À mi-parcours ! Excellent rythme ! 📈',
-        begin: 'Le défi commence ! Montrez votre force ! ⚡'
+        conquered: 'Défi conquis ! Vous êtes incroyable !',
+        final: 'Dernière ligne droite ! Vous y êtes presque !',
+        close: 'Si proche du but ! Continuez !',
+        halfway: 'À mi-parcours ! Excellent rythme !',
+        begin: 'Le défi commence ! Montrez votre force !'
       },
       motivation: {
         achieved: 'Accompli',
@@ -1171,18 +1206,18 @@ export default {
       enjoyment: 'plaisir',
       createHint: 'Touchez pour créer une nouvelle routine',
       confidence: {
-        expert: 'Vous êtes devenu un expert ! 🎓',
-        experienced: 'Expérience solide acquise ! 💼',
-        growing: 'Confiance grandissante ! 🌱',
-        building: 'Construction de l\'expertise ! 🔨',
-        starting: 'Début du parcours ! 🌟'
+        expert: 'Vous êtes devenu un expert !',
+        experienced: 'Expérience solide acquise !',
+        growing: 'Confiance grandissante !',
+        building: 'Construction de l\'expertise !',
+        starting: 'Début du parcours !'
       },
       personalization: {
-        master: 'Maître créateur de routines ! 🎨',
-        creator: 'Créateur passionné ! ✨',
-        adapter: 'Adaptateur intelligent ! 🔧',
-        beginner: 'Premiers pas créatifs ! 🎯',
-        explorer: 'Explorateur curieux ! 🔍'
+        master: 'Maître créateur de routines !',
+        creator: 'Créateur passionné !',
+        adapter: 'Adaptateur intelligent !',
+        beginner: 'Premiers pas créatifs !',
+        explorer: 'Explorateur curieux !'
       },
       pleasure: {
         joy: 'Joie',

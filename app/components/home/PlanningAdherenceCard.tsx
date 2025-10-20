@@ -100,7 +100,7 @@ const PlanningAdherenceCard: React.FC<PlanningAdherenceCardProps> = ({
         <View style={[styles.streakContainer, { backgroundColor: adherenceColor + '15' }]}>
           <TrendingUp size={16} color={adherenceColor} />
           <Text variant="caption" style={[styles.streakText, { color: adherenceColor }]}>
-            🔥 {streakWeeks} semaines de régularité
+            {streakWeeks} semaines de régularité
           </Text>
         </View>
       )}
@@ -156,7 +156,7 @@ const useStyles = () => {
     },
     message: {
       textAlign: 'center',
-      fontFamily: theme.typography.fontFamily.semibold,
+      fontFamily: theme.typography.fontFamily.semiBold,
       fontSize: theme.typography.fontSize.lg,
     },
     streakContainer: {
@@ -170,7 +170,7 @@ const useStyles = () => {
     },
     streakText: {
       marginLeft: theme.spacing.xs,
-      fontFamily: theme.typography.fontFamily.semibold,
+      fontFamily: theme.typography.fontFamily.semiBold,
     },
   });
 };

@@ -198,7 +198,7 @@ const useStyles = (theme: any) => StyleSheet.create({
     backgroundColor: theme.colors.background.input,
     color: theme.colors.text.primary,
     textAlign: 'center',
-    fontFamily: theme.typography.fontFamily.medium,
+    fontFamily: theme.typography.fontFamily.regular,
     height: 40,
     borderStyle: 'solid'
   },
@@ -207,7 +207,7 @@ const useStyles = (theme: any) => StyleSheet.create({
     color: theme.colors.text.secondary,
     marginBottom: 4,
     textAlign: 'center',
-    fontFamily: theme.typography.fontFamily.medium
+    fontFamily: theme.typography.fontFamily.regular
   },
   seriesNumber: {
     fontSize: 16,

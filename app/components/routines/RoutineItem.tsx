@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Animated, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import {
@@ -65,6 +65,17 @@ const RoutineItem = React.memo(({
   const stats = calculateStats(item);
   const { getScheduleByRoutineId } = useRoutineSchedule();
   const schedule = getScheduleByRoutineId(item.id);
+  const scaleAnim = useState(new Animated.Value(0))[0];
+
+  // Animation d'entrée
+  useEffect(() => {
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      friction: 8,
+      tension: 40,
+      useNativeDriver: true
+    }).start();
+  }, []);
 
   const getDayShortLabel = (day: DayOfWeek) => {
     switch (day) {
@@ -135,14 +146,14 @@ const RoutineItem = React.memo(({
 
   return (
     <>
-      <View
-        style={styles.routineCard}
+      <Animated.View
+        style={[styles.routineCard, { transform: [{ scale: scaleAnim }] }]}
       >
         <View style={styles.routineHeader}>
           <View style={styles.routineTitleContainer}>
             <Text style={styles.routineTitle}>{item.title}</Text>
           </View>
-          <TouchableOpacity onPress={() => onToggleFavorite(item.id)}>
+          <TouchableOpacity onPress={() => onToggleFavorite(item.id)} activeOpacity={0.7}>
             <Star
               size={20}
               color={item.favorite ? theme.colors.primary : theme.colors.text.secondary}
@@ -179,19 +190,21 @@ const RoutineItem = React.memo(({
                 haptics.impactLight();
                 setShowActionsModal(true);
               }}
+              activeOpacity={0.7}
             >
               <MoreVertical size={20} color={theme.colors.text.secondary} />
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.startButton}
               onPress={() => onStart(item.id)}
+              activeOpacity={0.7}
             >
               <Play size={20} color={theme.colors.text.primary} />
               <Text style={styles.startButtonText}>{t('routines.item.start')}</Text>
             </TouchableOpacity>
           </View>
         </View>
-      </View>
+      </Animated.View>
 
       <Modal
         visible={showActionsModal}
@@ -202,6 +215,7 @@ const RoutineItem = React.memo(({
           <TouchableOpacity
             style={styles.modalAction}
             onPress={() => handleAction(() => onEdit(item.id))}
+            activeOpacity={0.7}
           >
             <Edit size={24} color={theme.colors.text.primary} />
             <Text style={styles.modalActionText}>{t('routines.item.edit')}</Text>
@@ -209,6 +223,7 @@ const RoutineItem = React.memo(({
           <TouchableOpacity
             style={styles.modalAction}
             onPress={() => handleAction(() => onShare(item))}
+            activeOpacity={0.7}
           >
             <ShareIcon size={24} color={theme.colors.text.primary} />
             <Text style={styles.modalActionText}>{t('routines.item.share')}</Text>
@@ -216,6 +231,7 @@ const RoutineItem = React.memo(({
           <TouchableOpacity
             style={[styles.modalAction, styles.modalActionDelete]}
             onPress={() => handleAction(() => onDelete(item.id))}
+            activeOpacity={0.7}
           >
             <Trash2 size={24} color={theme.colors.error} />
             <Text style={[styles.modalActionText, styles.modalActionTextDelete]}>
@@ -231,103 +247,126 @@ const RoutineItem = React.memo(({
 const useStyles = (theme: any) => StyleSheet.create({
   routineCard: {
     backgroundColor: theme.colors.background.card,
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 12,
-    ...theme.shadows.sm
+    padding: theme.spacing.lg,
+    borderRadius: theme.borderRadius.xl,
+    marginBottom: theme.spacing.md,
+    ...theme.shadows.md
   },
   routineHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8
+    marginBottom: theme.spacing.sm
   },
   routineTitleContainer: {
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
+    flex: 1
   },
   routineTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: theme.typography.fontSize.lg,
+    fontFamily: theme.typography.fontFamily.bold,
     color: theme.colors.text.primary
   },
   routineDescription: {
-    fontSize: 14,
+    fontSize: theme.typography.fontSize.sm,
+    fontFamily: theme.typography.fontFamily.regular,
     color: theme.colors.text.secondary,
-    marginBottom: 12
+    marginBottom: theme.spacing.md,
+    lineHeight: theme.typography.lineHeight.relaxed * theme.typography.fontSize.sm
   },
   routineStats: {
     flexDirection: 'row',
-    gap: 16,
-    marginBottom: 12
+    flexWrap: 'wrap',
+    gap: theme.spacing.md,
+    marginBottom: theme.spacing.md
   },
   scheduledRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    marginBottom: 8
+    gap: theme.spacing.xs,
+    marginBottom: theme.spacing.sm,
+    backgroundColor: theme.colors.primary + '15',
+    paddingHorizontal: theme.spacing.sm,
+    paddingVertical: theme.spacing.xs / 2,
+    borderRadius: theme.borderRadius.full,
+    alignSelf: 'flex-start'
   },
   scheduledText: {
-    fontSize: 13,
-    color: theme.colors.text.secondary
+    fontSize: theme.typography.fontSize.xs,
+    fontFamily: theme.typography.fontFamily.semiBold,
+    color: theme.colors.text.primary
   },
   statItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4
+    gap: theme.spacing.xs / 2
   },
   statText: {
-    fontSize: 14,
+    fontSize: theme.typography.fontSize.sm,
+    fontFamily: theme.typography.fontFamily.regular,
     color: theme.colors.text.secondary
   },
   routineFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 8
+    marginTop: theme.spacing.sm,
+    paddingTop: theme.spacing.sm,
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.border.default
   },
   routineDate: {
-    fontSize: 12,
-    color: theme.colors.text.secondary
+    fontSize: theme.typography.fontSize.xs,
+    fontFamily: theme.typography.fontFamily.regular,
+    color: theme.colors.text.tertiary
   },
   routineActions: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8
+    gap: theme.spacing.sm
   },
   moreButton: {
-    padding: 8
+    width: 36,
+    height: 36,
+    borderRadius: theme.borderRadius.full,
+    backgroundColor: theme.colors.background.button,
+    alignItems: 'center',
+    justifyContent: 'center'
   },
   startButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: theme.colors.primary,
-    padding: theme.spacing.sm,
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.md,
     borderRadius: theme.borderRadius.md,
-    gap: theme.spacing.xs
+    gap: theme.spacing.xs,
+    ...theme.shadows.sm
   },
   startButtonText: {
-    color: theme.colors.text.primary,
+    color: theme.colors.text.onPrimary,
     fontSize: theme.typography.fontSize.base,
-    fontWeight: '600'
+    fontFamily: theme.typography.fontFamily.semiBold
   },
   modalActions: {
-    gap: 16
+    gap: theme.spacing.md
   },
   modalAction: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 12,
-    borderRadius: 8,
+    padding: theme.spacing.md,
+    borderRadius: theme.borderRadius.md,
     backgroundColor: theme.colors.background.button,
-    gap: 12
+    gap: theme.spacing.md
   },
   modalActionDelete: {
-    backgroundColor: theme.colors.error + '20'
+    backgroundColor: theme.colors.error + '15'
   },
   modalActionText: {
-    fontSize: 16,
+    fontSize: theme.typography.fontSize.base,
+    fontFamily: theme.typography.fontFamily.semiBold,
     color: theme.colors.text.primary
   },
   modalActionTextDelete: {

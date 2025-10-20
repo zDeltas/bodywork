@@ -48,7 +48,7 @@ export default function TimerSettings(props: TimerSettingsProps) {
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <View style={styles.settingsOverlay}>
         <View style={styles.settingsCard}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: theme.spacing.lg }}>
             <Text style={styles.settingsTitle}>Réglages</Text>
             <TouchableOpacity onPress={() => { onClose(); haptics.impactLight(); }} style={styles.closeBtn}>
               <Text style={{ color: theme.colors.background.main, fontWeight: '700' }}>OK</Text>
@@ -56,27 +56,27 @@ export default function TimerSettings(props: TimerSettingsProps) {
           </View>
 
           {/* Prep row */}
-          <TouchableOpacity style={styles.settingsRow} onPress={() => { setShowPrepPicker(true); haptics.selection(); }}>
+          <TouchableOpacity style={styles.settingsRow} onPress={() => { setShowPrepPicker(true); haptics.selection(); }} activeOpacity={0.7}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <View style={[styles.dot, { backgroundColor: '#FACC15' }]} />
+              <View style={[styles.dot, { backgroundColor: theme.colors.warning }]} />
               <Text style={styles.settingsLabel}>Préparation</Text>
             </View>
             <Text style={styles.settingsValue}>{formatDuration(prepTime)}</Text>
           </TouchableOpacity>
 
           {/* Work row */}
-          <TouchableOpacity style={styles.settingsRow} onPress={() => { setShowWorkPicker(true); haptics.selection(); }}>
+          <TouchableOpacity style={styles.settingsRow} onPress={() => { setShowWorkPicker(true); haptics.selection(); }} activeOpacity={0.7}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <View style={[styles.dot, { backgroundColor: '#F97316' }]} />
+              <View style={[styles.dot, { backgroundColor: theme.colors.primary }]} />
               <Text style={styles.settingsLabel}>Travail</Text>
             </View>
             <Text style={styles.settingsValue}>{formatDuration(workTime)}</Text>
           </TouchableOpacity>
 
           {/* Rest row */}
-          <TouchableOpacity style={styles.settingsRow} onPress={() => { setShowRestPicker(true); haptics.selection(); }}>
+          <TouchableOpacity style={styles.settingsRow} onPress={() => { setShowRestPicker(true); haptics.selection(); }} activeOpacity={0.7}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <View style={[styles.dot, { backgroundColor: '#3B82F6' }]} />
+              <View style={[styles.dot, { backgroundColor: theme.colors.info }]} />
               <Text style={styles.settingsLabel}>Repos</Text>
             </View>
             <Text style={styles.settingsValue}>{formatDuration(restTime)}</Text>
@@ -86,11 +86,11 @@ export default function TimerSettings(props: TimerSettingsProps) {
           <View style={styles.settingsRow}>
             <Text style={styles.settingsLabel}>Séries</Text>
             <View style={styles.rowActions}>
-              <TouchableOpacity style={styles.stepperBtn} onPress={() => { onChangeSets(Math.max(1, sets - 1)); haptics.selection(); }}>
+              <TouchableOpacity style={styles.stepperBtn} onPress={() => { onChangeSets(Math.max(1, sets - 1)); haptics.selection(); }} activeOpacity={0.7}>
                 <Minus size={18} color={theme.colors.text.primary} />
               </TouchableOpacity>
               <Text style={styles.settingsValue}>{sets}</Text>
-              <TouchableOpacity style={styles.stepperBtn} onPress={() => { onChangeSets(sets + 1); haptics.selection(); }}>
+              <TouchableOpacity style={styles.stepperBtn} onPress={() => { onChangeSets(sets + 1); haptics.selection(); }} activeOpacity={0.7}>
                 <Plus size={18} color={theme.colors.text.primary} />
               </TouchableOpacity>
             </View>
@@ -168,20 +168,68 @@ function formatDuration(totalSeconds: number) {
 
 const useStyles = (theme: any) =>
   StyleSheet.create({
-    settingsOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
+    settingsOverlay: {
+      flex: 1,
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      justifyContent: 'flex-end'
+    },
     settingsCard: {
       backgroundColor: theme.colors.background.card,
-      padding: theme.spacing.lg,
-      borderTopLeftRadius: 16,
-      borderTopRightRadius: 16,
-      ...Platform.select({ ios: { shadowColor: '#000', shadowOffset: { width: 0, height: -4 }, shadowOpacity: 0.2, shadowRadius: 8 }, android: { elevation: 12 } })
+      padding: theme.spacing.xl,
+      borderTopLeftRadius: theme.borderRadius.xl,
+      borderTopRightRadius: theme.borderRadius.xl,
+      ...theme.shadows.xl
     },
-    settingsTitle: { fontSize: theme.typography.fontSize.xl, fontFamily: theme.typography.fontFamily.bold, color: theme.colors.text.primary },
-    settingsRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 12 },
-    settingsLabel: { color: theme.colors.text.primary, fontFamily: theme.typography.fontFamily.semiBold, fontSize: theme.typography.fontSize.base, marginLeft: 8 },
-    dot: { width: 10, height: 10, borderRadius: 5 },
-    rowActions: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-    settingsValue: { minWidth: 56, textAlign: 'center', color: theme.colors.text.primary, fontFamily: theme.typography.fontFamily.bold, fontSize: theme.typography.fontSize.base },
-    stepperBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: theme.colors.background.button, alignItems: 'center', justifyContent: 'center' },
-    closeBtn: { paddingHorizontal: 12, paddingVertical: 6, backgroundColor: theme.colors.primary, borderRadius: 999 }
+    settingsTitle: {
+      fontSize: theme.typography.fontSize.xl,
+      fontFamily: theme.typography.fontFamily.bold,
+      color: theme.colors.text.primary
+    },
+    settingsRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingVertical: theme.spacing.md,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border.default
+    },
+    settingsLabel: {
+      color: theme.colors.text.primary,
+      fontFamily: theme.typography.fontFamily.semiBold,
+      fontSize: theme.typography.fontSize.base,
+      marginLeft: theme.spacing.sm
+    },
+    dot: {
+      width: 12,
+      height: 12,
+      borderRadius: theme.borderRadius.full
+    },
+    rowActions: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: theme.spacing.md
+    },
+    settingsValue: {
+      minWidth: 64,
+      textAlign: 'center',
+      color: theme.colors.text.primary,
+      fontFamily: theme.typography.fontFamily.bold,
+      fontSize: theme.typography.fontSize.base
+    },
+    stepperBtn: {
+      width: 40,
+      height: 40,
+      borderRadius: theme.borderRadius.full,
+      backgroundColor: theme.colors.background.button,
+      alignItems: 'center',
+      justifyContent: 'center',
+      ...theme.shadows.sm
+    },
+    closeBtn: {
+      paddingHorizontal: theme.spacing.md,
+      paddingVertical: theme.spacing.sm,
+      backgroundColor: theme.colors.primary,
+      borderRadius: theme.borderRadius.full,
+      ...theme.shadows.sm
+    }
   });

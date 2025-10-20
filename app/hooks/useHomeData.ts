@@ -347,38 +347,38 @@ export const useHomeData = (): { data: HomeData; loading: boolean; error: string
       switch (level) {
         case 'Excellente':
           message = progression > 5 
-            ? "Tu es au top de ta forme ! Ta régularité s'améliore encore 🔥"
-            : "Discipline exemplaire ! Tu maintiens un rythme de champion 💪";
+            ? "Tu es au top de ta forme ! Ta régularité s'améliore encore"
+            : "Discipline exemplaire ! Tu maintiens un rythme de champion";
           break;
           
         case 'Bonne':
           message = progression > 10
-            ? "Belle progression ! Tu prends de très bonnes habitudes ⚡"
+            ? "Belle progression ! Tu prends de très bonnes habitudes"
             : progression < -10
-            ? "Petit ralentissement, mais tu restes sur la bonne voie 👊"
-            : "Très bonne régularité ! Tu as trouvé ton rythme 🎯";
+            ? "Petit ralentissement, mais tu restes sur la bonne voie"
+            : "Très bonne régularité ! Tu as trouvé ton rythme";
           break;
           
         case 'Moyenne':
           message = progression > 15
-            ? "Ça s'améliore nettement ! Continue sur cette lancée 📈"
+            ? "Ça s'améliore nettement ! Continue sur cette lancée"
             : progression > 5
-            ? "Tu progresses bien ! Chaque séance compte 💪"
-            : "Tu peux faire mieux ! Accroche-toi, ça va payer 🚀";
+            ? "Tu progresses bien ! Chaque séance compte"
+            : "Tu peux faire mieux ! Accroche-toi, ça va payer";
           break;
           
         case 'Faible':
           message = progression > 10
-            ? "Super, tu reprends le rythme ! Continue comme ça ⚡"
+            ? "Super, tu reprends le rythme ! Continue comme ça"
             : totalCompletedActivities === 0
-            ? "C'est le moment de commencer ! Première activité = premier pas 🚀"
-            : "Allez, on se remet en selle ! Tu en es capable 💪";
+            ? "C'est le moment de commencer ! Première activité = premier pas"
+            : "Allez, on se remet en selle ! Tu en es capable";
           break;
       }
       
       // Ajouter félicitation pour long streak (≥ 4 semaines)
       if (streakWeeks >= 4) {
-        message += ` Incroyable streak de ${streakWeeks} semaines ! 👏`;
+        message += ` Incroyable streak de ${streakWeeks} semaines !`;
       }
       
       return message;
@@ -405,14 +405,14 @@ export const useHomeData = (): { data: HomeData; loading: boolean; error: string
     // Description dynamique selon progression
     const challengeIsCompleted = challengeCurrent >= challengeTarget;
     const challengeDescription = challengeIsCompleted
-      ? 'Défi réussi ! Excellent travail 🏆'
+      ? 'Défi réussi ! Excellent travail'
       : challengeTarget - challengeCurrent === 1
-      ? 'Plus qu\'une séance ! 🎯'
+      ? 'Plus qu\'une séance !'
       : `${challengeTarget} ${challengeType === 'sessions' ? 'séances' : 'kg'} prévues`;
     
     // Message spécial si défi accompli avant fin de semaine
     const challengeSpecialMessage = challengeIsCompleted && challengeDaysRemaining > 0
-      ? `Bravo ! Défi accompli avec ${challengeDaysRemaining} jour${challengeDaysRemaining > 1 ? 's' : ''} d'avance ! 🎉`
+      ? `Bravo ! Défi accompli avec ${challengeDaysRemaining} jour${challengeDaysRemaining > 1 ? 's' : ''} d'avance !`
       : undefined;
 
     // DAILY ROUTINE CALCULATIONS - Routines du jour

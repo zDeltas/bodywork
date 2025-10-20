@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Alert, FlatList, Share, StyleSheet, TouchableOpacity } from 'react-native';
+import { Alert, Animated, FlatList, Share, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { storageService } from '@/app/services/storage';
 import { useRouter } from 'expo-router';
@@ -26,9 +26,19 @@ export default function RoutinesListScreen() {
   const styles = useStyles(theme);
   const haptics = useHaptics();
   const { t } = useTranslation();
+  const fadeAnim = useState(new Animated.Value(0))[0];
 
   useEffect(() => {
     loadRoutines();
+  }, []);
+
+  // Animation d'entrée
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 600,
+      useNativeDriver: true
+    }).start();
   }, []);
 
   const loadRoutines = async () => {
@@ -147,6 +157,7 @@ export default function RoutinesListScreen() {
               haptics.impactLight();
               setShowFavoritesOnly(!showFavoritesOnly);
             }}
+            activeOpacity={0.7}
           >
             <Star
               size={20}
@@ -157,7 +168,8 @@ export default function RoutinesListScreen() {
         }
       />
 
-      <FlatList
+      <Animated.FlatList
+        style={{ opacity: fadeAnim }}
         data={filteredRoutines}
         renderItem={({ item }) => (
           <RoutineItem
@@ -207,12 +219,17 @@ const useStyles = (theme: any) => StyleSheet.create({
   },
   listContent: {
     flexGrow: 1,
-    padding: 16
+    padding: theme.spacing.lg,
+    paddingBottom: 100
   },
   filterButton: {
-    padding: 8,
-    borderRadius: 20,
-    backgroundColor: theme.colors.background.button
+    width: 40,
+    height: 40,
+    borderRadius: theme.borderRadius.full,
+    backgroundColor: theme.colors.background.button,
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...theme.shadows.sm
   },
   filterButtonActive: {
     backgroundColor: theme.colors.primary + '20'

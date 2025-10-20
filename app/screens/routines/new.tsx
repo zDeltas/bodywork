@@ -1041,7 +1041,7 @@ const useStyles = (theme: any) => StyleSheet.create({
   commonRestLabel: {
     color: theme.colors.text.primary,
     marginBottom: theme.spacing.sm,
-    fontFamily: theme.typography.fontFamily.medium
+    fontFamily: theme.typography.fontFamily.regular
   },
   timeInputContainer: {
     flexDirection: 'row',
@@ -1061,7 +1061,7 @@ const useStyles = (theme: any) => StyleSheet.create({
   },
   timeUnit: {
     color: theme.colors.text.secondary,
-    fontFamily: theme.typography.fontFamily.medium
+    fontFamily: theme.typography.fontFamily.regular
   },
   timePickerButton: {
     borderWidth: 1,
@@ -1073,7 +1073,7 @@ const useStyles = (theme: any) => StyleSheet.create({
   },
   timePickerButtonText: {
     color: theme.colors.text.primary,
-    fontFamily: theme.typography.fontFamily.medium,
+    fontFamily: theme.typography.fontFamily.regular,
     fontSize: theme.typography.fontSize.base
   },
   preparationToggleContainer: {
@@ -1085,7 +1085,7 @@ const useStyles = (theme: any) => StyleSheet.create({
   },
   preparationToggleLabel: {
     color: theme.colors.text.primary,
-    fontFamily: theme.typography.fontFamily.medium,
+    fontFamily: theme.typography.fontFamily.regular,
     fontSize: theme.typography.fontSize.base
   },
   switchContainer: {
@@ -1124,7 +1124,7 @@ const useStyles = (theme: any) => StyleSheet.create({
   quickSelectionLabel: {
     color: theme.colors.text.primary,
     marginBottom: theme.spacing.md,
-    fontFamily: theme.typography.fontFamily.semibold,
+    fontFamily: theme.typography.fontFamily.semiBold,
   },
   quickSelectionButtons: {
     flexDirection: 'row',
@@ -1148,7 +1148,7 @@ const useStyles = (theme: any) => StyleSheet.create({
   },
   quickButtonTextActive: {
     color: 'white',
-    fontFamily: theme.typography.fontFamily.semibold,
+    fontFamily: theme.typography.fontFamily.semiBold,
   },
   daysContainer: {
     marginBottom: theme.spacing.xl,
@@ -1156,7 +1156,7 @@ const useStyles = (theme: any) => StyleSheet.create({
   daysLabel: {
     color: theme.colors.text.primary,
     marginBottom: theme.spacing.md,
-    fontFamily: theme.typography.fontFamily.semibold,
+    fontFamily: theme.typography.fontFamily.semiBold,
   },
   daysGrid: {
     flexDirection: 'row',
@@ -1204,7 +1204,7 @@ const useStyles = (theme: any) => StyleSheet.create({
   summaryText: {
     color: theme.colors.primary,
     textAlign: 'center',
-    fontFamily: theme.typography.fontFamily.semibold,
+    fontFamily: theme.typography.fontFamily.semiBold,
   },
   infoContainer: {
     backgroundColor: theme.colors.background.input,

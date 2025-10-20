@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Platform, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { Animated, Platform, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as SplashScreen from 'expo-splash-screen';
 import { Clock, Minus, Plus, Settings, Timer as TimerIcon } from 'lucide-react-native';
@@ -20,6 +20,7 @@ function TimerScreen() {
   const { theme } = useTheme();
   const haptics = useHaptics();
   const styles = useStyles(theme);
+  const fadeAnim = useState(new Animated.Value(0))[0];
   const [mode, setMode] = useState<'timer' | 'stopwatch'>('timer');
   const [selectedTime, setSelectedTime] = useState(60);
   const [selectedRestTime, setSelectedRestTime] = useState(60);
@@ -29,6 +30,15 @@ function TimerScreen() {
   const [showCustomRestTimeModal, setShowCustomRestTimeModal] = useState(false);
   const [showCustomPrepTimeModal, setShowCustomPrepTimeModal] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+
+  // Animation d'entrée
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 600,
+      useNativeDriver: true
+    }).start();
+  }, []);
 
   const handleTimerComplete = () => {
     setShowCustomRestTimeModal(false);
@@ -114,7 +124,7 @@ function TimerScreen() {
         }
       />
 
-      <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: 100 }}>
+      <Animated.ScrollView style={[styles.content, { opacity: fadeAnim }]} contentContainerStyle={styles.contentContainer}>
         {mode === 'timer' && (
           <>
             <Text style={styles.sectionTitle}>{String(t('timer.series'))}</Text>
@@ -147,7 +157,7 @@ function TimerScreen() {
             prepTime={selectedPrepTime}
           />
         </View>
-      </ScrollView>
+      </Animated.ScrollView>
 
       <TimerSettings
         visible={showSettings}
@@ -224,53 +234,46 @@ const useStyles = (theme: any) => {
       backgroundColor: theme.colors.primary
     },
     content: {
-      flex: 1,
+      flex: 1
+    },
+    contentContainer: {
       padding: theme.spacing.lg,
-      paddingBottom: theme.spacing.xl * 2
+      paddingBottom: 100
     },
     timerContainer: {
       width: '100%',
       paddingHorizontal: 20
     },
     sectionTitle: {
-      fontSize: theme.typography.fontSize.xl,
+      fontSize: theme.typography.fontSize.base,
       fontFamily: theme.typography.fontFamily.bold,
       color: theme.colors.text.primary,
       marginBottom: theme.spacing.md,
-      marginTop: theme.spacing.lg
+      marginTop: theme.spacing.lg,
+      paddingHorizontal: theme.spacing.xs
     },
     setsContainer: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      gap: 16,
-      marginBottom: 24,
+      gap: theme.spacing.lg,
+      marginBottom: theme.spacing.xl,
       width: '100%'
     },
     setsButton: {
-      width: 40,
-      height: 40,
-      borderRadius: 20,
+      width: 48,
+      height: 48,
+      borderRadius: theme.borderRadius.full,
       backgroundColor: theme.colors.background.card,
       justifyContent: 'center',
       alignItems: 'center',
-      ...Platform.select({
-        ios: {
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.1,
-          shadowRadius: 4
-        },
-        android: {
-          elevation: 2
-        }
-      })
+      ...theme.shadows.sm
     },
     setsValue: {
-      fontSize: theme.typography.fontSize.xl,
+      fontSize: theme.typography.fontSize['2xl'],
       fontFamily: theme.typography.fontFamily.bold,
       color: theme.colors.text.primary,
-      minWidth: 30,
+      minWidth: 40,
       textAlign: 'center'
     }
   });

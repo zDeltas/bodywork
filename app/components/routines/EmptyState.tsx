@@ -1,5 +1,5 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Animated, StyleSheet, Text, View } from 'react-native';
 import { Plus } from 'lucide-react-native';
 import Button from '@/app/components/ui/Button';
 import { useTheme } from '@/app/hooks/useTheme';
@@ -15,6 +15,15 @@ const EmptyState = React.memo(({ onCreateRoutine, isFavoritesEmpty }: EmptyState
   const { theme } = useTheme();
   const { t } = useTranslation();
   const styles = useStyles(theme);
+  const fadeAnim = useState(new Animated.Value(0))[0];
+
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 600,
+      useNativeDriver: true
+    }).start();
+  }, []);
 
   const getTranslationKey = (key: string): TranslationKey => {
     const prefix = isFavoritesEmpty ? 'routines.noFavorites' : 'routines.emptyState';
@@ -22,7 +31,7 @@ const EmptyState = React.memo(({ onCreateRoutine, isFavoritesEmpty }: EmptyState
   };
 
   return (
-    <View style={styles.emptyContainer}>
+    <Animated.View style={[styles.emptyContainer, { opacity: fadeAnim }]}>
       <Text style={styles.emptyTitle}>
         {t(getTranslationKey('title'))}
       </Text>
@@ -37,7 +46,7 @@ const EmptyState = React.memo(({ onCreateRoutine, isFavoritesEmpty }: EmptyState
           icon={<Plus size={20} color={theme.colors.text.primary} />}
         />
       )}
-    </View>
+    </Animated.View>
   );
 });
 
@@ -46,31 +55,34 @@ const useStyles = (theme: any) => StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 32,
-    padding: 16
+    marginTop: theme.spacing.xl * 2,
+    padding: theme.spacing.lg
   },
   emptyTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: theme.typography.fontSize['2xl'],
+    fontFamily: theme.typography.fontFamily.bold,
     color: theme.colors.text.primary,
-    marginBottom: 8,
+    marginBottom: theme.spacing.sm,
     textAlign: 'center'
   },
   emptyText: {
-    fontSize: 16,
+    fontSize: theme.typography.fontSize.base,
+    fontFamily: theme.typography.fontFamily.regular,
     color: theme.colors.text.secondary,
     textAlign: 'center',
-    marginBottom: 24,
-    paddingHorizontal: 32
+    marginBottom: theme.spacing.xl,
+    paddingHorizontal: theme.spacing.xl,
+    lineHeight: theme.typography.lineHeight.relaxed * theme.typography.fontSize.base
   },
   emptyOrText: {
-    fontSize: 14,
+    fontSize: theme.typography.fontSize.sm,
+    fontFamily: theme.typography.fontFamily.regular,
     color: theme.colors.text.secondary,
-    marginVertical: 16
+    marginVertical: theme.spacing.lg
   },
   buttonContainer: {
     flexDirection: 'row',
-    gap: 4
+    gap: theme.spacing.xs
   }
 });
 

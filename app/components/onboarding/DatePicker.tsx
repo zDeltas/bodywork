@@ -224,7 +224,7 @@ const useStyles = () => {
     },
     dateLabel: {
       fontSize: theme.typography.fontSize.sm,
-      fontFamily: theme.typography.fontFamily.medium,
+      fontFamily: theme.typography.fontFamily.regular,
       marginBottom: theme.spacing.xs,
       textAlign: 'center',
     },

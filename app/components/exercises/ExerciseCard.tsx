@@ -177,7 +177,7 @@ const useStyles = () => {
     exerciseName: {
       color: theme.colors.text.primary,
       textAlign: 'center',
-      fontFamily: theme.typography.fontFamily.medium,
+      fontFamily: theme.typography.fontFamily.regular,
       lineHeight: 20,
     },
   });

@@ -84,7 +84,7 @@ const useStyles = () => {
     },
     loadingText: {
       fontSize: theme.typography.fontSize.lg,
-      fontFamily: theme.typography.fontFamily.medium,
+      fontFamily: theme.typography.fontFamily.regular,
       marginBottom: theme.spacing.md,
     },
     debugText: {

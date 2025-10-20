@@ -298,7 +298,7 @@ const useStyles = () => {
       borderRadius: 16,
       padding: theme.spacing.lg,
       marginBottom: theme.spacing.md,
-      ...theme.shadows.xs
+      ...theme.shadows.sm
     },
     todayCard: {
       borderWidth: 2,
@@ -330,7 +330,7 @@ const useStyles = () => {
     },
     statusText: {
       fontSize: theme.typography.fontSize.sm,
-      fontFamily: theme.typography.fontFamily.medium
+      fontFamily: theme.typography.fontFamily.regular
     },
     routinesContainer: {
       gap: theme.spacing.md

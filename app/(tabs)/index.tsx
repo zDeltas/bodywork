@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { useTheme } from '@/app/hooks/useTheme';
-import { LineChart, ListPlus, Plus, Ruler, Settings } from 'lucide-react-native';
+import { LineChart, ListPlus, Plus, Ruler, SlidersHorizontal } from 'lucide-react-native';
 import Header from '@/app/components/layout/Header';
 import { useHomeData } from '@/app/hooks/useHomeData';
 import EmptyState from '@/app/components/history/EmptyState';
@@ -91,8 +91,11 @@ export default function HomeScreen() {
         <Header
           title={t('common.appTitle')}
           rightComponent={
-            <Settings size={24} color={theme.colors.text.secondary}
-                      onPress={() => router.push('/screens/settings-home')} />
+            <SlidersHorizontal
+              size={24}
+              color={theme.colors.primary}
+              onPress={() => router.push('/screens/settings-home')}
+            />
           }
         />
         <View style={styles.loadingContainer}>
@@ -108,8 +111,11 @@ export default function HomeScreen() {
         <Header
           title={t('common.appTitle')}
           rightComponent={
-            <Settings size={24} color={theme.colors.text.secondary}
-                      onPress={() => router.push('/screens/settings-home')} />
+            <SlidersHorizontal
+              size={24}
+              color={theme.colors.primary}
+              onPress={() => router.push('/screens/settings-home')}
+            />
           }
         />
         <View style={styles.errorContainer}>
@@ -121,12 +127,11 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header avec icône settings */}
       <Header
         title={t('common.appTitle')}
         rightComponent={
           <View style={styles.headerIcons}>
-            <Settings
+            <SlidersHorizontal
               size={24}
               color={theme.colors.primary}
               onPress={() => router.push('/screens/settings-home')}
@@ -308,7 +313,7 @@ const useStyles = () => {
     },
     moodText: {
       color: theme.colors.text.secondary,
-      fontFamily: theme.typography.fontFamily.medium,
+      fontFamily: theme.typography.fontFamily.regular,
       textAlign: 'center'
     },
     quickActionsSection: {
@@ -321,7 +326,7 @@ const useStyles = () => {
       marginHorizontal: theme.spacing.lg,
       marginBottom: theme.spacing.md,
       color: theme.colors.text.secondary,
-      fontFamily: theme.typography.fontFamily.medium,
+      fontFamily: theme.typography.fontFamily.regular,
       fontSize: theme.typography.fontSize.sm,
       textTransform: 'uppercase',
       letterSpacing: 0.5

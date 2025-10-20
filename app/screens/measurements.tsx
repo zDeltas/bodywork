@@ -17,6 +17,7 @@ import { TranslationKey } from '@/translations';
 import useMeasurements from '@/app/hooks/useMeasurements';
 import Modal from '@/app/components/ui/Modal';
 import { router, useLocalSearchParams } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const MEASUREMENT_KEYS: MeasurementKey[] = [
   'neck',
@@ -38,7 +39,7 @@ const getMeasurementTranslationKey = (key: MeasurementKey): TranslationKey => {
 type ViewMode = 'history' | 'input';
 
 export default function MeasurementsScreen() {
-  const params = useLocalSearchParams<{ openInput?: string; openWeight?: string }>();
+  const params = useLocalSearchParams<{ openInput?: string; openWeight?: string; openHeight?: string }>();
   const { theme } = useTheme();
   const { t } = useTranslation();
   
@@ -61,7 +62,12 @@ export default function MeasurementsScreen() {
       setViewMode('input');
     }
     if (params?.openWeight === '1') {
+      setViewMode('input'); // Forcer le mode saisie
       setShowWeightModal(true);
+    }
+    if (params?.openHeight === '1') {
+      setViewMode('input'); // Forcer le mode saisie
+      setShowHeightModal(true);
     }
   }, [params]);
 
@@ -83,9 +89,21 @@ export default function MeasurementsScreen() {
   const closeHistoryModal = () => setHistoryModal({ key: null, open: false });
 
   const openWeightModal = () => setShowWeightModal(true);
-  const closeWeightModal = () => setShowWeightModal(false);
+  const closeWeightModal = () => {
+    setShowWeightModal(false);
+    // Nettoyer les paramètres URL si on vient de la navigation
+    if (params?.openWeight) {
+      router.replace('/screens/measurements');
+    }
+  };
   const openHeightModal = () => setShowHeightModal(true);
-  const closeHeightModal = () => setShowHeightModal(false);
+  const closeHeightModal = () => {
+    setShowHeightModal(false);
+    // Nettoyer les paramètres URL si on vient de la navigation
+    if (params?.openHeight) {
+      router.replace('/screens/measurements');
+    }
+  };
 
   const openWeightHistoryModal = () => {
     setHistoryModal({ key: null, open: true });
@@ -334,7 +352,7 @@ export default function MeasurementsScreen() {
   );
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Header title={t('measurements.title')} showBackButton={true} onBack={() => router.back()} />
       {renderViewToggle()}
       <ScrollView style={styles.content}>
@@ -371,6 +389,6 @@ export default function MeasurementsScreen() {
         onClose={closeHistoryModal}
         history={historyModal.key ? getHistory(historyModal.key) : getWeightHistory()}
       />
-    </View>
+    </SafeAreaView>
   );
 }

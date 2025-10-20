@@ -14,6 +14,7 @@ interface ModalProps {
   transparent?: boolean;
   style?: any;
   contentStyle?: any;
+  scrollable?: boolean;
 }
 
 export default function Modal({
@@ -25,7 +26,8 @@ export default function Modal({
                                 animationType = 'fade',
                                 transparent = true,
                                 style,
-                                contentStyle
+                                contentStyle,
+                                scrollable = true
                               }: ModalProps) {
   const { theme } = useTheme();
   const styles = useStyles(theme);
@@ -49,13 +51,17 @@ export default function Modal({
               )}
             </View>
           )}
-          <ScrollView
-            style={{ maxHeight: '90%' }}
-            contentContainerStyle={{ paddingBottom: theme.spacing.sm }}
-            showsVerticalScrollIndicator={false}
-          >
-            {children}
-          </ScrollView>
+          {scrollable ? (
+            <ScrollView
+              style={{ maxHeight: '90%' }}
+              contentContainerStyle={{ paddingBottom: theme.spacing.sm }}
+              showsVerticalScrollIndicator={false}
+            >
+              {children}
+            </ScrollView>
+          ) : (
+            children
+          )}
         </View>
       </View>
     </RNModal>

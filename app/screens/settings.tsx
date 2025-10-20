@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Linking, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Animated, ActivityIndicator, Alert, Linking, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { User, ChevronRight, Scale, Languages, SunMoon, Download, Trash2, Linkedin, Mail, CheckCircle, Circle } from 'lucide-react-native';
 import { BlurView } from 'expo-blur';
@@ -30,8 +30,18 @@ export default function SettingsScreen() {
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [showThemeModal, setShowThemeModal] = useState(false);
   const haptics = useHaptics();
+  const fadeAnim = useState(new Animated.Value(0))[0];
   // Feedback modal state
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+
+  // Animation d'entrée
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 600,
+      useNativeDriver: true
+    }).start();
+  }, []);
 
   // Auto-open feedback modal if pending prompt is scheduled
   useEffect(() => {
@@ -152,118 +162,166 @@ export default function SettingsScreen() {
           </View>
         </View>
       ) : (
-        <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: 100 }}>
+        <Animated.ScrollView style={[styles.content, { opacity: fadeAnim }]} contentContainerStyle={styles.contentContainer}>
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>{t('settings.preferences')}</Text>
-            <View className="rpe-setting" style={styles.settingItem}>
-              <View style={styles.settingInfo}>
+            
+            <TouchableOpacity
+              style={styles.featureCard}
+              onPress={openRpeModeModal}
+              activeOpacity={0.7}
+            >
+              <View style={[styles.featureIconContainer, { backgroundColor: theme.colors.primary + '15' }]}>
                 <User size={24} color={theme.colors.primary} />
-                <Text style={styles.settingLabel}>{t('settings.rpeMode')}</Text>
               </View>
-              <TouchableOpacity style={styles.settingControl} onPress={openRpeModeModal}>
-                <Text style={styles.settingValue}>
+              <View style={styles.featureContent}>
+                <Text style={styles.featureTitle}>{t('settings.rpeMode')}</Text>
+                <Text style={styles.featureDesc}>
                   {settings.rpeMode === 'never' ? t('settings.rpeNever') : t('settings.rpeAsk')}
                 </Text>
-                <ChevronRight size={20} color={theme.colors.text.secondary} />
-              </TouchableOpacity>
-            </View>
-
-            <View style={styles.settingItem}>
-              <View style={styles.settingInfo}>
-                <User size={24} color={theme.colors.primary} />
-                <Text style={styles.settingLabel}>{t('settings.gender')}</Text>
               </View>
-              <TouchableOpacity style={styles.settingControl} onPress={openGenderModal}>
-                <Text style={styles.settingValue}>
+              <ChevronRight size={20} color={theme.colors.text.tertiary} />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.featureCard}
+              onPress={openGenderModal}
+              activeOpacity={0.7}
+            >
+              <View style={[styles.featureIconContainer, { backgroundColor: theme.colors.primary + '15' }]}>
+                <User size={24} color={theme.colors.primary} />
+              </View>
+              <View style={styles.featureContent}>
+                <Text style={styles.featureTitle}>{t('settings.gender')}</Text>
+                <Text style={styles.featureDesc}>
                   {settings.gender === 'male' ? t('settings.male') : t('settings.female')}
                 </Text>
-                <ChevronRight size={20} color={theme.colors.text.secondary} />
-              </TouchableOpacity>
-            </View>
-
-            <View style={styles.settingItem}>
-              <View style={styles.settingInfo}>
-                <Scale size={24} color={theme.colors.primary} />
-                <Text style={styles.settingLabel}>{t('settings.weightUnit')}</Text>
               </View>
-              <TouchableOpacity style={styles.settingControl} onPress={openWeightUnitModal}>
-                <Text style={styles.settingValue}>{settings.weightUnit.toUpperCase()}</Text>
-                <ChevronRight size={20} color={theme.colors.text.secondary} />
-              </TouchableOpacity>
-            </View>
+              <ChevronRight size={20} color={theme.colors.text.tertiary} />
+            </TouchableOpacity>
 
-            <View style={styles.settingItem}>
-              <View style={styles.settingInfo}>
-                <Languages size={24} color={theme.colors.primary} />
-                <Text style={styles.settingLabel}>{t('settings.language')}</Text>
+            <TouchableOpacity
+              style={styles.featureCard}
+              onPress={openWeightUnitModal}
+              activeOpacity={0.7}
+            >
+              <View style={[styles.featureIconContainer, { backgroundColor: theme.colors.success + '15' }]}>
+                <Scale size={24} color={theme.colors.success} />
               </View>
-              <TouchableOpacity style={styles.settingControl} onPress={openLanguageModal}>
-                <Text style={styles.settingValue}>
+              <View style={styles.featureContent}>
+                <Text style={styles.featureTitle}>{t('settings.weightUnit')}</Text>
+                <Text style={styles.featureDesc}>{settings.weightUnit.toUpperCase()}</Text>
+              </View>
+              <ChevronRight size={20} color={theme.colors.text.tertiary} />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.featureCard}
+              onPress={openLanguageModal}
+              activeOpacity={0.7}
+            >
+              <View style={[styles.featureIconContainer, { backgroundColor: theme.colors.secondary + '15' }]}>
+                <Languages size={24} color={theme.colors.secondary} />
+              </View>
+              <View style={styles.featureContent}>
+                <Text style={styles.featureTitle}>{t('settings.language')}</Text>
+                <Text style={styles.featureDesc}>
                   {settings.language === 'en' ? t('settings.english') : t('settings.french')}
                 </Text>
-                <ChevronRight size={20} color={theme.colors.text.secondary} />
-              </TouchableOpacity>
-            </View>
-
-            <View style={styles.settingItem}>
-              <View style={styles.settingInfo}>
-                <SunMoon size={24} color={theme.colors.primary} />
-                <Text style={styles.settingLabel}>{t('settings.theme')}</Text>
               </View>
-              <TouchableOpacity style={styles.settingControl} onPress={openThemeModal}>
-                <Text style={styles.settingValue}>
+              <ChevronRight size={20} color={theme.colors.text.tertiary} />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.featureCard}
+              onPress={openThemeModal}
+              activeOpacity={0.7}
+            >
+              <View style={[styles.featureIconContainer, { backgroundColor: theme.colors.warning + '15' }]}>
+                <SunMoon size={24} color={theme.colors.warning} />
+              </View>
+              <View style={styles.featureContent}>
+                <Text style={styles.featureTitle}>{t('settings.theme')}</Text>
+                <Text style={styles.featureDesc}>
                   {settings.theme === 'dark' ? t('settings.dark') : t('settings.light')}
                 </Text>
-                <ChevronRight size={20} color={theme.colors.text.secondary} />
-              </TouchableOpacity>
-            </View>
+              </View>
+              <ChevronRight size={20} color={theme.colors.text.tertiary} />
+            </TouchableOpacity>
           </View>
 
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>{t('settings.application')}</Text>
 
-            <TouchableOpacity style={styles.settingItem} onPress={openFeedbackModal}>
-              <View style={styles.settingInfo}>
+            <TouchableOpacity
+              style={styles.featureCard}
+              onPress={openFeedbackModal}
+              activeOpacity={0.7}
+            >
+              <View style={[styles.featureIconContainer, { backgroundColor: theme.colors.primary + '15' }]}>
                 <Mail size={24} color={theme.colors.primary} />
-                <Text style={styles.settingLabel}>
+              </View>
+              <View style={styles.featureContent}>
+                <Text style={styles.featureTitle}>
                   {language === 'fr' ? 'Donner un avis' : 'Give Feedback'}
                 </Text>
+                <Text style={styles.featureDesc}>
+                  {language === 'fr' ? 'Partager votre expérience' : 'Share your experience'}
+                </Text>
               </View>
-              <ChevronRight size={20} color={theme.colors.text.secondary} />
+              <ChevronRight size={20} color={theme.colors.text.tertiary} />
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={styles.settingItem}
+              style={[styles.featureCard, styles.highlightCard]}
               onPress={handleExportData}
               disabled={isExporting}
+              activeOpacity={0.7}
             >
-              <View style={styles.settingInfo}>
-                <Download size={24} color={theme.colors.primary} />
-                <Text style={styles.settingLabel}>{t('settings.exportData')}</Text>
+              <View style={[styles.featureIconContainer, { backgroundColor: theme.colors.secondary + '15' }]}>
+                <Download size={24} color={theme.colors.secondary} />
+              </View>
+              <View style={styles.featureContent}>
+                <Text style={styles.featureTitle}>{t('settings.exportData')}</Text>
+                <Text style={styles.featureDesc}>{t('settings.exportToCSV')}</Text>
               </View>
               {isExporting ? (
-                <ActivityIndicator size="small" color={theme.colors.primary} />
+                <ActivityIndicator size="small" color={theme.colors.secondary} />
               ) : (
-                <ChevronRight size={20} color={theme.colors.text.secondary} />
+                <ChevronRight size={20} color={theme.colors.text.tertiary} />
               )}
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.settingItem} onPress={handleResetData}>
-              <View style={styles.settingInfo}>
+            <TouchableOpacity
+              style={[styles.featureCard, styles.dangerCard]}
+              onPress={handleResetData}
+              activeOpacity={0.7}
+            >
+              <View style={[styles.featureIconContainer, { backgroundColor: theme.colors.error + '15' }]}>
                 <Trash2 size={24} color={theme.colors.error} />
-                <Text style={[styles.settingLabel, { color: theme.colors.error }]}>
+              </View>
+              <View style={styles.featureContent}>
+                <Text style={[styles.featureTitle, { color: theme.colors.error }]}>
                   {t('settings.resetData')}
                 </Text>
+                <Text style={styles.featureDesc}>{t('settings.resetDataConfirmation')}</Text>
               </View>
-              <ChevronRight size={20} color={theme.colors.text.secondary} />
+              <ChevronRight size={20} color={theme.colors.text.tertiary} />
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.settingItem} onPress={toggleAbout}>
-              <View style={styles.settingInfo}>
-                <Mail size={24} color={theme.colors.primary} />
-                <Text style={styles.settingLabel}>{t('settings.about')}</Text>
+            <TouchableOpacity
+              style={styles.featureCard}
+              onPress={toggleAbout}
+              activeOpacity={0.7}
+            >
+              <View style={[styles.featureIconContainer, { backgroundColor: theme.colors.text.secondary + '10' }]}>
+                <Mail size={24} color={theme.colors.text.primary} />
               </View>
-              <ChevronRight size={20} color={theme.colors.text.secondary} />
+              <View style={styles.featureContent}>
+                <Text style={styles.featureTitle}>{t('settings.about')}</Text>
+                <Text style={styles.featureDesc}>{t('about.version')}</Text>
+              </View>
+              <ChevronRight size={20} color={theme.colors.text.tertiary} />
             </TouchableOpacity>
 
           </View>
@@ -295,7 +353,7 @@ export default function SettingsScreen() {
               </View>
             </BlurView>
           )}
-        </ScrollView>
+        </Animated.ScrollView>
       )}
 
       <Modal
@@ -468,45 +526,61 @@ const useStyles = () => {
       fontFamily: theme.typography.fontFamily.regular
     },
     content: {
-      flex: 1,
-      padding: theme.spacing.lg
+      flex: 1
+    },
+    contentContainer: {
+      padding: theme.spacing.lg,
+      paddingBottom: 100
     },
     section: {
-      marginBottom: theme.spacing.xl
+      marginBottom: theme.spacing.xl * 1.5
     },
     sectionTitle: {
-      fontSize: theme.typography.fontSize.lg,
+      fontSize: theme.typography.fontSize.base,
       fontFamily: theme.typography.fontFamily.bold,
-      color: theme.colors.primary,
-      marginBottom: theme.spacing.md
-    },
-    settingItem: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      paddingVertical: theme.spacing.md,
-      borderBottomWidth: 1,
-      borderBottomColor: theme.colors.border.default
-    },
-    settingInfo: {
-      flexDirection: 'row',
-      alignItems: 'center'
-    },
-    settingLabel: {
-      fontSize: theme.typography.fontSize.base,
       color: theme.colors.text.primary,
-      marginLeft: theme.spacing.md,
-      fontFamily: theme.typography.fontFamily.regular
+      marginBottom: theme.spacing.md,
+      paddingHorizontal: theme.spacing.xs
     },
-    settingControl: {
+    featureCard: {
       flexDirection: 'row',
-      alignItems: 'center'
+      alignItems: 'center',
+      backgroundColor: theme.colors.background.card,
+      borderRadius: theme.borderRadius.lg,
+      padding: theme.spacing.md,
+      marginBottom: theme.spacing.sm,
+      ...theme.shadows.sm
     },
-    settingValue: {
+    highlightCard: {
+      borderLeftWidth: 3,
+      borderLeftColor: theme.colors.secondary
+    },
+    dangerCard: {
+      borderLeftWidth: 3,
+      borderLeftColor: theme.colors.error
+    },
+    featureIconContainer: {
+      width: 48,
+      height: 48,
+      borderRadius: theme.borderRadius.md,
+      alignItems: 'center',
+      justifyContent: 'center'
+    },
+    featureContent: {
+      flex: 1,
+      marginLeft: theme.spacing.md,
+      marginRight: theme.spacing.sm
+    },
+    featureTitle: {
       fontSize: theme.typography.fontSize.base,
-      color: theme.colors.text.secondary,
-      marginRight: theme.spacing.sm,
-      fontFamily: theme.typography.fontFamily.regular
+      fontFamily: theme.typography.fontFamily.semiBold,
+      color: theme.colors.text.primary,
+      marginBottom: theme.spacing.xs / 2
+    },
+    featureDesc: {
+      fontSize: theme.typography.fontSize.sm,
+      fontFamily: theme.typography.fontFamily.regular,
+      color: theme.colors.text.secondary
     },
     aboutContainer: {
       position: 'absolute',

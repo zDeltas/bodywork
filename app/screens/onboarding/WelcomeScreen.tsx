@@ -171,7 +171,7 @@ const useStyles = () => {
     },
     motivationText: {
       fontSize: theme.typography.fontSize.base,
-      fontFamily: theme.typography.fontFamily.medium,
+      fontFamily: theme.typography.fontFamily.regular,
       lineHeight: theme.typography.lineHeight.relaxed * theme.typography.fontSize.base,
       textAlign: 'center',
       fontStyle: 'italic',

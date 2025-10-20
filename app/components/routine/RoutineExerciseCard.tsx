@@ -164,7 +164,7 @@ const useStyles = (theme: any) => StyleSheet.create({
   },
   restTimeButtonText: {
     color: theme.colors.text.primary,
-    fontFamily: theme.typography.fontFamily.medium,
+    fontFamily: theme.typography.fontFamily.regular,
     fontSize: theme.typography.fontSize.sm
   }
 });

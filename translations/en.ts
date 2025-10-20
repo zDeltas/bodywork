@@ -29,6 +29,7 @@ export default {
     next: 'Next',
     finish: 'Finish',
     or: 'or',
+    exercise: 'exercise',
     exercises: 'exercises',
     series: 'series',
     seconds: 'seconds',
@@ -37,7 +38,8 @@ export default {
     day: 'Day',
     month: 'Month',
     year: 'Year',
-    confirm: 'Confirm'
+    confirm: 'Confirm',
+    week: 'wk'
   },
 
   // Exercise Types (editor)
@@ -58,9 +60,9 @@ export default {
   // Home screen
   home: {
     greeting: 'Hey {name}',
-    morningMotivation: 'Ready to start strong today? 💪',
-    eveningMotivation: 'One last push for the road? 🔥',
-    afternoonMotivation: 'Ready to sweat? 🔥',
+    morningMotivation: 'Ready to start strong today?',
+    eveningMotivation: 'One last push for the road?',
+    afternoonMotivation: 'Ready to sweat?',
     weekProgress: '{current}/{total} sessions',
     currentWeek: 'Current week',
     vsLastWeek: 'vs last week',
@@ -71,21 +73,21 @@ export default {
     lastSession: 'Last session',
     seeDetails: 'See details',
     weeklyGoal: 'Weekly goal',
-    almostThere: 'You\'re almost there 👊',
-    oneMoreSession: '1 more session to reach your goal 🔥',
-    goalAchieved: 'Goal achieved! 🎉',
+    almostThere: 'You\'re almost there',
+    oneMoreSession: '1 more session to reach your goal',
+    goalAchieved: 'Goal achieved!',
     quickActions: 'Quick actions',
     viewExercise: 'View an exercise',
     startSession: 'Start my session',
     resumeSession: 'Resume my session',
     motivationalQuotes: [
-      'Every rep brings you closer to your best version 💪',
-      'The only bad workout is the one you don\'t do 🔥',
-      'Your muscles grow when you sleep, but they\'re forged here 💪',
-      'Today is the perfect day to get stronger 🚀',
-      'Every drop of sweat is a step towards your goal 💦',
-      'You are stronger than your excuses 💪',
-      'Progress starts with the first step 🚀'
+      'Every rep brings you closer to your best version',
+      'The only bad workout is the one you don\'t do',
+      'Your muscles grow when you sleep, but they\'re forged here',
+      'Today is the perfect day to get stronger',
+      'Every drop of sweat is a step towards your goal',
+      'You are stronger than your excuses',
+      'Progress starts with the first step'
     ],
     muscleGroups: 'Muscle groups worked',
     duration: 'Duration',
@@ -186,6 +188,14 @@ export default {
     rpeMode: 'RPE Setting',
     rpeAsk: 'Ask RPE',
     rpeNever: 'Do not ask (default 7)',
+    // Onboarding settings
+    onboarding: {
+      profile: 'User Profile',
+      viewProfile: 'View Profile',
+      appPreferences: 'App Preferences',
+      resetOnboarding: 'Reset Onboarding',
+      resetWarning: 'Are you sure you want to reset the onboarding? This will delete all your profile information.'
+    },
 
     routines: {
       title: 'Routines',
@@ -308,6 +318,7 @@ export default {
     selectDate: 'Select a date',
     duplicateLastSeries: 'Duplicate last series',
     routineCompleted: 'Routine completed!',
+    congratulationsMessage: 'Congratulations, you completed your workout!',
     quitRoutine: 'Quit Routine',
     quitRoutineMessage: 'Are you sure you want to quit this routine? Your progress will be lost.',
     exercises: 'exercises',
@@ -577,6 +588,27 @@ export default {
   // Profile screen
   profile: {
     title: 'Profile',
+    myProfile: 'My Profile',
+    trackingChallenges: 'Tracking & Challenges',
+    fitnessProfile: 'My Fitness Profile',
+    athleteProfile: 'Athletic Profile',
+    athleteProfileDesc: 'Goal, frequency, equipment',
+    configurePreferences: 'Configure my preferences',
+    measurementsDesc: 'Weight, height, measurements',
+    statsDesc: 'View my performance',
+    level: 'Level',
+    stats: {
+      thisWeek: 'This week',
+      totalSessions: 'Total sessions',
+      routines: 'Routines'
+    },
+    physicalInfo: 'Physical Information',
+    goals: 'Goals',
+    training: 'Training',
+    age: 'Age',
+    years: 'years old',
+    invalidHeight: 'Please enter a valid height (50-250 cm)',
+    invalidWeight: 'Please enter a valid weight (30-300 kg)',
     account: 'Account',
     myAccount: 'My Account',
     createAccount: 'Create Account',
@@ -584,9 +616,12 @@ export default {
     resetData: 'Reset Data',
     social: 'Social',
     share: 'Share App',
+    shareDesc: 'Invite your friends',
     rate: 'Rate App',
+    rateDesc: 'Give your feedback',
     settings: 'Settings',
     appSettings: 'App Settings',
+    appSettingsDesc: 'Language, theme, notifications',
     instagram: 'Instagram',
     instagramHandle: '@gainiziapp',
     instagramModal: {
@@ -956,24 +991,24 @@ export default {
       adherenceRate: 'Adherence rate',
       streakWeeks: 'consecutive weeks',
       onTime: 'On-time',
-      microCopy: '{completed}/{planned} planned sessions held • 🔥 Streak {streak} wks.',
+      microCopy: '{completed}/{planned} planned sessions held • Streak {streak} wks.',
       cta: {
         planWeek: 'Plan my week',
         catchUp: 'Catch up a session',
         maintain: 'Stay on track'
       },
       messages: {
-        exemplary: 'Exemplary consistency! 🏆',
-        excellent: 'Excellent adherence! 💪',
-        good: 'Great regularity! 👍',
-        progress: 'Making progress! 📈',
-        restart: 'Let\'s get back on track! 🚀'
+        exemplary: 'Exemplary consistency!',
+        excellent: 'Excellent adherence!',
+        good: 'Great regularity!',
+        progress: 'Making progress!',
+        restart: 'Let\'s get back on track!'
       }
     },
     
     weeklyChallenge: {
       title: 'Weekly Challenge',
-      microCopy: 'Challenge {current}/{target} {unit} • {days} days left ⚡',
+      microCopy: 'Challenge {current}/{target} {unit} • {days} days left',
       units: {
         sessions: 'sessions',
         volume: 'kg',
@@ -985,11 +1020,11 @@ export default {
         continue: 'Continue challenge'
       },
       messages: {
-        conquered: 'Challenge conquered! 🏆',
-        final: 'Final stretch! 🔥',
-        close: 'So close to the goal! 💪',
-        halfway: 'Halfway there! 📈',
-        begin: 'Challenge begins! ⚡'
+        conquered: 'Challenge conquered!',
+        final: 'Final stretch!',
+        close: 'So close to the goal!',
+        halfway: 'Halfway there!',
+        begin: 'Challenge begins!'
       }
     },
 
@@ -999,10 +1034,10 @@ export default {
       subtitle: 'Stay true to your program',
       sessionsHeld: 'sessions held',
       regularWeeks: 'regular weeks',
-      excellent: 'Excellent discipline 💪',
-      good: 'You\'re on the right track 🚀',
-      building: 'Keep it up 👊',
-      restart: 'Try to keep the pace 👊'
+      excellent: 'Excellent discipline',
+      good: 'You\'re on the right track',
+      building: 'Keep it up',
+      restart: 'Try to keep the pace'
     },
 
     challenge: {
@@ -1011,11 +1046,11 @@ export default {
       progress: 'Progress',
       sessions: 'sessions',
       exercises: 'exercises',
-      completed: 'Challenge completed! 🏆',
-      almostThere: 'Almost there ⚡',
-      halfway: 'Halfway through! 🔥',
-      building: 'Taking shape! 💪',
-      start: 'The challenge begins! 🔥',
+      completed: 'Challenge completed!',
+      almostThere: 'Almost there',
+      halfway: 'Halfway through!',
+      building: 'Taking shape!',
+      start: 'The challenge begins!',
       sessionsLeft: '{count} more session to succeed',
       daysLeft: '{count} days left'
     },
@@ -1034,32 +1069,32 @@ export default {
       viewSession: 'View session',
       startNewSession: 'Start a session',
       createRoutine: 'Create a routine',
-      allCompleted: 'All done 🎉',
+      allCompleted: 'All done',
       noRoutineMessage: 'No session planned for today. Ready to create your own session?',
-      sessionCompletedMessage: 'Well done! You completed today\'s session 🎉',
+      sessionCompletedMessage: 'Well done! You completed today\'s session',
       viewPlanning: 'View my planning',
       routinesPlanned: 'sessions planned',
       totalDuration: 'Total duration',
       progress: 'Progress',
-      motivationalReady: 'Ready to train? 💪',
-      motivationalContinue: 'Keep your consistency streak going 🔥',
-      motivationalCompleted: 'Great consistency today! 🔥',
-      motivationalRest: 'Enjoy your rest day ☀️'
+      motivationalReady: 'Ready to train?',
+      motivationalContinue: 'Keep your consistency streak going',
+      motivationalCompleted: 'Great consistency today!',
+      motivationalRest: 'Enjoy your rest day'
     },
 
     weeklyRoutines: {
       title: 'This Week\'s Planned Sessions',
       weekProgress: 'Week: {completed}/{target} sessions completed',
-      targetReached: 'Target reached! Keep the momentum going 🔥',
-      weekCompleted: 'Week completed ✅ {completed}/{target} sessions — excellent consistency 👏',
-      oneMore: '1 more to complete your goal 💪',
-      twoMore: '2 more to complete your goal 💪',
-      keepGoing: '{remaining} more to complete your goal 💪',
-      weekEnded: 'Week ended! Prepare for the next one 📅',
+      targetReached: 'Target reached! Keep the momentum going',
+      weekCompleted: 'Week completed {completed}/{target} sessions — excellent consistency',
+      oneMore: '1 more to complete your goal',
+      twoMore: '2 more to complete your goal',
+      keepGoing: '{remaining} more to complete your goal',
+      weekEnded: 'Week ended! Prepare for the next one',
       planNextWeek: 'Plan next week',
       viewRoutines: 'View my sessions',
       viewProgramming: 'View my programming',
-      restDay: 'Rest ☀️'
+      restDay: 'Rest'
     },
 
     schedule: {
@@ -1101,7 +1136,7 @@ export default {
 
     
     emotional: {
-      greeting: 'Hey {name}! 👋',
+      greeting: 'Hey {name}!',
       // Pillar 1: Quote → Philosophy → Inspiration
       philosophy: 'Philosophy',
       inspiration: 'Inspiration',
@@ -1111,11 +1146,11 @@ export default {
       sessions: 'sessions',
       daysStreak: 'consecutive days',
       discipline: {
-        complete: 'Exemplary discipline! 🏆',
-        excellent: 'Excellent consistency! 💪',
-        good: 'Great regularity! 👍',
-        progress: 'Making progress! 📈',
-        start: 'Let\'s start together! 🚀'
+        complete: 'Exemplary discipline!',
+        excellent: 'Excellent consistency!',
+        good: 'Great regularity!',
+        progress: 'Making progress!',
+        start: 'Let\'s start together!'
       },
       satisfaction: {
         complete: 'Accomplished',
@@ -1129,11 +1164,11 @@ export default {
       musclesWorked: 'Muscles worked',
       newRecord: 'New Record!',
       pride: {
-        record: 'Exceptional performance! 🔥',
-        exceptional: 'Impressive strength! 💥',
-        strong: 'Solid performance! 💪',
-        solid: 'Good work done! 👏',
-        progress: 'Steady progress! 📊'
+        record: 'Exceptional performance!',
+        exceptional: 'Impressive strength!',
+        strong: 'Solid performance!',
+        solid: 'Good work done!',
+        progress: 'Steady progress!'
       },
       performance: {
         record: 'Record',
@@ -1147,14 +1182,14 @@ export default {
       weeklyChallenge: 'Weekly Challenge',
       progress: 'Progress',
       defaultGoal: 'Achieve my fitness goals',
-      oneMore: 'Just one more session! 🎯',
+      oneMore: 'Just one more session!',
       sessionsLeft: '{count} sessions left',
       challenge: {
-        conquered: 'Challenge conquered! You\'re incredible! 🏆',
-        final: 'Final stretch! You\'re almost there! 🔥',
-        close: 'So close to the goal! Keep going! 💪',
-        halfway: 'Halfway there! Excellent pace! 📈',
-        begin: 'Challenge begins! Show your strength! ⚡'
+        conquered: 'Challenge conquered! You\'re incredible!',
+        final: 'Final stretch! You\'re almost there!',
+        close: 'So close to the goal! Keep going!',
+        halfway: 'Halfway there! Excellent pace!',
+        begin: 'Challenge begins! Show your strength!'
       },
       motivation: {
         achieved: 'Achieved',
@@ -1172,18 +1207,18 @@ export default {
       enjoyment: 'enjoyment',
       createHint: 'Tap to create a new routine',
       confidence: {
-        expert: 'You\'ve become an expert! 🎓',
-        experienced: 'Solid experience gained! 💼',
-        growing: 'Growing confidence! 🌱',
-        building: 'Building expertise! 🔨',
-        starting: 'Beginning the journey! 🌟'
+        expert: 'You\'ve become an expert!',
+        experienced: 'Solid experience gained!',
+        growing: 'Growing confidence!',
+        building: 'Building expertise!',
+        starting: 'Beginning the journey!'
       },
       personalization: {
-        master: 'Routine creation master! 🎨',
-        creator: 'Passionate creator! ✨',
-        adapter: 'Smart adapter! 🔧',
-        beginner: 'First creative steps! 🎯',
-        explorer: 'Curious explorer! 🔍'
+        master: 'Routine creation master!',
+        creator: 'Passionate creator!',
+        adapter: 'Smart adapter!',
+        beginner: 'First creative steps!',
+        explorer: 'Curious explorer!'
       },
       pleasure: {
         joy: 'Joy',

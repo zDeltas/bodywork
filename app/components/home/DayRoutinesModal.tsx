@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
-import { Clock, Play, X } from 'lucide-react-native';
+import { Clock, Play, X, Check, AlertCircle, Circle } from 'lucide-react-native';
 import { useTheme } from '@/app/hooks/useTheme';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { router } from 'expo-router';
@@ -51,9 +51,10 @@ const DayRoutinesModal: React.FC<DayRoutinesModalProps> = ({
   };
 
   const getStatusIcon = (routine: DayRoutineData) => {
-    if (routine.isCompleted) return '✅';
-    if (routine.isMissed) return '❌';
-    return '⚪';
+    const color = getStatusColor(routine);
+    if (routine.isCompleted) return <Check size={18} color={color} strokeWidth={2.5} />;
+    if (routine.isMissed) return <X size={18} color={color} strokeWidth={2.5} />;
+    return <Circle size={16} color={color} strokeWidth={2} />;
   };
 
   const getStatusColor = (routine: DayRoutineData) => {
@@ -96,9 +97,9 @@ const DayRoutinesModal: React.FC<DayRoutinesModalProps> = ({
             <View key={routine.id} style={styles.routineItem}>
               <View style={styles.routineHeader}>
                 <View style={styles.routineInfo}>
-                  <Text style={styles.statusIcon}>
+                  <View style={styles.statusIcon}>
                     {getStatusIcon(routine)}
-                  </Text>
+                  </View>
                   <View style={styles.routineDetails}>
                     <Text 
                       style={[
@@ -136,13 +137,13 @@ const DayRoutinesModal: React.FC<DayRoutinesModalProps> = ({
             </Text>
           ) : completedCount === routines.length ? (
             <Text style={styles.completedMessage}>
-              🎉 {t('home.dailyRoutine.allCompleted')}
+              {t('home.dailyRoutine.allCompleted')}
             </Text>
           ) : (
             <Text style={styles.motivationMessage}>
               {completedCount === 0 
                 ? t('home.dailyRoutine.motivationalReady')
-                : `${routines.length - completedCount} routine${routines.length - completedCount > 1 ? 's' : ''} restante${routines.length - completedCount > 1 ? 's' : ''} 💪`
+                : `${routines.length - completedCount} routine${routines.length - completedCount > 1 ? 's' : ''} restante${routines.length - completedCount > 1 ? 's' : ''}`
               }
             </Text>
           )}
@@ -173,12 +174,12 @@ const useStyles = () => {
     summaryLabel: {
       color: theme.colors.text.secondary,
       fontSize: theme.typography.fontSize.sm,
-      fontFamily: theme.typography.fontFamily.medium
+      fontFamily: theme.typography.fontFamily.regular
     },
     summaryValue: {
       color: theme.colors.text.primary,
       fontSize: theme.typography.fontSize.sm,
-      fontFamily: theme.typography.fontFamily.medium,
+      fontFamily: theme.typography.fontFamily.regular,
       flex: 1
     },
     routinesList: {
@@ -203,7 +204,10 @@ const useStyles = () => {
       gap: theme.spacing.md
     },
     statusIcon: {
-      fontSize: 20
+      width: 24,
+      height: 24,
+      alignItems: 'center',
+      justifyContent: 'center'
     },
     routineDetails: {
       flex: 1

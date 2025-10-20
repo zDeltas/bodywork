@@ -63,7 +63,7 @@ const DynamicHeader: React.FC<DynamicHeaderProps> = React.memo(({
     <View style={styles.container}>
       {/* Salutation principale */}
       <Text variant="heading" style={styles.greeting}>
-        👋 {t('home.greeting', { name: userName })}
+        {t('home.greeting', { name: userName })}
       </Text>
       
       {/* Message motivationnel */}

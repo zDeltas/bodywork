@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
-import { Calendar, CheckCircle, Clock, Target } from 'lucide-react-native';
+import { Calendar, CheckCircle, Clock, Target, Sun, Check, X, Circle } from 'lucide-react-native';
 import { useTheme } from '@/app/hooks/useTheme';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { router } from 'expo-router';
@@ -60,20 +60,20 @@ const WeeklyRoutinesCard: React.FC<WeeklyRoutinesCardProps> = ({
     const isPast = isAfter(today, endOfDay(date));
 
     if (dayRoutines.length === 0) {
-      return { type: 'rest', color: theme.colors.text.secondary, icon: '☀️' };
+      return { type: 'rest', color: theme.colors.text.secondary, IconComponent: Sun };
     }
 
     const completedCount = dayRoutines.filter(r => r.isCompleted).length;
     const totalCount = dayRoutines.length;
 
     if (completedCount === totalCount) {
-      return { type: 'completed', color: theme.colors.success, icon: '✅' };
+      return { type: 'completed', color: theme.colors.success, IconComponent: Check };
     } else if (isPast && completedCount < totalCount) {
-      return { type: 'missed', color: theme.colors.error, icon: '❌' };
+      return { type: 'missed', color: theme.colors.error, IconComponent: X };
     } else if (isToday && completedCount < totalCount) {
-      return { type: 'today', color: '#4CC9F0', icon: '🔵' };
+      return { type: 'today', color: '#4CC9F0', IconComponent: Circle };
     } else {
-      return { type: 'planned', color: theme.colors.text.secondary, icon: '⚪' };
+      return { type: 'planned', color: theme.colors.text.secondary, IconComponent: Circle };
     }
   };
 
@@ -156,9 +156,9 @@ const WeeklyRoutinesCard: React.FC<WeeklyRoutinesCardProps> = ({
               <Text style={[styles.dayInitial, { color: status.color }]}>
                 {getDayInitial(date)}
               </Text>
-              <Text style={styles.dayIcon}>
-                {status.icon}
-              </Text>
+              <View style={styles.dayIcon}>
+                <status.IconComponent size={14} color={status.color} />
+              </View>
               {dayRoutines.length > 0 && (
                 <Text style={[styles.dayCount, { color: status.color }]}>
                   {dayRoutines.length}
@@ -268,8 +268,9 @@ const useStyles = () => {
       marginBottom: 2
     },
     dayIcon: {
-      fontSize: 16,
-      marginBottom: 2
+      marginBottom: 2,
+      alignItems: 'center',
+      justifyContent: 'center'
     },
     dayCount: {
       fontSize: theme.typography.fontSize.xs,

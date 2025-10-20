@@ -1,6 +1,6 @@
-import React from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
-import { Calendar, CheckCircle, Clock, Play, Rocket, Target, TrendingUp } from 'lucide-react-native';
+import React, { useEffect, useState } from 'react';
+import { Animated, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Calendar, CheckCircle, Clock, Play, Rocket, Check } from 'lucide-react-native';
 import { useTheme } from '@/app/hooks/useTheme';
 import { useTranslation } from '@/app/hooks/useTranslation';
 import { router } from 'expo-router';
@@ -34,6 +34,16 @@ const DailyRoutineCard: React.FC<DailyRoutineCardProps> = ({
   const { t } = useTranslation();
   const styles = useStyles();
 
+  const fadeAnim = useState(new Animated.Value(0))[0];
+
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 400,
+      useNativeDriver: true
+    }).start();
+  }, []);
+
   const getStateColor = () => {
     if (!hasRoutineToday) {
       return theme.colors.text.secondary;
@@ -50,7 +60,7 @@ const DailyRoutineCard: React.FC<DailyRoutineCardProps> = ({
     if (!hasRoutineToday) {
       return Calendar;
     } else if (isCompleted) {
-      return Target;
+      return CheckCircle;
     } else {
       return Rocket;
     }
@@ -81,55 +91,36 @@ const DailyRoutineCard: React.FC<DailyRoutineCardProps> = ({
   };
 
   return (
-    <BaseCard
-      title={t('home.dailyRoutine.title')}
-      icon={<StateIcon size={28} color={stateColor} />}
-    >
-
-      {hasRoutineToday && routines.length > 0 ? (
-        <>
-          {}
-          <View style={styles.summaryContainer}>
-            <View style={styles.summaryRow}>
-              <Clock size={16} color={theme.colors.text.secondary} />
-              <Text variant="body" style={styles.summaryText}>
-                {routines.length} {routines.length === 1 ? 'séance prévue' : 'séances prévues'} • {getTotalDuration()} min
-                totales
+    <Animated.View style={{ opacity: fadeAnim }}>
+      <BaseCard
+        title={t('home.dailyRoutine.title')}
+        icon={<StateIcon size={28} color={stateColor} />}
+        style={hasRoutineToday && !isCompleted ? styles.highlightCard : undefined}
+      >
+        {hasRoutineToday && routines.length > 0 ? (
+          <>
+            {/* Résumé compact */}
+            <View style={styles.summaryContainer}>
+              <Text style={styles.summaryText}>
+                {getCompletedRoutinesCount()}/{routines.length} {routines.length === 1 ? 'séance' : 'séances'} • {getTotalDuration()} min
               </Text>
             </View>
-            <View style={styles.summaryRow}>
-              <TrendingUp size={16} color={theme.colors.text.secondary} />
-              <Text variant="body" style={styles.summaryText}>
-                {t('home.dailyRoutine.progress')} : {getCompletedRoutinesCount()}/{routines.length}
-                {getCompletedRoutinesCount() > 0 && ' ✅'}
-              </Text>
-            </View>
-          </View>
 
-          {}
-          <View style={styles.routinesList}>
-            {routines.slice(0, 3).map((routine, idx) => (
-              <View
-                key={routine.id}
-                style={[
-                  styles.routineItem,
-                  routine.isCompleted && styles.routineItemCompleted
-                ]}
-              >
-                <View style={styles.routineItemLeft}>
-                  <View style={[
-                    styles.routineNumber,
-                    routine.isCompleted && styles.routineNumberCompleted
-                  ]}>
-                    {routine.isCompleted ? (
-                      <CheckCircle size={20} color={theme.colors.success} />
-                    ) : (
-                      <Text style={styles.routineNumberText}>{idx + 1}</Text>
-                    )}
-                  </View>
-                  <View style={styles.routineInfo}>
+            {/* Liste des Routines */}
+            <View style={styles.routinesList}>
+              {routines.slice(0, 3).map((routine, idx) => (
+                <TouchableOpacity
+                  key={routine.id}
+                  style={[
+                    styles.routineItem,
+                    routine.isCompleted && styles.routineItemCompleted
+                  ]}
+                  onPress={() => !routine.isCompleted && router.push(`/screens/workout/session?routineId=${routine.id}`)}
+                  activeOpacity={routine.isCompleted ? 1 : 0.7}
+                  disabled={routine.isCompleted}
+                >
+                  <View style={styles.routineItemContent}>
                     <Text
-                      variant="body"
                       style={[
                         styles.routineItemName,
                         routine.isCompleted && styles.routineItemNameCompleted
@@ -139,58 +130,59 @@ const DailyRoutineCard: React.FC<DailyRoutineCardProps> = ({
                       {routine.name}
                     </Text>
                     {routine.estimatedDuration && (
-                      <Text variant="caption" style={styles.routineItemDuration}>
-                        {routine.estimatedDuration} min
-                      </Text>
+                      <View style={styles.durationRow}>
+                        <Clock size={14} color={theme.colors.text.secondary} />
+                        <Text style={styles.routineItemDuration}>
+                          {routine.estimatedDuration} min
+                        </Text>
+                      </View>
                     )}
                   </View>
-                </View>
-                {routine.isCompleted ? (
-                  <View style={styles.statusIndicator}>
-                    <Text style={styles.completedIcon}>✓</Text>
-                  </View>
-                ) : (
-                  <TouchableOpacity
-                    activeOpacity={0.7}
-                    style={styles.playButton}
-                    onPress={() => router.push(`/screens/workout/session?routineId=${routine.id}`)}
-                  >
-                    <Play size={18} color="white" fill="white" />
-                  </TouchableOpacity>
-                )}
-              </View>
-            ))}
-          </View>
-        </>
-      ) : (
-        <>
-          {}
-          <View style={styles.emptyStateContainer}>
-            <Text variant="body" style={styles.emptyStateMessage}>
-              {isCompleted
-                ? t('home.dailyRoutine.sessionCompletedMessage')
-                : t('home.dailyRoutine.noRoutineMessage')
-              }
+                  
+                  {routine.isCompleted ? (
+                    <View style={[styles.statusBadge, styles.statusBadgeCompleted]}>
+                      <Check size={16} color={theme.colors.success} strokeWidth={2.5} />
+                    </View>
+                  ) : (
+                    <View style={[styles.statusBadge, styles.statusBadgePending]}>
+                      <Play size={16} color="#4CC9F0" fill="#4CC9F0" />
+                    </View>
+                  )}
+                </TouchableOpacity>
+              ))}
+            </View>
+
+          </>
+        ) : (
+          <>
+            {/* État Vide */}
+            <View style={styles.emptyStateContainer}>
+              <Text variant="body" style={styles.emptyStateMessage}>
+                {isCompleted
+                  ? t('home.dailyRoutine.sessionCompletedMessage')
+                  : t('home.dailyRoutine.noRoutineMessage')
+                }
+              </Text>
+              {!isCompleted && (
+                <TouchableOpacity
+                  style={styles.createRoutineButton}
+                  onPress={() => router.push('/screens/routines')}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.createRoutineButtonText}>
+                    {t('home.dailyRoutine.createRoutine')}
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </View>
+            {/* Message Motivationnel */}
+            <Text variant="caption" style={styles.motivationalText}>
+              {getMotivationalMessage()}
             </Text>
-            {!isCompleted && (
-              <TouchableOpacity
-                style={styles.createRoutineButton}
-                onPress={() => router.push('/screens/routines')}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.createRoutineButtonText}>
-                  {t('home.dailyRoutine.createRoutine')}
-                </Text>
-              </TouchableOpacity>
-            )}
-          </View>
-          {}
-          <Text variant="caption" style={styles.motivationalText}>
-            {getMotivationalMessage()}
-          </Text>
-        </>
-      )}
-    </BaseCard>
+          </>
+        )}
+      </BaseCard>
+    </Animated.View>
   );
 };
 
@@ -198,128 +190,113 @@ const useStyles = () => {
   const { theme } = useTheme();
 
   return StyleSheet.create({
-    summaryContainer: {
-      backgroundColor: theme.colors.background.input,
-      borderRadius: theme.borderRadius.lg,
-      padding: theme.spacing.md,
-      marginBottom: theme.spacing.lg,
-      gap: theme.spacing.sm
+    // Bordure gauche highlight
+    highlightCard: {
+      borderLeftWidth: 3,
+      borderLeftColor: '#4CC9F0'
     },
-    summaryRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: theme.spacing.sm
+    
+    // Résumé compact
+    summaryContainer: {
+      marginBottom: theme.spacing.lg
     },
     summaryText: {
-      color: theme.colors.text.primary,
       fontSize: theme.typography.fontSize.sm,
-      flex: 1
+      fontFamily: theme.typography.fontFamily.medium,
+      color: theme.colors.text.secondary,
+      textAlign: 'center'
     },
+
+    // Liste des Routines
     routinesList: {
-      gap: theme.spacing.md,
-      marginBottom: theme.spacing.lg
+      gap: theme.spacing.sm
     },
     routineItem: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      backgroundColor: theme.colors.background.input,
-      borderRadius: theme.borderRadius.xl,
-      padding: theme.spacing.lg,
-      borderWidth: 0,
-      ...theme.shadows.sm
+      backgroundColor: theme.colors.background.card,
+      borderRadius: theme.borderRadius.md,
+      paddingVertical: theme.spacing.md,
+      paddingHorizontal: theme.spacing.lg,
+      borderWidth: 1.5,
+      borderColor: theme.colors.text.secondary + '30'
     },
     routineItemCompleted: {
-      opacity: 0.8 // Légèrement atténué mais pas trop
+      opacity: 0.6,
+      borderColor: theme.colors.text.secondary + '20'
     },
-    routineItemLeft: {
-      flexDirection: 'row',
-      alignItems: 'center',
+    routineItemContent: {
       flex: 1,
-      gap: theme.spacing.md
-    },
-    routineNumber: {
-      width: 40,
-      height: 40,
-      borderRadius: 20,
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: theme.colors.primary,
-      ...theme.shadows.sm
-    },
-    routineNumberCompleted: {
-      backgroundColor: 'transparent'
-    },
-    routineNumberText: {
-      color: 'white',
-      fontFamily: theme.typography.fontFamily.bold,
-      fontSize: theme.typography.fontSize.lg
-    },
-    routineInfo: {
-      flex: 1
+      marginRight: theme.spacing.md
     },
     routineItemName: {
-      color: theme.colors.text.primary,
+      fontSize: theme.typography.fontSize.base,
       fontFamily: theme.typography.fontFamily.semiBold,
-      fontSize: theme.typography.fontSize.md,
-      marginBottom: 2
+      color: theme.colors.text.primary,
+      marginBottom: 4
     },
     routineItemNameCompleted: {
-      color: theme.colors.text.secondary // Texte plus discret pour les terminées
+      color: theme.colors.text.secondary,
+      textDecorationLine: 'line-through'
+    },
+    durationRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4
     },
     routineItemDuration: {
-      color: theme.colors.text.secondary,
-      fontSize: theme.typography.fontSize.xs
+      fontSize: theme.typography.fontSize.sm,
+      fontFamily: theme.typography.fontFamily.regular,
+      color: theme.colors.text.secondary
     },
-    playButton: {
-      width: 44,
-      height: 44,
-      borderRadius: 22,
-      backgroundColor: theme.colors.primary,
-      alignItems: 'center',
-      justifyContent: 'center',
-      ...theme.shadows.md
-    },
-    statusIndicator: {
-      width: 44,
-      height: 44,
+    statusBadge: {
+      width: 32,
+      height: 32,
+      borderRadius: 16,
       alignItems: 'center',
       justifyContent: 'center'
     },
-    completedIcon: {
-      fontSize: 24,
-      color: theme.colors.success,
-      fontFamily: theme.typography.fontFamily.bold
+    statusBadgeCompleted: {
+      backgroundColor: theme.colors.success + '20'
     },
+    statusBadgePending: {
+      backgroundColor: '#4CC9F0' + '20'
+    },
+
+    // État Vide
     emptyStateContainer: {
-      paddingVertical: theme.spacing.xl,
+      paddingVertical: theme.spacing.xl * 1.5,
       alignItems: 'center'
     },
     emptyStateMessage: {
       color: theme.colors.text.primary,
       textAlign: 'center',
-      fontSize: theme.typography.fontSize.md,
-      lineHeight: 24,
-      marginBottom: theme.spacing.lg
+      fontSize: theme.typography.fontSize.base,
+      fontFamily: theme.typography.fontFamily.regular,
+      lineHeight: theme.typography.lineHeight.relaxed * theme.typography.fontSize.base,
+      marginBottom: theme.spacing.xl
     },
     createRoutineButton: {
-      paddingVertical: theme.spacing.sm,
-      paddingHorizontal: theme.spacing.lg,
-      borderRadius: theme.borderRadius.md,
-      borderWidth: 1,
-      borderColor: theme.colors.primary
+      paddingVertical: theme.spacing.md,
+      paddingHorizontal: theme.spacing.xl,
+      borderRadius: theme.borderRadius.lg,
+      backgroundColor: '#4CC9F0' + '15',
+      borderWidth: 1.5,
+      borderColor: '#4CC9F0'
     },
     createRoutineButtonText: {
-      color: theme.colors.primary,
+      color: '#4CC9F0',
       fontFamily: theme.typography.fontFamily.semiBold,
-      fontSize: theme.typography.fontSize.md
+      fontSize: theme.typography.fontSize.base
     },
     motivationalText: {
       color: theme.colors.text.secondary,
       textAlign: 'center',
       fontSize: theme.typography.fontSize.sm,
+      fontFamily: theme.typography.fontFamily.regular,
       fontStyle: 'italic',
-      marginTop: theme.spacing.md
+      marginTop: theme.spacing.lg
     }
   });
 };
